@@ -466,7 +466,8 @@
                         ({ 
 
                             type: 'GET',
-                            url: 'https://localhost/dam/public/admin/header_request/subcategories/' + category,
+                            url: 'http://127.0.0.1:8002/admin/header_request/subcategories/' + category,
+                            //url: {{ url('/product_catalog/storeProduct') }},
                             data: '',
                             success: function(result) {
                                 //alert(result.length);

@@ -72,6 +72,8 @@ Route::group(['middleware' => ['web']], function() {
     //PurchasingRequest
     Route::get('/admin/for_purchasing/getRequestPurchasing/{id}','AdminForPurchasingController@getRequestPurchasing')->name('purchasing-request');
     Route::get('/admin/for_purchasing/getRequestPrint/{id}','AdminForPurchasingController@getRequestPrint')->name('print-request');
+    Route::get('/admin/for_purchasing/getRequestClose/{id}','AdminForPurchasingController@getRequestClose')->name('purchasing-request');
+    
     //Route::get('/admin/for_purchasing/getRequestPrintPickList/{id}','AdminForPurchasingController@getRequestPrintPickList')->name('print-picklist');
     Route::get('admin/for_purchasing/ARFUpdate','AdminForPurchasingController@ARFUpdate');
     Route::get('admin/for_purchasing/PickListUpdate','AdminForPurchasingController@PickListUpdate');
