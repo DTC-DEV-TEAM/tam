@@ -1178,6 +1178,7 @@
 
 			HeaderRequest::where('id',$id)
 			->update([
+				    'closing_plug'=> 1,
 					'status_id'=> 13,
 					'closed_by'=> CRUDBooster::myId(),
 					'closed_at'=> date('Y-m-d H:i:s')	

@@ -54,6 +54,7 @@ Route::group(['middleware' => ['web']], function() {
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-search','AdminHeaderRequestController@itemSearch')->name('asset.item.search');
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/sub-categories','AdminHeaderRequestController@SubCategories')->name('asset.sub.categories');
     Route::post('/employees','AdminHeaderRequestController@Employees');
     Route::post('/companies','AdminHeaderRequestController@Companies');
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-fa', 'AdminHeaderRequestController@getAddRequisitionFA')->name('assets.add.requisition.fa'); 

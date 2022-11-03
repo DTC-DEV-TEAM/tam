@@ -458,17 +458,19 @@
                     $('#category_id'+tableRow).change(function(){
 
                         var category =  this.value;
-
+                        console.log(category);
                         var id_data = $(this).attr("data-id");
                         // $('.account'+id_data).prop("disabled", false);
 
                         $.ajax
                         ({ 
 
-                            type: 'GET',
-                            url: 'http://127.0.0.1:8002/admin/header_request/subcategories/' + category,
-                            //url: {{ url('/product_catalog/storeProduct') }},
-                            data: '',
+                            type: 'POST',
+                            //url: 'http://127.0.0.1:8002/admin/header_request/subcategories/' + category,
+                            url: "{{ route('asset.sub.categories') }}",
+                            data: {
+                                "id": category
+                            },
                             success: function(result) {
                                 //alert(result.length);
                             

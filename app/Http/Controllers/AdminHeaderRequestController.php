@@ -1083,8 +1083,10 @@
 			//CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been cancelled successfully!"), 'info');
 		}
 
-		public function SubCategories($id)
+		public function SubCategories(Request $request)
 		{
+			$data = Request::all();	
+			$id = $data['id'];
 
 			$categories = DB::table('category')->where('category_description', $id)->first();
 
