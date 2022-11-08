@@ -28,11 +28,74 @@
         <div class='panel-body'>
 
             <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.employee_name') }}</label>
+                         
+                        <input type="text" class="form-control"  id="employee_name" name="employee_name"  required readonly value="{{$employeeinfos->bill_to}}"> 
+
+                        <!--<select class="form-control select2" style="width: 100%;" required name="employee_name" id="employee_name">
+                                            <option value="">-- Select Employee Name --</option>
+
+                                            @foreach($employees as $datas)    
+                                                <option  value="{{$datas->bill_to}}">{{$datas->bill_to}}</option>
+                                            @endforeach
+
+                         </select> -->
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.company_name') }}</label>
+                        <input type="text" class="form-control"  id="company_name" name="company_name"  required readonly value="{{$employeeinfos->company_name}}">                                   
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.department') }}</label>
+                        <input type="text" class="form-control"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}">
+                        <!--
+                         <select class="form-control select2" style="width: 100%;" required name="department" id="department">
+                                            <option value="">-- Select Department --</option>
+
+                                            @foreach($departments as $datas)    
+                                                <option  value="{{$datas->department_name}}">{{$datas->department_name}}</option>
+                                            @endforeach
+
+                         </select> -->
+
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.position') }}</label>
+                        <input type="text" class="form-control"  id="position" name="position"  required readonly value="{{$employeeinfos->position_id}}">                                   
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.store_branch') }}</label>
                          
                         <input type="text" class="form-control"  id="store_branch" name="store_branch"  required readonly value="{{$stores->bea_mo_store_name}}"> 
+                        <input type="hidden" class="form-control"  id="store_branch_id" name="store_branch_id"  required readonly value="{{$stores->id}}"> 
 
                     </div>
                 </div>
@@ -163,7 +226,10 @@
                                                     <tbody id="bodyTable">
                                                         <tr class="tbl_header_color dynamicRows">
                                                             <th width="35%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
+                                                            <th width="20%" class="text-center">{{ trans('message.table.category_id_text') }}</th>      
+
+                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+
                                                             <!-- <th width="20%" class="text-center">{{ trans('message.table.application_id_text') }}</th> -->
                                                             <th width="7%" class="text-center">*{{ trans('message.table.quantity_text') }}</th> 
                                                            <!-- <th width="8%" class="text-center">{{ trans('message.table.image') }}</th>  -->
@@ -196,7 +262,7 @@
 
                                                         <tr id="tr-table1" class="bottom">
             
-                                                            <td colspan="2">
+                                                            <td colspan="3">
                                                                 <input type="button" id="add-Row" name="add-Row" class="btn btn-info add" value='Add Item' />
                                                             </td>
                                                             <td align="left" colspan="1">
@@ -298,8 +364,14 @@
                             '        @foreach($categories as $data)'+
                             '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
                             '         @endforeach'+
-                            '</select></td>' +
+                            '</select>'+
+                        '</td>' +
 
+                        '<td>'+
+                            '<select class="form-control" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required >' +
+                         
+                            '</select>'+
+                        '</td>' +    
                         /*
                         '<td>'+
                             '<select class="js-example-basic-multiple" multiple="multiple" name="app_id' + tableRow + '[]" data-id="' + tableRow + '" id="app_id' + tableRow + '" required style="width:100%;">' +
@@ -326,6 +398,8 @@
                     $('#app_id'+tableRow).attr('disabled', true);
 
                     $('.js-example-basic-multiple').select2();
+
+                    $('#sub_category_id'+tableRow).attr('disabled', true);
 
                     $('#app_id'+tableRow).change(function(){
 
@@ -393,22 +467,41 @@
 
                     $('#category_id'+tableRow).change(function(){
 
-                        var category = this.value;
-                        var description = $('#itemDesc'+$(this).attr("data-id")).val();
+                        var category =  this.value;
+                        console.log(category);
+                        var id_data = $(this).attr("data-id");
+                        // $('.account'+id_data).prop("disabled", false);
 
-                
+                        $.ajax
+                        ({ 
 
-                        if(description.includes("LAPTOP") && category == "IT ASSETS"){
+                            type: 'POST',
+                            //url: 'http://127.0.0.1:8002/admin/header_request/subcategories/' + category,
+                            url: "{{ route('asset.sub.categories') }}",
+                            data: {
+                                "id": category
+                            },
+                            success: function(result) {
+                                //alert(result.length);
+                            
+                                var i;
+                                var showData = [];
+
+                                showData[0] = "<option value=''>-- Select Sub Category --</option>";
+                                
+                                for (i = 0; i < result.length; ++i) {
+                                    var j = i + 1;
+                                    showData[j] = "<option value='"+result[i].class_description+"'>"+result[i].class_description+"</option>";
+                                }
+                                    
+                                $('#sub_category_id'+id_data).attr('disabled', false);
+                                
+                                jQuery('#sub_category_id'+id_data).html(showData);        
+                            
+                            }
+                        });
+
                         
-                        // alert(description);
-
-                            $('#app_id'+$(this).attr("data-id")).attr('disabled', false);
-
-                        }else{
-                        
-                            $('#app_id'+$(this).attr("data-id")).attr('disabled', true);
-                        }
-
                     });
 
 

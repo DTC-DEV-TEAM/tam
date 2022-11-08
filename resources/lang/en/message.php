@@ -194,7 +194,7 @@ return [
 
         'requestor_comments'  =>  'Requestor Comments',
         'approver_comments'  =>  'Approver Comments',
-        'recommendation_text'  =>  'Laptop Type',
+        'recommendation_text'  =>  'Laptop/Desktop Type',
 
         'it_comments'  =>  'IT Comments',
 

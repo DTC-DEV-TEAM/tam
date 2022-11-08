@@ -465,6 +465,7 @@
 			$position 			= $fields['position'];
 			$department 		= $fields['department'];
 			$store_branch 		= $fields['store_branch'];
+			$store_branch_id    = $fields['store_branch_id'];
 			$purpose 			= $fields['purpose'];
 			$condition 			= $fields['condition'];
 			$quantity_total 	= $fields['quantity_total'];
@@ -495,13 +496,13 @@
 
 				$postdata['status_id']		 			= StatusMatrix::where('current_step', 1)
 																		->where('request_type', $request_type_id)
-																		->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+																		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 																		->value('status_id');
 			}else{
 
 				$postdata['status_id']		 			= StatusMatrix::where('current_step', 1)
 																		->where('request_type', $request_type_id)
-																		->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+																		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 																		->value('status_id');
 
 				
@@ -512,7 +513,7 @@
 			$postdata['company_name'] 				= $employees->company_name;
 			$postdata['position'] 					= $employees->position_id;
 			$postdata['department'] 				= $employees->department_id;
-			$postdata['store_branch'] 				= $store_branch;
+			$postdata['store_branch'] 				= $store_branch_id;
 			$postdata['purpose'] 					= $purpose;
 			$postdata['conditions'] 				= $condition;
 			$postdata['quantity_total'] 			= $quantity_total;
@@ -525,7 +526,6 @@
 			$postdata['request_type_id']		 	= $request_type_id;
 
 			$postdata['privilege_id']		 		= CRUDBooster::myPrivilegeId();
-
 
 			if(!empty($application)){
 				$postdata['application'] 				= implode(", ",$application);
@@ -631,7 +631,7 @@
 					
 				}else{
 
-					if (str_contains($item_description[$x], 'LAPTOP')) {
+					if (str_contains($item_description[$x], 'LAPTOP') || str_contains($item_description[$x], 'DESKTOP')) {
 						$dataLines[$x]['to_reco'] = 1;
 					}else{
 						$dataLines[$x]['to_reco'] = 0;
@@ -774,7 +774,7 @@
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
-			
+			//dd($data['employeeinfos']);
 			if(CRUDBooster::myPrivilegeName() == "Employee"){ 
 
 				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
@@ -852,7 +852,7 @@
 				return $this->view("assets.add-requisition-fa", $data);
 
 			}else if(CRUDBooster::myPrivilegeName() == "Store Ops"){ 
-
+				
 				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
 
 
@@ -954,7 +954,7 @@
 				->get();				
 
 			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();	
-					
+			//dd($data);		
 			return $this->view("assets.detail", $data);
 		}
 
@@ -1094,6 +1094,7 @@
 							->select( 'class.*' )
 							->where('category_id', $categories->id)
 							->where('class_status', "ACTIVE")
+							->whereNull('deleted_at')
 							->orderby('class_description', 'ASC')->get();
 	
 			return($subcategories);

@@ -13,6 +13,13 @@
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
 
+	use App\Exports\ExportMultipleSheet;
+	use Maatwebsite\Excel\Facades\Excel;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+
 	class AdminAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
         public function __construct() {
@@ -240,7 +247,9 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			// if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+			// 	$this->index_button[] = ["label"=>"Import Data","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('add-import'),"color"=>"primary"];
+			// }
 
 
 	        /* 
@@ -692,6 +701,18 @@
 						->where('digits_imfs.id', $id)->get();
 
 			return $item_details;
+		}
+
+		public function getAddImport() {
+
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
+
+			$this->cbLoader();
+			$data['page_title'] = 'Import Data';
+			return $this->view("assets.item-master-import", $data);
+
 		}
 
 	}

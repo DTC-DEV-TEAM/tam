@@ -6,6 +6,15 @@
                     font-size:14px !important;
                     color:black !important;
             }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
 
         </style>
     @endpush
@@ -28,16 +37,80 @@
         <div class='panel-body'>
 
             <div class="row">
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.employee_name') }}</label>
+                         
+                        <input type="text" class="form-control"  id="employee_name" name="employee_name"  required readonly value="{{$employeeinfos->bill_to}}"> 
+
+                        <!--<select class="form-control select2" style="width: 100%;" required name="employee_name" id="employee_name">
+                                            <option value="">-- Select Employee Name --</option>
+
+                                            @foreach($employees as $datas)    
+                                                <option  value="{{$datas->bill_to}}">{{$datas->bill_to}}</option>
+                                            @endforeach
+
+                         </select> -->
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.company_name') }}</label>
+                        <input type="text" class="form-control"  id="company_name" name="company_name"  required readonly value="{{$employeeinfos->company_name}}">                                   
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+
+
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.department') }}</label>
+                        <input type="text" class="form-control"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}">
+                        <!--
+                         <select class="form-control select2" style="width: 100%;" required name="department" id="department">
+                                            <option value="">-- Select Department --</option>
+
+                                            @foreach($departments as $datas)    
+                                                <option  value="{{$datas->department_name}}">{{$datas->department_name}}</option>
+                                            @endforeach
+
+                         </select> -->
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label require">{{ trans('message.form-label.position') }}</label>
+                        <input type="text" class="form-control"  id="position" name="position"  required readonly value="{{$employeeinfos->position_id}}">                                   
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.store_branch') }}</label>
                          
                         <input type="text" class="form-control"  id="store_branch" name="store_branch"  required readonly value="{{$stores->bea_mo_store_name}}"> 
+                        <input type="hidden" class="form-control"  id="store_branch_id" name="store_branch_id"  required readonly value="{{$stores->id}}"> 
 
                     </div>
                 </div>
             </div>
-
 
             <hr/>
 
@@ -165,7 +238,11 @@
                                                         <tr class="tbl_header_color dynamicRows">
                                                             <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
                                                             <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
-                                                            <th width="20%" class="text-center">{{ trans('message.table.application_id_text') }}</th> 
+                                                            
+                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+
+                                                            <!-- <th width="20%" class="text-center">{{ trans('message.table.application_id_text') }}</th> -->
+                                                            
                                                             <th width="7%" class="text-center">*{{ trans('message.table.quantity_text') }}</th> 
                                                            <!-- <th width="8%" class="text-center">{{ trans('message.table.image') }}</th>  -->
                                                             <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
@@ -214,11 +291,37 @@
                                     <br>
                                 </div>
                 </div>
-          
+
+                <div class="col-md-12" id="application_div">
+                    <hr/>
+                    <div class="row"> 
+                        <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
+                            @foreach($applications as $data)
+                                <div class="col-md-2">
+                                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" >{{$data->app_name}}</label>
+                                    <br>
+                                </div>
+                            @endforeach
+                    </div>
+                    <hr/>
+                </div>
+
+                <div class="col-md-12" id="application_others_div">
+                    <div class="row">
+                        <label class="require control-label col-md-2">*{{ trans('message.form-label.application_others') }}</label>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control"  id="application_others" name="application_others"  required placeholder="e.g. VIBER, WHATSAPP, TELEGRAM" onkeyup="this.value = this.value.toUpperCase();">
+                        </div>
+                    </div>
+                    <hr/>
+                </div>
+
+
+
                 <div class="col-md-12">
                     <div class="form-group">
                         <label>{{ trans('message.table.note') }}</label>
-                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control" name="requestor_comments"></textarea>
+                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="5" class="form-control" name="requestor_comments"></textarea>
                     </div>
                 </div>
          
@@ -254,11 +357,46 @@
             null;
         };
         setTimeout("preventBack()", 0);
-
+        
         var tableRow = 1;
+
+        $("#application_div").hide();
+        $("#application_others_div").hide();
+
+        $("#application_others").removeAttr('required');
+        $(".application").removeAttr('required');
+
+
+        $('#OTHERS').change(function() {
+
+		    var ischecked= $(this).is(':checked');
+
+		    if(ischecked == false){
+                $("#application_others_div").hide();
+                $("#application_others").removeAttr('required');
+		    }else{
+                $("#application_others_div").show();
+                $("#application_others").attr('required', 'required');
+            }	
+
+		});
+
+        var app_count = 0;
+
+        $('.application').change(function() {
+            var ischecked= $(this).is(':checked');
+            if(ischecked == false){
+                app_count--;
+            }else{
+                app_count++;
+            }
+
+        });
+
 
         $(document).ready(function() {
 
+            const fruits = [];
 
             $("#add-Row").click(function() {
 
@@ -299,8 +437,20 @@
                             '        @foreach($categories as $data)'+
                             '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
                             '         @endforeach'+
-                            '</select></td>' +
+                            '</select>'+
+                        '</td>' +
 
+
+                        '<td>'+
+                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
+                            '  <option value=""></option>' +
+                            '        @foreach($sub_categories as $data)'+
+                            '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
+                            '         @endforeach'+
+                            '</select>'+
+                        '</td>' +
+
+                        /*    
                         '<td>'+
                             '<select class="js-example-basic-multiple" multiple="multiple" name="app_id' + tableRow + '[]" data-id="' + tableRow + '" id="app_id' + tableRow + '" required style="width:100%;">' +
                         
@@ -309,23 +459,25 @@
                             '         @endforeach'+
                             '</select>'+
                             '<br/><br/><input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control AppOthers" data-id="' + tableRow + '" id="AppOthers' + tableRow + '"  name="app_id_others[]" maxlength="100">' +
-                        '</td>' +           
+                        '</td>' +   
+                        */        
                         
                         '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid||(value=0);"></td>' +
                         
                         /*'<td><input type="file" name="image[]" id="image' + tableRow + '" accept="image/*"></td>' + */
                         
                         '<td>' +
-                            '<button id="deleteRow" name="removeRow" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button>' +
+                            '<button id="deleteRow" name="removeRow" data-id="' + tableRow + '" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button>' +
                         '</td>' +
 
                     '</tr>';
                     $(newrow).insertBefore($('table tr#tr-table1:last'));
 
-                    $('#app_id'+tableRow).attr('disabled', true);
+                    //$('#sub_category_id'+tableRow).attr('disabled', true);
 
                     $('.js-example-basic-multiple').select2();
-
+                    $('.sub_category_id').select2({
+                    placeholder_text_single : "- Select Sub Category -"});
                     $('#app_id'+tableRow).change(function(){
 
                             /*var appothers = this.value;
@@ -390,7 +542,7 @@
                     $('#AppOthers'+tableRow).hide();
                     $('#AppOthers'+tableRow).removeAttr('required');
 
-                    $('#category_id'+tableRow).change(function(){
+                    /*$('#category_id'+tableRow).change(function(){
 
                         var category = this.value;
                         var description = $('#itemDesc'+$(this).attr("data-id")).val();
@@ -408,8 +560,40 @@
                             $('#app_id'+$(this).attr("data-id")).attr('disabled', true);
                         }
 
-                    });
+                    });*/
 
+                    
+
+                    $('.sub_category_id').change(function(){
+
+                        var sub_category_id =  this.value;
+                        var fruits = [];
+                        $(".sub_category_id :selected").each(function() {
+                            fruits.push(this.value.toLowerCase().replace(/\s/g, ''));
+                        });
+                         console.log(fruits);
+                        if( fruits.includes("laptop") || fruits.includes("desktop")){
+
+                            $("#application_div").show();
+                           // $("#application_others_div").show();
+
+                            //$("#application_others").attr('required', 'required');
+
+                            //$(".application").attr('required', 'required');
+
+                        }else{
+
+                            $("#application_div").hide();
+                            $("#application_others_div").hide();
+
+                            $("#application_others").removeAttr('required');
+                            //$(".application").removeAttr('required');
+
+                        }
+
+                        
+
+                    });
 
                     $("#quantity_total").val(calculateTotalQuantity());
                     
@@ -419,8 +603,19 @@
             
             //deleteRow
             $(document).on('click', '.removeRow', function() {
-                if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
                
+                var id_data = $(this).attr("data-id");
+
+                if($("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "laptop" || $("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "desktop"){
+
+                        $("#application_div").hide();
+                        $("#application_div").val("");
+                        $("#application_others_div").hide();
+                        $("#application_others").removeAttr('required');
+   
+                }
+
+                if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
                     tableRow--;
 
                     $(this).closest('tr').remove();
@@ -711,9 +906,9 @@
                 return true;
             });
         });
-
+       
         $("#btnSubmit").click(function(event) {
-
+        
             var strconfirm = confirm("Are you sure you want to send this request?");
             if (strconfirm == true) {
 
@@ -756,7 +951,14 @@
                     }
                     
                 });
-
+                $(".sub_category_id :selected").each(function() {
+                    if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                        alert("Application cannot be empty!");
+                        event.preventDefault(); // cancel default behavior
+                    }
+                });
+                    
+                  
             }else{
 
                 return false;
@@ -765,8 +967,6 @@
             }
 
         });
-
-
 
     </script>
 @endpush

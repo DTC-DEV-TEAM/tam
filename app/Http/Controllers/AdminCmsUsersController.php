@@ -188,8 +188,9 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 
 						$('#form-group-department_id').hide();	
 						$('#department_id').removeAttr('required');
-						$('#form-group-employee_id').hide();
-						$('#employee_id').removeAttr('required');
+						$('#form-group-employee_id').show();
+						$('#employee_id').attr('required', 'required');
+						//$('#employee_id').removeAttr('required');
 
 						$('#form-group-company_name_id').hide();
 						$('#company_name_id').removeAttr('required');
@@ -278,12 +279,14 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 						$('#form-group-location_id').hide();
 						$('#location_id').removeAttr('required');
 	
-					}else if($(this).val() == 8){
+					}
+					else if($(this).val() == 8){
 
 						$('#form-group-department_id').hide();	
 						$('#department_id').removeAttr('required');
-						$('#form-group-employee_id').hide();
-						$('#employee_id').removeAttr('required');
+						$('#form-group-employee_id').show();
+						$('#employee_id').attr('required', 'required');
+						//$('#employee_id').removeAttr('required');
 
 						$('#form-group-company_name_id').hide();
 						$('#company_name_id').removeAttr('required');
@@ -297,7 +300,8 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 						$('#location_id').removeAttr('required');
 
 	
-					}else if($(this).val() == 5){
+					}
+					else if($(this).val() == 5){
 
 						$('#form-group-department_id').hide();	
 						$('#department_id').removeAttr('required');
@@ -352,12 +356,14 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 					$('#form-group-location_id').hide();
 					$('#location_id').removeAttr('required');
 
-				}else if($('#id_cms_privileges').val() == 8){
+				}
+				else if($('#id_cms_privileges').val() == 8){
 
 					$('#form-group-department_id').hide();	
 					$('#department_id').removeAttr('required');
-					$('#form-group-employee_id').hide();
-					$('#employee_id').removeAttr('required');
+					$('#form-group-employee_id').show();
+					$('#employee_id').attr('required', 'required');
+					//$('#employee_id').removeAttr('required');
 
 					$('#form-group-company_name_id').hide();
 					$('#company_name_id').removeAttr('required');
@@ -371,7 +377,8 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 					$('#location_id').removeAttr('required');
 
 
-				}else if($('#id_cms_privileges').val() == 5){
+				}
+				else if($('#id_cms_privileges').val() == 5){
 
 					$('#form-group-department_id').hide();	
 					$('#department_id').removeAttr('required');

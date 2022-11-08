@@ -53,7 +53,7 @@
 			$this->form[] = ['label'=>'Current Step','name'=>'current_step','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Next Step','name'=>'next_step','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Request Type','name'=>'request_type','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'requests,request_name','datatable_where'=>"status = 'ACTIVE'"];
-			$this->form[] = ['label'=>'Privilege Name','name'=>'id_cms_privileges','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_privileges,name','datatable_where'=>"name LIKE '%Employee%' || name LIKE '%HR%'"];
+			$this->form[] = ['label'=>'Privilege Name','name'=>'id_cms_privileges','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'cms_privileges,name','datatable_where'=>"name LIKE '%Employee%' || name LIKE '%HR%' || name LIKE '%Store Ops%'"];
 			$this->form[] = ['label'=>'Status Workflow','name'=>'status_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'statuses,status_description','datatable_where'=>"status = 'ACTIVE'"];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
