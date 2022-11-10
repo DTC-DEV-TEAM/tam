@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 03, 2022 at 11:16 AM
+-- Generation Time: Nov 10, 2022 at 11:28 AM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.4.29
 
@@ -51,7 +51,7 @@ INSERT INTO `applications` (`id`, `app_name`, `status`, `created_by`, `updated_b
 (6, 'BANDICAM', 'ACTIVE', 3, NULL, '2022-09-02 03:38:25', NULL, NULL),
 (7, 'VIBER', 'ACTIVE', 3, NULL, '2022-09-02 03:39:04', NULL, NULL),
 (8, 'WHATSAPP', 'ACTIVE', 3, NULL, '2022-09-02 03:39:18', NULL, NULL),
-(9, 'TELEGRAM', 'ACTIVE', 3, NULL, '2022-09-02 03:39:23', NULL, NULL);
+(9, 'QUICKBOOKS', 'ACTIVE', 3, 601, '2022-09-02 03:39:23', '2022-11-10 05:10:48', NULL);
 
 -- --------------------------------------------------------
 
@@ -78,7 +78,7 @@ CREATE TABLE `approval_matrices` (
 
 INSERT INTO `approval_matrices` (`id`, `id_cms_privileges`, `cms_users_id`, `department_list`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
 (1, 3, 593, '1,26,18,28', 'ACTIVE', 3, NULL, '2022-08-12 01:47:51', NULL, NULL),
-(3, 3, 596, '8,9,10', 'ACTIVE', 3, NULL, '2022-08-17 05:20:53', NULL, NULL);
+(3, 3, 596, '8,9,10,28', 'ACTIVE', 3, 601, '2022-08-17 05:20:53', '2022-11-07 09:02:29', NULL);
 
 -- --------------------------------------------------------
 
@@ -8133,7 +8133,130 @@ INSERT INTO `cms_logs` (`id`, `ipaddress`, `useragent`, `url`, `description`, `d
 (5503, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-03 10:12:43', NULL),
 (5504, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-03 10:12:52', NULL),
 (5505, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-03 10:13:22', NULL),
-(5506, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-03 10:13:29', NULL);
+(5506, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-03 10:13:29', NULL),
+(5507, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-03 10:18:39', NULL),
+(5508, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq1@digits.ph login with IP Address 127.0.0.1', '', 609, '2022-11-03 10:18:53', NULL),
+(5509, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq1@digits.ph logout', '', 609, '2022-11-03 10:19:24', NULL),
+(5510, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-04 02:21:22', NULL),
+(5511, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-04 02:23:33', NULL),
+(5512, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-04 02:23:44', NULL),
+(5513, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-04 02:24:27', NULL),
+(5514, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-04 02:24:36', NULL),
+(5515, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-04 02:25:18', NULL),
+(5516, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-04 02:25:26', NULL),
+(5517, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-04 02:32:43', NULL),
+(5518, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq2@digits.ph login with IP Address 127.0.0.1', '', 611, '2022-11-04 02:33:01', NULL),
+(5519, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-04 02:34:06', NULL),
+(5520, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq2@digits.ph logout', '', 611, '2022-11-04 02:39:54', NULL),
+(5521, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-04 02:40:05', NULL),
+(5522, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-04 02:40:27', NULL),
+(5523, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-04 02:40:35', NULL),
+(5524, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-04 02:46:05', NULL),
+(5525, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-04 02:46:17', NULL),
+(5526, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-04 03:44:36', NULL),
+(5527, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-04 03:44:46', NULL),
+(5528, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-04 06:51:17', NULL),
+(5529, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-04 06:51:42', NULL),
+(5530, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-04 06:51:52', NULL),
+(5531, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-04 07:10:21', NULL),
+(5532, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8001/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-07 05:42:30', NULL),
+(5533, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-07 08:57:21', NULL),
+(5534, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-07 08:57:33', NULL),
+(5535, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/status_matrix/add-save', 'Add New Data  at Status Matrix', '', 601, '2022-11-07 09:00:53', NULL),
+(5536, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-07 09:01:30', NULL),
+(5537, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-07 09:01:43', NULL),
+(5538, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/approval_matrix/edit-save/3', 'Update data  at Approval Matrix', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>department_list</td><td>8,9,10</td><td>8,9,10,28</td></tr><tr><td>updated_by</td><td></td><td>601</td></tr><tr><td>deleted_at</td><td></td><td></td></tr></tbody></table>', 601, '2022-11-07 09:02:29', NULL),
+(5539, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-07 09:02:37', NULL),
+(5540, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel1@digits.ph login with IP Address 127.0.0.1', '', 596, '2022-11-07 09:03:12', NULL),
+(5541, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel1@digits.ph logout', '', 596, '2022-11-07 09:13:21', NULL),
+(5542, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-07 09:13:37', NULL),
+(5543, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-08 00:38:43', NULL),
+(5544, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 00:38:55', NULL),
+(5545, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/users/edit-save/604', 'Update data Store Personnel at Users Management', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>password</td><td>$2y$10$0EfvJcWdy8KQZYqRvHV1seidpSO3o0HPdS8.bx.pEKzQ6baZiJ5yC</td><td></td></tr><tr><td>login_status</td><td>2</td><td></td></tr><tr><td>reset_password</td><td>0</td><td></td></tr><tr><td>created_by</td><td>3</td><td></td></tr><tr><td>updated_by</td><td>3</td><td>601</td></tr></tbody></table>', 601, '2022-11-08 02:03:00', NULL),
+(5546, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 02:04:30', NULL),
+(5547, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel1@digits.ph login with IP Address 127.0.0.1', '', 596, '2022-11-08 02:04:47', NULL),
+(5548, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel1@digits.ph logout', '', 596, '2022-11-08 02:06:45', NULL),
+(5549, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 02:06:57', NULL),
+(5550, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 02:14:36', NULL),
+(5551, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel1@digits.ph login with IP Address 127.0.0.1', '', 596, '2022-11-08 02:14:57', NULL),
+(5552, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel1@digits.ph logout', '', 596, '2022-11-08 02:15:28', NULL),
+(5553, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 02:15:38', NULL),
+(5554, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/applications/edit-save/9', 'Update data QUICKBOX at Applications', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>app_name</td><td>TELEGRAM</td><td>QUICKBOX</td></tr><tr><td>created_by</td><td>3</td><td></td></tr><tr><td>updated_by</td><td></td><td>601</td></tr><tr><td>deleted_at</td><td></td><td></td></tr></tbody></table>', 601, '2022-11-08 02:21:26', NULL),
+(5555, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 02:42:14', NULL),
+(5556, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel1@digits.ph login with IP Address 127.0.0.1', '', 596, '2022-11-08 02:42:32', NULL),
+(5557, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel1@digits.ph logout', '', 596, '2022-11-08 02:46:09', NULL),
+(5558, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 02:46:18', NULL),
+(5559, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 02:46:53', NULL),
+(5560, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-08 02:47:04', NULL),
+(5561, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-08 02:55:10', NULL),
+(5562, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-08 02:55:20', NULL),
+(5563, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-08 02:56:18', NULL),
+(5564, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 02:56:27', NULL),
+(5565, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 03:04:06', NULL),
+(5566, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-08 03:04:18', NULL),
+(5567, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/status_matrix/delete/22', 'Delete data 22 at Status Matrix', '', 601, '2022-11-08 03:07:17', NULL),
+(5568, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-08 03:07:35', NULL),
+(5569, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 03:07:43', NULL),
+(5570, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 03:08:19', NULL),
+(5571, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-08 03:08:28', NULL),
+(5572, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-08 05:21:20', NULL),
+(5573, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 05:21:28', NULL),
+(5574, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 05:29:52', NULL),
+(5575, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-08 05:30:01', NULL),
+(5576, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-08 05:30:36', NULL),
+(5577, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 05:30:44', NULL),
+(5578, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 06:20:53', NULL),
+(5579, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel1@digits.ph login with IP Address 127.0.0.1', '', 596, '2022-11-08 06:21:04', NULL),
+(5580, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel1@digits.ph logout', '', 596, '2022-11-08 06:33:07', NULL),
+(5581, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-08 06:33:13', NULL),
+(5582, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-08 06:33:39', NULL),
+(5583, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-08 06:33:46', NULL),
+(5584, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-08 06:33:59', NULL),
+(5585, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'rq3@digits.ph login with IP Address 127.0.0.1', '', 610, '2022-11-08 06:34:07', NULL),
+(5586, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'rq3@digits.ph logout', '', 610, '2022-11-08 06:35:10', NULL),
+(5587, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-08 06:35:31', NULL),
+(5588, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-08 06:35:54', NULL),
+(5589, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-08 06:36:03', NULL),
+(5590, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-08 06:36:25', NULL),
+(5591, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-08 06:36:32', NULL);
+INSERT INTO `cms_logs` (`id`, `ipaddress`, `useragent`, `url`, `description`, `details`, `id_cms_users`, `created_at`, `updated_at`) VALUES
+(5592, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-08 06:39:16', NULL),
+(5593, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-08 06:39:24', NULL),
+(5594, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-08 06:43:30', NULL),
+(5595, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-08 06:43:37', NULL),
+(5596, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-08 07:48:27', NULL),
+(5597, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-08 08:00:32', NULL),
+(5598, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-08 08:51:48', NULL),
+(5599, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-09 03:37:10', NULL),
+(5600, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-09 06:36:22', NULL),
+(5601, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-09 06:36:37', NULL),
+(5602, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-09 07:23:18', NULL),
+(5603, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-09 07:25:09', NULL),
+(5604, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-09 07:25:23', NULL),
+(5605, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-09 07:25:51', NULL),
+(5606, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-09 07:25:59', NULL),
+(5607, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-09 07:37:06', NULL),
+(5608, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-09 07:37:14', NULL),
+(5609, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/companies/add-save', 'Add New Data DIGITS at Companies', '', 601, '2022-11-09 07:41:24', NULL),
+(5610, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-09 08:03:30', NULL),
+(5611, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-09 10:15:43', NULL),
+(5612, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-10 05:07:14', NULL),
+(5613, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-10 05:07:29', NULL),
+(5614, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/applications/edit-save/9', 'Update data QUICKBOOKS at Applications', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>app_name</td><td>QUICKBOX</td><td>QUICKBOOKS</td></tr><tr><td>created_by</td><td>3</td><td></td></tr><tr><td>deleted_at</td><td></td><td></td></tr></tbody></table>', 601, '2022-11-10 05:10:48', NULL),
+(5615, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-10 05:11:36', NULL),
+(5616, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-10 05:11:44', NULL),
+(5617, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-10 05:13:19', NULL),
+(5618, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'asset@digits.ph login with IP Address 127.0.0.1', '', 599, '2022-11-10 05:13:28', NULL),
+(5619, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'asset@digits.ph logout', '', 599, '2022-11-10 05:32:37', NULL),
+(5620, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-10 05:32:45', NULL),
+(5621, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/menu_management/edit-save/98', 'Update data Receiving Asset at Menu Management', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>sorting</td><td>3</td><td></td></tr></tbody></table>', 601, '2022-11-10 05:34:05', NULL),
+(5622, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/menu_management/edit-save/105', 'Update data Deployed Asset at Menu Management', '<table class=\"table table-striped\"><thead><tr><th>Key</th><th>Old Value</th><th>New Value</th></thead><tbody><tr><td>sorting</td><td>11</td><td></td></tr></tbody></table>', 601, '2022-11-10 05:34:22', NULL),
+(5623, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-10 10:11:01', NULL),
+(5624, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'approverpersonnel@digits.ph login with IP Address 127.0.0.1', '', 593, '2022-11-10 10:11:11', NULL),
+(5625, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-10 10:11:40', NULL),
+(5626, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-10 10:11:47', NULL),
+(5627, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-10 10:27:45', NULL),
+(5628, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-10 10:27:52', NULL);
 
 -- --------------------------------------------------------
 
@@ -8193,14 +8316,14 @@ INSERT INTO `cms_menus` (`id`, `name`, `type`, `path`, `color`, `icon`, `parent_
 (95, 'Picking', 'Route', 'AdminPickingControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 8, '2022-08-16 00:25:38', '2022-11-03 03:49:58'),
 (96, 'Asset Inventory', 'URL', 'asset-inventory', 'normal', 'fa fa-list', 0, 1, 0, 1, 13, '2022-08-16 14:23:51', '2022-11-03 03:50:17'),
 (97, 'For Closing', 'Route', 'AdminClosingControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 9, '2022-08-17 05:16:17', '2022-08-18 09:21:54'),
-(98, 'Receiving Asset', 'Route', 'AdminReceivingAssetControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 3, '2022-08-18 00:43:25', '2022-11-03 03:35:40'),
+(98, 'Receiving Asset', 'Route', 'AdminReceivingAssetControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 3, '2022-08-18 00:43:25', '2022-11-10 05:34:05'),
 (99, 'Assets Movement History', 'Route', 'AdminAssetsInventoryHeaderControllerGetIndex', 'normal', 'fa fa-circle-o', 96, 1, 0, 1, 3, '2022-08-24 09:28:53', '2022-11-03 03:50:54'),
 (100, 'Asset Lists', 'Route', 'AdminAssetsInventoryBodyControllerGetIndex', 'normal', 'fa fa-circle-o', 96, 1, 0, 1, 2, '2022-08-24 09:31:01', '2022-11-03 03:50:42'),
 (101, 'Sub Department', 'Route', 'AdminSubDepartmentsControllerGetIndex', NULL, 'fa fa-circle-o', 84, 1, 0, 1, 6, '2022-08-30 14:06:28', NULL),
 (102, 'Move Order', 'Route', 'AdminMoveOrderControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 7, '2022-09-05 03:23:20', '2022-11-03 03:49:44'),
 (103, 'Warehouse Location', 'Route', 'AdminWarehouseLocationModelControllerGetIndex', NULL, 'fa fa-circle-o', 84, 1, 0, 1, 12, '2022-10-12 03:06:37', NULL),
 (104, 'Add Inventory', 'Route', 'AdminAssetsInventoryHeaderForApprovalControllerGetIndex', 'normal', 'fa fa-circle-o', 96, 1, 0, 1, 1, '2022-10-12 03:12:18', '2022-11-03 03:50:29'),
-(105, 'Deployed Asset', 'Route', 'AdminDeployedAssetControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 11, '2022-10-19 02:36:00', '2022-11-03 03:36:00'),
+(105, 'Deployed Asset', 'Route', 'AdminDeployedAssetControllerGetIndex', 'normal', 'fa fa-files-o', 0, 1, 0, 1, 11, '2022-10-19 02:36:00', '2022-11-10 05:34:22'),
 (106, 'Good and Defect Lists', 'Route', 'AdminGoodDefectListsControllerGetIndex', NULL, 'fa fa-files-o', 84, 1, 0, 1, 13, '2022-10-21 06:29:23', NULL),
 (111, 'Add Users', 'Module', 'users', 'normal', 'fa fa-users', 0, 1, 0, 1, 12, '2022-10-25 04:35:10', '2022-10-25 05:33:58');
 
@@ -8431,10 +8554,6 @@ INSERT INTO `cms_menus_privileges` (`id`, `id_cms_menus`, `id_cms_privileges`) V
 (652, 110, 1),
 (660, 111, 4),
 (661, 111, 1),
-(662, 98, 8),
-(663, 98, 1),
-(664, 105, 8),
-(665, 105, 1),
 (680, 102, 1),
 (681, 95, 1),
 (682, 96, 9),
@@ -8444,7 +8563,9 @@ INSERT INTO `cms_menus_privileges` (`id`, `id_cms_menus`, `id_cms_privileges`) V
 (686, 100, 9),
 (687, 100, 1),
 (688, 99, 9),
-(689, 99, 1);
+(689, 99, 1),
+(690, 98, 1),
+(691, 105, 1);
 
 -- --------------------------------------------------------
 
@@ -8727,10 +8848,6 @@ INSERT INTO `cms_privileges_roles` (`id`, `is_visible`, `is_create`, `is_read`, 
 (410, 1, 1, 1, 1, 1, 1, 93, NULL, NULL),
 (411, 1, 1, 1, 1, 1, 1, 94, NULL, NULL),
 (428, 1, 1, 1, 1, 1, 1, 95, NULL, NULL),
-(434, 1, 0, 1, 0, 0, 8, 95, NULL, NULL),
-(435, 1, 0, 1, 1, 0, 8, 88, NULL, NULL),
-(436, 1, 1, 1, 1, 0, 8, 65, NULL, NULL),
-(437, 1, 0, 1, 0, 0, 8, 76, NULL, NULL),
 (438, 1, 1, 1, 1, 1, 1, 96, NULL, NULL),
 (455, 1, 1, 1, 1, 0, 4, 65, NULL, NULL),
 (456, 1, 1, 1, 1, 0, 4, 4, NULL, NULL),
@@ -8744,7 +8861,8 @@ INSERT INTO `cms_privileges_roles` (`id`, `is_visible`, `is_create`, `is_read`, 
 (464, 1, 0, 1, 1, 0, 5, 77, NULL, NULL),
 (465, 1, 0, 1, 0, 0, 5, 76, NULL, NULL),
 (466, 1, 0, 1, 1, 0, 6, 79, NULL, NULL),
-(467, 1, 0, 1, 1, 0, 6, 76, NULL, NULL);
+(467, 1, 0, 1, 1, 0, 6, 76, NULL, NULL),
+(468, 1, 1, 1, 1, 0, 8, 65, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -8886,7 +9004,7 @@ INSERT INTO `cms_users` (`id`, `name`, `first_name`, `last_name`, `user_name`, `
 (601, 'Marvin Mosico', 'Marvin', 'Mosico', 'MosicoM', 'uploads/3/2022-08/businessman.png', 'marvinmosico@digits.ph', '$2y$10$lTkr082f.fdYuhbC9Q.xl.SWM7yBaP7dca69j/mbYuRBfHWnLwbJi', 1, 'ACTIVE', 2, 0, '2022-08-12 05:32:08', NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (602, 'Christoff Sy', 'Christoff', 'Sy', 'SyC', 'uploads/3/2022-08/businessman.png', 'christoffsy@digits.ph', '$2y$10$kyUQIl7hUg3NAG87xhPLuepqCHpamom0Jr/jJzzmPZIc/8UfRaWya', 1, 'ACTIVE', 2, 0, '2022-08-16 14:33:37', NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (603, 'AP Checker Personnel', 'AP Checker', 'Personnel', 'PersonnelA', 'uploads/3/2022-08/businessman.png', 'ap@digits.ph', '$2y$10$HaeLdHPC6BIeeVHikb0UzOft4kizYyQHxZytpVDxMICDWm9s2S3FS', 7, 'ACTIVE', 2, 0, '2022-08-18 09:20:23', NULL, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(604, 'Store Personnel', 'Store', 'Personnel', 'PersonnelS', 'uploads/3/2022-09/businessman.png', 'store@digits.ph', '$2y$10$0EfvJcWdy8KQZYqRvHV1seidpSO3o0HPdS8.bx.pEKzQ6baZiJ5yC', 8, 'ACTIVE', 2, 0, '2022-09-01 08:27:30', '2022-09-01 08:27:58', 3, 3, NULL, NULL, NULL, NULL, '53', NULL),
+(604, 'Store Personnel', 'Store', 'Personnel', 'PersonnelS', 'uploads/3/2022-09/businessman.png', 'store@digits.ph', '$2y$10$0EfvJcWdy8KQZYqRvHV1seidpSO3o0HPdS8.bx.pEKzQ6baZiJ5yC', 8, 'ACTIVE', 2, 0, '2022-09-01 08:27:30', '2022-11-08 02:03:00', 3, 601, NULL, NULL, 96, NULL, '53', ''),
 (605, 'Admin Personnel', 'Admin', 'Personnel', 'PersonnelA', 'uploads/3/2022-10/businessman.png', 'admin@digits.ph', '$2y$10$TvhbDjWk9MfhfkYd9v5J6.2e.4f77NvaTM1fiVCFwPPFB95/txoBq', 9, 'ACTIVE', 2, 0, '2022-10-12 03:41:16', NULL, 3, NULL, NULL, NULL, NULL, NULL, '', NULL),
 (609, 'Requestor firstname 1 Requestor firstname 2', 'Requestor firstname 1', 'Requestor firstname 2', 'Requestor firstname 2R', 'uploads/mrs-avatar.png', 'rq1@digits.ph', '$2y$10$o5j.xU5gqvqgtAFwjmXOoOD3ES/ww/EaFJxuje/y4oI8aCkv3b.Cm', 2, 'ACTIVE', 2, 0, '2022-10-25 10:36:10', NULL, 601, NULL, NULL, NULL, 93, NULL, '', NULL),
 (610, 'Jack doe', 'Jack', 'doe', 'doeJ', 'uploads/mrs-avatar.png', 'rq3@digits.ph', '$2y$10$VCzLMfk0tp4cKyq3sHy/8uFnbk670WIJaSQrwIe..lsy4Mp2jD3zm', 2, 'ACTIVE', 2, 0, '2022-10-25 10:40:35', NULL, 601, NULL, NULL, NULL, 95, NULL, '', NULL),
@@ -8932,8 +9050,8 @@ CREATE TABLE `companies` (
 --
 
 INSERT INTO `companies` (`id`, `company_name`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'DIGITS', 'ACTIVE', 3, NULL, '2022-07-21 11:48:19', NULL, NULL),
-(2, 'TASTELESS', 'ACTIVE', 3, NULL, '2022-07-21 11:50:00', NULL, NULL);
+(2, 'TASTELESS', 'ACTIVE', 3, NULL, '2022-07-21 11:50:00', NULL, NULL),
+(3, 'DIGITS', 'ACTIVE', 601, NULL, '2022-11-09 07:41:24', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -9781,7 +9899,8 @@ INSERT INTO `employees` (`id`, `employee_code`, `department_id`, `sub_department
 (91, 'EMP-0067', 26, 48, 'ASSOCIATE SOFTWARE DEVELOPER', 'CHUA, FREDERICK WADE.EEE', 'CHUA, FREDERICK WADE', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'CHUA, FREDERICK WADE', 'CHUA', 'FREDERICK WADE', '1', NULL, 1, 3, NULL, '2022-09-01 06:28:27', NULL, NULL),
 (93, 'EMP-0068', 26, 48, 'ASSOCIATE SOFTWARE DEVELOPER/BUSINESS ANALYST', 'DOE, JHON.EEE', 'DOE, JHON', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'DOE, JHON', 'DOE', 'JHON', '1', 'rq1@digits.ph', 1, 601, 601, '2022-10-25 10:35:14', '2022-10-25 10:38:01', NULL),
 (94, 'EMP-0069', 26, 48, 'ASSOCIATE SOFTWARE DEVELOPER/BUSINESS ANALYST', 'DOE, JANE.EEE', 'DOE, JANE', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'DOE, JANE', 'DOE', 'JANE', '1', 'rq2@digits.ph', 1, 601, 601, '2022-10-25 10:37:27', '2022-10-25 10:38:16', NULL),
-(95, 'EMP-0070', 26, 48, 'ASSOCIATE SOFTWARE DEVELOPER/BUSINESS ANALYST', 'DOE, JACK.EEE', 'DOE, JACK', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'DOE, JACK', 'DOE', 'JACK', '1', 'rq3@digits.ph', 1, 601, NULL, '2022-10-25 10:38:56', NULL, NULL);
+(95, 'EMP-0070', 26, 48, 'ASSOCIATE SOFTWARE DEVELOPER/BUSINESS ANALYST', 'DOE, JACK.EEE', 'DOE, JACK', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'DOE, JACK', 'DOE', 'JACK', '1', 'rq3@digits.ph', 1, 601, NULL, '2022-10-25 10:38:56', NULL, NULL),
+(96, 'EMP-0071', 28, 40, 'STORE PERSONNEL', 'GREENFIELDS, RAMEN BAR.EEE', 'GREENFIELDS, RAMEN BAR', 'DIGITS BLDG #56 MAYOR IGNACIO SANTOS DIAZ SAN MARTIN DE PORRES QUEZON NCR 1111 PHILIPPINES', 'DIGITS BLDG', '#56 MAYOR IGNACIO SANTOS DIAZ', 'SAN MARTIN DE PORRES', 1060, 15, '1111', 10, 'GREENFIELDS, RAMEN BAR', 'GREENFIELDS', 'RAMEN BAR', '2', 'store@digits.ph', 1, 601, 601, '2022-11-08 02:02:17', '2022-11-10 05:09:41', NULL);
 
 -- --------------------------------------------------------
 
@@ -10504,7 +10623,8 @@ INSERT INTO `status_matrices` (`id`, `current_step`, `next_step`, `request_type`
 (18, 7, 8, 5, 2, 18, 'ACTIVE', NULL, NULL, '2022-08-23 01:22:28', '2022-09-22 08:01:36', NULL),
 (19, 8, 9, 5, 2, 16, 'ACTIVE', NULL, NULL, '2022-09-22 08:02:23', NULL, NULL),
 (20, 9, 10, 5, 2, 19, 'ACTIVE', NULL, NULL, '2022-09-22 08:02:50', NULL, NULL),
-(21, 10, 11, 5, 2, 13, 'ACTIVE', NULL, NULL, '2022-09-22 08:03:09', NULL, NULL);
+(21, 10, 11, 5, 2, 13, 'ACTIVE', NULL, NULL, '2022-09-22 08:03:09', NULL, NULL),
+(22, 1, 2, 1, 8, 1, 'ACTIVE', NULL, NULL, '2022-11-07 09:00:53', NULL, '2022-11-08 03:07:17');
 
 -- --------------------------------------------------------
 
@@ -10514,6 +10634,8 @@ INSERT INTO `status_matrices` (`id`, `current_step`, `next_step`, `request_type`
 
 CREATE TABLE `stores` (
   `id` int(10) UNSIGNED NOT NULL,
+  `store_code` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `channels_id` int(11) NOT NULL,
   `bea_so_store_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `bea_mo_store_name` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `pos_warehouse` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -10542,237 +10664,109 @@ CREATE TABLE `stores` (
 -- Dumping data for table `stores`
 --
 
-INSERT INTO `stores` (`id`, `bea_so_store_name`, `bea_mo_store_name`, `pos_warehouse`, `pos_warehouse_branch`, `pos_warehouse_transit`, `pos_warehouse_transit_branch`, `pos_warehouse_rma`, `pos_warehouse_rma_branch`, `pos_warehouse_name`, `doo_subinventory`, `sit_subinventory`, `org_subinventory`, `channel_id`, `customer_type_id`, `locations_id`, `sts_group`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 'BASEUS.AYALA.BONIFACIO HIGH STREET.FRA', 'BASEUS AYALA BONIFACIO HIGH STREET FRA', 'BASEUSBGC', 'BSBGC', 'TBASEUSBGC', 'TBASEUSBGC', 'BASEUSBGR', 'RBASEUSBGC', 'BASEUS BGC', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 2, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 13:37:37', NULL),
-(2, 'BASEUS.AYALA.TRINOMA.RTL', 'BASEUS AYALA TRINOMA RTL', 'GBASEUSTRINOMA', 'BASEUSTRINOMA', 'TBASEUSTRINOMA', NULL, 'BSTRINOMARM', NULL, 'BASEUS TRINOMA', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-10-11 06:07:54', NULL),
-(3, 'BASEUS.AYALA.UPTC.RTL', 'BASEUS AYALA UPTC RTL', 'BASEUSUPTOWN', 'BASEUSUPTC', 'TBASEUSUPTOWN', NULL, 'BASEUSUPTOWNRM', NULL, 'BASEUS UP TOWN', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 14:04:25', NULL),
-(4, 'BASEUS.SM.FAIRVIEW.RTL', 'BASEUS SM FAIRVIEW RTL', 'GBASEUSFAIRVIEW', 'BASEUSFVW', 'TBASEUSFAIRVIEW', NULL, 'BASEUSFAIRVIEWRM', NULL, 'BASEUS FAIRVIEW', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 14:03:50', NULL),
-(5, 'BASEUS.SM.NORTH EDSA.RTL', 'BASEUS SM NORTH EDSA RTL', 'GBASEUSSMNORTH', 'GBASEUSSMNORTH', NULL, NULL, NULL, NULL, 'BASEUS SM NORTH', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 14:03:50', NULL),
-(6, 'BASEUS.SM.SOUTHMALL.RTL', 'BASEUS SM SOUTHMALL RTL', 'GBASEUSSOUTHMALL', 'BASEUSSOUTHMALL', 'TBASEUSSOUTHMALL', NULL, 'BASEUSSOUTHRM', NULL, 'BASEUS SOUTHMALL', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 14:03:50', NULL),
-(7, 'BEYOND THE BOX.AYALA.FAIRVIEW TERRACES.FRA', 'BEYOND THE BOX FAIRVIEW TERRACES FRA', 'GBTBFAIRVIEW', 'BTBFAIRVIEW', 'TBTBFAIRVIEW', 'TBTBFAIRVIEW', 'BTBFAIRVIEWRM', 'RBTBFAIRVIEW', 'BTB FAIRVIEW', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 12:16:02', NULL),
-(8, 'BEYOND THE BOX.AYALA.MARKET MARKET.FRA', 'BEYOND THE BOX AYALA MARKET MARKET FRA', 'GBTBMARKETMARKET', 'BTBMARKETMARKET', 'TBTBMARKETMARKET', 'TBTBMARKETMARKET', 'BTBMARKETMARKTRM', 'RBTBMARKETMARKET', 'BTB MARKET MARKET', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 6, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 12:20:28', NULL),
-(9, 'BEYOND THE BOX.CENTURY CITY.MAKATI.RTL', 'BEYOND THE BOX CENTURY CITY MAKATI RTL', 'GNBTBCENTURY', 'BTBCENTURY', 'TBTBCENTURY', 'TBTBCENTURY', 'BTBCENTURYRM', 'RBTBCENTURY', 'BTB CENTURY', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2022-03-11 13:13:30', NULL),
-(10, 'BEYOND THE BOX.CITY OF DREAMS.MANILA.RTL', 'BEYOND THE BOX CITY OF DREAMS MANILA RTL', 'GBTBCOD', 'BTBCOD', 'TBTBCOD', 'TBTBCITYOFDREAMS', 'BTBCODRM', 'RBTBCITYOFDREAMS', 'BTB CITY OF DREAMS', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:09:08', NULL),
-(11, 'BEYOND THE BOX.GREENHILLS.VMALL.RTL', 'BEYOND THE BOX GREENHILLS VMALL RTL', 'GBTBVMALL', 'BTBVMALL', 'TBTBVMALL', 'TBTBVMALL', 'BTBVMALLRM', 'RBTBVMALL', 'BTB VMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:10:10', NULL),
-(12, 'BEYOND THE BOX.KCC.VERANZA.RTL', 'BEYOND THE BOX KCC VERANZA RTL', 'GBTBVERANZA', 'BTBVERANZA', 'TBTBVERANZA', 'TBTBVERANZA', 'BTBVERANZARM', 'RBTBVERANZA', 'BTB VERANZA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:14:06', NULL),
-(13, 'BEYOND THE BOX.LIMKETKAI MALL.CDO.FRA', 'BEYOND THE BOX LIMKETKAI CDO FRA', 'BTBCDOG', 'BTBCDO', 'TBTBCDO', 'TBTBCDO', 'BTBCDORM', 'RBTBCDO', 'BTB CDO', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 11, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 13:20:11', NULL),
-(14, 'BEYOND THE BOX.MEGAWORLD.FORBESTOWN.FRA', 'BEYOND THE BOX MEGAWORLD FORBESTOWN FRA', 'GBTBFORBESTOWN', 'BTBFORBESTOWN', 'TBTBFORBESTOWN', 'TBTBFORBESTOWN', 'BTBFORBESTOWNRM', 'RBTBFORBESTOWN', 'BTB FORBESTOWN', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 12:16:15', NULL),
-(15, 'BEYOND THE BOX.MEGAWORLD.LUCKY CHINATOWN.FRA', 'BEYOND THE BOX MEGAWORLD LUCKY CHINATOWN FRA', 'GBTBLUCKYCHINA', 'BTBLUCKYCHINA', 'TBTBLUCKYCHINA', 'TBTBLUCKY', 'BTBLUCKYCHINARM', 'RBTBLUCKY', 'BTB LUCKY', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-12-02 12:16:07', NULL),
-(16, 'BEYOND THE BOX.MEGAWORLD.NEWPORT.RTL', 'BEYOND THE BOX MEGAWORLD NEWPORT RTL', 'GBTBRESORTSWORLD', 'BTBRESORTSWORLD', 'TBTBRESORTSWORLD', 'TBTBNEWPORT', 'BTBRSORTSWORLDRM', 'RBTBNEWPORT', 'BTB NEWPORT', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:15:13', NULL),
-(17, 'BEYOND THE BOX.MEGAWORLD.SOUTHWOODS.RTL', 'BEYOND THE BOX MEGAWORLD SOUTHWOODS RTL', 'GBTBSOUTHWOODS', 'BTBSOUTHWOODS', 'TBTBSOUTHWOODS', 'TBTBSOUTHWOODS', 'BTBSOUTHWOODSRM', 'RBTBSOUTHWOODS', 'BTB SOUTHWOODS', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:25:22', NULL),
-(18, 'BEYOND THE BOX.MEGAWORLD.UPTOWN MALL.RTL', 'BEYOND THE BOX MEGAWORLD UPTOWN RTL', 'GBTBUPTOWN', 'BTBUPTOWN', 'TBTBUPTOWN', 'TBTBUPTOWN', 'BTBUPTOWNRM', 'RBTBUPTOWN', 'BTB UPTOWN', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-06 01:25:22', NULL),
-(19, 'BEYOND THE BOX.MEGAWORLD.VENICE GRAND CANAL.RTL', 'BEYOND THE BOX VENICE GRAND CANAL RTL', 'GBTBPIAZZA', 'BTBPIAZZA', 'TBTBPIAZZA', 'TBTBPIAZZA', 'BTBPIAZZARM', 'RBTBPIAZZA', 'BTB PIAZZA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:58', '2021-06-09 10:21:42', NULL),
-(20, 'BEYOND THE BOX.ONE ROCKWELL.MAKATI.RTL', 'BEYOND THE BOX ONE ROCKWELL MAKATI RTL', 'GBTBROCKWELL', 'GBTBROCKWELL', NULL, NULL, NULL, NULL, 'BTB ROCKWELL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 14:36:07', NULL),
-(21, 'BEYOND THE BOX.ROBINSONS.ERMITA.RTL', 'BEYOND THE BOX ROBINSONS ERMITA RTL', 'GBTBERMITA', 'BTBERMITA', 'TBTBERMITA', 'TBTBERMITA', 'BTBERMITARM', 'RBTBERMITA', 'BTB ERMITA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(22, 'BEYOND THE BOX.ROBINSONS.GALLERIA.RTL', 'BEYOND THE BOX ROBINSONS GALLERIA RTL', 'GBTBGALLERIA', 'BTBGALLERIA', 'TBTBGALLERIA', 'TBTBGALLERIA', 'BTBGALLERIARM', 'RBTBGALLERIA', 'BTB GALLERIA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(23, 'BEYOND THE BOX.SM.BAGUIO.RTL', 'BEYOND THE BOX SM BAGUIO RTL', 'GBTBBAGUIO', 'BTBBAGUIO', 'TBTBBAGUIO', 'TBTBBAGUIO', 'BTBBAGUIORM', 'RBTBBAGUIO', 'BTB BAGUIO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(24, 'BEYOND THE BOX.THE PLAZA.GUAM.FRA', NULL, 'BTBGUAMPLAZA', NULL, NULL, NULL, NULL, NULL, 'BTB GUAM', 'FRANCHISE', NULL, 'FRANCHISE', 2, NULL, NULL, 2, 'INACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 13:40:43', NULL),
-(25, 'DIGITAL WALKER.AYALA.ABREEZA.RTL', 'DIGITAL WALKER AYALA ABREEZA RTL', 'GDWABREEZA', 'DWABREEZA', 'TDWABREEZA', 'TDWABREEZA', 'DWABREEZARM', 'RDWABREEZA', 'DW ABREEZA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(26, 'DIGITAL WALKER.AYALA.BAY AREA.RTL', 'DIGITAL WALKER AYALA BAY AREA RTL', 'GDWTHEBAY', 'DWTHEBAY', 'TDWTHEBAY', 'TDWTHEBAY', 'DWTHEBAYRM', 'RDWTHEBAY', 'DW THE BAY', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(27, 'DIGITAL WALKER.AYALA.CEBU.RTL', 'DIGITAL WALKER AYALA CEBU RTL', 'DWAYALACEBUG', 'DWAYALACEBU', 'TDWAYALACEBU', 'TDWAYALACEBU', 'DWALAYACEBURM', 'RDWAYALACEBU', 'DW AYALA CEBU', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(28, 'DIGITAL WALKER.AYALA.GLORIETTA 2.RTL', 'DIGITAL WALKER AYALA GLORIETTA 2 RTL', 'GDWGLORIETTA', 'DWGLORIETTA2', 'TDWGLORIETTA5', 'TDWGLORIETTA', 'DWGLORIETTARM', 'RDWGLORIETTA', 'DW GLORIETTA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(29, 'DIGITAL WALKER.AYALA.GREENBELT 5.FRA', 'DIGITAL WALKER AYALA GREENBELT 5 FRA', 'GDWGREENBELT5', 'DWGREENBELT5', 'TDWGREENBELT', 'TDWGREENBELT', 'DWGREENBELT5RM', 'RDWGREENBELT', 'DW GREENBELT', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 6, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 12:20:34', NULL),
-(30, 'DIGITAL WALKER.AYALA.ONE BONIFACIO.RTL', 'DIGITAL WALKER AYALA ONE BONIFACIO RTL', 'DWONEBONIG', 'DWONEBONI', 'DWONEBONIR', 'TDWONEBONIFACIO', 'DWONEBONIRM', 'RDWONEBONIFACIO', 'DW ONE BONIFACIO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(31, 'DIGITAL WALKER.AYALA.THE 30TH.RTL', 'DIGITAL WALKER AYALA THE 30TH RTL', 'GDWTHE30TH', 'DWTHE30TH', 'TDWTHE30TH', 'TDWTHE30TH', 'DWTHE30THRM', 'RDWTHE30TH', 'DW THE 30TH', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(32, 'DIGITAL WALKER.AYALA.TRINOMA.RTL', 'DIGITAL WALKER AYALA TRINOMA RTL', 'GDWTRINOMA', 'DWTRINOMA', 'TDWTRINOMA', 'TDWTRINOMA', 'DWTRINOMARM', 'RDWTRINOMA', 'DW TRINOMA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(33, 'DIGITAL WALKER.AYALA.UPTC.FRA', 'DIGITAL WALKER AYALA UPTC FRA', 'GDWUPTOWN', 'DWUPTC', 'TDWUPTOWNCENTER', 'TDWUPTC', 'DWUPTOWNRM', 'RDWUPTC', 'DW UPTC', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 5, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 12:19:37', NULL),
-(34, 'DIGITAL WALKER.AYALA.VERTIS NORTH.FRA', 'DIGITAL WALKER AYALA VERTIS NORTH FRA', 'GDWVERTIS', 'DWVERTISNORTH', 'TDWVERTISNORTH', 'TDWVERTIS', 'DWVERTIS', 'RDWVERTIS', 'DW VERTIS', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 5, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 12:19:33', NULL),
-(35, 'DIGITAL WALKER.CAPITOL COMMONS.ESTANCIA.FRA', 'DIGITAL WALKER CAPITOL COMMONS ESTANCIA FRA', 'GDWESTANCIA', 'DWESTANCIA', 'TDWESTANCIA', 'TDWESTANCIA', 'DWESTANCIARM', 'RDWESTANCIA', 'DW ESTANCIA', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 5, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 12:19:41', NULL),
-(36, 'DIGITAL WALKER.CC.ESTANCIA EXPANSION.FRA', 'DIGITAL WALKER CC ESTANCIA EXPANSION FRA', 'DWESTANCIAEG', 'DWESTANCIAEXP', 'DWESTANCIAEXT', 'TDWESTANCIAEXP', 'DWESTANCIAEXPR', 'RDWESTANCIAEXP', 'DW ESTANCIA EXP', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 10, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-12-02 13:19:44', NULL),
-(37, 'DIGITAL WALKER.CENTRIO.CDO.RTL', 'DIGITAL WALKER CENTRIO CDO RTL', 'GDWCAGAYAN', 'DWCAGAYAN', 'TDWCAGAYAN', 'TDWCDO', 'DWCAGAYANRM', 'RDWCDO', 'DW CDO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(38, 'DIGITAL WALKER.CENTURY CITY.MAKATI.RTL', 'DIGITAL WALKER CENTURY CITY MAKATI RTL', 'GDWCENTURY', 'DWCENTURY', 'TDWCENTURY', 'TDWCENTURY', 'DWCENTURYRM', 'RDWCENTURY', 'DW CENTURY', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:28:59', '2021-06-06 01:25:22', NULL),
-(39, 'DIGITAL WALKER.FESTIVAL MALL.ALABANG.FRA', 'DIGITAL WALKER FESTIVAL MALL ALABANG FRA', 'DWFESTIVAL', 'GDWFESTIVAL', NULL, NULL, NULL, NULL, 'DW FESTIVAL MALL', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 9, 'INACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-12-02 14:41:47', NULL),
-(40, 'DIGITAL WALKER.GREENHILLS.VMALL.RTL', 'DIGITAL WALKER GREENHILLS VMALL RTL', 'GDWVMALL', 'DWVMALL', 'TDWVMALL', 'TDWVMALL', 'DWVMALL', 'RDWVMALL', 'DW VMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(41, 'DIGITAL WALKER.MEGAWORLD.EASTWOOD.RTL', 'DIGITAL WALKER MEGAWORLD EASTWOOD RTL', 'GDWEASTWOOD', 'DWEASTWOOD', 'TDWEASTWOOD', 'TDWEASTWOOD', 'DWEASTWOODRM', 'RDWEASTWOOD', 'DW EASTWOOD', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(42, 'DIGITAL WALKER.MEGAWRLD.FESTIVE WALK.RTL', 'DIGITAL WALKER MEGAWRLD FESTIVEWALK RTL', '678001', 'DWFESTIVEWALK', '678002', 'TDWFESTIVEWALK', '678003', 'RDWFESTIVEWALK', 'DW FESTIVE WALK', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-23 11:16:04', NULL),
-(43, 'DIGITAL WALKER.OKADA.MANILA.RTL', 'DIGITAL WALKER OKADA MANILA RTL', 'DWOKADAG', 'DWOKADA', 'TDWOKADA', 'TDWOKADA', 'DWOKADARM', 'RDWOKADA', 'DW OKADA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(44, 'DIGITAL WALKER.ROBINSONS.ERMITA.RTL', 'DIGITAL WALKER ROBINSONS ERMITA RTL', 'GDWERMITA', 'DWERMITA', 'TDWERMITA', 'TDWERMITA', 'DWERMITARM', 'RDWERMITA', 'DW ERMITA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(45, 'DIGITAL WALKER.ROBINSONS.MAGNOLIA.FRA', 'DIGITAL WALKER ROBINSONS MAGNOLIA FRA', 'GDWMAGNOLIA', 'DWMAGNOLIA', 'TWDMAGNOLIA', 'TDWMAGNOLIA', 'DWMAGNOLIARM', 'RDWMAGNOLIA', 'DW MAGNOLIA', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 8, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-12-02 13:18:52', NULL),
-(46, 'DIGITAL WALKER.ROBINSONS.PIONEER.RTL', 'DIGITAL WALKER ROBINSONS PIONEER RTL', 'GDWPIONEER', 'DWPIONEER', 'TDWPIONEER', 'TDWPIONEER', 'DWPIONEERRM', 'RDWPIONEER', 'DW PIONEER', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(47, 'DIGITAL WALKER.ROCKWELL.POWERPLANT.RTL', 'DIGITAL WALKER ROCKWELL POWERPLANT RTL', 'GDWROCKWELL', 'DWROCKWELL', 'TDWROCKWELL', 'TDWROCKWELL', 'DWROCKWELLRM', 'RDWROCKWELL', 'DW ROCKWELL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:22', NULL),
-(48, 'DIGITAL WALKER.SHANGRI-LA.EDSA.RTL', 'DIGITAL WALKER SHANGRI-LA EDSA RTL', 'GDWSHANGRILA', 'DWSHANGRILA', 'TDWSHANGRILA', 'TDWSHANGRILA', 'DWSHANGRILARM', 'RDWSHANGRILA', 'DW SHANGRILA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:23', NULL),
-(49, 'DIGITAL WALKER.SM.AURA.RTL', 'DIGITAL WALKER SM AURA RTL', 'GDWSMAURA', 'DWSMAURA', 'TDWSMAURA', 'TDWSMAURA', 'DWSMAURARM', 'RDWSMAURA', 'DW SM AURA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:23', NULL),
-(50, 'DIGITAL WALKER.SM.BAGUIO.RTL', 'DIGITAL WALKER SM BAGUIO RTL', 'GDWBAGUIO', 'DWBAGUIO', 'TDWBAGUIO', 'TDWBAGUIO', 'DWBAGUIORM', 'RDWBAGUIO', 'DW BAGUIO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:23', NULL),
-(51, 'DIGITAL WALKER.SM.CEBU.RTL', 'DIGITAL WALKER SM CEBU RTL', 'DWSMCEBUG', 'DWSMCEBU', 'TDWSMCEBU', 'TDWSMCEBU', 'DWSMCEBURM', 'RDWSMCEBU', 'DW SM CEBU', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:00', '2021-06-06 01:25:23', NULL),
-(52, 'DIGITAL WALKER.SM.MALL OF ASIA.RTL', 'DIGITAL WALKER SM MALL OF ASIA RTL', 'GDWMOA', 'DWMOA', 'TDWMOA', 'TDWMOA', 'DWMOARM', 'RDWMOA', 'DW MOA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-06 01:25:23', NULL),
-(53, 'DIGITAL WALKER.SM.NORTH EDSA.RTL', 'DIGITAL WALKER SM NORTH EDSA RTL', 'DWSMNORTHG', 'DWSMNORTHEDSA', 'TDWSMNORTH', 'TDWNORTHEDSA', 'DWSMNORTHRM', 'RDWNORTHEDSA', 'DW NORTH EDSA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-06 01:25:23', NULL),
-(54, 'DIGITAL WALKER.SM.SOUTHMALL.RTL', 'DIGITAL WALKER SM SOUTHMALL RTL', '687001', 'DWSOUTHMALL', '687002', 'TDWSOUTHMALL', '687003', 'RDWSOUTHMALL', 'DW SOUTHMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-06 01:25:23', NULL),
-(55, 'DIGITAL WALKER.SUPERMALLS.CONRAD HOTEL.RTL', 'DIGITAL WALKER CONRAD HOTEL RTL', 'GDWCONRAD', 'DWCONRAD', 'TDWCONRAD', 'TDWCONRAD', 'DWCONRADRM', 'RDWCONRAD', 'DW CONRAD', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-09 07:03:13', NULL),
-(56, 'DIGITAL WALKER.SUPERMALLS.THE PODIUM.RTL', 'DIGITAL WALKER SUPERMALLS THE PODIUM RTL', 'GDWPODIUM', 'DWPODIUM', 'TDWPODIUM', 'TDWPODIUM', 'DWPODIUMRM', 'RDWPODIUM', 'DW PODIUM', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-06 01:25:23', NULL),
-(57, 'OMG.GREENHILLS.VMALL.RTL', 'OMG GREENHILLS VMALL RTL', 'OMGVMALLG', 'OMGVMALLG', NULL, NULL, NULL, NULL, 'OMG VMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-12-02 14:12:29', NULL),
-(58, 'OMG.MEGAWORLD.FESTIVE WALK.RTL', 'OMG MEGAWORLD FESTIVE WALK RTL', 'GOMGFESTIVE', 'OMGFESTIVE', 'OMGFESTIVER', NULL, 'OMGFESTIVERM', NULL, 'OMG FESTIVE WALK', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-12-02 14:12:29', NULL),
-(59, 'OMG.ROBINSONS.ERMITA.RTL', 'OMG OMG ROBINSONS ERMITA RTL', 'GOMGERMITA', 'OMGERMITA', 'TOMGERMITA', 'TOMGERMITA', 'OMGERMITARM', 'ROMGERMITA', 'OMG ERMITA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-07-09 06:17:13', NULL),
-(60, 'OMG.SM.CDO.RTL', 'OMG SM CDO RTL', 'OMGCDO', 'OMGCDO', 'TOMGCDO', NULL, 'OMGCDORM', NULL, 'OMG CDO', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-12-02 14:12:29', NULL),
-(61, 'OUTERSPACE.NAIA.TERMINAL 3.RTL', 'OUTERSPACE NAIA TERMINAL 3 RTL', 'GOSNAIA', 'OUTERSPACENAIAT3', 'TOSNAIA', NULL, 'OSNAIARM', NULL, 'OUTERSPACE NAIA TERMINAL', 'RETAIL', NULL, 'RETAIL', 1, NULL, NULL, 1, 'INACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-12-02 14:35:57', NULL),
-(62, 'SERVICE CENTER.AYALA.BONIFACIO HIGH STREET.RTL', 'SERVICE CENTER BONIFACIO HIGH STREET RTL', 'BTBSCBGCG', 'BTBSERVICEBGC', 'BTBSCBGCR', 'TSCBGC', 'RSCBGC', 'RSCBGC', 'SC BGC', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-09 10:25:14', NULL),
-(63, 'SERVICE CENTER.GREENHILLS.VMALL.RTL', 'SERVICE CENTER GREENHILLS VMALL RTL', 'BTBSCVMALLG', 'BTBSCVMALL', 'BTBSCVMALLR', 'TSCVMALL', 'RSCVMALL', 'RSCVMALL', 'SC VMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2020-11-13 03:29:01', '2021-06-06 01:25:23', NULL),
-(64, 'DIGITS WAREHOUSE', 'DIGITS WAREHOUSE', 'DIGITSWAREHOUSE', 'DIGITSWAREHOUSE', 'DIGITSWAREHOUSE', NULL, 'DIGITSWAREHOUSE', NULL, 'DIGITS WAREHOUSE', 'DIGITS', NULL, 'DIGITS', NULL, NULL, NULL, NULL, 'ACTIVE', NULL, NULL, '2020-12-28 11:32:43', NULL, NULL),
-(65, 'DIGITS RMA', 'DIGITS RMA', 'DIGITSRMA', 'DIGITSRMA', 'DIGITSRMA', NULL, 'DIGITSRMA', NULL, 'DIGITS RMA', 'RMA', NULL, 'RMA', NULL, NULL, NULL, NULL, 'ACTIVE', NULL, NULL, '2020-12-28 11:33:09', NULL, NULL),
-(67, 'DIGITAL WALKER.VISTA MALL.TAGUIG.RTL', 'DIGITAL WALKER VISTA MALL TAGUIG RTL', '698001', 'DWVISTAMALLTAG', '698002', 'TDWVISTATAGUIG', '698003', 'RDWVISTATAGUIG', 'DW VISTA TAGUIG', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2021-03-10 01:38:20', '2021-06-06 01:25:23', NULL),
-(68, 'DIGITAL WALKER.LAZADA.FBV.ONL', 'LAZADA DIGITAL WALKER FBV', 'GLAZADADWFBV', 'LAZADADWFBV', NULL, NULL, NULL, NULL, 'LAZADA DW FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:01', '2021-06-06 01:50:51', NULL),
-(69, 'FITBIT.LAZADA.FBV.ONL', 'LAZADA FITBIT FBV', 'GLAZADAFITBITFBV', 'LAZADAFITBITFBV', NULL, NULL, NULL, NULL, 'LAZADA FITBIT FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:01', '2021-06-06 01:54:50', NULL),
-(70, 'ONEPLUS.LAZADA.FBV.ONL', 'LAZADA ONEPLUS FBV', 'GLAZONEPLUSFBV', 'LAZADAONEPLUSFBV', NULL, NULL, NULL, NULL, 'LAZADA ONEPLUS FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:01', '2021-06-06 02:00:23', NULL),
-(71, 'UAG.LAZADA.FBV.ONL', 'LAZADA UAG FBV', 'GLAZADAUAGFBV', 'LAZADAUAGFBV', NULL, NULL, NULL, NULL, 'LAZADA UAG FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:01', '2021-06-06 02:08:07', NULL),
-(72, 'DIGITAL WALKER.SHOPEE.FBD.ONL', 'DIGITAL WALKER SHOPEE FBD', 'GSHOPEEDWFBD', 'DIGITS', 'TSHOPEEDWFBD', 'TSHOPEEDWFBD', 'RSHOPEEDWFBD', 'RSHOPEEDWFBD', 'SHOPEE DW FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:01', '2021-10-20 02:44:18', NULL),
-(73, 'ONEPLUS.SHOPEE.FBV.ONL', 'SHOPEE ONEPLUS FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, 'SHOPEE ONEPLUS FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:01', '2021-10-19 16:48:47', NULL),
-(74, 'BASEUS.LAZADA.FBV.ONL', 'LAZADA BASEUS FBV', 'LAZADAFBV', 'LAZADAFBV', NULL, NULL, NULL, NULL, 'LAZADA BASEUS FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 17:57:20', NULL),
-(75, 'FITBIT.SHOPEE.FBV.ONL', 'SHOPEE FITBIT FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, 'SHOPEE FITBIT FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(76, 'BASEUS.SHOPEE.FBV.ONL', 'SHOPEE BASEUS FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, 'SHOPEE BASEUS FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(77, 'JOYROOM.LAZADA.FBV.ONL', 'LAZADA JOYROOM FBV', 'LAZADAFBV', 'LAZADAFBV', NULL, NULL, NULL, NULL, 'LAZADA JOYROOM FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 17:56:55', NULL),
-(78, 'JOYROOM.SHOPEE.FBV.ONL', 'JOYROOM SHOPEE FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, 'JOYROOM SHOPEE FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(79, 'FITBIT.LAZADA.FBD.ONL', 'FITBIT LAZADA FBD', 'GLAZADAFITBITFBD', 'DIGITS', 'TLAZADAFITBITFBD', 'TLAZADAFITBITFBD', 'RLAZADAFITBITFBD', 'RLAZADAFITBITFBD', 'LAZADA FITBIT FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-20 02:38:10', NULL),
-(80, 'ONEPLUS.LAZADA.FBD.ONL', 'ONEPLUS LAZADA FBD', 'GLAZONEPLUSFBD', 'DIGITS', 'TLAZONEPLUSFBD', 'TLAZONEPLUSFBD', 'RLAZONEPLUSFBD', 'RLAZONEPLUSFBD', 'LAZADA ONEPLUS FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-20 02:40:34', NULL),
-(81, 'BASEUS.LAZADA.FBD.ONL', 'BASEUS LAZADA FBD', 'LAZADAFBD', 'LAZADAFBD', NULL, NULL, NULL, NULL, 'BASEUS LAZADA FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-06-06 02:22:41', NULL),
-(82, 'FITBIT.SHOPEE.FBD.ONL', 'FITBIT SHOPEE FBD', 'GSHOPEEFITBITFBD', 'DIGITS', 'TSHOPEEFITBITFBD', 'TSHOPEEFITBITFBD', 'RSHOPEEFITBITFBD', 'RSHOPEEFITBITFBD', 'SHOPEE FITBIT FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-20 02:44:41', NULL),
-(83, 'ONEPLUS.SHOPEE.FBD.ONL', 'ONEPLUS SHOPEE FBD', 'GSHPONEPLUSFBD', 'DIGITS', 'TSHPONEPLUSFBD', 'TSHPONEPLUSFBD', 'RSHPONEPLUSFBD', 'RSHPONEPLUSFBD', 'SHOPEE ONEPLUS FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-20 02:45:32', NULL),
-(84, 'BASEUS.SHOPEE.FBD.ONL', 'BASEUS SHOPEE FBD', 'SHOPEEFBD', 'SHOPEEFBD', NULL, NULL, NULL, NULL, 'BASEUS SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-06-06 02:22:41', NULL),
-(85, 'JOYROOM.SHOPEE.FBD.ONL', 'JOYROOM SHOPEE FBD', 'SHOPEEFBD', 'SHOPEEFBD', NULL, NULL, NULL, NULL, 'JOYROOM SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-06-06 02:20:04', NULL),
-(86, 'JOYROOM.LAZADA.FBD.ONL', 'JOYROOM LAZADA FBD', 'LAZADAFBD', 'LAZADAFBD', NULL, NULL, NULL, NULL, 'JOYROOM LAZADA FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-06-06 02:19:55', NULL),
-(87, 'AFTERSHOKZ.LAZADA.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'AFTERSHOKZ LAZADA CLL', 'LAZADA', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(88, 'DIGITAL WALKER.LAZADA.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'DIGITAL WALKER LAZADA CLL', 'LAZADA', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(89, 'MOMAX.LAZADA.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'MOMAX LAZADA CLL', 'LAZADA', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(90, 'AFTERSHOKZ.SHOPEE.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'AFTERSHOKZ SHOPEE CLL', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(91, 'DIGITAL WALKER.SHOPEE.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'DIGITAL WALKER SHOPEE CLL', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(92, 'MOMAX.SHOPEE.CLL.ONL', 'CLOUD LOGIC NEW MANILA FBV', 'CLOUDLOGIC', 'CLOUDLOGIC', NULL, NULL, NULL, NULL, 'MOMAX SHOPEE CLL', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 16:48:47', NULL),
-(93, '1MORE.LAZADA.FBV.ONL', 'LAZADA 1MORE FBV', 'LAZADAFBV', 'LAZADAFBV', NULL, NULL, NULL, NULL, 'LAZADA 1MORE FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:02', '2021-10-19 17:56:10', NULL),
-(94, '1MORE.SHOPEE.FBV.ONL', '1MORE SHOPEE FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, '1MORE SHOPEE FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:48:47', NULL),
-(95, '1MORE.LAZADA.FBD.ONL', '1MORE LAZADA FBD', 'LAZADAFBD', 'LAZADAFBD', NULL, NULL, NULL, NULL, '1MORE LAZADA FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-06-06 02:19:27', NULL),
-(96, '1MORE.SHOPEE.FBD.ONL', '1MORE SHOPEE FBD', 'SHOPEEFBD', 'SHOPEEFBD', NULL, NULL, NULL, NULL, '1MORE SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-06-06 02:19:27', NULL),
-(97, 'ZENDURE.LAZADA.FBV.ONL', 'LAZADA ZENDURE FBV', 'LAZADAFBV', 'LAZADAFBV', NULL, NULL, NULL, NULL, 'LAZADA ZENDURE FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 17:55:53', NULL),
-(98, 'ZENDURE.SHOPEE.FBV.ONL', 'ZENDURE SHOPEE FBV', 'SHOPEEFBV', 'SHOPEEFBV', NULL, NULL, NULL, NULL, 'ZENDURE SHOPEE FBV', 'SHOPEE', NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:48:47', NULL),
-(99, 'ZENDURE.LAZADA.FBD.ONL', 'ZENDURE LAZADA FBD', 'LAZADAFBD', 'LAZADAFBD', NULL, NULL, NULL, NULL, 'ZENDURE LAZADA FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-06-06 02:20:18', NULL),
-(100, 'ZENDURE.SHOPEE.FBD.ONL', 'ZENDURE SHOPEE FBD', 'SHOPEEFBD', 'SHOPEEFBD', NULL, NULL, NULL, NULL, 'ZENDURE SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-06-06 02:20:18', NULL),
-(101, 'HOME OFFICE.DIGITS.FBD.ONL', 'HOME OFFICE DIGITS FBD', 'GHOMEOFFICEFBD', 'ZERO INVENTORY', NULL, NULL, NULL, NULL, 'HOMEOFFICE FBD', NULL, 'HMEOFC FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:28:53', NULL),
-(102, 'BEYOND THE BOX.LAZADA.FBV.ONL', 'LAZADA BTB FBV', 'GLAZADABTBFBV', 'LAZADABTBFBV', NULL, NULL, NULL, NULL, 'LAZADA BTB FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:03', '2021-10-19 17:49:21', NULL),
-(103, 'ECQDIGITS.ONL', 'ECQ DIGITS', NULL, NULL, NULL, NULL, NULL, NULL, 'ECQ DIGITS', NULL, NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:48:47', NULL),
-(104, 'ECQRETAIL.ONL', 'ECQ RETAIL', NULL, NULL, NULL, NULL, NULL, NULL, 'ECQ RETAIL', NULL, NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:48:47', NULL),
-(105, 'MARSHALL.LAZADA.FBV.ONL', 'LAZADA MARSHALL FBV', 'GLAZMARSHALLFBV', 'LAZMARSHALLFBV', NULL, NULL, NULL, NULL, 'LAZADA MARSHALL FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2021-03-10 05:14:03', '2021-06-06 01:57:13', NULL),
-(106, 'THE GROVE HOWARD.ONL', 'THE GROVE HOWARD', 'THEGROVEHOWARD', 'THEGROVEHOWARD', NULL, NULL, NULL, NULL, 'THE GROVE HOWARD', NULL, NULL, 'ECOM', 4, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-19 16:48:47', NULL),
-(107, 'MARSHALL.LAZADA.FBD.ONL', 'MARSHALL LAZADA FBD', 'GLAZMARSHALLFBD', 'DIGITS', 'TLAZMARSHALLFBD', 'TLAZMARSHALLFBD', 'RLAZMARSHALLFBD', 'RLAZMARSHALLFBD', 'LAZADA MARSHALL FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-20 02:40:09', NULL),
-(108, 'UAG.LAZADA.FBD.ONL', 'UAG LAZADA FBD', 'GLAZADAUAGFBD', 'DIGITS', 'TLAZADAUAGFBD', 'TLAZADAUAGFBD', 'RLAZADAUAGFBD', 'RLAZADAUAGFBD', 'LAZADA UAG FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-10-20 02:38:35', NULL),
-(109, 'STORK PH.FBD.ONL', 'STORK PH FBD', 'STORKPHFBDONL', 'STORKPHFBDONL', NULL, NULL, NULL, NULL, 'STORK PH FBD', NULL, 'DIGITS FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:03', '2021-03-17 06:47:34', NULL),
-(110, 'MARSHALL.SHOPEE.FBD.ONL', 'MARSHALL SHOPEE FBD', 'GSHPMARSHALLFBD', 'DIGITS', 'TSHPMARSHALLFBD', 'TSHPMARSHALLFBD', 'RSHPMARSHALLFBD', 'RSHPMARSHALLFBD', 'SHOPEE MARSHALL FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:04', '2021-10-20 02:45:01', NULL),
-(111, 'BEYOND THE BOX.LAZADA.FBD.ONL', 'BEYOND THE BOX LAZADA FBD', 'GLAZADABTBFBD', 'DIGITS', 'TLAZADABTBFBD', 'TLAZADABTBFBD', 'RLAZADABTBFBD', 'RLAZADABTBFBD', 'LAZADA BTB FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:04', '2021-10-20 02:37:22', NULL),
-(112, 'BEYOND THE BOX.DIGITS.FBD.ONL', 'BEYOND THE BOX DIGITS FBD', 'GECOMBTBFBD', 'DIGITS', 'TECOMBTBFBD', 'TECOMBTBFBD', 'RECOMBTBFBD', 'RECOMBTBFBD', 'ECOM BTB FBD', NULL, 'WEBBTB FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-03-10 05:14:04', '2021-10-22 07:42:24', NULL),
-(113, 'AFTERSHOKZ.SHOPEE.FBD.ONL', 'AFTERSHOKZ SHOPEE FBD', 'SHOPEEFBD', 'SHOPEEFBD', NULL, NULL, NULL, NULL, 'AFTERSHOKZ SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'INACTIVE', 1, 1, '2021-03-10 05:14:04', '2021-06-06 02:21:48', NULL),
-(114, 'CLEARANCE.ROCKWELL.SANTOLAN TOWN PLAZA.SLE', 'CLEARANCE SANTOLAN TOWN PLAZA SLE', 'DWSANTOLANESALE', 'DWSANTOLANESALE', NULL, NULL, NULL, NULL, 'DW SANTOLAN SALE', 'CLEARANCE', NULL, 'DIGITS', 5, 1, NULL, NULL, 'ACTIVE', NULL, NULL, '2021-03-15 06:28:49', '2021-03-16 07:09:08', NULL),
-(115, 'ABENSON.DEPOT.PASIG.DLR', 'ABENSON DEPOT PASIG', 'GABENSONDEPOTPASIG', 'ABENSONDEPOTPASIG', NULL, NULL, NULL, NULL, 'ABENSON DEPOT PASIG', 'ABENSON', NULL, 'DISTRI', 10, 8, NULL, NULL, 'ACTIVE', NULL, NULL, '2021-03-15 06:29:51', '2022-03-25 10:39:21', NULL),
-(116, 'DW MACHINE.ROCKWELL.POWERPLANT.RTL', 'DW MACHINES ROCKWELL POWERPLANT RTL', 'GDWMACHINEROCK', 'DWMACHINEROCKWEL', 'TRNSTDWMACHINERO', 'TDWMACHROCKWELL', 'RMADWMACHINEROCK', 'RDWMACHROCKWELL', 'DW MACH ROCKWELL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2021-06-06 01:25:12', '2021-06-10 10:16:39', NULL),
-(117, 'DIGITAL WALKER MACHINE.TRINOMA.RTL', 'DW MACHINES TRINOMA RTL', 'DWMCHNETRINOMAGD', 'DWMCHNTRINOMA', 'DWMHNETRINOMATR', 'TDWMACHTRINOMA', 'RMADWMCHNTRINOMA', 'RDWMACHTRINOMA', 'DW MACH TRINOMA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', 1, 1, '2021-06-06 01:25:12', '2021-06-10 10:16:19', NULL),
-(118, 'DIGITAL WALKER.SM.FAIRVIEW.FRA', 'DIGITAL WALKER SM FAIRVIEW FRA', 'DWSMFAIRVIEWG', 'DWSMFAIRVIEW', 'DWSMFAIRVIEWTR', 'TDWFAIRVIEW', 'DWSMFAIRVIEWRMA', 'RDWFAIRVIEW', 'DW FAIRVIEW', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', 1, NULL, '2021-06-06 01:27:43', '2021-12-02 12:16:11', NULL),
-(119, 'DIGITAL WALKER.LAZADA.FBD.ONL', 'DIGITAL WALKER LAZADA FBD', 'GLAZADADWFBD', 'DIGITS', 'TLAZADADWFBD', 'TLAZADADWFBD', 'RLAZADADWFBD', 'RLAZADADWFBD', 'LAZADA DW FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2021-10-20 02:37:46', NULL),
-(120, 'DIGITAL WALKER.DIGITS.FBD.ONL', 'WEBSITE DW FBD', 'GECOMDWFBD', 'DIGITS', 'TECOMDWFBD', 'TECOMDWFBD', 'RECOMDWFBD', 'RECOMDWFBD', 'ECOM DW FBD', NULL, 'WEBDW FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2021-10-29 02:19:13', NULL),
-(121, 'BEYOND THE BOX.SHOPEE.FBD.ONL', 'SHOPEE BTB FBD', 'GSHOPEEBTBFBD', 'DIGITS', 'TSHOPEEBTBFBD', 'TSHOPEEBTBFBD', 'RSHOPEEBTBFBD', 'RSHOPEEBTBFBD', 'SHOPEE BTB FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2021-10-20 02:43:51', NULL),
-(122, 'BEYOND THE BOX.SHOPEE.FBV.ONL', 'SHOPEE BTB FBV', 'GSHOPEEBTBFBV', 'SHOPEEBTBFBV', NULL, NULL, NULL, NULL, 'SHOPEE BTB FBV', 'SHOPEE', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2021-10-19 17:27:47', NULL),
-(123, 'AFTERSHOKZ.LAZADA.FBD.ONL', 'AFTERSHOKZ LAZADA FBD', 'GLAZAFTFBD', 'DIGITS', 'TLAZAFTFBD', 'TLAZAFTFBD', 'RLAZAFTFBD', 'RLAZAFTFBD', 'LAZADA AFTERSHOKZ FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2022-02-11 06:34:35', NULL),
-(124, 'AFTERSHOKZ.LAZADA.FBV.ONL', 'LAZADA AFTERSHOKZ FBV', 'GLAZAFTFBV', 'LAZAFTFBV', NULL, NULL, NULL, NULL, 'LAZADA AFTERSHOKZ FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, 1, '2021-06-06 02:13:19', '2021-06-06 02:14:48', NULL),
-(125, 'DIGITAL WALKER.SM.MARILAO.RTL', 'DIGITAL WALKER SM MARILAO RTL', 'GDWSMMARILAO', 'DWSMMARILAO', 'TDWSMMARILAO', 'TDWSMMARILAO', 'RDWSMMARILAO', 'RDWSMMARILAO', 'DW SM MARILAO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-07-07 09:03:55', NULL, NULL),
-(126, 'DIGITAL WALKER.MEGAWORLD.UPTOWN MALL.RTL', 'DIGITAL WALKER MEGAWORLD UPTOWN MALL RTL', 'GDWUPTOWNMALL', 'DWUPTOWNMALL', 'TDWUPTOWNMALL', 'TDWUPTOWNMALL', 'RDWUPTOWNMALL', 'RDWUPTOWNMALL', 'DW UPTOWN MALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-09-24 05:17:10', '2021-09-24 05:41:33', NULL),
-(127, 'DIGITAL WALKER.THE OUTLETS.LIPA.RTL', 'DIGITAL WALKER THE OUTLETS LIPA RTL', 'GDWLIPA', 'DWLIPA', 'TDWLIPA', 'TDWLIPA', 'RDWLIPA', 'RDWLIPA', 'DW LIPA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-09-24 05:18:45', '2021-09-24 05:41:13', NULL),
-(128, 'DIGITAL WALKER.SM.SANTA MESA.RTL', 'DIGITAL WALKER SM SANTA MESA RTL', 'GDWSMSANTAMESA', 'DWSMSANTAMESA', 'TDWSMSANTAMESA', 'TDWSMSANTAMESA', 'RDWSMSANTAMESA', 'RDWSMSANTAMESA', 'DW SM SANTA MESA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-09-28 03:23:56', NULL, NULL),
-(129, 'DIGITAL WALKER.SM.GRAND CENTRAL.RTL', 'DIGITAL WALKER SM GRAND CENTRAL RTL', 'GDWCENTRAL', 'DWCENTRAL', 'TDWCENTRAL', 'TDWCENTRAL', 'RDWCENTRAL', 'RDWCENTRAL', 'DW GRAND CENTRAL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-10-04 02:17:25', '2021-11-25 08:22:04', NULL),
-(130, 'DIGITAL WALKER.AYALA.HIGH STREET.FRA', 'DIGITAL WALKER AYALA HIGH STREET FRA', 'GDWHIGHSTREET', 'DWHIGHSTREET', 'TDWHIGHSTREET', 'TDWHIGHSTREET', 'RDWHIGHSTREET', 'RDWHIGHSTREET', 'DW HIGH STREET', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 6, 'ACTIVE', NULL, NULL, '2021-10-13 01:26:30', '2021-12-09 05:32:30', NULL),
-(131, 'DIGITAL WALKER.ROBINSONS.GALLERIA.RTL', 'DIGITAL WALKER ROBINSONS GALLERIA RTL', 'GDWORTIGAS', 'DWORTIGAS', 'TDWORTIGAS', 'TDWORTIGAS', 'RDWORTIGAS', 'RDWORTIGAS', 'DW GALLERIA', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-10-18 03:48:56', '2022-01-10 07:15:41', NULL),
-(132, 'BEYOND THE BOX.VISTA MALL.NOMO.RTL', 'BEYOND THE BOX VISTA MALL NOMO RTL', 'GBTBNOMO', 'BTBNOMO', 'TBTBNOMO', 'TBTBNOMO', 'RBTBNOMO', 'RBTBNOMO', 'BTB NOMO', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-10-19 02:20:38', '2021-10-19 03:11:47', NULL),
-(133, 'DIGITAL WALKER.ROBINSONS.LA UNION.RTL', 'DIGITAL WALKER ROBINSONS LA UNION RTL', 'GDWLAUNION', 'DWLAUNION', 'TDWLAUNION', 'TDWLAUNION', 'RDWLAUNION', 'RDWLAUNION', 'DW LA UNION', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-10-19 02:21:33', NULL, NULL),
-(134, 'MOMAX.LAZADA.FBD.ONL', 'MOMAX LAZADA FBD', 'GMOMAXLAZADAFBD', 'DIGITS', 'TMOMAXLAZADAFBD', 'TMOMAXLAZADAFBD', 'RMOMAXLAZADAFBD', 'RMOMAXLAZADAFBD', 'LAZADA MOMAX FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', NULL, NULL, '2021-10-19 16:56:07', '2021-10-20 02:43:30', NULL),
-(135, 'MOMAX.LAZADA.FBV.ONL', 'MOMAX LAZADA FBV', 'GLAZADAMOMAXFBV', 'LAZADAMOMAXFBV', NULL, NULL, NULL, NULL, 'LAZADA MOMAX FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', NULL, NULL, '2021-10-19 17:04:28', NULL, NULL),
-(136, 'SOUNDPEATS.SHOPEE.FRA', 'SOUNDPEATS SHOPEE FRA', 'GSHPESOUNDPEATS', 'SHPESOUNDPEATS', 'TSHPESOUNDPEATS', 'TSHPESOUNDPEATS', 'RSHPESOUNDPEATS', 'RSHPESOUNDPEATS', 'SHPE SOUNDPEATS', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', NULL, NULL, '2021-11-03 03:36:50', '2022-02-16 01:33:41', NULL),
-(137, 'DIGITAL WALKER.SM.MEGAMALL.RTL', 'DIGITAL WALKER SM MEGAMALL RTL', 'GDWMANDALUYONG', 'DWMANDALUYONG', 'TDWMANDALUYONG', 'TDWMANDALUYONG', 'RDWMANDALUYONG', 'RDWMANDALUYONG', 'DW SM MEGAMALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-11-09 07:16:22', '2021-12-29 12:35:45', NULL),
-(138, 'POP UP STORE.SOLAIRE.DIGITAL WALKER.RTL', 'POP UP STORE SOLAIRE DIGITAL WALKER RTL', 'GDWSOLAIRE', 'DWSOLAIRE', 'TDWSOLAIRE', 'TDWSOLAIRE', 'RDWSOLAIRE', 'RDWSOLAIRE', 'DW SOLAIRE', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2021-11-12 00:50:05', NULL, NULL),
-(139, 'BLUESPACE HQ', 'BLUESPACE HQ', 'BLUESPACE', 'BLUESPACE', 'BLUESPACET', 'BLUESPACET', NULL, NULL, 'BLUESPACE HQ', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', NULL, NULL, '2021-12-04 01:55:15', '2021-12-16 02:45:15', NULL),
-(140, 'DIGITAL WALKER.AYALA.ATC.FRA', 'DIGITAL WALKER AYALA ATC FRA', 'GDWAYALAALABANG', 'DWAYALAALABANG', 'TDWAYALAALABANG', 'TDWAYALAALABANG', 'RDWAYALAALABANG', 'RDWAYALAALABANG', 'DW AYALA ALABANG', 'FRANCHISE', NULL, 'FRANCHISE', 2, 6, NULL, 4, 'ACTIVE', NULL, NULL, '2022-01-06 06:07:58', '2022-01-06 08:05:05', NULL),
-(141, 'DIGITAL WALKER.KCC MALL.ZAMBOANGA.RTL', 'DIGITAL WALKER KCC MALL ZAMBOANGA RTL', 'GDWKCCMALL', 'DWKCCMALL', 'TDWKCCMALL', 'TDWKCCMALL', 'RDWKCCMALL', 'RDWKCCMALL', 'DW KCC MALL', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2022-01-11 02:12:52', NULL, NULL),
-(142, 'AUDIOENGINE.LAZADA.FBD.ONL', 'AUDIOENGINE LAZADA FBD', 'GLAZADAAUDIOENG', 'LAZADAAUDIOENG', 'TLAZADAAUDIOENG', 'TLAZADAAUDIOENG', 'RLAZADAAUDIOENG', 'RLAZADAAUDIOENG', 'LAZADA AUDIOENGINE FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', NULL, NULL, '2022-01-11 07:49:34', '2022-01-13 06:38:40', NULL),
-(143, 'AUDIOENGINE.LAZADA.FBV.ONL', 'AUDIOENGINE LAZADA FBV', 'GLAZAUDFBV', 'LAZAUDFBV', NULL, NULL, NULL, NULL, 'AUDIOENGINE LAZADA FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-01-11 09:04:56', NULL, NULL),
-(144, 'HIDRATESPARK.LAZADA.FBD.ONL', 'HIDRATESPARK LAZADA FBD', 'GLAZADAHDRTESPRK', 'LAZADAHDRTESPRK', 'TLAZADAHDRTESPRK', 'TLAZADAHDRTESPRK', 'RLAZADAHDRTESPRK', 'RLAZADAHDRTESPRK', 'LAZADA HIDRATESPARK FBD', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', NULL, NULL, '2022-01-13 06:26:21', NULL, NULL),
-(145, 'HIDRATESPARK.SHOPEE.FBD.ONL', 'HIDRATESPARK SHOPEE FBD', 'GSHOPEEHDRTESPRK', 'SHOPEEHDRTESPRK', 'TSHOPEEHDRTESPRK', 'TSHOPEEHDRTESPRK', 'RSHOPEEHDRTESPRK', 'RSHOPEEHDRTESPRK', 'HIDRATESPARK SHOPEE FBD', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', NULL, NULL, '2022-01-13 06:29:25', NULL, NULL),
-(146, 'HIDRATESPARK.LAZADA.FBV.ONL', 'HIDRATESPARK LAZADA FBV', 'GLAZHIDFBV', 'LAZHIDFBV', NULL, NULL, NULL, NULL, 'HIDRATESPARK LAZADA FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-01-13 06:31:58', NULL, NULL),
-(147, 'ASUS PHILIPPINES CORPORATION.CRP', 'ASUS PHILIPPINES CORPORATION', 'GASUSPHILIPPINESCORPORATION', 'GASUSPHILIPPINESCORPORATION', NULL, NULL, NULL, NULL, 'ASUS PHILIPPINES CORPORATION', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(148, 'AUTOMOBILE CENTRAL ENTERPRISE INC.CRP', 'AUTOMOBILE CENTRAL ENTERPRISE INC', 'GAUTOMOBILECENTRALENTERPRISEINC', 'GAUTOMOBILECENTRALENTERPRISEINC', NULL, NULL, NULL, NULL, 'AUTOMOBILE CENTRAL ENTERPRISE INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(149, 'AZEUS SYSTEMS PHILIPPINES LIMITED.OUT', 'AZEUS SYSTEMS PHILIPPINES LIMITED', 'GAZEUSSYSTEMSPHILIPPINESLIMITED', 'GAZEUSSYSTEMSPHILIPPINESLIMITED', NULL, NULL, NULL, NULL, 'AZEUS SYSTEMS PHILIPPINES LIMITED', 'DISTRI', NULL, 'DISTRI', 7, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(150, 'BANK OF CHINA (HONGKONG) LIMITED.CRP', 'BANK OF CHINA (HONGKONG) LIMITED', 'GBANKOFCHINAHONGKONGLIMITED', 'GBANKOFCHINAHONGKONGLIMITED', NULL, NULL, NULL, NULL, 'BANK OF CHINA (HONGKONG) LIMITED', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(151, 'BANK OF SINGAPORE LIMITED.CRP', 'BANK OF SINGAPORE LIMITED', 'GBANKOFSINGAPORELIMITED', 'GBANKOFSINGAPORELIMITED', NULL, NULL, NULL, NULL, 'BANK OF SINGAPORE LIMITED', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(152, 'BANK OF THE PHIL.ISLANDS.CRP', 'BANK OF THE PHIL.ISLANDS', 'GBANKOFTHEPHILISLANDS', 'GBANKOFTHEPHILISLANDS', NULL, NULL, NULL, NULL, 'BANK OF THE PHIL.ISLANDS', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(153, 'BERMOR TECHZONE COMPUTER PARTS & AAC.CRP', 'BERMOR TECHZONE COMPUTER PARTS & AAC', 'GBERMORTECHZONECOMPUTERPARTSAAC', 'GBERMORTECHZONECOMPUTERPARTSAAC', NULL, NULL, NULL, NULL, 'BERMOR TECHZONE COMPUTER PARTS & AAC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(154, 'BETTZEIT SOUTHEAST ASIA INC.CRP', 'BETTZEIT SOUTHEAST ASIA INC', 'GBETTZEITSOUTHEASTASIAINC', 'GBETTZEITSOUTHEASTASIAINC', NULL, NULL, NULL, NULL, 'BETTZEIT SOUTHEAST ASIA INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(155, 'CREDIT ACCESS PH FINANCING CO.INC.CRP', 'CREDIT ACCESS PH FINANCING CO.INC', 'GCREDITACCESSPHFINANCINGCOINC', 'GCREDITACCESSPHFINANCINGCOINC', NULL, NULL, NULL, NULL, 'CREDIT ACCESS PH FINANCING CO.INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(156, 'ELECTROCOMPUTER DATA SYSTEM.CRP', 'ELECTROCOMPUTER DATA SYSTEM', 'GELECTROCOMPUTERDATASYSTEM', 'GELECTROCOMPUTERDATASYSTEM', NULL, NULL, NULL, NULL, 'ELECTROCOMPUTER DATA SYSTEM', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(157, 'ENJOYLIFE MARKETING CORP.CRP', 'ENJOYLIFE MARKETING CORP', 'GENJOYLIFEMARKETINGCORP', 'GENJOYLIFEMARKETINGCORP', NULL, NULL, NULL, NULL, 'ENJOYLIFE MARKETING CORP', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(158, 'EUROFRAGANCE PHILIPPINES INC.CRP', 'EUROFRAGANCE PHILIPPINES INC', 'GEUROFRAGANCEPHILIPPINESINC', 'GEUROFRAGANCEPHILIPPINESINC', NULL, NULL, NULL, NULL, 'EUROFRAGANCE PHILIPPINES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(159, 'F MUSIQUE BANC ENTERPRISES.CRP', 'F MUSIQUE BANC ENTERPRISES', 'GFMUSIQUEBANCENTERPRISES', 'GFMUSIQUEBANCENTERPRISES', NULL, NULL, NULL, NULL, 'F MUSIQUE BANC ENTERPRISES', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(160, 'FASTJOBS PHILIPPINES INC.CRP', 'FASTJOBS PHILIPPINES INC', 'GFASTJOBSPHILIPPINESINC', 'GFASTJOBSPHILIPPINESINC', NULL, NULL, NULL, NULL, 'FASTJOBS PHILIPPINES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(161, 'FELCRIS DAVAO.FELCRIS CENTRALE.DAVAO.DLR', 'FELCRIS DAVAO.FELCRIS CENTRALE.DAVAO', 'GFELCRISDAVAOFELCRISCENTRALEDAVAO', 'GFELCRISDAVAOFELCRISCENTRALEDAVAO', NULL, NULL, NULL, NULL, 'FELCRIS DAVAO.FELCRIS CENTRALE.DAVAO', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(162, 'FELIPE ROY RUFINO.CRP', 'FELIPE ROY RUFINO', 'GFELIPEROYRUFINO', 'GFELIPEROYRUFINO', NULL, NULL, NULL, NULL, 'FELIPE ROY RUFINO', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(163, 'GADGET HEADZ GADGETS AND ACCESSORIES.DLR', 'GADGET HEADZ GADGETS AND ACCESSORIES', 'GGADGETHEADZGADGETSANDACCESSORIES', 'GGADGETHEADZGADGETSANDACCESSORIES', NULL, NULL, NULL, NULL, 'GADGET HEADZ GADGETS AND ACCESSORIES', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(164, 'GLOBE.HEAD OFFICE.OUT', 'GLOBE.HEAD OFFICE', 'GGLOBEHEADOFFICE', 'GGLOBEHEADOFFICE', NULL, NULL, NULL, NULL, 'GLOBE.HEAD OFFICE', 'DISTRI', NULL, 'DISTRI', 7, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(165, 'GRUNDFOS PUMPS (PHILS.), INC.CRP', 'GRUNDFOS PUMPS (PHILS.), INC', 'GGRUNDFOSPUMPSPHILSINC', 'GGRUNDFOSPUMPSPHILSINC', NULL, NULL, NULL, NULL, 'GRUNDFOS PUMPS (PHILS.), INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(166, 'JMB ALBAY GADGETS.DLR', 'JMB ALBAY GADGETS', 'GJMBALBAYGADGETS', 'GJMBALBAYGADGETS', NULL, NULL, NULL, NULL, 'JMB ALBAY GADGETS', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(167, 'JP SAN PEDRO MUSICAL INSTRUMENT TRD.CRP', 'JP SAN PEDRO MUSICAL INSTRUMENT TRD', 'GJPSANPEDROMUSICALINSTRUMENTTRD', 'GJPSANPEDROMUSICALINSTRUMENTTRD', NULL, NULL, NULL, NULL, 'JP SAN PEDRO MUSICAL INSTRUMENT TRD', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(168, 'KEYSYS INC.CRP', 'KEYSYS INC', 'GKEYSYSINC', 'GKEYSYSINC', NULL, NULL, NULL, NULL, 'KEYSYS INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(169, 'KIMSTORE ENTERPRISE CORP.DLR', 'KIMSTORE ENTERPRISE CORP', 'GKIMSTOREENTERPRISECORP', 'GKIMSTOREENTERPRISECORP', NULL, NULL, NULL, NULL, 'KIMSTORE ENTERPRISE CORP', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(170, 'KUMU INC.CRP', 'KUMU INC', 'GKUMUINC', 'GKUMUINC', NULL, NULL, NULL, NULL, 'KUMU INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(171, 'LIKE ME TRADING.CRP', 'LIKE ME TRADING', 'GLIKEMETRADING', 'GLIKEMETRADING', NULL, NULL, NULL, NULL, 'LIKE ME TRADING', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(172, 'METRO PACIFIC HEALTH TECH CORP.CRP', 'METRO PACIFIC HEALTH TECH CORP', 'GMETROPACIFICHEALTHTECHCORP', 'GMETROPACIFICHEALTHTECHCORP', NULL, NULL, NULL, NULL, 'METRO PACIFIC HEALTH TECH CORP', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:21', NULL, NULL),
-(173, 'NEST MANILA HOME APPLIANCES TRADING.OUT', 'NEST MANILA HOME APPLIANCES TRADING', 'GNESTMANILAHOMEAPPLIANCESTRADING', 'GNESTMANILAHOMEAPPLIANCESTRADING', NULL, NULL, NULL, NULL, 'NEST MANILA HOME APPLIANCES TRADING', 'DISTRI', NULL, 'DISTRI', 7, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(174, 'NEXUS TECHNOLOGIES INC.CRP', 'NEXUS TECHNOLOGIES INC', 'GNEXUSTECHNOLOGIESINC', 'GNEXUSTECHNOLOGIESINC', NULL, NULL, NULL, NULL, 'NEXUS TECHNOLOGIES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(175, 'NURTUREMED PHARMA, INC.CRP', 'NURTUREMED PHARMA, INC', 'GNURTUREMEDPHARMAINC', 'GNURTUREMEDPHARMAINC', NULL, NULL, NULL, NULL, 'NURTUREMED PHARMA, INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(176, 'OR1 MARKETING MANAGEMENT.CRP', 'OR1 MARKETING MANAGEMENT', 'GOR1MARKETINGMANAGEMENT', 'GOR1MARKETINGMANAGEMENT', NULL, NULL, NULL, NULL, 'OR1 MARKETING MANAGEMENT', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(177, 'PC HUB COMPUTER TECHNOLOGY, INC.DLR', 'PC HUB COMPUTER TECHNOLOGY, INC', 'GPCHUBCOMPUTERTECHNOLOGYINC', 'GPCHUBCOMPUTERTECHNOLOGYINC', NULL, NULL, NULL, NULL, 'PC HUB COMPUTER TECHNOLOGY, INC', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(178, 'PROFESSIONAL CREATIVES AND TRADE MARKETERS INC.CRP', 'PROFESSIONAL CREATIVES AND TRADE MARKETERS INC', 'GPROFESSIONALCREATIVESANDTRADEMARKETERSINC', 'GPROFESSIONALCREATIVESANDTRADEMARKETERSINC', NULL, NULL, NULL, NULL, 'PROFESSIONAL CREATIVES AND TRADE MARKETERS INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(179, 'RUSTANS.MAKATI.DLR', 'RUSTANS.MAKATI', 'GRUSTANSMAKATI', 'GRUSTANSMAKATI', NULL, NULL, NULL, NULL, 'RUSTANS.MAKATI', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(180, 'RUSTANS.SHANGRI-LA.EDSA.DLR', 'RUSTANS.SHANGRI-LA.EDSA', 'GRUSTANSSHANGRILAEDSA', 'GRUSTANSSHANGRILAEDSA', NULL, NULL, NULL, NULL, 'RUSTANS.SHANGRI-LA.EDSA', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL);
-INSERT INTO `stores` (`id`, `bea_so_store_name`, `bea_mo_store_name`, `pos_warehouse`, `pos_warehouse_branch`, `pos_warehouse_transit`, `pos_warehouse_transit_branch`, `pos_warehouse_rma`, `pos_warehouse_rma_branch`, `pos_warehouse_name`, `doo_subinventory`, `sit_subinventory`, `org_subinventory`, `channel_id`, `customer_type_id`, `locations_id`, `sts_group`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(181, 'SCHENKER MNL ADMIN COMP CENTER INC.CRP', 'SCHENKER MNL ADMIN COMP CENTER INC', 'GSCHENKERMNLADMINCOMPCENTERINC', 'GSCHENKERMNLADMINCOMPCENTERINC', NULL, NULL, NULL, NULL, 'SCHENKER MNL ADMIN COMP CENTER INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(182, 'SEAOIL PHILIPPINES INC.CRP', 'SEAOIL PHILIPPINES INC', 'GSEAOILPHILIPPINESINC', 'GSEAOILPHILIPPINESINC', NULL, NULL, NULL, NULL, 'SEAOIL PHILIPPINES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(183, 'SHOPHERO TV INC.CRP', 'SHOPHERO TV INC', 'GSHOPHEROTVINC', 'GSHOPHEROTVINC', NULL, NULL, NULL, NULL, 'SHOPHERO TV INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(184, 'START UP ENTERPRISES.CRP', 'START UP ENTERPRISES', 'GSTARTUPENTERPRISES', 'GSTARTUPENTERPRISES', NULL, NULL, NULL, NULL, 'START UP ENTERPRISES', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(185, 'TATRONIC GROUP, INC.DLR', 'TATRONIC GROUP, INC', 'GTATRONICGROUPINC', 'GTATRONICGROUPINC', NULL, NULL, NULL, NULL, 'TATRONIC GROUP, INC', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(186, 'TECHBYTRX COMPUTER PARTS AND ACCESSORIES TRADING.DLR', 'TECHBYTRX COMPUTER PARTS AND ACCESSORIES TRADING', 'GTECHBYTRXCOMPUTERPARTSANDACCESSORIESTRADING', 'GTECHBYTRXCOMPUTERPARTSANDACCESSORIESTRADING', NULL, NULL, NULL, NULL, 'TECHBYTRX COMPUTER PARTS AND ACCESSORIES TRADING', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(187, 'THE INBOX STORE.SM.CLARK PAMPANGA.DLR', 'THE INBOX STORE.SM.CLARK PAMPANGA', 'GTHEINBOXSTORESMCLARKPAMPANGA', 'GTHEINBOXSTORESMCLARKPAMPANGA', NULL, NULL, NULL, NULL, 'THE INBOX STORE.SM.CLARK PAMPANGA', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(188, 'THE PHILIPPINE AMERICAN LIFE AND GENERAL INSURANCE COMPANY.CRP', 'THE PHILIPPINE AMERICAN LIFE AND GENERAL INSURANCE COMPANY', 'GTHEPHILIPPINEAMERICANLIFEANDGENERALINSURANCECOMPANY', 'GTHEPHILIPPINEAMERICANLIFEANDGENERALINSURANCECOMPANY', NULL, NULL, NULL, NULL, 'THE PHILIPPINE AMERICAN LIFE AND GENERAL INSURANCE COMPANY', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(189, 'TL SALES AND MANAGEMENT SERVICES, INC.CRP', 'TL SALES AND MANAGEMENT SERVICES, INC', 'GTLSALESANDMANAGEMENTSERVICESINC', 'GTLSALESANDMANAGEMENTSERVICESINC', NULL, NULL, NULL, NULL, 'TL SALES AND MANAGEMENT SERVICES, INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(190, 'TOTAL BUSINESS AGENCY.CRP', 'TOTAL BUSINESS AGENCY', 'GTOTALBUSINESSAGENCY', 'GTOTALBUSINESSAGENCY', NULL, NULL, NULL, NULL, 'TOTAL BUSINESS AGENCY', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(191, 'VICTORIA COURT.HILLCREST.CRP', 'VICTORIA COURT.HILLCREST', 'GVICTORIACOURTHILLCREST', 'GVICTORIACOURTHILLCREST', NULL, NULL, NULL, NULL, 'VICTORIA COURT.HILLCREST', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(192, 'WARNER MUSIC PHILIPPINES INC.CRP', 'WARNER MUSIC PHILIPPINES INC', 'GWARNERMUSICPHILIPPINESINC', 'GWARNERMUSICPHILIPPINESINC', NULL, NULL, NULL, NULL, 'WARNER MUSIC PHILIPPINES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(193, 'WESTCON SOLUTIONS PHILIPPINES INC.CRP', 'WESTCON SOLUTIONS PHILIPPINES INC', 'GWESTCONSOLUTIONSPHILIPPINESINC', 'GWESTCONSOLUTIONSPHILIPPINESINC', NULL, NULL, NULL, NULL, 'WESTCON SOLUTIONS PHILIPPINES INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(194, 'WORLD SOLUTION TECHNOLOGY INC.CRP', 'WORLD SOLUTION TECHNOLOGY INC', 'GWORLDSOLUTIONTECHNOLOGYINC', 'GWORLDSOLUTIONTECHNOLOGYINC', NULL, NULL, NULL, NULL, 'WORLD SOLUTION TECHNOLOGY INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(195, 'XUNDD TRADING CORPORATION.DLR', 'XUNDD TRADING CORPORATION', 'GXUNDDTRADINGCORPORATION', 'GXUNDDTRADINGCORPORATION', NULL, NULL, NULL, NULL, 'XUNDD TRADING CORPORATION', 'DISTRI', NULL, 'DISTRI', 10, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2022-03-25 10:56:22', NULL, NULL),
-(196, 'ABENSON.HEAD OFFICE.CON', 'ABENSON HEAD OFFICE CON', 'GABENSONHOFCCON', 'GABENSONHOFCCON', NULL, NULL, NULL, NULL, 'ABENSON HEAD OFFICE CON', 'ABENSON', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-03-30 17:52:23', '2022-03-30 18:16:21', NULL),
-(197, 'R.O.X.AYALA.BONIFACIO HIGH STREET.CON', 'R.O.X. AYALA BONIFACIO HIGH STREET CON', 'GROXAYALABHSCON', 'GROXAYALABHSCON', NULL, NULL, NULL, NULL, 'R.O.X. AYALA BONIFACIO HIGH STREET CON', 'ROX', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-03-30 17:54:56', '2022-03-30 18:16:45', NULL),
-(198, 'MONEYGURU PHILIPPINES CORP.CRP', 'MONEYGURU PHILIPPINES CORP', 'MONEYGURUPHILIPPINESCORP', 'MONEYGURUPHILIPPINESCORP', NULL, NULL, NULL, NULL, 'MONEYGURU PHILIPPINES CORP', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-04-13 02:50:38', NULL, NULL),
-(199, 'PURE MOVEMENT LAB.CON', 'PURE MOVEMENT LAB.CON', 'PUREMOVEMENTLABCON', 'PUREMOVEMENTLABCON', NULL, NULL, NULL, NULL, 'PURE MOVEMENT LAB CON', 'PURE MOVE', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', NULL, NULL, '2022-04-13 07:35:46', NULL, NULL),
-(200, 'SM DEPARTMENT STORE.SM.MEGAMALL.CON', 'SM DEPARTMENT STORE SM MEGAMALL CON', 'SMDEPTSMMEGAMALLCON', 'SMDEPTSMMEGAMALLCON', NULL, NULL, NULL, NULL, 'SM DEPT STORE SM MEGAMALL CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', NULL, 1, '2022-04-13 07:39:59', '2022-06-22 00:40:59', NULL),
-(201, 'LISTENING ROOM.SM.MEGAMALL.DLR', 'LISTENING ROOM SM MEGAMALL', 'LISTENINGROOMSMMEGAMALL', 'LISTENINGROOMSMMEGAMALL', NULL, NULL, NULL, NULL, 'LISTENING ROOM SM MEGAMALL', 'DISTRI', NULL, 'DISTRI', 7, 8, NULL, NULL, 'ACTIVE', NULL, 73, '2022-04-18 02:37:27', '2022-07-04 08:41:29', NULL),
-(202, 'XIAOMI.AYALA.CIRCUIT MAKATI.RTL', 'XIAOMI AYALA CIRCUIT MAKATI RTL', 'GXMICIRCUITMKTI', 'XMICIRCUITMKTI', 'TXMICIRCUITMKTI', 'TXMICIRCUITMKTI', 'RXMICIRCUITMKTI', 'RXMICIRCUITMKTI', 'XIAOMI CIRCUIT MAKATI', 'RETAIL', NULL, 'RETAIL', 1, 9, NULL, 1, 'ACTIVE', NULL, NULL, '2022-04-21 07:27:17', NULL, NULL),
-(203, 'NOTHING.LAZADA.FBD.ONL', 'NOTHING LAZADA FBD', 'GNOTHINGLAZADA', 'NOTHINGLAZADA', 'TNOTHINGLAZADA', 'TNOTHINGLAZADA', 'RNOTHINGLAZADA', 'RNOTHINGLAZADA', 'NOTHING LAZADA', 'LAZADA', 'LAZADA FBD', 'ECOM', 4, 7, 1, 3, 'ACTIVE', 1, 1, '2022-04-28 02:31:36', '2022-07-01 02:00:44', NULL),
-(204, 'NOTHING.SHOPEE.FBD.ONL', 'NOTHING SHOPEE FBD', 'GNOTHINGSHOPEE', 'NOTHINGSHOPEE', 'TNOTHINGSHOPEE', 'TNOTHINGSHOPEE', 'RNOTHINGSHOPEE', 'RNOTHINGSHOPEE', 'NOTHING SHOPEE', 'SHOPEE', 'SHOPEE FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, 73, '2022-04-28 02:33:52', '2022-06-30 01:22:23', NULL),
-(205, 'NOTHING.LAZADA.FBV.ONL', 'NOTHING LAZADA FBV', 'GNOTHINGLAZADAFBV', 'NOTHINGLAZADAFBV', NULL, NULL, NULL, NULL, 'NOTHING LAZADA FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2022-04-28 02:41:51', NULL, NULL),
-(206, 'SPECK.LAZADA.FBV.ONL', 'SPECK LAZADA FBV', 'GLAZSPECKFBV', 'LAZSPECKFBV', NULL, NULL, NULL, NULL, 'SPECK LAZADA FBV', 'LAZADA', NULL, 'ECOM', 4, 7, NULL, NULL, 'ACTIVE', 1, NULL, '2022-05-12 03:50:39', NULL, NULL),
-(207, 'CLEARANCE.DW ROB ANTIPOLO 2022.RTL', 'CLEARANCE DW ROB ANTIPOLO 2022 RTL', 'GDWROBANTIPOLO', 'DWROBANTIPOLO', 'TDWROBANTIPOLO', 'TDWROBANTIPOLO', 'RDWROBANTIPOLO', 'RDWROBANTIPOLO', 'DW ROB ANTIPOLO', 'RETAIL', NULL, 'RETAIL', 1, 9, 1, 1, 'ACTIVE', 1, NULL, '2022-05-19 10:45:57', NULL, NULL),
-(208, 'EL OBSERVATORIO DE MANILA, INC.CRP', 'EL OBSERVATORIO DE MANILA, INC', 'ELOBSERVATORIODEMANILA', 'ELOBSERVATORIODEMANILA', NULL, NULL, NULL, NULL, 'EL OBSERVATORIO DE MANILA, INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-06 06:03:30', NULL, NULL),
-(209, 'SM APPLIANCE.SM.MEGAMALL.CON', 'SM APPLIANCE SM MEGAMALL CON', 'GSMAPPMEGAMALL', 'SMAPPMEGAMALL', NULL, NULL, NULL, NULL, 'SM APP MEGAMALL CON', 'SM APP', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-09 03:09:23', NULL, NULL),
-(210, 'DIGITAL WALKER.AYALA TRIANGLE.SERENE.RTL', 'DIGITAL WALKER AYALA TRIANGLE SERENE RTL', 'GDWAYALASERENE', 'DWAYALASERENE', 'TDWAYALASERENE', 'TDWAYALASERENE', 'RDWAYALASERENE', 'RDWAYALASERENE', 'DW AYALA SERENE', 'RETAIL', NULL, 'RETAIL', 1, 9, 1, 1, 'ACTIVE', 1, NULL, '2022-06-10 09:34:55', NULL, NULL),
-(211, 'UNIGLOBE TRAVELWARE CO. INC.CON', 'UNIGLOBE TRAVELWARE CO INC CON', 'GUNIGLOBE', 'UNIGLOBE', NULL, NULL, NULL, NULL, 'UNIGLOBE TRAVELWARE CO INC CON', 'TRAVELCLUB', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, 1, '2022-06-22 00:08:32', '2022-06-22 00:09:20', NULL),
-(212, 'SM DEPARTMENT STORE.SM.MAKATI.CON', 'SM DEPARTMENT STORE SM MAKATI CON', 'GSMMAKATICON', 'GSMMAKATICON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM MAKATI CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:52', NULL, NULL),
-(213, 'SM DEPARTMENT STORE.SM.MANILA.CON', 'SM DEPARTMENT STORE SM MANILA CON', 'GSMMANILACON', 'GSMMANILACON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM MANILA CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:52', NULL, NULL),
-(214, 'SM DEPARTMENT STORE.SM.MARIKINA.CON', 'SM DEPARTMENT STORE SM MARIKINA CON', 'GSMMARIKINACON', 'GSMMARIKINACON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM MARIKINA CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:52', NULL, NULL),
-(215, 'SM DEPARTMENT STORE.SM.MALL OF ASIA.CON', 'SM DEPARTMENT STORE SM MALL OF ASIA CON', 'GSMMOACON', 'GSMMOACON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM MALL OF ASIA CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:52', NULL, NULL),
-(216, 'SM DEPARTMENT STORE.SM.NORTH EDSA.CON', 'SM DEPARTMENT STORE SM NORTH EDSA CON', 'GSMNORTHEDSACON', 'GSMNORTHEDSACON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM NORTH EDSA CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:52', NULL, NULL),
-(217, 'SM DEPARTMENT STORE.SM.SOUTHMALL.CON', 'SM DEPARTMENT STORE SM SOUTHMALL CON', 'GSMSOUTHMALLCON', 'GSMSOUTHMALLCON', NULL, NULL, NULL, NULL, 'SM DEPARTMENT STORE SM SOUTHMALL CON', 'SM DEPT', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 00:30:53', NULL, NULL),
-(218, 'TOBY\'S.AYALA.GLORIETTA 4.CON', 'TOBY\'S AYALA GLORIETTA 4 CON', 'GAYALAGLORIETTA4', 'GAYALAGLORIETTA4', NULL, NULL, NULL, NULL, 'TOBY\'S AYALA GLORIETTA 4 CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:21', NULL, NULL),
-(219, 'TOBY\'S.SM.MALL OF ASIA.CON', 'TOBY\'S SM MALL OF ASIA CON', 'GSMMALLOFASIA', 'GSMMALLOFASIA', NULL, NULL, NULL, NULL, 'TOBY\'S SM MALL OF ASIA CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:21', NULL, NULL),
-(220, 'TOBY\'S.SM.THE BLOCK.CON', 'TOBY\'S SM THE BLOCK CON', 'GSMTHEBLOCK', 'GSMTHEBLOCK', NULL, NULL, NULL, NULL, 'TOBY\'S SM THE BLOCK CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:21', NULL, NULL),
-(221, 'TOBY\'S.AYALA.TRINOMA.CON', 'TOBY\'S AYALA TRINOMA CON', 'GAYALATRINOMA', 'GAYALATRINOMA', NULL, NULL, NULL, NULL, 'TOBY\'S AYALA TRINOMA CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:21', NULL, NULL),
-(222, 'TOBY\'S.AYALA.GLORIETTA 2.CON', 'TOBY\'S AYALA GLORIETTA 2 CON', 'GAYALAGLORIETTA2', 'GAYALAGLORIETTA2', NULL, NULL, NULL, NULL, 'TOBY\'S AYALA GLORIETTA 2 CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:21', NULL, NULL),
-(223, 'TOBY\'S.SM.SAN LAZARO.CON', 'TOBY\'S SM SAN LAZARO CON', 'GSMSANLAZARO', 'GSMSANLAZARO', NULL, NULL, NULL, NULL, 'TOBY\'S SM SAN LAZARO CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:22', NULL, NULL),
-(224, 'TOBY\'S.SM.AURA.CON', 'TOBY\'S SM AURA CON', 'GSMAURA', 'GSMAURA', NULL, NULL, NULL, NULL, 'TOBY\'S SM AURA CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:22', NULL, NULL),
-(225, 'TOBY\'S.SM.MEGAMALL.CON', 'TOBY\'S SM MEGAMALL CON', 'GSMMEGAMALL', 'GSMMEGAMALL', NULL, NULL, NULL, NULL, 'TOBY\'S SM MEGAMALL CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:22', NULL, NULL),
-(226, 'TOBY\'S.SHANGRI-LA.EDSA.CON', 'TOBY\'S SHANGRI-LA EDSA CON', 'GSHANGRILAEDSA', 'GSHANGRILAEDSA', NULL, NULL, NULL, NULL, 'TOBY\'S SHANGRI-LA EDSA CON', 'TOBYS', NULL, 'DISTRI', 6, 2, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 01:49:22', NULL, NULL),
-(227, 'ECOM.DIGITS.FBD.ONL', 'ECOM DIGITS FBD', 'GECOMFBD', 'ECOMFBD', 'TECOMFBD', 'TECOMFBD', 'RECOMFBD', 'RECOMFBD', 'ECOM FBD', NULL, 'ECOM FBD', 'ECOM', 4, 7, NULL, 3, 'ACTIVE', 1, NULL, '2022-06-22 07:32:38', NULL, NULL),
-(228, 'ESP COMMERCIAL.CRP', 'ESP COMMERCIAL', 'GESPCOMMERCIAL', 'GESPCOMMERCIAL', NULL, NULL, NULL, NULL, 'ESP COMMERCIAL', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-06-22 08:05:10', NULL, NULL),
-(229, 'ASTRAL DATA SYSTEMS INC.CRP', 'ASTRAL DATA SYSTEMS INC', 'GASTRALDATASYSTEMSINC', 'GASTRALDATASYSTEMSINC', NULL, NULL, NULL, NULL, 'ASTRAL DATA SYSTEMS INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-07-08 07:05:23', NULL, NULL),
-(230, 'IONTECH INC.CRP', 'IONTECH INC', 'GIONTECHINC', 'GIONTECHINC', NULL, NULL, NULL, NULL, 'IONTECH INC', 'DISTRI', NULL, 'DISTRI', 11, 3, NULL, NULL, 'ACTIVE', 1, NULL, '2022-07-13 07:41:54', NULL, NULL);
+INSERT INTO `stores` (`id`, `store_code`, `channels_id`, `bea_so_store_name`, `bea_mo_store_name`, `pos_warehouse`, `pos_warehouse_branch`, `pos_warehouse_transit`, `pos_warehouse_transit_branch`, `pos_warehouse_rma`, `pos_warehouse_rma_branch`, `pos_warehouse_name`, `doo_subinventory`, `sit_subinventory`, `org_subinventory`, `channel_id`, `customer_type_id`, `locations_id`, `sts_group`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'BAD_BIRD', 8, NULL, 'BAD BIRD MANILA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, 1, '2019-12-21 00:24:37', '2020-01-24 03:58:53', '2021-02-24 00:03:44'),
+(2, 'COMMISSARY', 5, NULL, 'COMMISSARY SAN JUAN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-28 00:10:51', NULL),
+(3, 'COMMISSARY', 5, NULL, 'COMMISSARY CAVITE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-28 00:11:04', NULL),
+(4, 'FLOWER_BOY', 10, NULL, 'FLOWERBOY THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 04:06:55', NULL),
+(5, 'TSUKE_MEN', 5, NULL, 'TSUKE-MEN THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-25 01:02:55', NULL),
+(6, 'GOCHUGANG', 10, NULL, 'GOCHU GANG THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 04:05:36', NULL),
+(7, 'BEEFIER', 10, NULL, 'BEEFIER THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 03:59:57', NULL),
+(8, 'BABU', 10, NULL, 'BABU THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 03:58:18', NULL),
+(9, 'SAMYAN_KITCHEN', 10, NULL, 'SAMYAN THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 04:05:31', NULL),
+(10, 'GRANIVORE', 10, NULL, 'GRANIVORE THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 04:07:09', NULL),
+(11, 'WRONG_RAMEN', 5, NULL, 'WRONG RAMEN HYDRA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-25 01:03:24', NULL),
+(12, 'YOUR_LOCAL', 10, NULL, 'YOUR LOCAL MAKATI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:27:44', '2020-01-24 04:06:03', NULL),
+(13, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN TRINOMA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-21 00:34:10', '2020-01-25 00:34:15', NULL),
+(14, 'FOWL_BREAD', 10, NULL, 'FOWL BREAD BGC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 1, '2019-12-26 22:59:09', '2020-01-24 04:09:21', NULL),
+(15, 'BAD_BIRD', 8, NULL, 'BAD BIRD SERENDRA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-24 03:59:24', NULL, '2021-07-06 22:17:49'),
+(16, 'CUBA_LIBRE', 5, NULL, 'CUBA LIBRE THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-24 04:00:44', NULL, '2021-02-24 00:04:00'),
+(17, 'BAD_BIRD', 10, NULL, 'BAD BIRD MEGAMALL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-24 04:03:35', NULL, NULL),
+(19, 'BAD_BIRD', 10, NULL, 'BAD BIRD HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, 4, '2020-01-24 04:14:17', '2021-08-26 14:25:14', '2021-10-01 14:27:35'),
+(20, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN THE GROVE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-25 00:34:38', NULL, NULL),
+(21, 'HANAMARUKEN', 8, NULL, 'HANAMARUKEN SERENDRA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 4, '2020-01-25 00:35:49', '2020-05-15 00:54:16', NULL),
+(22, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN SANTOLAN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-25 00:38:13', NULL, NULL),
+(23, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN MARILAO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-25 00:38:56', NULL, '2020-03-15 04:12:00'),
+(24, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN FORBESTOWN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-25 00:39:42', NULL, NULL),
+(25, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN ATC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-25 00:40:39', NULL, NULL),
+(26, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR FAIRVIEW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, 4, '2020-01-28 00:04:38', '2022-07-07 10:04:13', NULL),
+(27, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR MANILA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:05:39', NULL, NULL),
+(28, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR NORTH EDSA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, 4, '2020-01-28 00:06:26', '2022-10-06 06:26:58', NULL),
+(29, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR SANTOLAN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:07:11', NULL, NULL),
+(30, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR UP TOWN CENTER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:08:00', NULL, NULL),
+(31, 'BBX', 8, NULL, 'BBX GLORIETTA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-28 00:08:45', NULL, '2021-07-06 22:17:41'),
+(32, 'THE_GRID', 5, NULL, 'THE GRID ROCKWELL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:11:54', NULL, NULL),
+(33, 'SCOUTS_HONOR', 5, NULL, 'SCOUT\'S HONOR HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-28 00:13:20', NULL, '2021-02-24 00:05:15'),
+(34, 'SCOUTS_HONOR', 5, NULL, 'SCOUT\'S HONOR UPTOWN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:14:43', NULL, NULL),
+(35, 'SCOUTS_HONOR', 5, NULL, 'SCOUT\'S HONOR VERTIS', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:15:42', NULL, NULL),
+(36, 'WORKSHOP', 5, NULL, 'WORKSHOP THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:16:37', NULL, NULL),
+(37, 'EAT_YOURSELF_BANKRUPT', 5, NULL, 'EAT YOURSELF BANKRUPT MANILA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:20:50', NULL, NULL),
+(38, 'PIZZA_EXPRESS', 5, NULL, 'PIZZA EXPRESS MEGAMALL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:22:40', NULL, NULL),
+(39, 'PIZZA_EXPRESS', 5, NULL, 'PIZZA EXPRESS UPTOWN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:23:31', NULL, NULL),
+(40, 'LE_PETIT_SOUFFLE', 5, NULL, 'LE PETIT SOUFFLE CCM', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-28 00:24:33', NULL, '2021-07-06 22:18:14'),
+(41, 'POISON', 5, NULL, 'POISON HYDRA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-01-28 00:25:23', NULL, NULL),
+(42, 'POSPORO', 5, NULL, 'POSPORO HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-28 00:26:34', NULL, '2021-02-24 00:04:30'),
+(43, 'HOLE_IN_THE_WALL', 5, NULL, 'HOLE IN THE WALL CCM', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-01-28 00:29:33', NULL, '2021-02-24 00:04:30'),
+(44, 'WORKSHOP', 5, NULL, 'WORKSHOP HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-02-01 03:09:30', NULL, '2021-02-24 00:05:15'),
+(45, 'CHAMPION_HOTPOT', 5, NULL, 'CHAMPION HOTPOT', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-03-15 04:06:57', NULL, NULL),
+(46, 'COMMISSARY', 5, NULL, 'COMMISSARY P. TUAZON', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2020-03-15 04:07:29', '2020-06-18 16:45:22', NULL),
+(47, 'GATSUMAN', 5, NULL, 'GATSUMAN UPTOWN MALL BGC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-03-15 04:10:29', '2021-09-22 21:35:05', NULL),
+(48, 'GRANIVORE', 10, NULL, 'GRANIVORE PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2020-03-15 04:11:23', '2020-03-15 21:05:22', '2021-02-24 00:04:00'),
+(49, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN BAGUIO', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, NULL, '2020-03-15 04:12:15', NULL, '2021-07-06 22:17:59'),
+(50, 'SAMYAN_KITCHEN', 10, NULL, 'SAMYAN MOA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2020-03-15 04:16:14', '2020-03-15 04:19:50', '2021-02-24 00:04:45'),
+(52, 'SAMYAN_KITCHEN', 10, NULL, 'SAMYAN ONE BONI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, NULL, '2020-03-15 04:20:06', NULL, '2021-02-24 00:04:45'),
+(53, 'RAMEN_BAR', 12, NULL, 'RAMEN BAR GREENFIELDS', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-03-15 04:21:13', NULL, NULL),
+(54, 'PUBLIC_EATERY', 5, NULL, 'PUBLIC EATERY MAGNOLIA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-03-15 04:21:38', '2022-08-17 23:51:55', NULL),
+(55, 'PRACTICAL_COFFEE', 5, NULL, 'PRACTICAL COFFEE SKY RANCH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-03-15 04:22:19', '2021-12-17 14:08:39', NULL),
+(56, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, 4, '2020-03-29 21:38:30', '2021-03-05 19:06:03', '2021-07-06 22:18:09'),
+(57, 'SCOUTS_KITCHEN', 5, NULL, 'SCOUT\'S KITCHEN', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-03-29 21:44:06', NULL, '2021-02-24 00:05:15'),
+(58, 'SCOUTS_PASTRY', 5, NULL, 'SCOUT\'S PASTRY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-03-29 21:44:23', NULL, '2021-02-24 00:05:15'),
+(59, 'SLABBERS', 5, NULL, 'SLABBERS HITW', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 1, NULL, '2020-03-29 21:45:12', NULL, '2021-02-24 00:05:15'),
+(61, 'THE_DAILY_CUT', 12, NULL, 'THE DAILY CUT', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, NULL, '2020-03-29 22:13:27', NULL, NULL),
+(62, 'COMMI_PASTRY', 5, NULL, 'COMMISSARY PASTRY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-06-18 16:42:05', NULL, NULL),
+(63, 'TSUKE_MEN', 5, NULL, 'TSUKE-MEN HYDRA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-07-21 16:26:13', NULL, NULL),
+(64, 'COMMISSARY', 5, NULL, 'CORP PLAN DEPT.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2020-08-14 22:00:43', '2020-08-14 22:09:24', '2022-05-14 12:17:33'),
+(65, 'COMMISSARY', 5, NULL, 'ACCOUNTING DEPT', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-08-14 22:06:20', NULL, NULL),
+(66, 'COMMISSARY', 5, NULL, 'PURCHASING DEPT.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2020-08-14 22:08:49', NULL, NULL),
+(67, 'PS_CAFE_BAR', 10, NULL, 'PS CAFE BAR', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-09-08 20:37:44', '2021-06-25 15:30:10', NULL),
+(68, 'SPICEBIRD', 12, NULL, 'SPICEBIRD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, NULL, '2020-09-08 20:37:56', NULL, '2021-10-01 14:28:25'),
+(69, 'COMMISSARY', 5, NULL, 'PRODUCTION DRY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-11-19 17:45:16', '2020-11-24 16:51:14', NULL),
+(70, 'COMMISSARY', 5, NULL, 'PRODUCTION WET', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-11-19 17:54:25', '2020-11-24 16:51:02', NULL),
+(71, 'COMMI_PASTRY', 5, NULL, 'PRODUCTION PASTRY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2020-11-19 17:55:25', '2020-11-24 16:51:08', NULL),
+(72, 'HANAMARUKEN', 5, NULL, 'HANAMARUKEN ESTANCIA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-01-14 01:42:02', NULL, NULL),
+(73, 'GOCHUGANG', 10, NULL, 'GOCHU-RUN EATOGETHER', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2021-02-25 01:58:48', '2021-12-17 14:09:32', NULL),
+(74, 'WHITE_FLOWER_TH', 10, NULL, 'WHITE FLOWER TEA HOUSE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 1, 4, '2021-03-05 16:43:22', '2021-03-05 19:03:33', NULL),
+(75, 'TSUKE_MEN', 10, NULL, 'TSUKE-MEN MOA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2021-07-06 22:13:46', '2021-07-06 22:14:15', NULL),
+(76, 'LE_PETIT_SOUFFLE', 5, NULL, 'LE PETIT SOUFFLE CCM', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, 4, '2021-07-10 03:06:55', '2022-08-10 03:51:51', NULL),
+(77, 'TSUKE_MEN', 5, NULL, 'TSUKE-MEN SKY RANCH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-07-24 02:56:28', NULL, NULL),
+(78, 'SAMYAN_KITCHEN', 10, NULL, 'THE PAD', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-08-23 20:29:35', NULL, NULL),
+(79, 'BAD_BIRD', 5, NULL, 'BAD BIRD THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-09-08 00:37:23', NULL, NULL),
+(80, 'OK_BOB', 10, NULL, 'OK BOB THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-10-01 14:26:45', NULL, NULL),
+(81, 'SCOUTS_HONOR', 8, NULL, 'SCOUT\'S HONOR ROBINSON\'S MAGNOLIA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2021-10-09 21:46:31', '2021-10-09 21:47:10', NULL),
+(82, 'DRIPP', 10, NULL, 'DRIPP THE GRID', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-11-11 08:19:30', NULL, NULL),
+(83, 'PIZZA_EXPRESS', 5, NULL, 'PIZZA EXPRESS ROCKWELL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 130, NULL, '2021-11-22 02:35:25', NULL, NULL),
+(84, 'BAD_BIRD', 5, NULL, 'BAD BIRD SKY RANCH', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2021-12-15 06:00:17', NULL, NULL),
+(85, 'BAD_BIRD', 5, NULL, 'BAD BIRD ALABANG WEST PARADE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-01-10 06:37:52', NULL, NULL),
+(86, 'TSUKE_MEN', 5, NULL, 'TSUKE-MEN ALABANG WEST PARADE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-01-10 06:38:43', '2022-01-21 06:58:58', NULL),
+(87, 'GATSUMAN', 5, NULL, 'GASUMAN THE OUTLETS', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-03-14 07:10:58', '2022-03-14 07:11:51', NULL),
+(88, 'SAMYAN_KITCHEN', 10, NULL, 'SAMYAN PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-07-06 05:33:49', NULL, NULL),
+(89, 'BAD_BIRD', 5, NULL, 'BAD BIRD PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-07-06 05:34:24', NULL, NULL),
+(90, 'TEN', 5, NULL, 'TEN PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-07-07 05:07:57', NULL, NULL),
+(91, 'THE_BEVERAGE_BAR', 5, NULL, 'THE BEVERAGE BAR PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-07-07 05:08:22', NULL, NULL),
+(92, 'THE_BEVERAGE_BAR', 5, NULL, 'THE BEVERAGE BAR PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'INACTIVE', 4, NULL, '2022-07-07 05:08:22', NULL, NULL),
+(93, 'ANYHOW', 10, NULL, 'ANYHOW PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-07-07 05:08:41', NULL, NULL),
+(94, 'BAD_BIRD', 8, NULL, 'BAD BIRD ERMITA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-08 06:11:28', '2022-09-08 06:14:00', NULL),
+(95, 'BAD_BIRD', 5, NULL, 'BAD BIRD MANIAL', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-09-08 06:11:51', NULL, '2022-09-08 06:12:07'),
+(96, 'TSUKE_MEN', 8, NULL, 'TSUKE-MEN MANILA', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-08 06:13:01', '2022-09-08 06:13:41', NULL),
+(97, 'MATCHA_TOKYO', 5, NULL, 'MATCHA TOKYO MITSUKOSHI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-27 12:58:15', '2022-09-29 07:27:36', NULL),
+(98, 'MITSUKOSHI', 5, NULL, 'MITSUKOSHI BGC', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-09-29 07:17:14', NULL, NULL),
+(99, 'BOOKOH', 5, NULL, 'BOOKOH MITSUKOSHI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-29 07:17:44', '2022-09-29 07:27:28', NULL),
+(100, 'MANILA_INASAL', 5, NULL, 'MANILA INASAL MITSUKOSHI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-29 07:18:22', '2022-09-29 07:27:34', NULL),
+(101, 'BAD_BIRD', 5, NULL, 'BAD BIRD MITSUKOSHI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, 4, '2022-09-29 07:18:44', '2022-09-29 07:27:25', NULL),
+(102, 'OK_BOB', 10, NULL, 'OK BOB PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-10-04 04:37:52', NULL, NULL),
+(103, 'BOOKOH', 10, NULL, 'BOOKOH PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-10-04 04:38:50', NULL, NULL),
+(104, 'KONBINI_KARAAGE', 5, NULL, 'KONBINI KARAAGE PUBLIC EATERY', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-10-05 01:29:51', NULL, NULL),
+(105, 'MATCHA_TOKYO', 5, NULL, 'THE MATCHA TOKYO MITSUKOSHI', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'ACTIVE', 4, NULL, '2022-11-07 07:14:29', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -11171,9 +11165,7 @@ ALTER TABLE `arf_type`
 -- Indexes for table `assets`
 --
 ALTER TABLE `assets`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `digits_code` (`digits_code`),
-  ADD UNIQUE KEY `asset_code` (`asset_code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `assets_header_images`
@@ -11667,7 +11659,7 @@ ALTER TABLE `cms_email_templates`
 -- AUTO_INCREMENT for table `cms_logs`
 --
 ALTER TABLE `cms_logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5507;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5629;
 
 --
 -- AUTO_INCREMENT for table `cms_menus`
@@ -11679,7 +11671,7 @@ ALTER TABLE `cms_menus`
 -- AUTO_INCREMENT for table `cms_menus_privileges`
 --
 ALTER TABLE `cms_menus_privileges`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=690;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=692;
 
 --
 -- AUTO_INCREMENT for table `cms_moduls`
@@ -11703,7 +11695,7 @@ ALTER TABLE `cms_privileges`
 -- AUTO_INCREMENT for table `cms_privileges_roles`
 --
 ALTER TABLE `cms_privileges_roles`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=468;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=469;
 
 --
 -- AUTO_INCREMENT for table `cms_settings`
@@ -11739,7 +11731,7 @@ ALTER TABLE `comments_good_defect_tbl`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `condition_type`
@@ -11769,7 +11761,7 @@ ALTER TABLE `digits_imfs`
 -- AUTO_INCREMENT for table `employees`
 --
 ALTER TABLE `employees`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- AUTO_INCREMENT for table `fulfillment_histories`
@@ -11865,13 +11857,13 @@ ALTER TABLE `statuses_employees`
 -- AUTO_INCREMENT for table `status_matrices`
 --
 ALTER TABLE `status_matrices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=231;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=106;
 
 --
 -- AUTO_INCREMENT for table `sub_department`
