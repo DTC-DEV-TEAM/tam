@@ -187,7 +187,7 @@
 			$this->script_js = "
 			$(document).ready(function() {
 
-				$('#category_id').attr('disabled', 'true');
+				//$('#category_id').attr('disabled', 'true');
 
 			});
 			";
@@ -325,7 +325,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-			unset($postdata['category_id']);
+			//unset($postdata['category_id']);
 
 			$postdata['updated_by']=CRUDBooster::myId();
 	    }
