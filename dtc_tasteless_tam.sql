@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2022 at 11:28 AM
+-- Generation Time: Nov 11, 2022 at 06:04 AM
 -- Server version: 10.1.38-MariaDB
 -- PHP Version: 7.4.29
 
@@ -2412,7 +2412,7 @@ CREATE TABLE `class` (
 --
 
 INSERT INTO `class` (`id`, `category_id`, `class_code`, `class_description`, `useful_life`, `class_status`, `created_by`, `updated_by`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 1, 'FAF', 'FURNITURES AND FIXTURES', NULL, 'ACTIVE', 4, 177, '2020-02-12 03:47:41', '2020-02-13 05:22:27', NULL),
+(1, 1, 'FAF', 'FURNITURES AND FIXTURES', NULL, 'ACTIVE', 4, 177, '2020-02-12 03:47:41', '2020-02-13 05:22:27', '2022-11-11 05:03:01'),
 (2, 1, 'EQP', 'EQUIPMENT', NULL, 'ACTIVE', 4, 177, '2020-02-12 03:47:51', '2020-02-13 05:22:16', NULL),
 (3, 2, 'OFS', 'OFFICE SUPPLIES', '2', 'ACTIVE', 4, 3, '2020-02-12 03:47:58', '2022-08-30 10:30:23', NULL),
 (4, 2, 'UTS', 'UTILITY SUPPLIES', NULL, 'ACTIVE', 4, 177, '2020-02-12 03:48:05', '2020-02-13 05:22:57', NULL),
@@ -8256,7 +8256,12 @@ INSERT INTO `cms_logs` (`id`, `ipaddress`, `useragent`, `url`, `description`, `d
 (5625, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'approverpersonnel@digits.ph logout', '', 593, '2022-11-10 10:11:40', NULL),
 (5626, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'it@digits.ph login with IP Address 127.0.0.1', '', 597, '2022-11-10 10:11:47', NULL),
 (5627, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'it@digits.ph logout', '', 597, '2022-11-10 10:27:45', NULL),
-(5628, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-10 10:27:52', NULL);
+(5628, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-10 10:27:52', NULL),
+(5629, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'marvinmosico@digits.ph logout', '', 601, '2022-11-10 10:30:10', NULL),
+(5630, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/logout', 'store@digits.ph logout', '', 604, '2022-11-10 10:30:28', NULL),
+(5631, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'marvinmosico@digits.ph login with IP Address 127.0.0.1', '', 601, '2022-11-11 03:43:55', NULL),
+(5632, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/login', 'store@digits.ph login with IP Address 127.0.0.1', '', 604, '2022-11-11 05:00:46', NULL),
+(5633, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36', 'http://127.0.0.1:8002/admin/sub_categories/delete/1', 'Delete data 1 at Sub Categories', '', 601, '2022-11-11 05:03:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -11659,7 +11664,7 @@ ALTER TABLE `cms_email_templates`
 -- AUTO_INCREMENT for table `cms_logs`
 --
 ALTER TABLE `cms_logs`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5629;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5634;
 
 --
 -- AUTO_INCREMENT for table `cms_menus`

@@ -736,7 +736,7 @@
 
 		public function getSyncItemMaster(){
             
-            $secretKey = "7baf82363ee048337aa044471b9b0e94"; 
+			$secretKey = "7baf82363ee048337aa044471b9b0e94"; 
             $uniqueString = time(); 
             $userAgent = $_SERVER['HTTP_USER_AGENT']; 
             $userAgent = $_SERVER['HTTP_USER_AGENT']; 
@@ -751,9 +751,7 @@
     
             //https://stackoverflow.com/questions/8115683/php-curl-custom-headers
             $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,"http://dimfs.digitstrading.ph/api/das_items_created");
-			//curl_setopt($ch, CURLOPT_URL,"https://jsonplaceholder.typicode.com/todos");
-			
+            curl_setopt($ch, CURLOPT_URL,"https://dimfs.digitstrading.ph/api/das_items");
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
