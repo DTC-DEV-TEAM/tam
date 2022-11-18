@@ -106,7 +106,11 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/employees/download-template-employee','AdminEmployeesController@DownloadEmployeeTemplate');
     Route::post('/admin/employees/upload-employees','AdminEmployeesController@BulkEmployeesUpload')->name('upload-employees');
 
-
+    //users
+    Route::get('/admin/users/user-account-upload','AdminCmsUsersController@UploadUserAccount');
+    Route::post('/admin/users/upload-users','AdminCmsUsersController@userAccountUpload')->name('upload-users');
+    Route::get('/admin/users/upload-user-account-template','AdminCmsUsersController@uploadUserAccountTemplate');
+    Route::get('/admin/db-truncate','TruncateController@dbtruncate');
     Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

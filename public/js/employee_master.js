@@ -569,7 +569,7 @@ $( document ).ready(function() {
 
     });
 
-    $('#contact_person_ln').on('change keyup click', function() {
+    $('#first_name').on('change keyup click', function() {
 
         name1 = this.value;
 
@@ -581,7 +581,7 @@ $( document ).ready(function() {
                 checkConcatName();
             }else{
 
-                if($('#contact_person_ln').val() == null || $('#contact_person_ln').val() == ''){
+                if($('#first_name').val() == null || $('#first_name').val() == ''){
                     // name1 += ', ';
                     name1 = '';
                     channel_code = '';
@@ -600,7 +600,7 @@ $( document ).ready(function() {
                 checkConcatName();
             }else{
 
-                if($('#contact_person_ln').val() == null || $('#contact_person_ln').val() == ''){
+                if($('#first_name').val() == null || $('#first_name').val() == ''){
                     // name1 += ', ';
                     name1 = '';
                     channel_code = '';
@@ -616,7 +616,7 @@ $( document ).ready(function() {
     });
 
 
-    $('#contact_person_fn').on('change keyup click', function() {
+    $('#last_name').on('change keyup click', function() {
 
         name2 = this.value;
 

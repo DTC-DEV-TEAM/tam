@@ -8,6 +8,7 @@
 	use App\BodyRequest;
 	use App\ApprovalMatrix;
 	use App\StatusMatrix;
+	use App\Users;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -49,8 +50,8 @@
 			$this->col[] = ["label"=>"Status","name"=>"status_id","join"=>"statuses,status_description"];
 			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
 			$this->col[] = ["label"=>"Request Type","name"=>"request_type_id","join"=>"requests,request_name"];
-			$this->col[] = ["label"=>"Company Name","name"=>"company_name","join"=>"companies,company_name"];
-			$this->col[] = ["label"=>"Employee Name","name"=>"employee_name","join"=>"employees,bill_to"];
+			$this->col[] = ["label"=>"Company Name","name"=>"company_name"];
+			$this->col[] = ["label"=>"Employee Name","name"=>"employee_name","join"=>"cms_users,bill_to"];
 			$this->col[] = ["label"=>"Department","name"=>"department","join"=>"departments,department_name"];
 			$this->col[] = ["label"=>"Requested By","name"=>"created_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Requested Date","name"=>"created_at"];
@@ -291,21 +292,20 @@
 
 				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 
-				$approvalMatrix = ApprovalMatrix::where('approval_matrices.cms_users_id', CRUDBooster::myId())->get();
-				
+				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
+			
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){
-				    array_push($approval_array, $matrix->department_list);
+				    array_push($approval_array, $matrix->id);
 				}
 				$approval_string = implode(",",$approval_array);
-				$departmentlist = array_map('intval',explode(",",$approval_string));
+				$userslist = array_map('intval',explode(",",$approval_string));
 	
-				$query->whereIn('header_request.department', $departmentlist)
+				$query->whereIn('header_request.created_by', $userslist)
 				//->whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
 				->where('header_request.status_id', $pending) 
 				->whereNull('header_request.deleted_at')
-				->orderBy('header_request.id', 'DESC');
-
+				->orderBy('header_request.id', 'ASC');
 
 			}
 	            
@@ -498,7 +498,7 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
@@ -514,7 +514,7 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
 						'stores.bea_mo_store_name as store_branch',
