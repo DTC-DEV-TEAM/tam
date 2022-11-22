@@ -110,7 +110,20 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/users/user-account-upload','AdminCmsUsersController@UploadUserAccount');
     Route::post('/admin/users/upload-users','AdminCmsUsersController@userAccountUpload')->name('upload-users');
     Route::get('/admin/users/upload-user-account-template','AdminCmsUsersController@uploadUserAccountTemplate');
+
+    //truncate table
     Route::get('/admin/db-truncate','TruncateController@dbtruncate');
+
+    //locations import
+    Route::get('/admin/locations/store-location-upload','AdminLocationsController@UploadLocationsView');
+    Route::post('/admin/locations/upload-locations','AdminLocationsController@locationsUpload')->name('upload-locations');
+    Route::get('/admin/locations/upload-locations-template','AdminLocationsController@uploadLocationsTemplate');
+
+    //Departments import
+    Route::get('/admin/departments/departments-upload','AdminDepartmentsController@UploadDepartmentsView');
+    Route::post('/admin/departments/upload-departments','AdminDepartmentsController@departmentsUpload')->name('upload-departments');
+    Route::get('/admin/departments/upload-departments-template','AdminDepartmentsController@uploadDepartmentsTemplate');
+
     Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

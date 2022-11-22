@@ -1,9 +1,11 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
 	use DB;
 	use CRUDBooster;
+	use Excel;
+	use App\Imports\DepartmentsImport;
+	use Illuminate\Http\Request;
 
 	class AdminDepartmentsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -134,8 +136,16 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				if(CRUDBooster::isSuperadmin()){
+					$this->index_button[] = [
+						"title"=>"Import Departments",
+						"label"=>"Import Departments",
+						"icon"=>"fa fa-download",
+						"color"=>"success",
+						"url"=>CRUDBooster::mainpath('departments-upload')];
+				}
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -350,9 +360,34 @@
 
 	    }
 
+		public function uploadDepartmentsTemplate() {
+			$filename = "Departments-upload-".date("Ymd")."-".date("h.i.sa"). ".csv";
+				header("Content-Disposition: attachment; filename=\"$filename\"");
+				header("Content-Type: text/csv; charset=UTF-16LE");
+				$out = fopen("php://output", 'w');
+				$flag = false;
+				if(!$flag) {
+					// display field/column names as first row
+					fputcsv($out, array('DEPARTMENT_NAME'));
+					$flag = true;
+				}
+				fputcsv($out, array('The Grid - Tsukemen'));
+				fclose($out);
+				exit;
+		}
 
+		public function UploadDepartmentsView() {
+			// if(!CRUDBooster::isSuperadmin()) {    
+			// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			// }
+			$data['page_title']= 'Departments Upload';
+			return view('imports.departments-import', $data)->render();
+		}
 
-	    //By the way, you can still create your own method in here... :) 
-
-
+		public function departmentsUpload(Request $request) {
+			$path_excel = $request->file('import_file')->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+			Excel::import(new DepartmentsImport, $path);	
+			CRUDBooster::redirect(CRUDBooster::adminpath('departments'), trans("Upload Successfully!"), 'success');
+		}
 	}

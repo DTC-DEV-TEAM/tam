@@ -1,10 +1,11 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
 	use DB;
 	use CRUDBooster;
-
+	use Excel;
+	use App\Imports\LocationsImport;
+	use Illuminate\Http\Request;
 	class AdminLocationsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
         public function __construct() {
@@ -37,7 +38,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 			$this->col[] = ["label"=>"Location Name","name"=>"store_name"];
-			$this->col[] = ["label"=>"COA","name"=>"coa_id"];
+			//$this->col[] = ["label"=>"COA","name"=>"coa_id"];
 			$this->col[] = ["label"=>"Status","name"=>"store_status"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
 			//$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name"];
@@ -137,7 +138,16 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				if(CRUDBooster::isSuperadmin()){
+					$this->index_button[] = [
+						"title"=>"Import Locations",
+						"label"=>"Import Locations",
+						"icon"=>"fa fa-download",
+						"color"=>"success",
+						"url"=>CRUDBooster::mainpath('store-location-upload')];
+				}
+			}
 
 
 	        /* 
@@ -353,9 +363,35 @@
 
 	    }
 
+		public function uploadLocationsTemplate() {
+			$filename = "Locations-upload-".date("Ymd")."-".date("h.i.sa"). ".csv";
+				header("Content-Disposition: attachment; filename=\"$filename\"");
+				header("Content-Type: text/csv; charset=UTF-16LE");
+				$out = fopen("php://output", 'w');
+				$flag = false;
+				if(!$flag) {
+					// display field/column names as first row
+					fputcsv($out, array('CHANNELS_ID', 'STORE_NAME'));
+					$flag = true;
+				}
+				fputcsv($out, array('8', 'BAD BIRD MANILA'));
+				fclose($out);
+				exit;
+		}
 
+		public function UploadLocationsView() {
+			// if(!CRUDBooster::isSuperadmin()) {    
+			// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			// }
+			$data['page_title']= 'Locations Upload';
+			return view('imports.locations-import', $data)->render();
+		}
 
-	    //By the way, you can still create your own method in here... :) 
-
+		public function locationsUpload(Request $request) {
+			$path_excel = $request->file('import_file')->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+			Excel::import(new LocationsImport, $path);	
+			CRUDBooster::redirect(CRUDBooster::adminpath('locations'), trans("Upload Successfully!"), 'success');
+		}
 
 	}
