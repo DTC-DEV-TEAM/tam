@@ -663,7 +663,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 			"department", "sub_department", "position", "approver", "location"], $headings);
 
 			if (count($is_diff) > 0) {
-				CRUDBooster::redirect(CRUDBooster::adminpath('users'), 'Invalid Template column, please refer to downloaded template.', 'danger');
+				CRUDBooster::redirect(CRUDBooster::adminpath('users'), 'Invalid Column Field, please refer to downloaded template.', 'danger');
 			} else {
 				try {
 					Excel::import(new UserImport, $path);	
