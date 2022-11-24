@@ -22,8 +22,9 @@ class DepartmentsImport implements ToCollection, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
+    
         foreach ($rows->toArray() as $row){
-          
+    
             Departments::updateOrcreate([
                 'department_name' => $row['department_name'] 
             ],
