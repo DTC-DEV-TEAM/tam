@@ -30,18 +30,18 @@ class UserImport implements ToCollection, SkipsEmptyRows, WithHeadingRow, WithVa
             $sub_departments 	= DB::table('sub_department')->where(['sub_department_name' => strtoupper($row['sub_department'])])->first();
             
             $locations 	        = DB::table('locations')->where(['store_name' => strtoupper($row['location'])])->first();
-            $full_name          = $row['first_name'].", ".$row['first_name'];
+            $full_name          = $row['last_name'].", ".$row['first_name'];
             $full_name_employee = $full_name.".EEE";
             if($priviledgeId == 3){
 				$approver_id = $approver;
 				$approver_id_manager = $approver;
 				$approver_id_executive = NULL;
 			}else if($priviledgeId == 11){
-				$approver_id = NULL;
+				$approver_id = $approver;
 				$approver_id_manager = NULL;
 				$approver_id_executive = NULL;
 			}else if($priviledgeId == 12){
-				$approver_id = NULL;
+				$approver_id = $approver;
 				$approver_id_manager = NULL;
 				$approver_id_executive = NULL;
 			}else{

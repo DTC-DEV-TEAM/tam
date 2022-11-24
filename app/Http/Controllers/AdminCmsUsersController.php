@@ -117,9 +117,9 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		
 	    
 	    $this->index_button = array();
-		$this->index_button[] = ["label"=>"Export Lists","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
         if(CRUDBooster::getCurrentMethod() == 'getIndex') {
 			if(CRUDBooster::isSuperadmin()){
+				$this->index_button[] = ["label"=>"Export Lists","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
 				$this->index_button[] = [
 					"title"=>"Upload User Accounts",
 					"label"=>"Upload User Accounts",

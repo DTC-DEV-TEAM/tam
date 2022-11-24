@@ -14,7 +14,7 @@
             <div class='callout callout-success'>
                 <h4>Welcome to Data Importer Tool</h4>
                 Before uploading a file, please read below instructions : <br/>
-                * File format should be : CSV file format<br/>
+                * File format should be : CSV, XLSX file format<br/>
             </div>
 
             <label class='col-sm-2 control-label'>Import Template File: </label>
@@ -26,8 +26,8 @@
 
             <label for='import_file' class='col-sm-2 control-label'>File to Import: </label>
             <div class='col-sm-4'>
-                <input type='file' name='import_file' class='form-control' required accept=".csv"/>
-                <div class='help-block'>File type supported only : CSV</div>
+                <input type='file' name='import_file' class='form-control' required/>
+                <div class='help-block'>File type supported only : CSV, XLSX</div>
             </div>
 
         </div><!-- /.box-body -->
