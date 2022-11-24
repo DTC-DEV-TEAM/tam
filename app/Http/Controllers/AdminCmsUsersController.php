@@ -13,6 +13,7 @@ use App\ApprovalMatrix;
 use App\Imports\UserImport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\HeadingRowImport;
 
 class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -653,7 +654,37 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 	public function userAccountUpload(Request $request) {
 		$path_excel = $request->file('import_file')->store('temp');
 		$path = storage_path('app').'/'.$path_excel;
-		Excel::import(new UserImport, $path);	
+		$headings = array_filter((new HeadingRowImport)->toArray($path)[0][0]);
+
+		if (count($headings) !== 9) {
+			CRUDBooster::redirect(CRUDBooster::adminpath('users'), 'Template column not match, please refer to downloaded template.', 'danger');
+		} else {
+			$is_diff = array_diff([ "email", "privilege", "first_name","last_name",
+			"department", "sub_department", "position", "approver", "location"], $headings);
+
+			if (count($is_diff) > 0) {
+				CRUDBooster::redirect(CRUDBooster::adminpath('users'), 'Invalid Template column, please refer to downloaded template.', 'danger');
+			} else {
+				try {
+					Excel::import(new UserImport, $path);	
+					CRUDBooster::redirect(CRUDBooster::adminpath('users'), 'Import Successfully!', 'success');
+				} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+					$failures = $e->failures();
+					
+					$error = [];
+					foreach ($failures as $failure) {
+						$line = $failure->row();
+						foreach ($failure->errors() as $err) {
+							$error[] = $err . " on line: " . $line; 
+						}
+					}
+					
+					$errors = collect($error)->unique()->toArray();
+			
+				}
+				CRUDBooster::redirect(CRUDBooster::adminpath('users'), $errors[0], 'danger');
+	       }
+		}
 	}
 	
 }
