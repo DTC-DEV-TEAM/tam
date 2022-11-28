@@ -98,7 +98,7 @@ class UserImport implements ToCollection, SkipsEmptyRows, WithHeadingRow, WithVa
                 }
             },
             '*.privilege' => 'required',
-            '*.approver' => 'required',
+            //'*.approver' => 'required',
        ];
     }
 }
