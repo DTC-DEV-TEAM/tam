@@ -524,7 +524,7 @@
 				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -542,7 +542,7 @@
 						'employees.bill_to as employee_name',
 						'employees.company_name_id as company_name',
 						'departments.department_name as department',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'picked.name as pickedby',
@@ -615,7 +615,7 @@
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -631,7 +631,7 @@
 						'companies.company_name as company_name',
 						'departments.department_name as department',
 						'positions.position_description as position',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'processed.name as processedby',
