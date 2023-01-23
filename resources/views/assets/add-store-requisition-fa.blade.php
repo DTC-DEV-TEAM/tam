@@ -6,6 +6,15 @@
                     font-size:14px !important;
                     color:black !important;
             }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
 
         </style>
     @endpush
@@ -26,28 +35,21 @@
         <input type="hidden" value="5" name="request_type_id" id="request_type_id">
 
         <div class='panel-body'>
-
             <div class="row">
-
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.employee_name') }}</label>
                          
                         <input type="text" class="form-control"  id="employee_name" name="employee_name"  required readonly value="{{$employeeinfos->bill_to}}"> 
                     </div>
-
                 </div>
-
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.company_name') }}</label>
                         <input type="text" class="form-control"  id="company_name" name="company_name"  required readonly value="{{$employeeinfos->company_name_id}}">                                   
                     </div>
                 </div>
-
             </div>
-
-
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -335,8 +337,8 @@
                         '</td>' +  
 
                         '<td>'+
-                            '<select class="form-control drop'+ tableRow + '" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required>' +
-                            '  <option value="">- Select Category -</option>' +
+                            '<select data-placeholder="- Select Category -" class="form-control category_id" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required style="width:100%">' +
+                            //'  <option value="">- Select Category -</option>' +
                             '        @foreach($categories as $data)'+
                             '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
                             '         @endforeach'+
@@ -344,10 +346,13 @@
                         '</td>' +
 
                         '<td>'+
-                            '<select class="form-control" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required >' +
-                         
+                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
+                            '  <option value=""></option>' +
+                            '        @foreach($sub_categories as $data)'+
+                            '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
+                            '         @endforeach'+
                             '</select>'+
-                        '</td>' +    
+                        '</td>' + 
                         /*
                         '<td>'+
                             '<select class="js-example-basic-multiple" multiple="multiple" name="app_id' + tableRow + '[]" data-id="' + tableRow + '" id="app_id' + tableRow + '" required style="width:100%;">' +
@@ -360,7 +365,7 @@
                         '</td>'+
                         */      
                         
-                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid||(value=0);"></td>' +
+                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;"></td>' +
                         
                         /*'<td><input type="file" name="image[]" id="image' + tableRow + '" accept="image/*"></td>' + */
                         
@@ -374,8 +379,10 @@
                     $('#app_id'+tableRow).attr('disabled', true);
 
                     $('.js-example-basic-multiple').select2();
-
-                    $('#sub_category_id'+tableRow).attr('disabled', true);
+                    $('#category_id'+tableRow).select2({minimumResultsForSearch: -1});
+                    $('#sub_category_id'+tableRow).select2({
+                    placeholder_text_single : "- Select Sub Category -"});
+                    //$('#sub_category_id'+tableRow).attr('disabled', true);
 
                     $('#app_id'+tableRow).change(function(){
 
@@ -783,57 +790,160 @@
         });
 
         $("#btnSubmit").click(function(event) {
-
-            var strconfirm = confirm("Are you sure you want to send this request?");
-            if (strconfirm == true) {
-
-                var countRow = $('#asset-items tfoot tr').length;
+            // var strconfirm = confirm("Are you sure you want to send this request?");
+            // if (strconfirm == true) {
+            //     var countRow = $('#asset-items tfoot tr').length;
+            //     // var value = $('.vvalue').val();
+            //     if (countRow == 1) {
+            //         alert("Please add an item!");
+            //         event.preventDefault(); // cancel default behavior
+            //     }
+            //     var qty = 0;
+            //     $('.quantity_item').each(function() {
+            //         qty = $(this).val();
+            //         if (qty == 0) {
+            //             alert("Quantity cannot be empty or zero!");
+            //             event.preventDefault(); // cancel default behavior
+            //         } else if (qty < 0) {
+            //             alert("Negative Value is not allowed!");
+            //             event.preventDefault(); // cancel default behavior
+            //         }
+            //     });
+            //     var description = "test";
+            //     $('.itemDesc').each(function() {
+            //         description = $(this).val();
+            //         if (description == null) {
+            //             alert("Item Description cannot be empty!");
+            //             event.preventDefault(); // cancel default behavior
+            //         } else if (description == "") {
+            //             alert("Item Description cannot be empty!");
+            //             event.preventDefault(); // cancel default behavior
+            //         }   
+            //     });
+            // }else{
+            //     return false;
+            //     window.stop();
+            // }
+            event.preventDefault();
+            var countRow = $('#asset-items tfoot tr').length;
                 // var value = $('.vvalue').val();
-
-                if (countRow == 1) {
-
-                    alert("Please add an item!");
+                if(! $(".purpose").is(':checked')){
+                    swal({
+                        type: 'error',
+                        title: 'Please choose Purpose!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    }); 
                     event.preventDefault(); // cancel default behavior
+                    return false;
+                }else if (countRow == 1) {
+                    swal({
+                        type: 'error',
+                        title: 'Please add an item!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    }); 
+                    event.preventDefault(); // cancel default behavior
+                    return false;
+                }else{ 
+                    var item = $("input[name^='item_description']").length;
+                    var item_value = $("input[name^='item_description']");
+                    for(i=0;i<item;i++){
+                        if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Item Description cannot be empty!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                
+                    } 
 
-                }
+                    var sub_cat = $(".category_id option").length;
+                    var sub_cat_value = $('.category_id').find(":selected");
+                    for(i=0;i<sub_cat;i++){
+                        if(sub_cat_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please select Category!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                
+                    } 
 
-                var qty = 0;
+                    var sub_cat = $(".sub_category_id option").length;
+                    var sub_cat_value = $('.sub_category_id').find(":selected");
+                    for(i=0;i<sub_cat;i++){
+                        if(sub_cat_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please select Sub Category!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                
+                    } 
 
-                $('.quantity_item').each(function() {
-
-                    qty = $(this).val();
-                    if (qty == 0) {
-                        alert("Quantity cannot be empty or zero!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (qty < 0) {
-                        alert("Negative Value is not allowed!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-
-                });
-
-                var description = "test";
-
-                $('.itemDesc').each(function() {
-
-                    description = $(this).val();
-                    if (description == null) {
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (description == "") {
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
+                    //quantity validation
+                    var v = $("input[name^='quantity']").length;
+                    var value = $("input[name^='quantity']");
+                    var reg = /^0/gi;
+                        for(i=0;i<v;i++){
+                            if(value.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'Quantity cannot be empty or zero!',
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9",
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }else if(value.eq(i).val() < 0){
+                                swal({
+                                    type: 'error',
+                                    title: 'Negative Value is not allowed!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                }); 
+                                event.preventDefault(); // cancel default behavior
+                                return false;
+                            }else if(value.eq(i).val().match(reg)){
+                                swal({
+                                    type: 'error',
+                                    title: 'Invalid Quantity Value!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                }); 
+                                event.preventDefault(); // cancel default behavior
+                                return false;     
+                            }  
                     
-                });
-
-            }else{
-
-                return false;
-                window.stop();
-
-            }
-
+                        } 
+                                          
+                        swal({
+                            title: "Are you sure?",
+                            type: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#41B314",
+                            cancelButtonColor: "#F9354C",
+                            confirmButtonText: "Yes, send it!",
+                            width: 450,
+                            height: 200
+                            }, function () {
+                                $("#AssetRequest").submit();                   
+                        });
+                    
+                }     
         });
 
 

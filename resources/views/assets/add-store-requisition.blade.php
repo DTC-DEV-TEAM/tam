@@ -58,11 +58,14 @@
 
 
             <div class="row">
+
+
+
+
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.department') }}</label>
                         <input type="text" class="form-control"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}">
-  
                     </div>
 
                 </div>
@@ -439,7 +442,7 @@
                         '</td>' +   
                         */        
                         
-                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid||(value=0);"></td>' +
+                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;"></td>' +
                         
                         /*'<td><input type="file" name="image[]" id="image' + tableRow + '" accept="image/*"></td>' + */
                         
@@ -885,64 +888,160 @@
         });
        
         $("#btnSubmit").click(function(event) {
-        
-            var strconfirm = confirm("Are you sure you want to send this request?");
-            if (strconfirm == true) {
-
-                var countRow = $('#asset-items tfoot tr').length;
+            // var strconfirm = confirm("Are you sure you want to send this request?");
+            // if (strconfirm == true) {
+            //     var countRow = $('#asset-items tfoot tr').length;
+            //     // var value = $('.vvalue').val();
+            //     if (countRow == 1) {
+            //         alert("Please add an item!");
+            //         event.preventDefault(); // cancel default behavior
+            //     }
+            //     var qty = 0;
+            //     $('.quantity_item').each(function() {
+            //         qty = $(this).val();
+            //         if (qty == 0) {
+            //             alert("Quantity cannot be empty or zero!");
+            //             event.preventDefault(); // cancel default behavior
+            //         } else if (qty < 0) {
+            //             alert("Negative Value is not allowed!");
+            //             event.preventDefault(); // cancel default behavior
+            //         }
+            //     });
+            //     var description = "test";
+            //     $('.itemDesc').each(function() {
+            //         description = $(this).val();
+            //         if (description == null) {
+            //             alert("Item Description cannot be empty!");
+            //             event.preventDefault(); // cancel default behavior
+            //         } else if (description == "") {
+            //             alert("Item Description cannot be empty!");
+            //             event.preventDefault(); // cancel default behavior
+            //         }               
+            //     });
+            //     $(".sub_category_id :selected").each(function() {
+            //         if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+            //             alert("Application cannot be empty!");
+            //             event.preventDefault(); // cancel default behavior
+            //         }
+            //     });                 
+            // }else{
+            //     return false;
+            //     window.stop();
+            // }
+            event.preventDefault();
+            var countRow = $('#asset-items tfoot tr').length;
+            var reg = /^0/gi;
                 // var value = $('.vvalue').val();
-
-                if (countRow == 1) {
-
-                    alert("Please add an item!");
+                if(! $(".purpose").is(':checked')){
+                    swal({
+                        type: 'error',
+                        title: 'Please choose Purpose!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    }); 
                     event.preventDefault(); // cancel default behavior
-
+                    return false;
+                }else if (countRow == 1) {
+                    swal({
+                        type: 'error',
+                        title: 'Please add an item!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    }); 
+                    event.preventDefault(); // cancel default behavior
+                }else{
+                    var item = $("input[name^='item_description']").length;
+                    var item_value = $("input[name^='item_description']");
+                    for(i=0;i<item;i++){
+                        if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Item Description cannot be empty!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                
+                    } 
+                    var sub_cat = $(".sub_category_id option").length;
+                    var sub_cat_value = $('.sub_category_id').find(":selected");
+                    for(i=0;i<sub_cat;i++){
+                        if(sub_cat_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please select Sub Category!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                
+                    } 
+                    //quantity validation
+                    var v = $("input[name^='quantity']").length;
+                    var value = $("input[name^='quantity']");
+                    var reg = /^0/gi;
+                        for(i=0;i<v;i++){
+                            if(value.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'Quantity cannot be empty or zero!',
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9",
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }else if(value.eq(i).val() < 0){
+                                swal({
+                                    type: 'error',
+                                    title: 'Negative Value is not allowed!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                }); 
+                                event.preventDefault(); // cancel default behavior
+                                return false;
+                            }else if(value.eq(i).val().match(reg)){
+                                swal({
+                                    type: 'error',
+                                    title: 'Invalid Quantity Value!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                }); 
+                                event.preventDefault(); // cancel default behavior
+                                return false;     
+                            }  
+                    
+                        } 
+                        $(".sub_category_id :selected").each(function() {
+                        if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                            swal({  
+                                type: 'error',
+                                title: 'Please choose an Application!',
+                                icon: 'error',
+                                confirmButtonColor: "#367fa9",
+                                
+                            });
+                            event.preventDefault();
+                            return false;
+                        }else{
+                            swal({
+                                title: "Are you sure?",
+                                type: "warning",
+                                showCancelButton: true,
+                                confirmButtonColor: "#41B314",
+                                cancelButtonColor: "#F9354C",
+                                confirmButtonText: "Yes, send it!",
+                                width: 450,
+                                height: 200
+                                }, function () {
+                                    $("#AssetRequest").submit();                                                   
+                            });
+                        }
+                    }); 
                 }
-
-                var qty = 0;
-
-                $('.quantity_item').each(function() {
-
-                    qty = $(this).val();
-                    if (qty == 0) {
-                        alert("Quantity cannot be empty or zero!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (qty < 0) {
-                        alert("Negative Value is not allowed!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-
-                });
-
-                var description = "test";
-
-                $('.itemDesc').each(function() {
-
-                    description = $(this).val();
-                    if (description == null) {
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (description == "") {
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-                    
-                });
-                $(".sub_category_id :selected").each(function() {
-                    if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
-                        alert("Application cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-                });
-                    
-                  
-            }else{
-
-                return false;
-                window.stop();
-
-            }
-
         });
 
     </script>
