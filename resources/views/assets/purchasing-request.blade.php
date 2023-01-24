@@ -408,7 +408,8 @@
                                                 
                                                                                         </select>
                                                                                     @else
-                                                                                        <select class="js-example-basic-single recodropdown" style="width: 100%; height: 35px;"  name="recommendation[]" id="recommendation" data-id="{{$tableRow}}" disabled>
+                                                                                    <input type="text" class="form-control" data-id="{{$tableRow}}" id="recommendation{{$tableRow}}" value="{{$rowresult->recommendation}}"  name="recommendation[]"  readonly>
+                                                                                        <!-- <select class="js-example-basic-single recodropdown" style="width: 100%; height: 35px;"  name="recommendation[]" id="recommendation" data-id="{{$tableRow}}" disabled>
                                                                                             <option value="">-- Select Recommendation --</option>
                                                 
                                                                                             @foreach($recommendations as $datas)    
@@ -419,7 +420,7 @@
                                                                                                 @endif
                                                                                             @endforeach
                                                 
-                                                                                        </select>
+                                                                                        </select> -->
                                                                                     @endif
 
                                                                                 </td>
@@ -522,12 +523,7 @@
                 </div>
             @endif
 
-
-
-
             <hr />
-
-            <hr/>
             <div class="row">  
                 <div class="col-md-12">
                     <div class="form-group">
@@ -591,22 +587,13 @@
         </div>
 
         <div class='panel-footer'>
-
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-           
-            
             <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.new') }}</button>
-            
             <!-- <button class="btn btn-warning pull-right" type="submit" id="btnPrint" style="margin-right: 10px;"> <i class="fa fa-print" ></i> {{ trans('message.form.print') }}</button> -->
-
              <button class="btn btn-warning pull-right" type="submit" id="btnUpdate" style="margin-right: 10px;"> <i class="fa fa-circle-o" ></i> {{ trans('message.form.update') }}</button> 
-        
         </div>
 
     </form>
-
-
-
 
 
 </div>
@@ -897,29 +884,85 @@
 	});
 
     $("#btnSubmit").click(function(event) {
- 
-        var strconfirm = confirm("Are you sure you want to proceed this request?");
-        if (strconfirm == true) {
-
-            if( $("#po_number").val() == "" || $("#po_number").val() == null ){
-                $("#po_number, #po_date, #quote_date").attr('required', 'required');
-                window.stop();
-            }else if( $("#po_date").val() == "" || $("#po_date").val() == null ){
-                $("#po_number, #po_date, #quote_date").attr('required', 'required');
-                window.stop();
-            }else if( $("#quote_date").val() == "" || $("#quote_date").val() == null ){
-                $("#po_number, #po_date, #quote_date").attr('required', 'required');
-                window.stop();
-            }else{               
-                    $("#action").val("1");
-                    $(this).attr('disabled','disabled');
-                    $('#myform').submit(); 
-                }
-            
-        }else{
+        // var strconfirm = confirm("Are you sure you want to proceed this request?");
+        // if (strconfirm == true) {
+        //     if( $("#po_number").val() == "" || $("#po_number").val() == null ){
+        //         $("#po_number, #po_date, #quote_date").attr('required', 'required');
+        //         window.stop();
+        //     }else if( $("#po_date").val() == "" || $("#po_date").val() == null ){
+        //         $("#po_number, #po_date, #quote_date").attr('required', 'required');
+        //         window.stop();
+        //     }else if( $("#quote_date").val() == "" || $("#quote_date").val() == null ){
+        //         $("#po_number, #po_date, #quote_date").attr('required', 'required');
+        //         window.stop();
+        //     }else{               
+        //             $("#action").val("1");
+        //             $(this).attr('disabled','disabled');
+        //             $('#myform').submit(); 
+        //         }
+        // }else{
+        //     return false;
+        //     window.stop();
+        // }
+        event.preventDefault();
+        if($("#po_number").val() == "" || $("#po_number").val() == null){
+            swal({
+                type: 'error',
+                title: 'PO Number required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
             return false;
-            window.stop();
+        }else if($("#po_date").val() == "" || $("#po_date").val() == null){
+            swal({
+                type: 'error',
+                title: 'PO Date required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#quote_date").val() == "" || $("#quote_date").val() == null){
+            swal({
+                type: 'error',
+                title: 'Quote Date required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else{
+            var item = $("input[name^='reco_digits_code']").length;
+            var item_value = $("input[name^='reco_digits_code']");
+            for(i=0;i<item;i++){
+                if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Digits Code and Item Description cannot be empty!!',
+                            icon: 'error',
+                            confirmButtonColor: "#367fa9",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+        
+            } 
+            swal({
+            title: "Are you sure you?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, proceed!",
+            width: 450,
+            height: 200
+            }, function () {
+                $("#action").val("1");
+                $("#myform").submit();                   
+        });
         }
+        
 
         /*
         var countRow = $('#asset-items tbody tr').length;

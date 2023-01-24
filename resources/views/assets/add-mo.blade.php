@@ -307,97 +307,86 @@
 
     $("#btnSubmit").click(function(event) {
 
+        // var countRow = $('#asset-items tbody tr').length;
+        // var error = 0;
+        // var strconfirm = confirm("Are you sure you want to move this request?");
+        // if (strconfirm == true) {
+        //     if (countRow == 2) {
+        //         alert("Please add an item!");
+        //         event.preventDefault(); // cancel default behavior
+        //     }else{
+        //         $('.itemDcode').each(function() {
+        //             description = $(this).val();
+        //             if (description == null) {
+        //                 error++;
+        //                 alert("Digits Code cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             } else if (description == "") {
+        //                 error++;
+        //                 alert("Digits Code cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             }
+        //         });
+
+        //         $('.itemDesc').each(function() {
+        //             description = $(this).val();
+        //             if (description == null) {
+        //                 error++;
+        //                 alert("Item Description cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             } else if (description == "") {
+        //                 error++;
+        //                 alert("Item Description cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             }
+        //         });
+
+        //         $('.cost_item').each(function() {
+        //             description = $(this).val();
+        //             if (description == null) {
+        //                 error++;
+        //                 alert("Item Cost cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             } else if (description == "") {
+        //                 error++;
+        //                 alert("Item Cost cannot be empty!");
+        //                 event.preventDefault(); // cancel default behavior
+        //             }
+        //         });
+
+        //         if(error == 0){
+        //             $(this).attr('disabled','disabled');
+        //             $('#AssetRequest').submit(); 
+        //         }
+        //     }
+        // }else{
+        //     return false;
+        //     window.stop();
+        // }
         var countRow = $('#asset-items tbody tr').length;
-
-
         var error = 0;
-
-        var strconfirm = confirm("Are you sure you want to move this request?");
-
-        if (strconfirm == true) {
-
-            if (countRow == 2) {
-
-                alert("Please add an item!");
-                event.preventDefault(); // cancel default behavior
-
-            }else{
-
-                $('.itemDcode').each(function() {
-
-                    description = $(this).val();
-
-                    if (description == null) {
-
-                        error++;
-
-                        alert("Digits Code cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (description == "") {
-
-                        error++;
-
-                        alert("Digits Code cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-
-                });
-
-
-                $('.itemDesc').each(function() {
-
-                    description = $(this).val();
-
-                    if (description == null) {
-
-                        error++;
-
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (description == "") {
-
-                        error++;
-
-                        alert("Item Description cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-
-                });
-
-
-                $('.cost_item').each(function() {
-
-                    description = $(this).val();
-
-                    if (description == null) {
-
-                        error++;
-
-                        alert("Item Cost cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    } else if (description == "") {
-
-                        error++;
-
-                        alert("Item Cost cannot be empty!");
-                        event.preventDefault(); // cancel default behavior
-                    }
-
-                });
-
-
-                if(error == 0){
-                    $(this).attr('disabled','disabled');
-                    $('#AssetRequest').submit(); 
-                }
-
-            }
-
+        event.preventDefault();
+        if (countRow == 2) {
+            swal({
+                type: 'error',
+                title: 'Please add an item!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
         }else{
-
-            return false;
-            window.stop();
-
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#41B314",
+                cancelButtonColor: "#F9354C",
+                confirmButtonText: "Yes, send it!",
+                width: 450,
+                height: 200
+                }, function () {
+                    $("#AssetRequest").submit();                                                   
+            });
         }
 
     });

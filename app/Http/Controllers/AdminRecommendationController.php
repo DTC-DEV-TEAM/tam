@@ -389,7 +389,6 @@
 			$reco_digits_code 		= $fields['reco_digits_code'];
 			$reco_item_description 	= $fields['reco_item_description'];
 
-	
 			//$postdata['status_id'] 				= $it_reco;
 
 			$postdata['status_id']		 			=	 StatusMatrix::where('current_step', 3)

@@ -305,7 +305,7 @@
 				//->whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
 				->where('header_request.status_id', $pending) 
 				->whereNull('header_request.deleted_at')
-				->orderBy('header_request.id', 'ASC');
+				->orderBy('header_request.id', 'DESC');
 
 			}
 	            

@@ -347,7 +347,7 @@
 			
 			$cancelled  = 		DB::table('statuses')->where('id', 8)->value('id');
 
-			$List = MoveOrder::whereNull('closed_at')->orderby('mo_body_request.status_id', 'asc')->orderby('mo_body_request.id', 'asc')->get();
+			$List = MoveOrder::whereNull('closed_at')->whereNotNull('mo_reference_number')->whereNotNull('header_request_id')->orderby('mo_body_request.status_id', 'asc')->orderby('mo_body_request.id', 'asc')->get();
 
 			$list_array = array();
 
@@ -475,7 +475,7 @@
 
 			if($column_index == 5){
 
-				$request_type = 			DB::table('employees')->where(['id' => $column_value])->first();
+				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
 				
 				if($column_value == $request_type->id){
 
@@ -558,8 +558,7 @@
 			$unit_cost 							= $fields['add_unit_cost'];
 			$total_unit_cost 					= $fields['add_total_unit_cost'];
 			$body_request_id 					= $fields['body_request_id'];
-			$item_id 							= $fields['item_id'];
-			$inventory_id 						= $fields['inventory_id'];
+			
 			$quantity_total 					= $fields['quantity_total'];
 			$total 								= $fields['total'];
 
@@ -568,9 +567,14 @@
 			//$postdata['quantity_total']		 	= $quantity_total;
 			//$postdata['total']		 			= $total;
 
-			
 			$arf_header 		= HeaderRequest::where(['id' => $Header_id])->first();
-
+			if(in_array($arf_header->request_type_id, [1, 5])){
+			    $inventory_id 						= $fields['inventory_id'];
+				$item_id 							= $fields['item_id'];
+			}else{
+				$inventory_id 						= NULL;
+				$item_id 							= $fields['inventory_id'];
+			}
 			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])->count();
 
 			$count_header 		= MoveOrder::count();
@@ -578,8 +582,8 @@
 			$count_header1  	= $count_header + 1;
 
 			//dd(count((array)$digits_code));
-
-			if($arf_header->request_type_id == 5){
+			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
 												->value('status_id');
@@ -590,7 +594,7 @@
 			}
 
 		
-
+            //dd($body_request_id, $body_request_id);
 			for($x=0; $x < count((array)$item_description); $x++) {
 
 
@@ -626,10 +630,21 @@
 					}else{
 
 						if(count((array)$digits_code) != $body_request){
-							
-							$count_header++;
-							$header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
-							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+
+							if($body_request_id[$x] == "" || $body_request_id[$x] == null){
+
+								$count_header++;
+								$header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
+								$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+
+							}else{
+								$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
+								$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+
+							}
+							// $count_header++;
+							// $header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
+							// $reference_number	= 	"MO-".$header_ref.$ref_inventory;
 
 							//$reference_number	= 	"MO-".$header_ref;
 						}else{
@@ -671,24 +686,30 @@
 
 				}
 
+				$array_location = [1,2];
+				if(in_array($arf_header->request_type_id, [1, 5])){
+					$location 						= $inventory_info->location;
+				}else{
+					$location 						= implode(",",$array_location);
+				}
 
 				$dataLines1[$x]['serial_no'] 			= $serial_no[$x];
 				$dataLines1[$x]['quantity'] 			= $quantity[$x];
 				$dataLines1[$x]['unit_cost'] 			= $unit_cost[$x];
 				$dataLines1[$x]['total_unit_cost'] 		= $total_unit_cost[$x];
 				$dataLines1[$x]['to_reco'] 				= $arf_header->to_reco;
-				$dataLines1[$x]['location_id'] 			= $inventory_info->location;
+				$dataLines1[$x]['location_id'] 			= $location;
 				$dataLines1[$x]['created_by'] 			= CRUDBooster::myId();
 				$dataLines1[$x]['created_at'] 			= date('Y-m-d H:i:s');
-
+				$dataLines1[$x]['request_created_by']   = $arf_header->created_by;
+				$dataLines1[$x]['request_type_id_mo']   = $arf_header->request_type_id;
 
 				array_push($locationArray, $inventory_info->location);
-
-
+			
 				BodyRequest::where('id',$body_request_id[$x])
 				->update([
 					'mo_plug'=> 		1,
-					'location_id'=> 	$inventory_info->location,
+					'location_id'=> 	$location,
 					'to_mo'=> 	0
 				]);	
 
@@ -713,6 +734,11 @@
 			}
 
 
+			if(in_array($arf_header->request_type_id, [1, 5])){
+				$headLocation 						= implode(",", $locationArray);
+			}else{
+				$headLocation 						= $location;
+			}
 
 			if($arf_header->print_by == null){	
 				
@@ -723,7 +749,7 @@
 					'status_id'=> 	$for_printing,
 					'quantity_total'=> 	$quantity_total,
 					'total'=> 	$total,
-					'location_id'=> implode(",", $locationArray),
+					'location_id'=> $headLocation,
 					'to_mo'=> 	0
 				]);
 
@@ -797,7 +823,7 @@
 	    public function hook_after_add($id) {        
 	        //Your code here
 
-			MoveOrder::wherenull('mo_reference_number')->delete();
+			MoveOrder::wherenull('status_id')->delete();
 
 			//$fields 	= Request::all();
 
@@ -809,8 +835,9 @@
 
 			
 			$arf_header 		= HeaderRequest::where(['id' => $mo_request->header_request_id])->first();
-
-			if($arf_header->request_type_id == 5){
+			
+			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
 												->value('status_id');
@@ -1031,18 +1058,25 @@
 			//where('status_id', $for_move_order)->
 			//$cancelled  = 		DB::table('statuses')->where('id', 8)->value('id');
 
+			//Option 1
+			// $data['AssetRequest'] = HeaderRequest::whereNotNull('purchased2_by')->where('mo_plug', 0)
+			// 									   ->orwhere('to_mo', 1)
+			// 									   ->get();
+			//Option 2
 			$data['AssetRequest'] = HeaderRequest::whereNotNull('purchased2_by')->where('mo_plug', 0)
+			                                       ->whereNotIn('request_type_id' , [6,7])
+												   ->where('status_id','!=',13)
 												   ->orwhere('to_mo', 1)
 												   ->get();
 
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1055,17 +1089,17 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'tagged.name as taggedby',
 						'header_request.created_at as created_at'
 						)
 				->where('header_request.id', $id)->first();
-
+        
 			$data['Body'] = BodyRequest::
 				select(
 				  'body_request.*'
@@ -1120,11 +1154,11 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1137,10 +1171,10 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'tagged.name as taggedby',
@@ -1209,11 +1243,11 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1226,10 +1260,10 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						'positions.position_description as position',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'processed.name as processedby',
@@ -1269,11 +1303,11 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1286,10 +1320,10 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'tagged.name as taggedby',
@@ -1308,7 +1342,6 @@
 				->leftjoin('statuses', 'mo_body_request.status_id', '=', 'statuses.id')
 				->orderby('mo_body_request.id', 'desc')
 				->get();	
-
 			return $this->view("assets.mo-new-detail", $data);
 
 		}
@@ -1325,7 +1358,8 @@
 			$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 
 			//$for_picking =  		DB::table('statuses')->where('id', 15)->value('id');
-			if($arf_header->request_type_id == 5){
+			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			//if($arf_header->request_type_id == 5){
 				$for_picking = 			StatusMatrix::where('current_step', 6)
 										->where('request_type', $arf_header->request_type_id)
 										->value('status_id');
@@ -1382,11 +1416,11 @@
 			$data['Header'] = HeaderRequest::
 								leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 								->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-								->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+								->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 								->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 								->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 								->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-								->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+								->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 								->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 								->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 								->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1399,10 +1433,10 @@
 										'condition_type.*',
 										'requested.name as requestedby',
 										'employees.bill_to as employee_name',
-										'companies.company_name as company_name',
+										'employees.company_name_id as company_name',
 										'departments.department_name as department',
 										//'positions.position_description as position',
-										'stores.bea_mo_store_name as store_branch',
+										'locations.store_name as store_branch',
 										'approved.name as approvedby',
 										'recommended.name as recommendedby',
 										'tagged.name as taggedby',
@@ -1429,7 +1463,7 @@
 					<div class="col-md-4">
 
 							<input type="hidden" value="'. $data['Header']->requestid .'" name="header_request_id" id="header_request_id">		
-
+							
 							<p>'. $data['Header']->reference_number .'</p>
 					</div>
 					<label class="control-label col-md-2">Requested Date:</label>
@@ -1519,7 +1553,7 @@
 							<input type="hidden"  class="form-control"  name="add_item_id[]" id="add_item_id'.$tableRow.'"  required  value='.$rowresult->id.'">                                                                               
 							<input type="hidden"  class="form-control"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
 							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
-							
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
 							<button type="button"  data-id="'.$tableRow.'"  class="btn btn-info btnsearch" id="searchrow'.$tableRow.'" name="searchrow" disabled><i class="glyphicon glyphicon-search"></i></button>
 						</td>
 
@@ -1600,14 +1634,7 @@
 											</tr>
 										</tbody>
 										<tfoot>
-											<tr id="tr-table1" class="bottom">
-												<td colspan="4">
-													
-												</td> 
-												<td align="center" colspan="1">
-													<label>'.$total.'</label>
-												</td>
-											</tr>
+											
 										</tfoot>
 									</table>
 								</div>
@@ -1619,15 +1646,25 @@
 				<script type="text/javascript">
 
 					var modal = document.getElementById("myModal");
+					var modal2 = document.getElementById("myModal2");
 
 					$(".btnsearch").click(function() {
-						document.querySelector("body").style.overflow = "hidden";
-						modal.style.display = "block";
+						if($("#category").val() == 1 || $("#category").val() == 5){
+							document.querySelector("body").style.overflow = "hidden";
+							modal.style.display = "block";
+						}else {
+							document.querySelector("body").style.overflow = "hidden";
+							modal2.style.display = "block";
+						}
 					});
 
 					$("#searchclose").click(function() {
 						document.querySelector("body").style.overflow = "visible";
 						modal.style.display = "none";
+					});
+					$("#searchclose2").click(function() {
+						document.querySelector("body").style.overflow = "visible";
+						modal2.style.display = "none";
 					});
 
 					$(".btnsearch").click(function(event) {
@@ -1674,10 +1711,10 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1690,9 +1727,9 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'processed.name as processedby',
@@ -1739,10 +1776,13 @@
 				$mo_id = 				$data['mo_id']; 
 	
 				$inventory_id = 		$data['inventory_id'];
+
+				$item_id = 		        $data['item_id'];
 	
 				$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
-			
-				if($arf_header->request_type_id == 5){
+				
+				if(in_array($arf_header->request_type_id, [5, 6, 7])){
+				//if($arf_header->request_type_id == 5){
 					$for_receiving = 		StatusMatrix::where('current_step', 8)
 											->where('request_type', $arf_header->request_type_id)
 											->value('status_id');
@@ -1752,7 +1792,7 @@
 											->value('status_id');
 				}
 
-				$employee_name = DB::table('employees')->where('id', $arf_header->employee_name)->first();
+				$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
 
 				for($x=0; $x < count((array)$mo_id); $x++){
 
@@ -1774,18 +1814,22 @@
 					*/
 
 					array_push($itemID, $mo_id[$x]);
-
-
-					$email_info = 	DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->first();
-
-					$mo_info = 		MoveOrder::where('inventory_id', $email_info->id)->first();
+                    
+					if(in_array($arf_header->request_type_id, [1, 5])){
+						$email_info = 	DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->first();
+						$mo_info = 		MoveOrder::where('inventory_id', $email_info->id)->first();
+					}else{
+						$email_info = 	DB::table('assets')->where('id', $item_id[$x])->first();
+						$mo_info = 		MoveOrder::where('item_id', $email_info->id)->first();
+					}
+					$category_id = 			DB::table('category')->where('id',	$email_info->category_id)->value('category_description');
 
 					array_push($mo_reference_number, $mo_info->mo_reference_number);
 					array_push($asset_code, $email_info->asset_code);
 					array_push($digits_code, $email_info->digits_code);
 					array_push($item_description, $email_info->item_description);
-					array_push($item_category, $email_info->item_category);
-					array_push($serial_no, $email_info->serial_no);
+					array_push($item_category, $email_info->item_category ? $email_info->item_category : $category_id);
+					array_push($serial_no, $email_info->serial_no ? $email_info->serial_no : "");
 
 						/*$full_date = 	"<b> Reference Number: </b> ".$mo_info->mo_reference_number."<br>".
 										"<b> Assign Code:</b> ".$email_info->asset_code."<br>".
@@ -1813,8 +1857,14 @@
 				
 				$infos['assign_to'] = $employee_name->bill_to;
 				$infos['reference_number'] = $arf_header->reference_number;
-				$infos['systemlink'] = "<a href='https://dam-test.digitstrading.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
-				//$infos['systemlink'] = "<a href='https://localhost/dam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				//if(app()->environment('production')) {
+					//$infos['systemlink'] = "<a href='https://tam.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				//}else if(app()->environment('staging')){
+					//$infos['systemlink'] = "<a href='https://tam-test.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				//}else{
+					$infos['systemlink'] = "<a href='https://localhost/tam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				//}
+			
 				$infos['mo_reference_number'] = '<p>'. implode("<br>", $mo_reference_number) .'</p>';
 				$infos['asset_code'] = '<p>'. implode("<br>", $asset_code) .'</p>';
 				$infos['digits_code'] = '<p>'. implode("<br>", $digits_code) .'</p>';
@@ -1822,9 +1872,7 @@
 				$infos['item_category'] = '<p>'. implode("<br>", $item_category) .'</p>';
 				$infos['serial_no'] = '<p>'. implode("<br>", $serial_no) .'</p>';
 				
-
-				CRUDBooster::sendEmail(['to'=>'rickyalnin201995@gmail.com','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
-				
+				//CRUDBooster::sendEmail(['to'=>$employee_name->email,'data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
 				CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
 
 				if($arf_header->print_by_form == null){

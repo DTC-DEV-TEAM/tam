@@ -119,16 +119,22 @@
 	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
 	        | 
 	        */
-	        $this->addaction = array();
-			if(CRUDBooster::myPrivilegeName() == "Asset Custodian"){ 
-			    $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default'];
-			}else if(CRUDBooster::myPrivilegeName() == "IT" OR CRUDBooster::myPrivilegeName() == "Admin" OR CRUDBooster::myPrivilegeName() == "Super Administrator" ){
-				$for_approval = DB::table('statuses')->where('id', 20)->value('id');
-				$approved = DB::table('statuses')->where('id', 22)->value('id');
-				$reject = DB::table('statuses')->where('id', 21)->value('id');
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $approved or [header_approval_status] == $reject"];
+	        $this->addaction = array(); 
+			$for_approval = DB::table('statuses')->where('id', 20)->value('id');
+			$reject = DB::table('statuses')->where('id', 21)->value('id');
+			$recieved = DB::table('statuses')->where('id', 22)->value('id');
+			if(CRUDBooster::myPrivilegeId() == 6){
+				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval && [location] == 1"];
+				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval && [location] == 2"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved "];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
 			
+			}
+			else if(CRUDBooster::myPrivilegeId() == 5 || CRUDBooster::myPrivilegeId() == 9 || CRUDBooster::isSuperadmin()){
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
 			}
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -168,7 +174,7 @@
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Export","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
-				if(CRUDBooster::myPrivilegeName() == "Asset Custodian" OR CRUDBooster::myPrivilegeName() == "Super Administrator"){ 
+				if(CRUDBooster::myPrivilegeId() == 6 || CRUDBooster::isSuperadmin()){ 
 				    $this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-inventory'),"color"=>"success"];
 				}
 			}
@@ -204,7 +210,7 @@
 	        */
 	        $this->script_js = NULL;
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-				if(CRUDBooster::myPrivilegeName() == "Asset Custodian"){ 
+				if(CRUDBooster::myPrivilegeId() == 6){ 
 					$this->script_js = "
 					$(document).ready(function() {
 					$('h1').contents().filter(function(){
@@ -314,11 +320,11 @@
 			$it_warehouse  =    DB::table('warehouse_location_model')->where('id', 3)->value('id');
 			$admin_threef  =    DB::table('warehouse_location_model')->where('id', 1)->value('id');
 			$admin_gf  =  		DB::table('warehouse_location_model')->where('id', 2)->value('id');
-			if(CRUDBooster::myPrivilegeName() == "IT"){ 
+			if(CRUDBooster::myPrivilegeId() == 5){ 
 				$query->where('assets_inventory_header_for_approval.location', $it_warehouse)
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
-			}else if(CRUDBooster::myPrivilegeName() == "Admin"){ 
+			}else if(CRUDBooster::myPrivilegeId() == 9){ 
 				$query->whereIn('assets_inventory_header_for_approval.location', [$admin_threef, $admin_gf])
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
@@ -460,7 +466,7 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {  
-				if(!CRUDBooster::myPrivilegeName() === "Asset Custodian") {    
+				if(!CRUDBooster::myPrivilegeId() == 6) {    
 					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 				}
 			}
@@ -525,7 +531,7 @@
 
 			$data['page_title'] = 'Add Inventory';
 
-			$data['warehouse_location'] = WarehouseLocationModel::all();
+			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();;
 
 			return $this->view("assets.add-inventory", $data);
 
@@ -577,7 +583,7 @@
 				)
 				->where('assets_inventory_body_for_approval.header_id', $id)
 				->get();
-				$data['warehouse_location'] = WarehouseLocationModel::all();
+				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 				return $this->view("assets.edit-inventory-list-for-approval", $data);
 		}
 
@@ -628,14 +634,62 @@
 				)
 				->where('assets_inventory_body_for_approval.header_id', $id)
 				->get();
-				$data['warehouse_location'] = WarehouseLocationModel::all();
+				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 				return $this->view("assets.inventory_list_for_approval", $data);
+		}
+
+		public function getDetailViewPrint($id){
+			$this->cbLoader();
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+			$data = [];
+			$data['page_title'] = 'View Asset Movement History Inventory Details';
+            //header details
+			$data['Header'] = AssetsInventoryHeader::leftjoin('assets_header_images', 'assets_inventory_header.id', '=', 'assets_header_images.header_id')
+				->leftjoin('cms_users', 'assets_inventory_header.created_by', '=', 'cms_users.id')
+				->select(
+					'assets_inventory_header.*',
+					'assets_inventory_header.id as header_id',
+					'cms_users.*',
+					'assets_inventory_header.created_at as date_created'
+					)
+			    ->where('assets_inventory_header.id', $id)
+			    ->first();
+
+			$data['header_images'] = AssetsHeaderImages::select(
+				  'assets_header_images.*'
+				)
+				->where('assets_header_images.header_id', $id)
+				->get();
+	        //Body details
+			$data['Body'] = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
+			    ->leftjoin('assets_inventory_header', 'assets_inventory_body.header_id', '=', 'assets_inventory_header.id')
+			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
+				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
+				->select(
+				  'assets_inventory_body.*',
+				  'assets_inventory_body.id as aib_id',
+				  'statuses.*',
+				  'assets_inventory_header.location as location',
+				  'warehouse_location_model.location as body_location',
+				  'assets.item_type as itemType',
+				  'assets.image as itemImage',
+				  'assets_inventory_body.updated_at as date_updated',
+				  'cms_users_updated_by.name as updated_by'
+				)
+				->where('assets_inventory_body.header_id', $id)
+				->get();
+
+				return $this->view("assets.inventory_list", $data);
 		}
 
 		public function getapprovedProcess(Request $request){
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {  
-				if(!CRUDBooster::myPrivilegeName() === "Asset Custodian") {    
+				if(!CRUDBooster::myPrivilegeId() == 6) {    
 					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 				}
 			}
@@ -728,7 +782,21 @@
 				)
 				->where('assets_inventory_body_for_approval.header_id', $id)
 				->get();
+
 			/* process to generate chronological sequential numbers asset code */
+			//segregate fixed assets to get category id
+			$FixAssetsArr = [];
+			$FaCatId = DB::table('category')->find(1);
+			foreach ($body as $fkey => $fvalue) {
+				if (strtolower($fvalue['item_category']) == strtolower($FaCatId->category_description)) {
+					$FixAssetsArr[] = $fvalue;
+					unset($body[$fkey]);
+				}
+				foreach($FixAssetsArr as $valFa){
+					$getFaAssets = $valFa['item_category'];
+				}
+			}
+
             //segregate it assets to get category id
 			$ItAssetsArr = [];
 			$itCatId = DB::table('category')->find(5);
@@ -742,20 +810,60 @@
 					$getItAssets = $valIt['item_category'];
 				}
 			}
-		
-			//segregate fixed assets to get category id
-			$FixAssetsArr = [];
-			$FaCatId = DB::table('category')->find(1);
-			foreach ($body as $fkey => $fvalue) {
-				if (strtolower($value['item_category']) == strtolower($FaCatId->category_description)) {
-					$FixAssetsArr[] = $fvalue;
-					unset($body[$fkey]);
+
+			//segregate supplies to get category id
+			$suppliesArr = [];
+			$SuppCatId = DB::table('category')->find(2);
+			foreach ($body as $skey => $svalue) {
+				if (strtolower($svalue['item_category']) == strtolower($SuppCatId->category_description)) {
+					$suppliesArr[] = $svalue;
+					unset($body[$skey]);
 				}
-				foreach($FixAssetsArr as $valFa){
-					$getFaAssets = $valFa['item_category'];
+				foreach($suppliesArr as $valSupp){
+					$getSuppliesAssets = $valSupp['item_category'];
 				}
 			}
 
+			//segregate packaging bag to get category id
+			$packagingBagArr = [];
+			$PpbCatId = DB::table('category')->find(3);
+			foreach ($body as $ppbkey => $ppbvalue) {
+				if (strtolower($ppbvalue['item_category']) == strtolower($PpbCatId->category_description)) {
+					$packagingBagArr[] = $ppbvalue;
+					unset($body[$ppbkey]);
+				}
+				foreach($packagingBagArr as $valPpb){
+					$getPackagingBagAssets = $valPpb['item_category'];
+				}
+			}
+
+			//segregate marketing to get category id
+			$marketingArr = [];
+			$marketingCatId = DB::table('category')->find(4);
+			foreach ($body as $mkey => $mvalue) {
+				if (strtolower($mvalue['item_category']) == strtolower($marketingCatId->category_description)) {
+					$marketingArr[] = $mvalue;
+					unset($body[$mkey]);
+				}
+				foreach($marketingArr as $valm){
+					$getMarketingAssets = $valm['item_category'];
+				}
+			}
+
+			//segregate fixtures and furnitures to get category id
+			$fafArr = [];
+			$fafCatId = DB::table('category')->find(6);
+			foreach ($body as $fafkey => $fafvalue) {
+				if (strtolower($fafvalue['item_category']) == strtolower($fafCatId->category_description)) {
+					$fafArr[] = $fafvalue;
+					unset($body[$fafkey]);
+				}
+				foreach($fafArr as $valfaf){
+					$getFafAssets = $valfaf['item_category'];
+				}
+			}
+		
+			
 			//put asset code per based on  item category IT ASSETS
 			$finalItAssetsArr = [];
 			$DatabaseCounterIt = DB::table('assets_inventory_body')->where('item_category',$getItAssets)->count();
@@ -774,8 +882,45 @@
 					$finalFixAssetsArr[] = $finalfavalue;
 			}
 
+			//put asset code per based on  item category SUPPLIES
+			$finalSuppliessArr = [];
+			$DatabaseCounterSupplies = DB::table('assets_inventory_body')->where('item_category',$getSuppliesAssets)->count();
+			foreach((array)$suppliesArr as $finalsuppkey => $finalsuppvalue) {
+					$finalsuppvalue['asset_code'] = "A3".str_pad ($DatabaseCounterSupplies + 1, 6, '0', STR_PAD_LEFT);
+					$DatabaseCounterSupplies++; // or any rule you want.	
+					$finalSuppliessArr[] = $finalsuppvalue;
+			}
+
+			//put asset code per based on  item category PACKAGING BAG
+			$finalPpbArr = [];
+			$DatabaseCounterPpb = DB::table('assets_inventory_body')->where('item_category',$getPackagingBagAssets)->count();
+			foreach((array)$packagingBagArr as $finalppbkey => $finalppbvalue) {
+					$finalppbvalue['asset_code'] = "A4".str_pad ($DatabaseCounterPpb + 1, 6, '0', STR_PAD_LEFT);
+					$DatabaseCounterPpb++; // or any rule you want.	
+					$finalPpbArr[] = $finalppbvalue;
+			}
+
+			//put asset code per based on  item category MARKETING
+			$finalMarketingArr = [];
+			$DatabaseCounterMarketing = DB::table('assets_inventory_body')->where('item_category',$getMarketingAssets)->count();
+			foreach((array)$marketingArr as $finalmkey => $finalmvalue) {
+					$finalmvalue['asset_code'] = "A5".str_pad ($DatabaseCounterMarketing + 1, 6, '0', STR_PAD_LEFT);
+					$DatabaseCounterMarketing++; // or any rule you want.	
+					$finalMarketingArr[] = $finalmvalue;
+			}
+
+			//put asset code per based on  item category FIXTURES AND FURNITURES
+			$finalFafArr = [];
+			$DatabaseCounterFaf = DB::table('assets_inventory_body')->where('item_category',$getFafAssets)->count();
+			foreach((array)$fafArr as $finalfafkey => $finalfafvalue) {
+					$finalfafvalue['asset_code'] = "A6".str_pad ($DatabaseCounterFaf + 1, 6, '0', STR_PAD_LEFT);
+					$DatabaseCounterFaf++; // or any rule you want.	
+					$finalFafArr[] = $finalfafvalue;
+			}
+
             //Merge all data from segragating per item category
-			$finalDataofSplittingArray = array_merge($finalItAssetsArr, $finalFixAssetsArr);
+			$finalDataofSplittingArray = array_merge($finalItAssetsArr, $finalFixAssetsArr, $finalSuppliessArr, $finalPpbArr, $finalMarketingArr, $finalFafArr);
+
 			//save final data
 			$saveData = [];
 			$saveContainerData = [];
@@ -802,7 +947,7 @@
 			}
 			AssetsInventoryBody::insert($saveData);
 
-			$message = ['status'=>'success', 'message' => 'Received!','redirect_url'=>CRUDBooster::mainpath('generate-barcode/'.$id)];
+			$message = ['status'=>'success', 'message' => 'Received!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 			sleep(3);
 			// Lock acquired after waiting a maximum of 5 seconds...
@@ -818,7 +963,7 @@
 		public function getrejectedProcess(Request $request){
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {  
-				if(!CRUDBooster::myPrivilegeName() === "Asset Custodian") {    
+				if(!CRUDBooster::myPrivilegeId() == 6) {    
 					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 				}
 			}
@@ -926,6 +1071,88 @@
 		public function getExport() 
 		{
 			return Excel::download(new ExportHeaderInventory, 'requested_inventory.xlsx');
+		}
+
+		//export ap for recording
+		public function getExportApRecording($id, $date) {
+			$data = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
+					->leftjoin('cms_users', 'assets_inventory_body.created_by', '=', 'cms_users.id')
+					->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
+					->leftjoin('assets_inventory_header', 'assets_inventory_body.header_id', '=', 'assets_inventory_header.id')
+					->select(
+						'assets_inventory_body.*',
+						'assets_inventory_body.id as aib_id',
+						'statuses.*',
+						'cms_users.*',
+						'assets_inventory_header.*',
+						'assets.item_type as itemType',
+						'assets_inventory_body.location as body_location',
+						'assets_inventory_header.location as location',
+						'assets_inventory_header.created_at as date_created'
+					)
+					->where('assets_inventory_body.header_id', $id)
+					->whereDate('assets_inventory_body.created_at', $date)
+			        ->get();
+			//dd($data);
+			$data_array [] = array("Po No",
+									"Invoice Date",
+									"Invoice No",
+									"RR Date",
+									"Asset Code",
+									"Digits Code",
+									"Serial No",
+									"Status",
+									"Location",
+									"Item Condition",
+									"Item Description",
+									"Value",
+									"Item Type",
+									"Quantity",
+									"Warranty Coverage Year",
+									"Created By",
+									"Date Created");
+			foreach($data as $data_item)
+			{
+				$data_array[] = array(
+					'PO No' => $data_item->po_no,
+					'Invoice Date' => $data_item->invoice_date,
+					'Invoice No' => $data_item->invoice_no,
+					'RR Date' => $data_item->rr_date,
+					'Asset Code' => $data_item->asset_code,
+					'Digit Code' => $data_item->digits_code,
+					'Serial No' =>$data_item->serial_no,
+					'Status' =>$data_item->status_description,
+					'Location' =>$data_item->body_location,
+					'Item Condition' =>$data_item->item_condition,
+					'Item Description' => $data_item->item_description,
+					'Value' => $data_item->value,
+					'Item Type' =>$data_item->itemType,
+					'Quantity' =>$data_item->quantity,
+					'Warranty Coverage Year' => $data_item->warranty_coverage,
+					'Created By' =>$data_item->name,
+					'Date Created' =>$data_item->date_created,
+				);
+			}
+			$this->ExportExcelForApRecording($data_array);
+		}
+
+		public function ExportExcelForApRecording($assets_data){
+			ini_set('max_execution_time', 0);
+			ini_set('memory_limit', '4000M');
+			try {
+				$spreadSheet = new Spreadsheet();
+				$spreadSheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(20);
+				$spreadSheet->getActiveSheet()->fromArray($assets_data);
+				$Excel_writer = new Xlsx($spreadSheet);
+				header('Content-Type: application/vnd.ms-excel');
+				header('Content-Disposition: attachment;filename="AssetsInventoryApRecording.xlsx"');
+				header('Cache-Control: max-age=0');
+				ob_end_clean();
+				$Excel_writer->save('php://output');
+				exit();
+			} catch (Exception $e) {
+				return;
+			}
 		}
 
 	}

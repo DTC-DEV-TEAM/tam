@@ -222,14 +222,15 @@
                                             
                                                                                     </select>
                                                                                 @else
-                                                                                    <select class="js-example-basic-single recodropdown" style="width: 100%; height: 35px;"  name="recommendation[]" id="recommendation" data-id="{{$tableRow}}" disabled>
+                                                                                <input type="text" class="form-control" data-id="{{$tableRow}}" id="recommendation{{$tableRow}}" value="NOT APPLICABLE"  name="recommendation[]"  readonly>
+                                                                                    <!-- <select class="js-example-basic-single Notrecodropdown" style="width: 100%; height: 35px;"  name="recommendation[]" id="recommendation" data-id="{{$tableRow}}" disabled>
                                                                                         <option value="">-- Select Recommendation --</option>
                                             
                                                                                         @foreach($recommendations as $datas)    
-                                                                                            <option  value="{{$datas->user_type}}">{{$datas->user_type}}</option>
+                                                                                            <option  value="0">{{$datas->user_type}}</option>
                                                                                         @endforeach
                                             
-                                                                                    </select>
+                                                                                    </select> -->
                                                                                 @endif
 
                                                                             <!--  <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control Reco" data-id="{{$tableRow}}" id="recommendation{{$tableRow}}"  name="recommendation[]"  required maxlength="100">
@@ -586,19 +587,44 @@
     });
 
 
-    $('#btnSubmit').click(function() {
-
-        var strconfirm = confirm("Are you sure you want to reco this request?");
-        if (strconfirm == true) {
-
-            $(this).attr('disabled','disabled');
-
-            $('#myform').submit(); 
-            
-        }else{
-            return false;
-            window.stop();
-        }
+    $('#btnSubmit').click(function(event) {
+        // var strconfirm = confirm("Are you sure you want to reco this request?");
+        // if (strconfirm == true) {
+        //     $(this).attr('disabled','disabled');
+        //     $('#myform').submit(); 
+        // }else{
+        //     return false;
+        //     window.stop();
+        // }
+        event.preventDefault();
+        var reco = $(".recodropdown option").length;
+        var reco_value = $('.recodropdown').find(":selected");
+        for(i=0;i<reco;i++){
+            if(reco_value.eq(i).val() == ""){
+                swal({  
+                        type: 'error',
+                        title: 'Please select Laptop/Desktop Type!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+            } 
+    
+        } 
+        swal({
+            title: "Are you sure you want to reco this request?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, submit it!",
+            width: 450,
+            height: 200
+            }, function () {
+                $(this).attr('disabled','disabled');
+                $("#myform").submit();                   
+        });
 
     });
 

@@ -16,6 +16,7 @@
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use PhpOffice\PhpSpreadsheet\IOFactory;
 	use Carbon\Carbon;
+	use App\Imports\InventoryUpload;
 	
 	class AdminAssetsInventoryBodyController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private static $apiContext;
@@ -157,7 +158,14 @@
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 			    $this->index_button[] = ["label"=>"Export Data","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('asset-lists-export'),"color"=>"primary"];
-			// 	$this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::adminPath('assets_inventory_header/add-inventory'),"color"=>"success"];
+				if(CRUDBooster::isSuperadmin()){
+				$this->index_button[] = [
+					"title"=>"Upload Inventory",
+					"label"=>"Upload Inventory",
+					"icon"=>"fa fa-download",
+					"url"=>CRUDBooster::mainpath('inventory-upload')];
+				}
+				// 	$this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::adminPath('assets_inventory_header/add-inventory'),"color"=>"success"];
 			// 	//$this->index_button[] = ["label"=>"Return Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-return'),"color"=>"success"];
 
 			// 	//$this->index_button[] = ["label"=>"Transfer Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-transfer'),"color"=>"success"];
@@ -304,7 +312,9 @@
 			$reserved  =  		DB::table('statuses')->where('id', 2)->value('status_description');
 			$deployed  =  		DB::table('statuses')->where('id', 3)->value('status_description');
 			$defective  =  		DB::table('statuses')->where('id', 23)->value('status_description');
-
+			$forReturn =  		DB::table('statuses')->where('id', 26)->value('status_description');
+			$forTransfer =  		DB::table('statuses')->where('id', 27)->value('status_description');
+			$notAvailabe =  		DB::table('statuses')->where('id', 28)->value('status_description');
 			if($column_index == 4){
 				if($column_value == $for_approval){
 					$column_value = '<span class="label label-success">'.$for_approval.'</span>';
@@ -316,6 +326,12 @@
 					$column_value = '<span class="label label-danger">'.$deployed.'</span>';
 				}else if($column_value == $defective){
 					$column_value = '<span class="label label-danger">'.$defective.'</span>';
+				}else if($column_value == $forReturn){
+					$column_value = '<span class="label label-info">'.$forReturn.'</span>';
+				}else if($column_value == $forTransfer){
+					$column_value = '<span class="label label-info">'.$forTransfer.'</span>';
+				}else if($column_value == $notAvailabe){
+					$column_value = '<span class="label label-danger">'.$notAvailabe.'</span>';
 				}
 			}
 
@@ -368,24 +384,28 @@
 			$item_condition =  $fields['item_condition'];
 			$comments =  $fields['comments'];
 			$other_comment =  $fields['other_comment'];
-		
-			if($item_condition === "Good"){
+			$quantity =  $fields['quantity'];
+			$statuses_id =  $fields['statuses_id'];
+			if($item_condition === "Good" && $quantity != 0){
                $status = 6;
+			}else if($quantity == 0){
+               $status = 28;
 			}else{
 				$status = 23;
 			}
-			//dd($item_condition);
+	
 			DB::table('assets_inventory_body')->where('id', $id)
 			->update([
 				'item_condition' => $item_condition,
 				'statuses_id' => $status,
+				'quantity' => $quantity,
 				'updated_by' => CRUDBooster::myId()
 			]);
 
 			//save defect and good comments
 			$container = [];
 			$containerSave = [];
-			foreach($comments as $key => $val){
+			foreach((array)$comments as $key => $val){
 				$container['arf_number'] = NULL;
 				$container['digits_code'] = $digits_code;
 				$container['asset_code'] = $asset_code;
@@ -618,5 +638,46 @@
 		{
 			return Excel::download(new ExportMultipleSheet, 'asset_lists.xlsx');
 		}
+
+
+		public function getInventory(Request $request){
+        $AssetsInventoryBody = AssetsInventoryBody::select('assets_inventory_body.*');
+        $per_page = $request->input('per_page');
+        return (isset($per_page)) ? $AssetsInventoryBody->paginate($per_page) :  $AssetsInventoryBody->get();
+
+        }
+
+		public function uploadInventory() {
+			$data['page_title']= 'Inventory Upload';
+			return view('import.inventory-import', $data)->render();
+		}
+
+		public function inventoryUpload(Request $request) {
+			$data = Request::all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+
+			try {
+				Excel::import(new InventoryUpload, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), trans("Upload Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
+				
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
+				}
+				
+				$errors = collect($error)->unique()->toArray();
+		
+			}
+			CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), $errors[0], 'danger');
+		}
+
+		
 
 	}

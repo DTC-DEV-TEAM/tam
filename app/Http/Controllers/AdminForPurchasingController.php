@@ -137,9 +137,9 @@
 				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestPurchasing/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[purchased2_by] == null"];
 				
 
-				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[mo_by] != null"];
+				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye'];
 
-				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestClose/[id]'),'icon'=>'fa fa-check-circle', "showIf"=>"[status_id] == $for_closing"];
+				//$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestClose/[id]'),'icon'=>'fa fa-check-circle', "showIf"=>"[status_id] == $for_closing"];
 				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintPickList/[id]'),'icon'=>'fa fa-print', "showIf"=>"[purchased2_by] != null && [status_id] == $processing"];
 				
 				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrint/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status_id] == $picked"];
@@ -611,15 +611,15 @@
 
 
 				if($arf_header->request_type_id == 5){
-
-					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
 
 				}else{
-
-					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
@@ -1103,7 +1103,7 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
@@ -1120,7 +1120,7 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
 						'locations.store_name as store_branch',

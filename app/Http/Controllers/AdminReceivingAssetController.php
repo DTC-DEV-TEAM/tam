@@ -9,6 +9,7 @@
 	use App\ApprovalMatrix;
 	use App\StatusMatrix;
 	use App\MoveOrder;
+	use App\Models\InAssets;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -393,7 +394,7 @@
 
 			if($column_index == 5){
 
-				$request_type = 			DB::table('employees')->where(['id' => $column_value])->first();
+				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
 				
 				if($column_value == $request_type->id){
 
@@ -475,11 +476,18 @@
 
 			$arf_header 				= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 
+		
 			if($arf_header->request_type_id == 5){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
 												//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 												->value('status_id');
+			}else if(in_array($arf_header->request_type_id, [6, 7])){
+				//if($arf_header->request_type_id == 5){
+					$for_closing 				= StatusMatrix::where('current_step', 10)
+													->where('request_type', $arf_header->request_type_id)
+													//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+													->value('status_id');
 			}else{
 				$for_closing 				= StatusMatrix::where('current_step', 10)
 												->where('request_type', $arf_header->request_type_id)
@@ -487,39 +495,96 @@
 												->value('status_id');
 			}
 
-			$employee_name = DB::table('employees')->where('id', $arf_header->employee_name)->first();
-
-			for($x=0; $x < count((array)$item_id); $x++) {
-
-					MoveOrder::where('id',$item_id[$x])
-					->update([
-						'status_id'=> 	$for_closing
-					]);	
-
-					DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
-					->update([
-						'statuses_id'=> 			3,
-						'deployed_to'=> 			$employee_name->bill_to,
-						'deployed_by'=> 			CRUDBooster::myId(),
-						'deployed_at'=> 			date('Y-m-d H:i:s'),
-						'location'=> 				4
-					]);
-
-					DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity');
-
-			}	
+			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
+				for($x=0; $x < count((array)$item_id); $x++) {
+					if(in_array($arf_header->request_type_id, [1, 5])){
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'status_id'=> 	$for_closing
+						]);	
+						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
+						->update([
+							'statuses_id'=> 			3,
+							'deployed_to'=> 			$employee_name->bill_to,
+							'deployed_by'=> 			CRUDBooster::myId(),
+							'deployed_at'=> 			date('Y-m-d H:i:s'),
+							'location'=> 				4
+						]);
+						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity');
+					}else{
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'status_id'=> 	$for_closing,
+							'closed_at'=> 	date('Y-m-d H:i:s')
+						]);	
+					}
+				}	
+		    
 			
 			if($arf_header->received_by == null){
-
-				HeaderRequest::where('id', $arf_header->id)
-				->update([
-					'status_id'=> 	 	$for_closing,
-					'received_by'=> 	CRUDBooster::myId(),
-					'received_at'=> 	date('Y-m-d H:i:s')
-				]);	
-
+				if(in_array($arf_header->request_type_id, [1, 5])){
+					HeaderRequest::where('id', $arf_header->id)
+					->update([
+						'status_id'=> 	 	$for_closing,
+						'received_by'=> 	CRUDBooster::myId(),
+						'received_at'=> 	date('Y-m-d H:i:s')
+					]);	
+			    }else{
+					HeaderRequest::where('id', $arf_header->id)
+					->update([
+						    'status_id'=> 	 	$for_closing,
+							'received_by'=> 	CRUDBooster::myId(),
+							'received_at'=> 	date('Y-m-d H:i:s'),
+							'closing_plug'=> 1,
+							'closed_by'=> CRUDBooster::myId(),
+							'closed_at'=> date('Y-m-d H:i:s')
+						
+					]);	
+				}
 			}
+            //save in IN assets
+			// $inAssets 	= MoveOrder::whereIn('id',$item_id)->get();
+	
+			// $mo_reference = [];
+			// $request_type_id_mo = [];
+			// $digits_code = [];
+            // $asset_code = [];
+            // $item_description = [];
+			// $serial_no = [];
+			// $quantity = [];
+			// $unit_cost = [];
+			// foreach($inAssets as $invData){
+			// 	array_push($mo_reference, $invData['mo_reference_number']);
+			// 	array_push($request_type_id_mo, $invData['request_type_id_mo']);
+			// 	array_push($digits_code, $invData['digits_code']);
+            //     array_push($asset_code, $invData['asset_code']);
+            //     array_push($item_description, $invData['item_description']);
+			// 	array_push($serial_no, $invData['serial_no']);
+			// 	array_push($quantity, $invData['quantity']);
+			// 	array_push($unit_cost, $invData['unit_cost']);
+			// }
 
+			// //put in in assets deployed
+			// for($x=0; $x < count((array)$item_id); $x++) {
+			// 	InAssets::create([
+			// 		'arf_number'          => $arf_header->reference_number,
+			// 		'mo_ref_number'       => $mo_reference[$x],
+			// 		'requestor_id'        => $arf_header->employee_name,
+			// 		'requestor_name'      => $employee_name->bill_to,
+			// 		'transfer_to'         => NULL,
+			// 		'transaction_type'    => $request_type_id_mo[$x],
+			// 		'request_type'        => "REQUEST",
+			// 		'asset_code'          => $asset_code[$x],
+			// 		'digits_code'         => $digits_code[$x],
+			// 		'item_description'    => $item_description[$x],
+			// 		'serial_no'           => $serial_no[$x],
+			// 		'quantity'            => $quantity[$x],
+			// 		'amount'              => $unit_cost[$x],
+			// 		'date_received'       => date('Y-m-d H:i:s'),
+			// 	]);
+		    // }
+
+			
 			/*$arf_header = 		HeaderRequest::where(['id' => $id])->first();
 
 			if($arf_header->request_type_id == 5){
@@ -612,10 +677,10 @@
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
+				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -630,9 +695,9 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'employees.company_name_id as company_name',
 						'departments.department_name as department',
-						'stores.bea_mo_store_name as store_branch',
+						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'picked.name as pickedby',
@@ -687,12 +752,17 @@
 
 			$arf_header 				= HeaderRequest::where(['id' => $id])->first();
 
-			
 			if($arf_header->request_type_id == 5){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
 												//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 												->value('status_id');
+			}else if(in_array($arf_header->request_type_id, [6, 7])){
+				//if($arf_header->request_type_id == 5){
+					$for_closing 				= StatusMatrix::where('current_step', 10)
+													->where('request_type', $arf_header->request_type_id)
+													//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+													->value('status_id');
 			}else{
 				$for_closing 				= StatusMatrix::where('current_step', 10)
 												->where('request_type', $arf_header->request_type_id)
@@ -702,39 +772,57 @@
 			
 			$MO_infos =  	MoveOrder::where('mo_body_request.header_request_id', $id)->where('mo_body_request.status_id', $for_receiving)->get();
 
-			$employee_name = DB::table('employees')->where('id', $arf_header->employee_name)->first();
+			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
 
 			foreach( $MO_infos as $request_value ){
-
-				DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)
+				if(in_array($arf_header->request_type_id, [1, 5])){
+					DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)
+						->update([
+							'statuses_id'=> 			3,
+							'deployed_to'=> 			$employee_name->bill_to,
+							'deployed_by'=> 			CRUDBooster::myId(),
+							'deployed_at'=> 			date('Y-m-d H:i:s'),
+							'location'=> 				4
+						]);
+					DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)->decrement('quantity');
+					MoveOrder::where('id', $request_value->id)
 					->update([
-						'statuses_id'=> 			3,
-						'deployed_to'=> 			$employee_name->bill_to,
-						'deployed_by'=> 			CRUDBooster::myId(),
-						'deployed_at'=> 			date('Y-m-d H:i:s'),
-						'location'=> 				4
+						'status_id'=> 	$for_closing
+					]);	
+			    }else{
+					MoveOrder::where('id', $request_value->id)
+					->update([
+						'status_id'=> 	$for_closing,
+						'closed_at'=> 	date('Y-m-d H:i:s')
 					]);
-
-				DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)->decrement('quantity');
-				
-				MoveOrder::where('id', $request_value->id)
-				->update([
-					'status_id'=> 	$for_closing
-				]);	
-
-
+				}
 			}
 
-			if($arf_header->received_by == null){
-
-				HeaderRequest::where('id', $arf_header->id)
-				->update([
-					'status_id'=> 	 	$for_closing,
-					'received_by'=> 	$arf_header->created_by,
-					'received_at'=> 	date('Y-m-d H:i:s')
-				]);	
-
-			}
+			
+				if(in_array($arf_header->request_type_id, [1, 5])){
+					if($arf_header->received_by == null){
+						HeaderRequest::where('id', $arf_header->id)
+						->update([
+							'status_id'=> 	 	$for_closing,
+							'received_by'=> 	$arf_header->created_by,
+							'received_at'=> 	date('Y-m-d H:i:s')
+						]);	
+			    	}
+			    }else{
+					if($arf_header->received_by == null){
+						HeaderRequest::where('id',$arf_header->id)
+						->update([
+								'received_by'=> 	$arf_header->created_by,
+								'received_at'=> 	date('Y-m-d H:i:s'),
+								'closing_plug'=> 1,
+								'status_id'=> 	 	$for_closing,
+								'closed_by'=> $arf_header->created_by,
+								'closed_at'=> date('Y-m-d H:i:s')
+							
+						]);	
+				    }
+				}
+			
 			
 
 			$data['alertmessage'] = 1;
