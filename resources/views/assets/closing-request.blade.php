@@ -514,19 +514,29 @@
     };
     setTimeout("preventBack()", 0);
 
-    $('#btnSubmit').click(function() {
-
-        var strconfirm = confirm("Are you sure you want to close this request?");
-        if (strconfirm == true) {
-
-            $(this).attr('disabled','disabled');
-
-            $('#myform').submit(); 
-            
-        }else{
-            return false;
-            window.stop();
-        }
+    $('#btnSubmit').click(function(event) {
+        // var strconfirm = confirm("Are you sure you want to close this request?");
+        // if (strconfirm == true) {
+        //     $(this).attr('disabled','disabled');
+        //     $('#myform').submit(); 
+        // }else{
+        //     return false;
+        //     window.stop();
+        // }
+        event.preventDefault();
+        swal({
+            title: "Are you sure?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, close it!",
+            width: 450,
+            height: 200
+            }, function () {
+                $(this).attr('disabled','disabled');
+                $('#myform').submit();                                                  
+        });
 
     });
 

@@ -4,17 +4,14 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	use App\HeaderRequest;
-	use App\BodyRequest;
-	use App\ApprovalMatrix;
-	use App\StatusMatrix;
-	use App\MoveOrder;
-	class AdminDeployedAssetController extends \crocodicstudio\crudbooster\controllers\CBController {
+	use App\Models\ReturnTransferAssets;
+	use App\Models\ReturnTransferAssetsHeader;
+	class AdminReturnCloseController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "mo_reference_number";
+			$this->title_field = "requestor_name";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
@@ -26,31 +23,46 @@
 			$this->button_delete = false;
 			$this->button_detail = false;
 			$this->button_show = true;
-			$this->button_filter = false;
+			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "mo_body_request";
+			$this->table = "return_transfer_assets_header";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			
-			$this->col[] = ["label"=>"Arf Number","name"=>"header_request_id","join"=>"header_request,reference_number"];
-			$this->col[] = ["label"=>"Reference Number","name"=>"mo_reference_number"];
-			$this->col[] = ["label"=>"Digits Code","name"=>"digits_code"];
-			$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
-			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
-			$this->col[] = ["label"=>"Requested Date","name"=>"header_request_id","join"=>"header_request,created_at"];
-			$this->col[] = ["label"=>"Received Date","name"=>"header_request_id","join"=>"header_request,received_at"];
-			$this->col[] = ["label"=>"MO Number","name"=>"mo_reference_number","visible"=>false];
-			$this->col[] = ["label"=>"MO Number","name"=>"header_request_id","visible"=>false];
-			
+			$this->col[] = ["label"=>"Status","name"=>"status","join"=>"statuses,status_description"];
+			$this->col[] = ["label"=>"Reference No","name"=>"reference_no"];
+			$this->col[] = ["label"=>"Name","name"=>"requestor_name","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Return Type","name"=>"request_type_id","join"=>"requests,request_name"];
+			$this->col[] = ["label"=>"Type of Request","name"=>"request_type"];
+			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
+			$this->col[] = ["label"=>"Transacted By","name"=>"transacted_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Transacted Date","name"=>"transacted_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 
 			# END FORM DO NOT REMOVE THIS LINE
+
+			# OLD START FORM
+			//$this->form = [];
+			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Requestor Name","name"=>"requestor_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"request_type,id"];
+			//$this->form[] = ["label"=>"Request Type","name"=>"request_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Approved Date","name"=>"approved_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rejected Date","name"=>"rejected_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
+			# OLD END FORM
+
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -78,10 +90,13 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			
-			$this->addaction[] = ['title'=>'View','url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[mo_reference_number] != null && [header_request_id] != null"];
-			$this->addaction[] = ['title'=>'View','url'=>CRUDBooster::mainpath('detail-mo-only/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[header_request_id] == null"];
-			
+			if(CRUDBooster::isUpdate()) {
+				
+				$toClose  = 		DB::table('statuses')->where('id', 25)->value('id');
+
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestClosingReturn/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == $toClose"];
+
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -238,18 +253,12 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        $closed =  	DB::table('statuses')->where('id', 13)->value('id');
-			$for_closing =  	DB::table('statuses')->where('id', 19)->value('id');
-           
-			$query->where('mo_body_request.request_created_by', CRUDBooster::myId())
-				//->orWhere('mo_body_request.created_by', CRUDBooster::myId())
-				->whereIn('mo_body_request.status_id', [$closed, $for_closing])
-				->whereNull('mo_body_request.return_flag')
-				//->whereNotIn('header_request.request_type_id', [6,7])
-				; 
-		
-			
+	        $toClose  = 	DB::table('statuses')->where('id', 25)->value('id');
 
+     
+			$query->where('return_transfer_assets_header.status', $toClose)
+				  ->orderBy('return_transfer_assets_header.id', 'asc');
+	            
 	    }
 
 	    /*
@@ -259,7 +268,12 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	$toClose  =      DB::table('statuses')->where('id', 25)->value('status_description');
+			if($column_index == 1){
+				if($column_value == $toClose){
+					$column_value = '<span class="label label-info">'.$toClose.'</span>';
+				}
+			}
 	    }
 
 	    /*
@@ -295,8 +309,22 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
+	        $fields = Request::all();
 
+			$item_id 					= $fields['item_id'];
+
+			$closed  = 		DB::table('statuses')->where('id',13)->value('id');
+			ReturnTransferAssets::where('return_header_id',$id)
+			->update([
+					'status' => $closed
+			]);	
+
+			ReturnTransferAssetsHeader::where('id', $id)
+			->update([
+				'status'=> 	   $closed,
+				'close_by' => CRUDBooster::myId(),
+				'close_at' => date('Y-m-d H:i:s')
+			]);	
 	    }
 
 	    /* 
@@ -334,117 +362,55 @@
 	        //Your code here
 
 	    }
-
-		public function getDetail($id){
+		public function getRequestClosingReturn($id){
 			
-			$this->cbLoader();
-            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
-                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-            }
 
-			$header_id = DB::table('mo_body_request')->where('id', $id)->first();
+			$this->cbLoader();
+			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}  
+
+
 			$data = array();
 
-			$data['page_title'] = 'View Request';
+			$data['page_title'] = 'Close Return/Transfer Asset';
 
-			$data['Header'] = HeaderRequest::
-				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
-				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
-				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
-				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
-				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
-				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
-				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
-				->leftjoin('cms_users as processed', 'header_request.purchased2_by','=', 'processed.id')
-				->leftjoin('cms_users as picked', 'header_request.picked_by','=', 'picked.id')
-				->leftjoin('cms_users as received', 'header_request.received_by','=', 'received.id')
-				->leftjoin('cms_users as closed', 'header_request.closed_by','=', 'closed.id')
+			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
+				->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
+				->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
+				->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
+				->leftjoin('cms_users as received', 'return_transfer_assets_header.transacted_by','=', 'received.id')
+				->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
+				->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
 				->select(
-						'header_request.*',
-						'header_request.id as requestid',
-						'header_request.created_at as created',
-						'request_type.*',
-						'condition_type.*',
-						'requested.name as requestedby',
-						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
-						'departments.department_name as department',
+						'return_transfer_assets_header.*',
+						'return_transfer_assets_header.id as requestid',
+						'requests.request_name as request_name',
+						'employees.name as employee_name',
+						'employees.company_name_id as company',
+						'employees.position_id as position',
+						'departments.department_name as department_name',
 						'locations.store_name as store_branch',
 						'approved.name as approvedby',
-						'recommended.name as recommendedby',
-						'picked.name as pickedby',
 						'received.name as receivedby',
-						'processed.name as processedby',
 						'closed.name as closedby',
-						'header_request.created_at as created_at'
+						'locations.store_name as store_branch'
 						)
-				->where('header_request.id', $header_id->header_request_id)->first();
+				->where('return_transfer_assets_header.id', $id)->first();
+           
+		
+
+			$data['return_body'] = ReturnTransferAssets::
+			           leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
 				
-			$data['Body'] = BodyRequest::
-				select(
-				  'body_request.*'
-				)
-				->where('body_request.header_request_id', $header_id->header_request_id)
-				->get();
-
-			$data['Body1'] = BodyRequest::
-				select(
-				  'body_request.*'
-				)
-				->where('body_request.header_request_id', $header_id->header_request_id)
-				->wherenotnull('body_request.digits_code')
-				->orderby('body_request.id', 'desc')
-				->get();
-
-			$data['MoveOrder'] = MoveOrder::
-				select(
-				  'mo_body_request.*',
-				  'statuses.status_description as status_description'
-				)
-				->where('mo_body_request.header_request_id', $header_id->header_request_id)
-				->leftjoin('statuses', 'mo_body_request.status_id', '=', 'statuses.id')
-				->orderby('mo_body_request.id', 'desc')
-				->get();
-
-			$data['BodyReco'] = DB::table('recommendation_request')
 				->select(
-				  'recommendation_request.*'
-				)
-				->where('recommendation_request.header_request_id', $header_id->header_request_id)
-				->get();				
-
-			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();	
-					
-			return $this->view("assets.deployed_details", $data);
-		}
-
-		public function getDetailMoOnly($id){
-			
-			$this->cbLoader();
-            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
-                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-            }
-
-			//$header_id = DB::table('mo_body_request')->where('id', $id)->first();
-			$data = array();
-
-			$data['page_title'] = 'View Request';
-
-			$data['MoveOrder'] = MoveOrder::
-				select(
-				  'mo_body_request.*',
-				  'statuses.status_description as status_description'
-				)
-				->where('mo_body_request.id', $id)
-				->leftjoin('statuses', 'mo_body_request.status_id', '=', 'statuses.id')
-				->orderby('mo_body_request.id', 'desc')
-				->get();
-
-			
-					
-			return $this->view("assets.deployed_details_mo_only", $data);
+						'return_transfer_assets.*',
+						'statuses.*',
+						)
+						->where('return_transfer_assets.return_header_id', $id)->get();	
+			// dd($data['return_body']);
+	
+			return $this->view("assets.return-closing-request", $data);
 		}
 
 

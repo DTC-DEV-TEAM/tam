@@ -318,7 +318,7 @@
 				
 				$query->where('header_request.created_by', CRUDBooster::myId())->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
 			
-			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 11, 12])){ 
+			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 11, 12, 14])){ 
 
 				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
 				
@@ -330,21 +330,16 @@
 				$usersmentlist = array_map('intval',explode(",",$approval_string));
 
 				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-				
-
 				$query->whereIn('header_request.created_by', $usersmentlist)
 				//->whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
 				->where('header_request.approved_by','!=', null)
 				->whereNull('header_request.deleted_at')
 				->orderBy('header_request.id', 'ASC');
 
-			}else if(CRUDBooster::myPrivilegeName() == "IT"){ 
+			}else if(CRUDBooster::myPrivilegeId() == 5){ 
 
 				//$approved =  		DB::table('statuses')->where('id', 4)->value('id');
-
 				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-				
-
 				//$query->whereIn('header_request.department', explode(",",$user_data->department_id))
 				$query->
 				//whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
@@ -353,13 +348,17 @@
 				->whereNull('header_request.deleted_at')
 				->orderBy('header_request.id', 'ASC');
 
-			}else if(CRUDBooster::myPrivilegeName() == "Asset Custodian"){ 
+			}else if(CRUDBooster::myPrivilegeId() == 6){ 
 
 				$query->whereNotNull('header_request.purchased2_by')->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
 
-			}else if(CRUDBooster::myPrivilegeName() == "AP Checker"){ 
+			}else if(CRUDBooster::myPrivilegeId() == 7){ 
 
-				$query->whereNotNull('header_request.closed_by')->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
+				$query->whereNotNull('header_request.closed_by')->where('header_request.closed_by', CRUDBooster::myId())->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 9){ 
+
+				$query->whereNotNull('header_request.purchased2_by')->where('header_request.picked_by', CRUDBooster::myId())->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
 
 			}
 	            
@@ -590,7 +589,7 @@
 				->get();				
 
 			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();		
-
+		
 			return $this->view("assets.detail-history", $data);
 		}
 
@@ -615,7 +614,7 @@
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
+				->leftjoin('stores', 'header_request.store_branch', '=', 'stores.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -631,7 +630,7 @@
 						'companies.company_name as company_name',
 						'departments.department_name as department',
 						'positions.position_description as position',
-						'locations.store_name as store_branch',
+						'stores.bea_mo_store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
 						'processed.name as processedby',

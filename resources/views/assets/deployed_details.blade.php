@@ -11,7 +11,7 @@
         Detail Form
     </div>
 
-    <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>
+
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="0" name="action" id="action">
 
@@ -63,7 +63,7 @@
 
             </div>
 
-            @if(CRUDBooster::myPrivilegeId() == 8 || CRUDBooster::isSuperadmin())
+            @if($Header->store_branch != null || $Header->store_branch != "")
                 <div class="row">                           
                     <label class="control-label col-md-2">{{ trans('message.form-label.store_branch') }}:</label>
                     <div class="col-md-4">
@@ -161,7 +161,7 @@
                                                     <th width="24%" class="text-center">{{ trans('message.table.reco_item_description_text') }}</th>
                                                 @endif 
                                                
-                                                    <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
+                                                    <!-- <th width="5%" class="text-center">{{ trans('message.table.action') }}</th> -->
                                              
                                             </tr>
                                             <tr id="tr-table">
@@ -231,7 +231,7 @@
                                                                                         {{$rowresult->reco_item_description}}
                                                                                     </td>
                                                                                 @endif
-                                                                                @if($Header->po_number == null || $Header->po_number == "")    
+                                                                                <!-- @if($Header->po_number == null || $Header->po_number == "")    
                                                                                         <td style="text-align:center" height="10">
                                                                                             <button id="deleteRow{{$tableRow}}" name="removeRow" data-id="{{$tableRow}}" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-remove"></i></button>
                                                                                         </td>
@@ -239,7 +239,7 @@
                                                                                         <td style="text-align:center" height="10">
                                                                                             <button id="deleteRow{{$tableRow}}" name="removeRow" data-id="{{$tableRow}}" class="btn btn-danger removeRow" disabled><i class="glyphicon glyphicon-remove"></i></button>
                                                                                         </td>
-                                                                                @endif
+                                                                                @endif -->
 
                                                                                 
                                                                             </tr>
@@ -476,7 +476,7 @@
 
         </div>
 
-    </form>
+    
 
 
 

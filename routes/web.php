@@ -123,7 +123,26 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/departments/departments-upload','AdminDepartmentsController@UploadDepartmentsView');
     Route::post('/admin/departments/upload-departments','AdminDepartmentsController@departmentsUpload')->name('upload-departments');
     Route::get('/admin/departments/upload-departments-template','AdminDepartmentsController@uploadDepartmentsTemplate');
+    
+    //Asset Return 
+    Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/return-assets', 'AdminReturnTransferAssetsHeaderController@getReturnAssets')->name('assets.return.assets'); 
+    Route::post(config('crudbooster.ADMIN_PATH').'/selectedReturnHeader','AdminReturnTransferAssetsHeaderController@selectedReturnHeader')->name('order.selected.header');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_assets/save-return-assets','AdminReturnTransferAssetsHeaderController@saveReturnAssets')->name('assets.save.return.assets');
+    Route::get('admin/return_transfer_assets_header/getRequestCancelReturn/{id}','AdminReturnTransferAssetsHeaderController@getRequestCancelReturn')->name('getRequestCancelReturn');
+    Route::get('/admin/return_approval/getRequestApprovalReturn/{id}','AdminReturnApprovalController@getRequestApprovalReturn')->name('approval-request-return');
+    Route::get('/admin/return_close/getRequestClosingReturn/{id}','AdminReturnCloseController@getRequestClosingReturn')->name('return-closing-request');
+    Route::get('/admin/return_picking/getRequestPickingReturn/{id}','AdminReturnPickingController@getRequestPickingReturn')->name('return-picking-request');
+    Route::get('/admin/return_transfer_assets_header/getRequestPrintTF/{id}','AdminReturnTransferAssetsHeaderController@getRequestPrintTF')->name('print-request-tf');
+    
+    //Transfer Assets
+    Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
+    Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
+    Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
 
+    //inventory upload
+    Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
+    Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
+    
     Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

@@ -649,7 +649,7 @@
 
 		public function uploadInventory() {
 			$data['page_title']= 'Inventory Upload';
-			return view('import.inventory-import', $data)->render();
+			return view('imports.inventory-import', $data)->render();
 		}
 
 		public function inventoryUpload(Request $request) {

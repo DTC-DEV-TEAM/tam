@@ -478,7 +478,7 @@
 			$count_header       = DB::table('header_request')->count();
 			$header_ref         = str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);			
 			$reference_number	= "ARF-".$header_ref;
-			$employees          = DB::table('cms_users')->where('bill_to', $employee_name)->first();
+			$employees          = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$pending            = DB::table('statuses')->where('id', 1)->value('id');
 			$approved           = DB::table('statuses')->where('id', 4)->value('id');
 
@@ -501,7 +501,7 @@
 			$postdata['company_name'] 				= $employees->company_name_id;
 			$postdata['position'] 					= $employees->position_id;
 			$postdata['department'] 				= $employees->department_id;
-			$postdata['store_branch'] 				= $store_branch_id;
+			$postdata['store_branch'] 				= $employees->location_id;
 			$postdata['purpose'] 					= $purpose;
 			$postdata['conditions'] 				= $condition;
 			$postdata['quantity_total'] 			= $quantity_total;

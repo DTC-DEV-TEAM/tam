@@ -91,18 +91,27 @@
         </div>
            <div class="row">
              <div class="col-md-12">
-                     <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label">Item Condition</label>
-                            <select required selected data-placeholder="-- Please Select Item Condition --" id="item_condition" name="item_condition" class="form-select select2" style="width:100%;">
-                           
-                            <option <?php if ($Body->item_condition == 'Good') echo 'selected'; ?>>Good</option>
-                            <option <?php if ($Body->item_condition == 'Defective') echo 'selected'; ?>>Defective</option>
-                                <!-- <option value="{{ $key }}" {{$suggestions_datas[0]->categories_id == $key ? "selected" : "" }}>{{ $value->item_condition }}</option> -->
-                         
-                            </select>
-                        </div>
-                       </div>
+                <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Item Condition</label>
+                    <select required selected data-placeholder="-- Please Select Item Condition --" id="item_condition" name="item_condition" class="form-select select2" style="width:100%;">
+                    
+                    <option <?php if ($Body->item_condition == 'Good') echo 'selected'; ?>>Good</option>
+                    <option <?php if ($Body->item_condition == 'Defective') echo 'selected'; ?>>Defective</option>
+                        <!-- <option value="{{ $key }}" {{$suggestions_datas[0]->categories_id == $key ? "selected" : "" }}>{{ $value->item_condition }}</option> -->
+                    
+                    </select>
+                </div>
+                </div>
+                <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Quantity</label>
+                    <input type="text" class="form-control" name="quantity" id="quantity" value="{{$Body->quantity}}">
+                </div>
+                </div>
+             </div>
+             <div class="col-md-12">
+            
              </div>
             </div>
             <br>

@@ -11,17 +11,25 @@ class AssetsInventoryBody extends Model
         'header_id', 
         'statuses_id', 
         'po_no',
+        'warranty_coverage',
         'digits_code',
         'item_code',
         'item_description',
+        'item_condition',
         'value',
         'item_type',
         'quantity',
         'serial_no',
         'item_photo',
-        'assets_code',
+        'asset_code',
+        'deployed_to',
         'barcode',
-        'created_by'
+        'created_by',
+        'deployed_to_id',
+        'location',
+        'request_type_id_inventory',
+        'item_category',
+        'item_id'
     ];
 
     public function assetsinventoryheader()
