@@ -512,7 +512,7 @@
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
 				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
+				->leftjoin('locations', 'employees.location_id', '=', 'locations.id')
 
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')

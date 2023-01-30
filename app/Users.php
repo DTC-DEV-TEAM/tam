@@ -30,4 +30,25 @@ class Users extends Model
         'approver_id',
         'store_id'
     ] ;
+
+      //customers query
+      public function scopeUser($query, $id)
+      {
+          return $query->where('cms_users.id', $id)
+                        ->leftjoin('cms_privileges', 'cms_users.id_cms_privileges','=','cms_privileges.id')
+                        ->leftjoin('departments', 'cms_users.department_id','=','departments.id')
+                        ->leftjoin('sub_department', 'cms_users.sub_department_id','=','sub_department.id')
+                        ->leftjoin('locations', 'cms_users.location_id', '=', 'locations.id')
+                        ->leftjoin('cms_users as approver', 'cms_users.approver_id', '=', 'approver.id')
+                        ->select(
+                            'cms_users.*',
+                            'departments.*',
+                            'sub_department.*',
+                            'locations.*',
+                            'cms_privileges.name as privilege_name',
+                            'approver.name as approver'
+                         
+                          ) 
+                        ->first();
+      }
 }

@@ -4,62 +4,42 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	use App\HeaderRequest;
-	use App\BodyRequest;
-	use App\ApprovalMatrix;
-	use App\StatusMatrix;
+	use App\Models\Requests;
+	use App\Models\ReturnTransferAssets;
+	use App\Models\ReturnTransferAssetsHeader;
+	use App\MoveOrder;
 	use App\Users;
-	//use Illuminate\Http\Request;
-	//use Illuminate\Support\Facades\Input;
-	use Illuminate\Support\Facades\Log;
-	use Illuminate\Support\Facades\Redirect;
-
-	class AdminApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
-
-        public function __construct() {
-			// Register ENUM type
-			//$this->request = $request;
-			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-		}
-
-		private static $apiContext; 
+	class AdminReturnHistoryAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
-			$this->title_field = "employee_name";
+			$this->title_field = "requestor_name";
 			$this->limit = "20";
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
+			$this->button_add = false;
 			$this->button_edit = false;
-			$this->button_delete = true;
-			$this->button_detail = false;
+			$this->button_delete = false;
+			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "header_request";
+			$this->table = "return_transfer_assets_header";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Status","name"=>"status_id","join"=>"statuses,status_description"];
-			$this->col[] = ["label"=>"Reference Number","name"=>"reference_number"];
-			$this->col[] = ["label"=>"Request Type","name"=>"request_type_id","join"=>"requests,request_name"];
-			$this->col[] = ["label"=>"Company Name","name"=>"company_name"];
-			$this->col[] = ["label"=>"Employee Name","name"=>"employee_name","join"=>"cms_users,bill_to"];
-			$this->col[] = ["label"=>"Department","name"=>"department","join"=>"departments,department_name"];
-			$this->col[] = ["label"=>"Requested By","name"=>"created_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Requested Date","name"=>"created_at"];
-			//$this->col[] = ["label"=>"Updated By","name"=>"updated_by","join"=>"cms_users,name"];
-			//$this->col[] = ["label"=>"Updated Date","name"=>"updated_at"];
-			$this->col[] = ["label"=>"Approved By","name"=>"approved_by","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Approved Date","name"=>"approved_at"];
-			$this->col[] = ["label"=>"Rejected Date","name"=>"rejected_at"];
+			$this->col[] = ["label"=>"Status","name"=>"status","join"=>"statuses,status_description"];
+			$this->col[] = ["label"=>"Reference No","name"=>"reference_no"];
+			$this->col[] = ["label"=>"Name","name"=>"requestor_name","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Return Type","name"=>"request_type_id","join"=>"requests,request_name"];
+			$this->col[] = ["label"=>"Type of Request","name"=>"request_type"];
+			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -69,23 +49,21 @@
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Reference Number","name"=>"reference_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status Id","name"=>"status_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"status,id"];
-			//$this->form[] = ["label"=>"Employee Name","name"=>"employee_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Company Name","name"=>"company_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Position","name"=>"position","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Department","name"=>"department","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Store Branch","name"=>"store_branch","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Purpose","name"=>"purpose","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Conditions","name"=>"conditions","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Quantity Total","name"=>"quantity_total","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Cost Total","name"=>"cost_total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Total","name"=>"total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Requestor Name","name"=>"requestor_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"request_type,id"];
+			//$this->form[] = ["label"=>"Request Type","name"=>"request_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
 			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved At","name"=>"approved_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Rejected At","name"=>"rejected_at","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Approved Date","name"=>"approved_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			//$this->form[] = ["label"=>"Rejected Date","name"=>"rejected_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
+			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
+			//$this->form[] = ["label"=>"Close By","name"=>"close_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			//$this->form[] = ["label"=>"Close At","name"=>"close_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
 			# OLD END FORM
 
 			/* 
@@ -115,13 +93,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			if(CRUDBooster::isUpdate()) {
-				
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApproval/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $pending"];
-				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
-			}
 
 
 	        /* 
@@ -279,33 +250,56 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-			if(CRUDBooster::isSuperadmin()){
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				$query->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'DESC')->where('header_request.status_id', $pending)->orderBy('header_request.id', 'DESC');
+	        if(CRUDBooster::isSuperadmin()){
+		
+				$query->whereNull('return_transfer_assets_header.archived')->orderBy('return_transfer_assets_header.status', 'DESC')->orderBy('return_transfer_assets_header.id', 'DESC');
 			
-			}else{
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			}else if(CRUDBooster::myPrivilegeId() == 2){ 
+				
+				$query->where('return_transfer_assets_header.requested_by', CRUDBooster::myId())->whereNull('return_transfer_assets_header.archived')->orderBy('return_transfer_assets_header.status', 'asc')->orderBy('return_transfer_assets_header.id', 'DESC');
+			
+			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 11, 12, 14])){ 
 
 				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
-			
+				
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){
 				    array_push($approval_array, $matrix->id);
 				}
 				$approval_string = implode(",",$approval_array);
-				$userslist = array_map('intval',explode(",",$approval_string));
-	
-				$query->whereIn('header_request.created_by', $userslist)
-				//->whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
-				->where('header_request.status_id', $pending) 
-				->whereNull('header_request.deleted_at')
-				->orderBy('header_request.id', 'DESC');
+				$usersmentlist = array_map('intval',explode(",",$approval_string));
+
+				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+				$query->whereIn('return_transfer_assets_header.requested_by', $usersmentlist)
+				//->whereIn('return_transfer_assets_header.company_name', explode(",",$user_data->company_name_id))
+				->where('return_transfer_assets_header.approved_by','!=', null)
+				->whereNull('return_transfer_assets_header.archived')
+				->orderBy('return_transfer_assets_header.id', 'ASC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 5){ 
+
+				//$approved =  		DB::table('statuses')->where('id', 4)->value('id');
+				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+				$query->where('return_transfer_assets_header.transacted_by', '!=', null)
+				->where('return_transfer_assets_header.request_type_id', 1)
+				->whereNull('return_transfer_assets_header.archived')
+				->orderBy('return_transfer_assets_header.id', 'ASC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 9){ 
+
+				//$approved =  		DB::table('statuses')->where('id', 4)->value('id');
+				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+				$query->where('return_transfer_assets_header.transacted_by', '!=', null)
+				->where('return_transfer_assets_header.request_type_id', 5)
+				->whereNull('return_transfer_assets_header.archived')
+				->orderBy('return_transfer_assets_header.id', 'ASC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 7){ 
+
+				$query->whereNotNull('return_transfer_assets_header.close_by')
+				->where('return_transfer_assets_header.close_by', CRUDBooster::myId())
+				->whereNull('return_transfer_assets_header.archived')
+				->orderBy('return_transfer_assets_header.status', 'asc')->orderBy('return_transfer_assets_header.id', 'DESC');
 
 			}
 	            
@@ -318,24 +312,24 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
-			$pending  =  		DB::table('statuses')->where('id', 1)->value('status_description');
-			$approved =  		DB::table('statuses')->where('id', 4)->value('status_description');
-			$rejected =  		DB::table('statuses')->where('id', 5)->value('status_description');
-			$it_reco  = 		DB::table('statuses')->where('id', 7)->value('status_description');
-
-			if($column_index == 2){
+	    	$pending      =  	 DB::table('statuses')->where('id', 1)->value('status_description');
+			$cancelled    =  	 DB::table('statuses')->where('id', 8)->value('status_description');
+			$forturnover  =      DB::table('statuses')->where('id', 24)->value('status_description');
+			$toClose      =      DB::table('statuses')->where('id', 25)->value('status_description');
+			$closed       =      DB::table('statuses')->where('id', 13)->value('status_description');
+			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
-				}else if($column_value == $approved){
-					$column_value = '<span class="label label-info">'.$approved.'</span>';
-				}else if($column_value == $rejected){
-					$column_value = '<span class="label label-danger">'.$rejected.'</span>';
-				}else if($column_value == $it_reco){
-					$column_value = '<span class="label label-info">'.$it_reco.'</span>';
+				}else if($column_value == $cancelled){
+					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
+				}else if($column_value == $forturnover){
+					$column_value = '<span class="label label-info">'.$forturnover.'</span>';
+				}else if($column_value == $toClose){
+					$column_value = '<span class="label label-info">'.$toClose.'</span>';
+				}else if($column_value == $closed){
+					$column_value = '<span class="label label-success">'.$closed.'</span>';
 				}
 			}
-
 	    }
 
 	    /*
@@ -372,56 +366,6 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-			$fields = Request::all();
-			$cont = (new static)->apiContext;
-
-			$dataLines = array();
-
-			$approval_action 		= $fields['approval_action'];
-
-			
-
-			$approver_comments 		= $fields['approver_comments'];
-
-			$approved =  		DB::table('statuses')->where('id', 4)->value('id');
-			$rejected =  		DB::table('statuses')->where('id', 5)->value('id');
-
-
-			$arf_header = HeaderRequest::where(['id' => $id])->first();
-
-			$arf_body = BodyRequest::where(['header_request_id' => $id])->get();
-
-			if($approval_action  == 1){
-
-				//dd($approval_action);
-
-				$postdata['status_id']		 			= StatusMatrix::where('current_step', 2)
-																		->where('request_type', $arf_header->request_type_id)
-																		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
-																		->value('status_id');
-
-				$postdata['approver_comments'] 	= $approver_comments;
-				$postdata['approved_by'] 		= CRUDBooster::myId();
-				$postdata['approved_at'] 		= date('Y-m-d H:i:s');
-
-				foreach($arf_body as $body_arf){
-
-					if($body_arf->category_id == "IT ASSETS"){
-
-						$postdata['to_reco'] 	= 1;
-
-					}
-
-				}
-
-			}else{
-
-				$postdata['status_id'] 			= $rejected;
-				$postdata['approver_comments'] 	= $approver_comments;
-				$postdata['approved_by'] 		= CRUDBooster::myId();
-				$postdata['rejected_at'] 		= date('Y-m-d H:i:s');
-
-			}
 
 	    }
 
@@ -435,23 +379,6 @@
 	    public function hook_after_edit($id) {
 	        //Your code here 
 
-			$fields = Request::all();
-			$cont = (new static)->apiContext;
-
-			$arf_header = HeaderRequest::where(['id' => $id])->first();
-
-			$approved =  		DB::table('statuses')->where('id', 4)->value('id');
-			$rejected =  		DB::table('statuses')->where('id', 5)->value('id');
-			$for_tagging =  	DB::table('statuses')->where('id', 7)->value('id');
-
-			if($arf_header->status_id  == $approved){
-				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_approve_success",['reference_number'=>$arf_header->reference_number]), 'info');
-			}elseif($arf_header->status_id  == $for_tagging){
-				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_approve_success",['reference_number'=>$arf_header->reference_number]), 'info');
-			}else{
-				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_reject_success",['reference_number'=>$arf_header->reference_number]), 'danger');
-			}
-			
 	    }
 
 	    /* 
@@ -478,59 +405,49 @@
 
 	    }
 
-
-
-	    //By the way, you can still create your own method in here... :) 
-
-		public function getRequestApproval($id){
+		public function getDetail($id){
 			
 
 			$this->cbLoader();
-			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-			}  
-
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
 
 			$data = array();
 
-			$data['page_title'] = 'Approve Request';
-
-			$data['Header'] = HeaderRequest::
-				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
-				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
-				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
-				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('locations', 'employees.location_id', '=', 'locations.id')
-
-				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
-				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
+			$data['page_title'] = 'View Return Request';
+			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
+			->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
+			->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
+			->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
+			->leftjoin('cms_users as received', 'return_transfer_assets_header.transacted_by','=', 'received.id')
+			->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
+			->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
+			->select(
+					'return_transfer_assets_header.*',
+					'return_transfer_assets_header.id as requestid',
+					'requests.request_name as request_name',
+					'employees.name as employee_name',
+					'employees.company_name_id as company',
+					'employees.position_id as position',
+					'departments.department_name as department_name',
+					'approved.name as approvedby',
+					'received.name as receivedby',
+					'closed.name as closedby',
+					'locations.store_name as store_branch'
+					)
+			->where('return_transfer_assets_header.id', $id)->first();
+	   
+			$data['return_body'] = ReturnTransferAssets::
+					leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+				
 				->select(
-						'header_request.*',
-						'header_request.id as requestid',
-						'header_request.created_at as created',
-						'request_type.*',
-						'condition_type.*',
-						'requested.name as requestedby',
-						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
-						'departments.department_name as department',
-						//'positions.position_description as position',
-						'locations.store_name as store_branch',
-						'approved.name as approvedby'
-						)
-				->where('header_request.id', $id)->first();
-
-			$data['Body'] = BodyRequest::
-				select(
-				  'body_request.*'
-				)
-				->where('body_request.header_request_id', $id)
-				->whereNull('deleted_at')
-				->get();
-
-			return $this->view("assets.approval-request", $data);
+					'return_transfer_assets.*',
+					'statuses.*',
+					)
+					->where('return_transfer_assets.return_header_id', $id)->get();	
+			
+			return $this->view("assets.view-return-details", $data);
 		}
 
 

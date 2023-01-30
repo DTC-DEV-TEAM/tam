@@ -110,6 +110,13 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/users/user-account-upload','AdminCmsUsersController@UploadUserAccount');
     Route::post('/admin/users/upload-users','AdminCmsUsersController@userAccountUpload')->name('upload-users');
     Route::get('/admin/users/upload-user-account-template','AdminCmsUsersController@uploadUserAccountTemplate');
+   
+    //Item Master
+    Route::get('/admin/assets/item-master-upload','AdminAssetsController@UploadItemMaster');
+    Route::post('/admin/assets/upload-item-master','AdminAssetsController@itemMasterUpload')->name('upload-item-master');
+    Route::get('/admin/db-truncate','TruncateController@dbtruncate');
+    Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-data','AdminAssetsController@getItemMasterDataApi')->name('get-item-master-data');
+    Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-updated-data','AdminAssetsController@getItemMasterUpdatedDataApi')->name('get-item-master-updated-data');
 
     //truncate table
     Route::get('/admin/db-truncate','TruncateController@dbtruncate');

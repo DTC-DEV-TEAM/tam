@@ -889,6 +889,18 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		}
 	}
 
+	//Get Customer view
+	public function getDetail($id){
+		$this->cbLoader();
+		if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+			CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+		}
+		$data = [];
+		$data['page_title'] = 'View User Details';
+		$data['users'] = Users::user($id);
+		return $this->view("user-account.view_user", $data);
+	}
+
 	public function getExport(){
 		return Excel::download(new ExportUsersList, 'TAM-UsersList.xlsx');
 	}

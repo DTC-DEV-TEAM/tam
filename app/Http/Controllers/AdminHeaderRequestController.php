@@ -369,9 +369,6 @@
 					$sub_query->where('header_request.created_by', CRUDBooster::myId())
 	
 							  ->whereNull('header_request.deleted_at'); 
-					$sub_query->orwhere('header_request.employee_name', $user->id)
-	
-							  ->whereNull('header_request.deleted_at');
 
 				});
 
@@ -621,7 +618,7 @@
 					
 				}else{
 
-					if (str_contains($item_description[$x], 'LAPTOP') || str_contains($item_description[$x], 'DESKTOP')) {
+					if (str_contains($sub_category_id[$x], 'LAPTOP') || str_contains($sub_category_id[$x], 'DESKTOP')) {
 						$dataLines[$x]['to_reco'] = 1;
 					}else{
 						$dataLines[$x]['to_reco'] = 0;
@@ -832,7 +829,7 @@
 				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
 				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
 				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
+				->leftjoin('locations', 'employees.location_id', '=', 'locations.id')
 				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
@@ -1063,7 +1060,9 @@
 			]);	
 
 
-			if($quantity_total == 0){
+			$bodyCount = DB::table('body_request')->where('header_request_id',$headerID)->whereNull('body_request.deleted_at')->count();
+
+			if($bodyCount == 0){
 				HeaderRequest::where('id', $headerID)
 				->update([
 					'status_id'=> 8,
