@@ -498,7 +498,11 @@
 			$postdata['company_name'] 				= $employees->company_name_id;
 			$postdata['position'] 					= $employees->position_id;
 			$postdata['department'] 				= $employees->department_id;
-			$postdata['store_branch'] 				= $employees->location_id;
+			if(CRUDBooster::myPrivilegeId() == 8){
+				$postdata['store_branch'] 			= $employees->location_id;
+			}else{
+				$postdata['store_branch'] 			= NULL;
+			}
 			$postdata['purpose'] 					= $purpose;
 			$postdata['conditions'] 				= $condition;
 			$postdata['quantity_total'] 			= $quantity_total;

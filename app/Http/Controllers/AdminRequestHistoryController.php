@@ -318,7 +318,7 @@
 				
 				$query->where('header_request.created_by', CRUDBooster::myId())->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
 			
-			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 11, 12, 14])){ 
+			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 10, 11, 13,14])){ 
 
 				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
 				
