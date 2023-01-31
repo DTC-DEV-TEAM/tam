@@ -28,6 +28,11 @@
 
                         <tr>
                             <td colspan="4"><hr/></td>
+                          
+                        </tr>
+                        <tr>
+                            <td width="20%"><label><strong>Arf Number: <strong></label></td>
+                            <td width="40%"><p>{{$Header->reference_number}}</p></td>
                         </tr>
                         
                         <tr>

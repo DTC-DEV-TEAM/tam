@@ -26,6 +26,8 @@
                             </td>
                         </tr>
                         <tr>
+                            <td width="20%"><label><strong>Arf#:<strong></label></td>
+                            <td width="40%"><p>{{$Header->reference_number}}</p></td>
                             <td width="20%"><label><strong>MO#:<strong></label></td>
                             <td width="40%"><p>{{$HeaderID->mo_reference_number}}</p></td>
                             <!--<td width="20%"><label><strong>Company:<strong></label></td>
@@ -95,6 +97,8 @@
                                                         <input type="hidden" value="{{$rowresult->id}}" name="mo_id[]">
                                                        
                                                         <input type="hidden" value="{{$rowresult->inventory_id}}" name="inventory_id[]">
+
+                                                        <input type="hidden" value="{{$rowresult->item_id}}" name="item_id[]">
 
                                                         {{$rowresult->digits_code}}
 

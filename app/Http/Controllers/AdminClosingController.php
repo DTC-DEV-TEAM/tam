@@ -329,7 +329,7 @@
 			$MOList = array_map('intval',explode(",",$list_string));	
 
 			$query->whereIn('mo_body_request.id', $MOList)
-				  ->orderBy('header_request.id', 'asc');
+				  ->orderBy('mo_body_request.id', 'asc');
 
 			//$query->where('header_request.status_id', $received)->orderBy('header_request.status_id', 'desc')->orderBy('header_request.id', 'asc');
 	            
