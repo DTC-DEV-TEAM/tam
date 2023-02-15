@@ -194,6 +194,15 @@
                 </div>
             @endif
 
+            @if($Header->if_from_erf != null || $Header->if_from_erf != "")
+                <div class="row">                           
+                    <label class="control-label col-md-2">Erf Number:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->if_from_erf}}</p>
+                    </div>
+                </div>
+            @endif
+
             <hr/>
 
             <div class="row">                           

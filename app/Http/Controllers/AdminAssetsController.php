@@ -40,7 +40,7 @@
 			}else{
 				$this->button_edit = false;
 			}
-			$this->button_delete = true;
+			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -79,59 +79,16 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-
-			//$this->form[] = ['label'=>'Asset Tag','name'=>'asset_tag','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
-			//$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
-
-			//$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'digits_imfs,digits_code'];
+			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 			$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			//$this->form[] = ['label'=>'Item Type','name'=>'item_type','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'GENERAL;SERIAL'];
-
-			$this->form[] = ['label'=>'Item Description','name'=>'item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-
-			//$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description','datatable_where'=>"category_status = 'ACTIVE'"];
-
+			$this->form[] = ['label'=>'Item Description','name'=>'item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
+			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description','datatable_where'=>"category_status = 'ACTIVE' && id = 1 || id = 5"];
 			$this->form[] = ['label'=>'Class','name'=>'class_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'class,class_description','datatable_where'=>"class_status = 'ACTIVE'"];
 
-			//$this->form[] = ['label'=>'Brand','name'=>'brand_id','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			//$this->form[] = ['label'=>'Brand','name'=>'brand_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'brand,brand_description','datatable_where'=>"brand_status = 'ACTIVE'"];
-
-			//$this->form[] = ['label'=>'Class','name'=>'class_id','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			
-
-			//$this->form[] = ['label'=>'Vendor','name'=>'vendor_id','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			//$this->form[] = ['label'=>'Vendor','name'=>'vendor_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'vendor,vendor_name','datatable_where'=>"vendor_status = 'ACTIVE'"];
-
-
-			//$this->form[] = ['label'=>'Item Cost','name'=>'item_cost','type'=>'number','step'=>'0.01','validation'=>'required|numeric|min:0.00','width'=>'col-sm-5'];
-			/*$this->form[] = ['label'=>'Serial No','name'=>'serial_no','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			
-			$this->form[] = ['label'=>'Brand','name'=>'brand_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'brand,brand_description','datatable_where'=>"brand_status = 'ACTIVE'"];
-			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description','datatable_where'=>"category_status = 'ACTIVE'"];
-			$this->form[] = ['label'=>'Class','name'=>'class_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'class,class_description','datatable_where'=>"class_status = 'ACTIVE'"];
-			
-			$this->form[] = ['label'=>'Item Description','name'=>'item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			
-			$this->form[] = ['label'=>'Vendor','name'=>'vendor_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'vendor,vendor_name','datatable_where'=>"vendor_status = 'ACTIVE'"];
-
-			$this->form[] = ['label'=>'Item Cost','name'=>'item_cost','type'=>'number','step'=>'0.01','validation'=>'required|numeric|min:0.00','width'=>'col-sm-5'];
-			*/
-
-			/*if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
-				$this->form[] = ['label'=>'Add Quantity','name'=>'add_quantity','type'=>'number','step'=>'0.01','validation'=>'integer|min:0','width'=>'col-sm-5'];
-				$this->form[] = ['label'=>'Current Quantity','name'=>'quantity','type'=>'number','step'=>'0.01','validation'=>'required|numeric|min:0.00','width'=>'col-sm-5', 'readonly'=>true];
-				$this->form[] = ['label'=>'Total Quantity','name'=>'total_quantity','type'=>'number','step'=>'0.01','validation'=>'required|numeric|min:0.00','width'=>'col-sm-5', 'readonly'=>true];
-			}else{
-				$this->form[] = ['label'=>'Quantity','name'=>'quantity','type'=>'number','step'=>'0.01','validation'=>'required|numeric|min:0.00','width'=>'col-sm-5'];
-			} */
-			//$this->form[] = ['label'=>'Status Id','name'=>'status_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'status,id'];
-			//$this->form[] = ['label'=>'Assign To','name'=>'assign_to','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-5','datatable'=>'cms_users,name','datatable_where'=>"status = 'ACTIVE'"];
-
-			$this->form[] = ['label'=>'Device Image','name'=>'image','type'=>'upload','validation'=>'required|image','width'=>'col-sm-5'];
+			$this->form[] = ['label'=>'Cost','name'=>'item_cost','type'=>'text','validation'=>'required','width'=>'col-sm-5'];
 			
 			//$this->form[] = ['label'=>'Status','name'=>'status_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'statuses,status_description','datatable_where'=>"status_type = 'ASSETS'"];
-			
+			}
 			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
 				//$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
 				$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
@@ -288,7 +245,7 @@
 	        $this->script_js = NULL;
 			$this->script_js = "
 			$(document).ready(function() {
-				$('#category_id, #class_id').attr('disabled', 'true');
+				$('#category_id, #class_id').select2();
 				 $('#digits_code').change(function() {
 					var digits_code = this.value;
 					$.ajax
@@ -646,23 +603,7 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
 			$postdata['updated_by']=CRUDBooster::myId();
-
-			/*$postdata['quantity']= $postdata['total_quantity'];
-
-			if($postdata['assign_to'] != null || $postdata['assign_to'] != "" ){
-
-				$postdata['status_id']= 2;
-
-				$postdata['assign_by']=		CRUDBooster::myId();
-				$postdata['assign_date']=	date('Y-m-d H:i:s');
-
-
-			}*/
-
-			unset($postdata['category_id']);
-
 
 	    }
 

@@ -39,7 +39,11 @@
             <div class="row">                           
                 <label class="control-label col-md-2">{{ trans('message.form-label.employee_name') }}:</label>
                 <div class="col-md-4">
+                    @if($Header->header_created_by != null || $Header->header_created_by != "")
                         <p>{{$Header->employee_name}}</p>
+                    @else
+                    <p>{{$Header->header_emp_name}}</p>
+                    @endif
                 </div>
 
                 <label class="control-label col-md-2">{{ trans('message.form-label.company_name') }}:</label>
@@ -68,6 +72,15 @@
                     <label class="control-label col-md-2">{{ trans('message.form-label.store_branch') }}:</label>
                     <div class="col-md-4">
                             <p>{{$Header->store_branch}}</p>
+                    </div>
+                </div>
+            @endif
+
+            @if($Header->if_from_erf != null || $Header->if_from_erf != "")
+                <div class="row">                           
+                    <label class="control-label col-md-2">Erf Number:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->if_from_erf}}</p>
                     </div>
                 </div>
             @endif

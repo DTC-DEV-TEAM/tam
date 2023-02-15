@@ -150,6 +150,32 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
     Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
     
+     //Deployed Assets
+     Route::get('/admin/deployed_asset/Detail/{id}','AdminDeployedAssetsController@Detail')->name('deployed-asset');
+     Route::get('/admin/deployed_asset/DetailMoOnly/{id}','AdminDeployedAssetsController@DetailMoOnly')->name('deployed-asset');
+     
+     //hr requisition for new employee
+     Route::post(config('crudbooster.ADMIN_PATH').'/hr_requisition/search-user','AdminHrRequisitionController@SearchUser')->name('hr.search.user');
+     Route::get('admin/erf_header_request/getRequestCancel/{id}','AdminHrRequisitionController@getRequestCancel')->name('getRequestCancel');
+     Route::get('/admin/erf_edit_status/getEditErf/{id}','AdminErfEditStatusController@getEditErf')->name('edit-erf');
+     Route::get('/admin/erf_edit_status/getErfCreateAccount/{id}','AdminErfEditStatusController@getErfCreateAccount')->name('create-account-erf');
+     Route::get('/admin/erf_edit_status/getDetailErf/{id}','AdminErfEditStatusController@getDetailErf')->name('details-erf');
+     Route::post('/admin/erf_edit_status/create-account','AdminErfEditStatusController@createAccount')->name('create-account');
+     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/get-getEmail','AdminErfEditStatusController@getEmail')->name('getEmail');
+     Route::post(config('crudbooster.ADMIN_PATH').'/customers/get-checkEmail','AdminErfEditStatusController@checkEmail')->name('checkEmail');
+     Route::get('/admin/erf_edit_status/getErfSetOnboardingDate/{id}','AdminErfEditStatusController@getErfSetOnboardingDate')->name('set-onboarding-erf');
+     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/setOnboarding','AdminErfEditStatusController@setOnboarding')->name('set-onboarding-date');
+ 
+     //Applicant Moduel
+     Route::get('/admin/applicant_module/getEditApplicant/{id}','AdminApplicantModuleController@getEditApplicant')->name('edit-applicant');
+     Route::get('/admin/applicant_module/getDetailApplicant/{id}','AdminApplicantModuleController@getDetailApplicant')->name('applicant-detail');
+     //Aplicant Import and export
+     Route::get('/admin/applicant_module/applicant-upload','AdminApplicantModuleController@applicantUploadView');
+     Route::post('/admin/applicant_module/upload-applicant','AdminApplicantModuleController@applicantUpload')->name('upload-applicant');
+     Route::post('/admin/applicant_module/search-applicant','AdminApplicantModuleController@searchApplicant')->name('erf-search');
+     Route::post('/admin/applicant_module/export-applicant','AdminApplicantModuleController@applicantExport')->name('export-applicant');
+     Route::get('/admin/applicant_module/download-applicant-template','AdminApplicantModuleController@downloadApplicantTemplate');
+ 
     Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

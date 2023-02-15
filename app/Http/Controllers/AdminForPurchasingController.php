@@ -139,7 +139,7 @@
 
 				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye'];
 
-				//$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestClose/[id]'),'icon'=>'fa fa-check-circle', "showIf"=>"[status_id] == $for_closing"];
+				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestClose/[id]'),'icon'=>'fa fa-check-circle', "showIf"=>"[status_id] == $for_closing"];
 				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintPickList/[id]'),'icon'=>'fa fa-print', "showIf"=>"[purchased2_by] != null && [status_id] == $processing"];
 				
 				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrint/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status_id] == $picked"];
@@ -611,15 +611,15 @@
 
 
 				if($arf_header->request_type_id == 5){
-					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
-					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
 
 				}else{
-					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
-					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
