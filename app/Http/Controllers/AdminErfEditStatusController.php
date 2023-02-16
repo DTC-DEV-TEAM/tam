@@ -421,7 +421,7 @@
 					$arfHeaderContainer['reference_number']		      = "ARF-".str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);
 					$count_header ++;
 					$arfHeaderContainer['employee_name' ]		      = $erf_header->reference_number;
-					$arfHeaderContainer['company_name'] 			  = "DIGITS";
+					$arfHeaderContainer['company_name'] 			  = "TASTELESSs";
 					$arfHeaderContainer['position'] 				  = $erf_header->position;
 					$arfHeaderContainer['department' ]				  = $erf_header->department;
 					$arfHeaderContainer['store_branch']		          = NULL;

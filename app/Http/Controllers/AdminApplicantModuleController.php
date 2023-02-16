@@ -357,12 +357,16 @@
 			 $data['getData'] = Applicant::
 			   leftjoin('statuses', 'applicant_table.status', '=', 'statuses.id')
 			 ->leftjoin('cms_users as created', 'applicant_table.created_by', '=', 'created.id')
+			 ->leftjoin('cms_users as updated_by', 'applicant_table.updated_by', '=', 'updated_by.id')
 			 ->select(
 				'applicant_table.*',
 				'applicant_table.id as apid',
 				'statuses.status_description as status_description',
-				'created.name as created_name'
-				)->get();
+				'created.name as created_name',
+				'updated_by.name as updated_by'
+				)
+				->orderByRaw('FIELD( applicant_table.status, 34,35,31,8)')
+				->get();
 			$data['erf_number'] = DB::table('erf_header_request')->get();
 			$data['statuses'] = Statuses::select(
 				'statuses.*'
