@@ -934,8 +934,8 @@
                     var sub_cat = $(".sub_category_id option").length;
                     var sub_cat_value = $('.sub_category_id').find(":selected");
                     for(i=0;i<sub_cat;i++){
-                        var val = sub_cat_value.eq(i).val() || '';
-                        if(app_count == 0 && $.inArray(val.toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                        var val = sub_cat_value.eq(i).val();
+                        if(app_count == 0 && $.inArray((sub_cat_value.eq(i).val() || '').toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
                             swal({  
                                     type: 'error',
                                     title: 'Please choose an Application!',
