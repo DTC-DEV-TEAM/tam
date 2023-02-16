@@ -25,8 +25,11 @@
         <div class='panel-body'>
         <div class="row" style="margin:5px">   
 
-        <button type="button" id="btn-export" class="btn btn-primary btn-sm btn-export" data-toggle="modal" data-target="#myModal" style="margin-bottom:10px"><i class="fa fa-download"></i>
+        <!-- <button type="button" id="btn-export" class="btn btn-primary btn-sm btn-export" data-toggle="modal" data-target="#myModal" style="margin-bottom:10px"><i class="fa fa-download"></i>
             <span>Export Filter</span>
+        </button> -->
+        <button type="button" id="btn-export" class="btn btn-primary btn-sm btn-export" style="margin-bottom:10px"><i class="fa fa-download"></i>
+            <span>Export Data</span>
         </button>
             <table class='table table-hover table-striped table-bordered' id="table_dashboard">
                 <thead>
@@ -150,10 +153,19 @@
 @endsection
 
 @push('bottom')
+<script src=
+"https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js" >
+    </script>
+    <script src=
+"https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js" >
+    </script>
+        <script src=
+"https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js" >
+    </script>
     <script type="text/javascript">
        var table;
        $(document).ready(function() {
-            $("#table_dashboard").DataTable({
+            table = $("#table_dashboard").DataTable({
                 ordering:false,
                 pageLength:25,
                 language: {
@@ -163,6 +175,22 @@
                     [10, 25, 50, 100, -1],
                     [10, 25, 50, 100, "All"],
                     ],
+                buttons: [
+                    {
+                        extend: "excel",
+                        title: "Applicant",
+                        exportOptions: {
+                        columns: ":not(.not-export-column)",
+                        columns: ":gt(0)",
+                            modifier: {
+                            page: "current",
+                        }
+                        },
+                    },
+                ],
+            });
+            $("#btn-export").on("click", function () {
+                table.button(".buttons-excel").trigger();
             });
             $('#erf_number,#status').select2({})
             $(".date").datetimepicker({

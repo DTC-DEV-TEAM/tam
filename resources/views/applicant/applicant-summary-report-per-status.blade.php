@@ -53,7 +53,7 @@
         <div class='panel-body'>
         <div class="row" style="margin:5px">   
 
-        <button type="button" id="btn-export" class="btn btn-success btn-sm btn-export" style="margin-bottom:10px"><i class="fa fa-download"></i>
+        <button type="button" id="btn-export" class="btn btn-primary btn-sm btn-export" style="margin-bottom:10px"><i class="fa fa-download"></i>
             <span>Export Data</span>
         </button>
             <table class='table table-hover table-striped table-bordered' id="table_dashboard">
