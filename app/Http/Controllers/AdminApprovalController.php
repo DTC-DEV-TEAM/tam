@@ -287,20 +287,20 @@
 				$query->whereNull('header_request.deleted_at')->orderBy('header_request.status_id', 'DESC')->where('header_request.status_id', $pending)->orderBy('header_request.id', 'DESC');
 			
 			}else{
-
+    
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
 
 				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 
-				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
-			
+				$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
+
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){
 				    array_push($approval_array, $matrix->id);
 				}
 				$approval_string = implode(",",$approval_array);
 				$userslist = array_map('intval',explode(",",$approval_string));
-	
+				//dd($userslist);
 				$query->whereIn('header_request.created_by', $userslist)
 				//->whereIn('header_request.company_name', explode(",",$user_data->company_name_id))
 				->where('header_request.status_id', $pending) 
