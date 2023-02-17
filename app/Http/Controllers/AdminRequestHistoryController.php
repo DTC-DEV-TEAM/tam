@@ -320,7 +320,7 @@
 			
 			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 10, 11, 13,14])){ 
 
-				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
+				$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
 				
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){
