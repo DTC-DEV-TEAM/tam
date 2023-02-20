@@ -291,8 +291,9 @@
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
 
 				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
-				$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
+				
+				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
+				//$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
 
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){

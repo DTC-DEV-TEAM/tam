@@ -93,8 +93,8 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		}elseif(CRUDBooster::isSuperadmin()) {
 
 			$this->form[] = array("label"=>"Privilege","name"=>"id_cms_privileges","required"=>true,"type"=>"select","datatable"=>"cms_privileges,name", 'width'=>'col-sm-5');	
-			$this->form[] = array('label'=>'Approver','name'=>'approver_id','type'=>'select2-new','datatable'=>'cms_users,name','datatable_where'=>"id_cms_privileges = '3' || id_cms_privileges = '10' || id_cms_privileges = '11' || id_cms_privileges = '13' || id_cms_privileges = '14'",'width'=>'col-sm-5');
-			$this->form[] = array('label'=>'Approver','name'=>'approver_id_manager','type'=>'select3-new','datatable'=>'cms_users,name','datatable_where'=>"id_cms_privileges = '10' || id_cms_privileges = '11' || id_cms_privileges = '13' || id_cms_privileges = '14'",'width'=>'col-sm-5', 'class'=>'approver_one');
+			$this->form[] = array('label'=>'Approver','name'=>'approver_id','type'=>'select2','datatable'=>'cms_users,name','datatable_where'=>"id_cms_privileges = '3' || id_cms_privileges = '10' || id_cms_privileges = '11' || id_cms_privileges = '13' || id_cms_privileges = '14'",'width'=>'col-sm-5');
+			$this->form[] = array('label'=>'Approver','name'=>'approver_id_manager','type'=>'select2','datatable'=>'cms_users,name','datatable_where'=>"id_cms_privileges = '10' || id_cms_privileges = '11' || id_cms_privileges = '13' || id_cms_privileges = '14'",'width'=>'col-sm-5', 'class'=>'approver_one');
 			//$this->form[] = array('label'=>'Approver','name'=>'approver_id_executive','type'=>'select2','datatable'=>'cms_users,name','datatable_where'=>"id_cms_privileges = '12'",'width'=>'col-sm-5');
 			$this->form[] = array("label"=>"Location","name"=>"location_id","required"=>true,"type"=>"select2","datatable"=>"locations,store_name", 'datatable_where'=>"store_status = 'ACTIVE'",'width'=>'col-sm-5');
 			//$this->form[] = array("label"=>"Stores","name"=>"store_id","type"=>"check-box","datatable"=>"stores,bea_mo_store_name", 'datatable_where'=>"status = 'ACTIVE'", 'width'=>'col-sm-10' );
@@ -275,29 +275,6 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 				});
 
 			}else if(edit_action){
-
-				var a  = 	approver_id.split(',').length;
-				var b = 	approver_id.split(',');
-				var selectedValues = new Array();
-
-				for (let i = 0; i < a; i++) {
-				
-					selectedValues[i] = b[i];
-
-					$('#approver_id').val(selectedValues);
-				}
-
-				var c  = 	approver_id_manager.split(',').length;
-				var d = 	approver_id_manager.split(',');
-				var selectedManagerValues = new Array();
-
-				for (let j = 0; j < c; j++) {
-				
-					selectedManagerValues[j] = d[j];
-
-					$('#approver_id_manager').val(selectedManagerValues);
-				}
-
 				$('#form-group-approver_id_manager').hide();
 				$('#approver_id_manager').removeAttr('required');
 
@@ -553,28 +530,16 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 		$postdata['user_name'] = $postdata['last_name'].''.substr($postdata['first_name'], 0, 1);
 		
 		
-		$approverIdData1 = array();
-		$approver_id = json_encode($postdata['approver_id'], true);
-		$approver_idArray1 = explode(",", $approver_id);
-
-		foreach ($approver_idArray1 as $keyAp1 => $value_ap1) {
-			$approverIdData1[$keyAp1] = preg_replace("/[^0-9]/","",$value_ap1);
-		}
-
-		$approverManagerData2 = array();
-		$approver_id_manager = json_encode($postdata['approver_id_manager'], true);
-		$approver_id_managerArray2 = explode(",", $approver_id_manager);
-
-		foreach ($approver_id_managerArray2 as $keyAp2 => $value_ap2) {
-			$approverManagerData2[$keyAp2] = preg_replace("/[^0-9]/","",$value_ap2);
-		}
-
-		if($postdata['id_cms_privileges'] == 3){
-			$postdata['approver_id'] = implode(",", $approverManagerData2);
-			$postdata['approver_id_manager'] = implode(",", $approverManagerData2);
+        if($postdata['id_cms_privileges'] == 3){
+			$postdata['approver_id'] = $postdata['approver_id_manager'];
+			$postdata['approver_id_manager'] = $postdata['approver_id_manager'];
 			$postdata['approver_id_executive'] = NULL;
+		}else if($postdata['id_cms_privileges'] == 11){
+			$postdata['approver_id'] = $postdata['approver_id_executive'];
+			$postdata['approver_id_manager'] = NULL;
+			$postdata['approver_id_executive'] = $postdata['approver_id_executive'];
 		}else{
-			$postdata['approver_id'] = implode(",", $approverIdData1);
+			$postdata['approver_id'] = $postdata['approver_id'];
 			$postdata['approver_id_manager'] = NULL;
 			$postdata['approver_id_executive'] = NULL;
 		}
@@ -653,7 +618,6 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 
 	public function hook_before_edit(&$postdata,$id) {        
 
-
             $postdata['name'] = $postdata['first_name'].' '.$postdata['last_name'];
     		$postdata['user_name'] = $postdata['last_name'].''.substr($postdata['first_name'], 0, 1);
 
@@ -663,28 +627,16 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 				$postdata['status'] = 'ACTIVE';
 			}
 
-			$approverIdData1 = array();
-    		$approver_id = json_encode($postdata['approver_id'], true);
-    		$approver_idArray1 = explode(",", $approver_id);
-    
-    		foreach ($approver_idArray1 as $keyAp1 => $value_ap1) {
-    			$approverIdData1[$keyAp1] = preg_replace("/[^0-9]/","",$value_ap1);
-    		}
-
-			$approverManagerData2 = array();
-    		$approver_id_manager = json_encode($postdata['approver_id_manager'], true);
-    		$approver_id_managerArray2 = explode(",", $approver_id_manager);
-    
-    		foreach ($approver_id_managerArray2 as $keyAp2 => $value_ap2) {
-    			$approverManagerData2[$keyAp2] = preg_replace("/[^0-9]/","",$value_ap2);
-    		}
-    
 			if($postdata['id_cms_privileges'] == 3){
-				$postdata['approver_id'] = implode(",", $approverManagerData2);
-				$postdata['approver_id_manager'] = implode(",", $approverManagerData2);
+				$postdata['approver_id'] = $postdata['approver_id_manager'];
+				$postdata['approver_id_manager'] = $postdata['approver_id_manager'];
 				$postdata['approver_id_executive'] = NULL;
+			}else if($postdata['id_cms_privileges'] == 11){
+				$postdata['approver_id'] = $postdata['approver_id_executive'];
+				$postdata['approver_id_manager'] = NULL;
+				$postdata['approver_id_executive'] = $postdata['approver_id_executive'];
 			}else{
-				$postdata['approver_id'] = implode(",", $approverIdData1);
+				$postdata['approver_id'] = $postdata['approver_id'];
 				$postdata['approver_id_manager'] = NULL;
 				$postdata['approver_id_executive'] = NULL;
 			}
