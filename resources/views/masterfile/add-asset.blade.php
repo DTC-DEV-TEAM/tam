@@ -3,6 +3,53 @@
     
         <style type="text/css">   
             .select2-container--default .select2-selection--multiple .select2-selection__choice{color:black;}
+            .select2-selection__choice{
+                    font-size:14px !important;
+                    color:black !important;
+            }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
+
+            .firstRow {
+                border: 1px solid rgba(39, 38, 38, 0.5);
+                padding: 10px;
+                margin-left: 10px;
+                border-radius: 3px;
+                opacity: 2;
+            }
+
+            .firstRow {
+                padding: 10px;
+                margin-left: 10px;
+            }
+
+            .finput {
+                border:none;
+                border-bottom: 1px solid rgba(18, 17, 17, 0.5);
+            }
+
+            input.finput:read-only {
+                background-color: #fff;
+            }
+
+            input.sinput:read-only {
+                background-color: #fff;
+            }
+
+            input.addinput:read-only {
+                background-color: #f5f5f5;
+            }
+
+            .input-group-addon {
+                background-color: #f5f5f5 !important;
+            }
         </style>
     @endpush
 @section('content')
@@ -15,19 +62,47 @@
 <div class='panel panel-default'>
     <div class='panel-heading'>Add Asset Form</div>
 
-    <form action='{{CRUDBooster::mainpath('add-save')}}' method="POST" id="AddCategoryForm" enctype="multipart/form-data">
+    <form action='{{CRUDBooster::mainpath('add-save')}}' method="POST" id="AddAssetForm" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
 
         <div class='panel-body'>
-           <div class="row">
-             <div class="col-md-12">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label">Category Description</label>
-                        <input type="text" class="form-control" name="category_description" id="category_description" >
-                    </div>
+          <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Sub Category</label>
+                    <select selected data-placeholder="- Select Sub Category -" class="form-control drop" name="sub_category_id" data-id="" id="sub_category_id" required style="width:100%">
+                        <option value=""></option>
+                        @foreach($sub_categories as $subData)
+                            <option value="{{$subData->id}}">{{$subData->class_description}}</option>
+                        @endforeach
+                    </select>
                 </div>
-             </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                <label class="control-label">Description</label>
+                    <input type="text" class="form-control finput" name="item_description" id="item_description">
+                </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label"><span style="color:red">*</span> Location</label>
+                    <select required selected data-placeholder="-- Please Select Location --" id="location" name="location" class="form-select select2" style="width:100%;">
+                    @foreach($warehouse_location as $res)
+                        <option value=""></option>
+                        <option value="{{ $res->id }}">{{ $res->location }}</option>
+                    @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                <label class="control-label">Cost</label>
+                    <input type="text" class="form-control finput" name="cost" id="cost">
+                </div>
+            </div>
           </div>
         </div>
         
@@ -45,7 +120,7 @@
 @push('bottom')
     <script type="text/javascript">
         $(document).ready(function() {
-            $('.select2').select2({placeholder_text_single : "-- Select --"})
+            $('#category_id, #sub_category_id, #location').select2({placeholder_text_single : "-- Select --"})
 
             $("#btnSubmit").click(function(event) {
             event.preventDefault();
@@ -59,7 +134,7 @@
                     width: 450,
                     height: 200
                     }, function () {
-                        $("#AddCategoryForm").submit();                     
+                        $("#AddAssetForm").submit();                     
                 });
             });
         });

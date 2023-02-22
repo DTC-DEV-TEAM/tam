@@ -4,6 +4,7 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use App\Models\SubCategory;
 
 	class AdminSubCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -18,14 +19,14 @@
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
-			$this->orderby = "id,desc";
+			$this->orderby = "id,asc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = true;
-			$this->button_delete = true;
+			$this->button_delete = FALSE;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -36,31 +37,26 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
+			
+			$this->col[] = ["label"=>"FA Code","name"=>"category_code"];
+			$this->col[] = ["label"=>"Description","name"=>"class_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"category,category_description"];
-			$this->col[] = ["label"=>"Sub Category Code","name"=>"class_code"];
-			$this->col[] = ["label"=>"Sub Category Name","name"=>"class_description"];
-			$this->col[] = ["label"=>"Useful Life","name"=>"useful_life"];
 			$this->col[] = ["label"=>"Status","name"=>"class_status"];
-			//$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
+			$this->col[] = ["label"=>"Limit Code","name"=>"limit_code"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
-			//$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name"];
 			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description'];
-			$this->form[] = ['label'=>'Sub Category Code','name'=>'class_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
+			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				
-				//$this->form[] = ['label'=>'Status','name'=>'class_status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
+				$this->form[] = ['label'=>'Status','name'=>'class_status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 
 				//$this->form[] = ['label'=>'Useful Life','name'=>'useful_life','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-
-				$this->form[] = ["label"=>"Useful Life","name"=>"useful_life","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0",'width'=>'col-sm-5'];
-			
 			}
 
 
@@ -150,7 +146,9 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				$this->index_button[] = ["label"=>"Add Category","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-category'),"color"=>"success"];
+			}
 
 
 	        /* 
@@ -288,7 +286,11 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	if($column_index == 5){
+				if($column_value != null){
+					$column_value = '<span class="label label-danger">'.$column_value.'</span>';
+				}
+			}
 	    }
 
 	    /*
@@ -299,8 +301,33 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
-			$postdata['created_by']=CRUDBooster::myId();
+	        $fields = Request::all();
+			$from_code = $fields['from_code'];
+			$from_to = $fields['from_to'];
+			$category_id = $fields['category_id'];
+			$category_description = $fields['category_description'];
+			
+			$checkRowDbExist = DB::table('class')->select(DB::raw("(category_code) AS code"))->get()->toArray();
+			$checkRowDbColumnExist = array_column($checkRowDbExist, 'code');
+			//code check validity
+			$fromCode   = SubCategory::select('*')->where('from_code','>=', $from_code)->orWhere('to_code','>=', $from_code)->get()->count();
+			$FromtoCode = SubCategory::select('*')->where('to_code','>=', $from_to)->orWhere('from_code','>=', $from_to)->get()->count();
+			if (in_array($from_code . ' - ' . $from_to, $checkRowDbColumnExist)) {
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_exist_data_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
+			}else if($fromCode != 0){
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_invalid_code_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
+			}else if($FromtoCode != 0){
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_invalid_code_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
+			}else{
+				$postdata['from_code']= $from_code;
+				$postdata['to_code']= $from_to;
+				$postdata['category_code']= $from_code . " - " . $from_to;
+				$postdata['category_id'] = $category_id;
+				$postdata['class_description'] = $category_description;
+				$postdata['class_status'] = "ACTIVE";
+				$postdata['created_by']=CRUDBooster::myId();
+			}
+			
 	    }
 
 	    /* 
@@ -366,9 +393,57 @@
 
 	    }
 
+		/*****CUSTOM FUNCTION AREA */ 
+		public function getAddCategory() {
 
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
 
-	    //By the way, you can still create your own method in here... :) 
+			$this->cbLoader();
+			$data['page_title'] = 'Add Sub Category';
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1])->orderby('category_description', 'asc')->get();
+			return $this->view("sub_categories.add-sub-category", $data);
 
+		}
+
+		public function getSubCatCodeRangeFrom(Request $request){
+			$fields = Request::all();
+			$code = $fields['code'] ? $fields['code'] : "";
+			$data = [];
+			$countCode = SubCategory::select('*')->where('from_code','>=', $code)->orWhere('to_code','>=', $code)->get()->count();
+			if($countCode) {
+				$data['item'] = "<span id='notif' class='label label-danger'> Invalid Code</span>";
+				$data['disabled'] = 1;
+			  }else{
+				$data['item'] = "<span id='notif' class='label label-success'> Code Available.</span>";
+				$data['disabled'] = 0;
+			  }
+			  
+			echo json_encode($data);
+		}
+
+		public function getSubCatCodeRangeTo(Request $request){
+			$fields = Request::all();
+			$code = $fields['code'] ? $fields['code'] : "";
+			$data = [];
+			$countCode = SubCategory::select('*')->where('to_code','>=', $code)->orWhere('from_code','>=', $code)->get()->count();
+			  if($countCode) {
+				$data['item'] = "<span id='notif' class='label label-danger'> Invalid Code</span>";
+				$data['disabled'] = 1;
+			  }else{
+				$data['item'] = "<span id='notif' class='label label-success'> Code Available.</span>";
+				$data['disabled'] = 0;
+			  }
+			echo json_encode($data);
+		}
+
+		public function getSubCatCodeRangeAll(Request $request){
+			$fields = Request::all();
+			$code = $fields['code'];
+			dd($code);
+			$data = SubCategory::select('from_code')->get();
+			echo json_encode($data);
+		}
 
 	}

@@ -1,19 +1,20 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	//use Request;
+	use Request;
 	use DB;
 	use CRUDBooster;
 
 	use App\Assets;
 	use App\Statuses;
 	use Excel;
-	use Illuminate\Http\Request;
+	//use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
 	use Maatwebsite\Excel\HeadingRowImport;
 	use App\Imports\ItemMasterImport;
+	use App\WarehouseLocationModel;
 	//use App\Imports\InventoryUpload;
 
 	class AdminAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -52,27 +53,12 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 
-			//$this->col[] = ["label"=>"Status","name"=>"status_id","join"=>"statuses,status_description"];
-			$this->col[] = ["label"=>"Device Image","name"=>"image","image"=>1];
-			//$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
-			//$this->col[] = ["label"=>"Asset Tag","name"=>"asset_tag"];
-			$this->col[] = ["label"=>"Digits Code","name"=>"digits_code"];
-			//$this->col[] = ["label"=>"Item Type","name"=>"item_type"];
-			//$this->col[] = ["label"=>"Serial No","name"=>"serial_no"];
+			$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"category,category_description"];
-			$this->col[] = ["label"=>"Sub Category","name"=>"class_id","join"=>"class,class_description"];
-
-			$this->col[] = ["label"=>"Useful Life","name"=>"class_id","join"=>"class,useful_life"];
-
-			//$this->col[] = ["label"=>"Item Cost","name"=>"item_cost"];
-			/*$this->col[] = ["label"=>"Quantity","name"=>"quantity"];
-			$this->col[] = ["label"=>"Status","name"=>"status_id","join"=>"statuses,status_description"];
-			$this->col[] = ["label"=>"Assign To","name"=>"assign_to", "join" => "cms_users,name"];
-			$this->col[] = ["label"=>"Assign Date","name"=>"assign_date"]; */
-			//$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
+			$this->col[] = ["label"=>"Sub Category","name"=>"sub_category_id","join"=>"class,class_description"];
+			$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
-			//$this->col[] = ["label" => "Updated By", "name" => "updated_by", "join" => "cms_users,name"];
 			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
 
 			# END COLUMNS DO NOT REMOVE THIS LINE
@@ -80,10 +66,9 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
-			$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
 			$this->form[] = ['label'=>'Item Description','name'=>'item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description','datatable_where'=>"category_status = 'ACTIVE' && id = 1 || id = 5"];
-			$this->form[] = ['label'=>'Class','name'=>'class_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'class,class_description','datatable_where'=>"class_status = 'ACTIVE'"];
+			$this->form[] = ['label'=>'Class','name'=>'sub_category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'class,class_description','datatable_where'=>"class_status = 'ACTIVE'"];
 
 			$this->form[] = ['label'=>'Cost','name'=>'item_cost','type'=>'text','validation'=>'required','width'=>'col-sm-5'];
 			
@@ -96,19 +81,6 @@
 				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
 			}
 			# END FORM DO NOT REMOVE THIS LINE
-
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Digits Code","name"=>"digits_code","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Asset Tag","name"=>"asset_tag","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Serial No","name"=>"serial_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Item Description","name"=>"item_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Category Id","name"=>"category_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"category,id"];
-			//$this->form[] = ["label"=>"Status Id","name"=>"status_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"status,id"];
-			//$this->form[] = ["label"=>"Assign To","name"=>"assign_to","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -202,11 +174,12 @@
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
 				if(CRUDBooster::isSuperadmin()){
-					$this->index_button[] = [
-						"title"=>"Upload Item Master",
-						"label"=>"Upload Item Master",
-						"icon"=>"fa fa-upload",
-						"url"=>CRUDBooster::mainpath('item-master-upload')];
+					// $this->index_button[] = [
+					// 	"title"=>"Upload Item Master",
+					// 	"label"=>"Upload Item Master",
+					// 	"icon"=>"fa fa-upload",
+					// 	"url"=>CRUDBooster::mainpath('item-master-upload')];
+					$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 				}
 				// $this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
 			}
@@ -522,64 +495,34 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
-
-			$postdata['created_by']=CRUDBooster::myId();
-
-
-			$postdata['status_id']= 9;
-			
-
-			$postdata['total_quantity']= $postdata['quantity'];
-
-			
-
-			$count_header = DB::table("assets")->count();
-			$header_ref   =  str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);			
-			$reference_number	= "ASS-".$header_ref;
-			$reference_number1	= "DTC-".$header_ref;
-
-			$postdata['asset_code']= $reference_number;
-
-			$postdata['asset_tag']= $reference_number1;
-
-			//$postdata['category_id'] 		= DB::table('category')->where('category_description', $postdata['category_id'])->value('id');	
-			//$postdata['brand_id'] 		= DB::table('brand')->where('brand_description', $postdata['brand_id'])->value('id');	
-			//$postdata['class_id'] 		= DB::table('class')->where('class_description', $postdata['class_id'])->value('id');	
-			//$postdata['vendor_id'] 		= DB::table('vendor')->where('vendor_name', $postdata['vendor_id'])->value('id');
-
-
-			if($postdata['assign_to'] != null || $postdata['assign_to'] != "" ){
-
-				$postdata['status_id']= 2;
-
-				$postdata['assign_by']=		CRUDBooster::myId();
-				$postdata['assign_date']=	date('Y-m-d H:i:s');
-
-
-
-				//$check = Assets::where('id', $id)->first();
-
-				$assign = DB::table("cms_users")->where('id', $postdata['assign_to'])->first();
-
-				$category = DB::table("category")->where('id', $postdata['category_id'])->first();
-
-				$assign_by = DB::table("cms_users")->where('id',CRUDBooster::myId())->first();
-
-				$data = [	'assign_to'=>			$assign->name,
-							'asset_tag'=>			$postdata['asset_tag'],
-							'digits_code'=>			$postdata['digits_code'],
-							'serial_no'=>			$postdata['serial_no'],
-							'item_description'=>	$postdata['item_description'],
-							'category_id'=>			$category->category_description,
-							'assign_date'=>			date('Y-m-d H:i:s'),
-							'assign_by'=>			$assign_by->name
-						]; 
-
-				CRUDBooster::sendEmail(['to'=>'rickyalnin201995@gmail.com','data'=>$data,'template'=>'assets_confirmation','attachments'=>$files]);
-
+			$fields = Request::all();
+			$sub_id = $fields['sub_category_id'];
+			$item_description = $fields['item_description'];
+			$location = $fields['location'];
+			$cost = $fields['cost'];
+			$getSubData = DB::table('class')->where('id', $sub_id)->first();
+			$assetCount = DB::table('assets')->where('sub_category_id', $sub_id)->count();
+            if($assetCount == 0){
+				$assetCode = $getSubData->from_code;	
+			}else{
+				$assetCode = $getSubData->from_code + $assetCount;
 			}
-
+    
+			if($assetCode > $getSubData->to_code){
+				DB::table('class')->where('id',$sub_id)
+					->update([
+						'limit_code'   => "Code exceed in Item Master",
+					]);	
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-asset"),"Asset Code Exceed!","danger");
+			}else{
+				$postdata['asset_code'] = $assetCode;
+				$postdata['item_description'] = $item_description;
+				$postdata['category_id'] = $getSubData->category_id;
+				$postdata['sub_category_id'] = $sub_id;
+				$postdata['location'] = $location;
+				$postdata['item_cost'] = $cost;
+			}
+				
 	    }
 
 	    /* 
@@ -668,29 +611,6 @@
 
 	    }
 
-
-
-	    //By the way, you can still create your own method in here... :) 
-
-		public function Items($id)
-		{
-			$item_details = DB::table("digits_imfs")
-						->leftjoin('category', 'digits_imfs.category_id', '=', 'category.id')
-						->leftjoin('brand', 'digits_imfs.brand_id', '=', 'brand.id')
-						->leftjoin('class', 'digits_imfs.class_id', '=', 'class.id')
-						->leftjoin('vendor', 'digits_imfs.vendor_id', '=', 'vendor.id')
-						
-						->select( 	'digits_imfs.*', 
-									'category.category_description as category_description',
-									'brand.brand_description as brand_description',
-									'class.class_description as class_description',
-									'vendor.vendor_name as vendor_name'
-								)
-						->where('digits_imfs.id', $id)->get();
-
-			return $item_details;
-		}
-
 		public function UploadItemMaster() {
 			$data['page_title']= 'Item Master Upload';
 			return view('import.item-master-upload', $data)->render();
@@ -703,156 +623,19 @@
 			CRUDBooster::redirect(CRUDBooster::adminpath('assets'), trans("Upload Successfully!"), 'success');
 		}
 
-		public function getItemMasterDataApi(Request $request) {
-			$secretKey = "1f9653c84409990a899f5bd63f719771"; 
-            $uniqueString = time(); 
-            $userAgent = $_SERVER['HTTP_USER_AGENT']; 
-            $userAgent = $_SERVER['HTTP_USER_AGENT']; 
-            if($userAgent == '' || is_null($userAgent)){
-                $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36';    
-            }
-            $xAuthorizationToken = md5( $secretKey . $uniqueString . $userAgent);
-            $xAuthorizationTime = $uniqueString;
-            $vars = [
-                "your_param"=>1
-            ];
-    
-            //https://stackoverflow.com/questions/8115683/php-curl-custom-headers
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,"https://aimfs.digitstrading.ph/public/api/imfs_items_created");
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-            curl_setopt($ch, CURLOPT_POST, FALSE);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,null);
-            curl_setopt($ch, CURLOPT_HTTPGET, TRUE);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 300);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , 30);
-    
-            $headers = [
-            'X-Authorization-Token: ' . $xAuthorizationToken,
-            'X-Authorization-Time: ' . $xAuthorizationTime,
-            'User-Agent: '.$userAgent
-            ];
-    
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            $server_output = curl_exec ($ch);
-            curl_close ($ch);
-    
-            $response = json_decode($server_output, true);
-          
-            $data = [];
-            $count = 0;
-            if(!empty($response["data"])) {
-				foreach ($response["data"] as $key => $value) {
-					$count++;
-						DB::beginTransaction();
-						try {
-							Assets::updateOrcreate([
-								'digits_code' => $row['digits_code'] 
-							],
-							[
-								'digits_code' => $value['digits_code'],
-								'item_description' => $value['item_description'],
-								'brand_id' => $value['brand_id'],
-								'category_id' => $value['category_id'],
-								'class_id' => $value['class_id'],
-								'vendor_id' => $value['vendor_id'],
-								'item_cost' => $value['current_srp'],
-								'asset_tag' => "",
-								'quantity' => 0,
-								'add_quantity' => 0,
-								'total_quantity' => 0,
-								'status_id' => 0,
-								'created_by' => CRUDBooster::myId(),
-								'created_at' => date('Y-m-d H:i:s'),
-							]);
-							DB::commit();
-						} catch (\Exception $e) {
-							\Log::debug($e);
-							DB::rollback();
-						}
-					
-				}
-            }
-            \Log::info('Item Create: executed! items');
-		}
+		public function getAddAsset() {
 
-		public function getItemMasterUpdatedDataApi(Request $request) {
-			$secretKey = "1f9653c84409990a899f5bd63f719771"; 
-            $uniqueString = time(); 
-            $userAgent = $_SERVER['HTTP_USER_AGENT']; 
-            $userAgent = $_SERVER['HTTP_USER_AGENT']; 
-            if($userAgent == '' || is_null($userAgent)){
-                $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36';    
-            }
-            $xAuthorizationToken = md5( $secretKey . $uniqueString . $userAgent);
-            $xAuthorizationTime = $uniqueString;
-            $vars = [
-                "your_param"=>1
-            ];
-    
-            //https://stackoverflow.com/questions/8115683/php-curl-custom-headers
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL,"https://aimfs.digitstrading.ph/public/api/imfs_items_updated");
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
-            curl_setopt($ch, CURLOPT_POST, FALSE);
-            curl_setopt($ch, CURLOPT_POSTFIELDS,null);
-            curl_setopt($ch, CURLOPT_HTTPGET, TRUE);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 300);
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT , 30);
-    
-            $headers = [
-            'X-Authorization-Token: ' . $xAuthorizationToken,
-            'X-Authorization-Time: ' . $xAuthorizationTime,
-            'User-Agent: '.$userAgent
-            ];
-    
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-            $server_output = curl_exec ($ch);
-            curl_close ($ch);
-    
-            $response = json_decode($server_output, true);
-       
-            $data = [];
-            $count = 0;
-            if(!empty($response["data"])) {
-				foreach ($response["data"] as $key => $value) {
-					$count++;
-						DB::beginTransaction();
-						try {
-							Assets::updateOrcreate([
-								'digits_code' => $row['digits_code'] 
-							],
-							[
-								'digits_code' => $value['digits_code'],
-								'item_description' => $value['item_description'],
-								'brand_id' => $value['brand_id'],
-								'category_id' => $value['category_id'],
-								'class_id' => $value['class_id'],
-								'vendor_id' => $value['vendor_id'],
-								'item_cost' => $value['current_srp'],
-								'asset_tag' => "",
-								'quantity' => 0,
-								'add_quantity' => 0,
-								'total_quantity' => 0,
-								'status_id' => 0,
-								'updated_by' => CRUDBooster::myId(),
-								'updated_at' => date('Y-m-d H:i:s'),
-							]);
-							DB::commit();
-						} catch (\Exception $e) {
-							\Log::debug($e);
-							DB::rollback();
-						}
-					
-				}
-            }
-            \Log::info('Item Create: executed! items');
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
+
+			$this->cbLoader();
+			$data['page_title'] = 'Add Asset Masterfile';
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1])->orderby('category_description', 'asc')->get();
+			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
+			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			return $this->view("masterfile.add-asset", $data);
+
 		}
 
 

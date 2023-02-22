@@ -176,9 +176,13 @@ Route::group(['middleware' => ['web']], function() {
      Route::post('/admin/applicant_module/export-applicant','AdminApplicantModuleController@applicantExport')->name('export-applicant');
      Route::get('/admin/applicant_module/download-applicant-template','AdminApplicantModuleController@downloadApplicantTemplate');
  
-    Route::get('/admin/clear-view', function() {
+     //Get Sub Category Code Range
+     Route::post(config('crudbooster.ADMIN_PATH').'/sub_categories/get-getSubCatCodeRangeFrom','AdminSubCategoriesController@getSubCatCodeRangeFrom')->name('getRangeCodeFrom');
+     Route::post(config('crudbooster.ADMIN_PATH').'/sub_categories/get-getSubCatCodeRangeTo','AdminSubCategoriesController@getSubCatCodeRangeTo')->name('getRangeCodeTo');
+     Route::post(config('crudbooster.ADMIN_PATH').'/sub_categories/get-getSubCatCodeRangeAll','AdminSubCategoriesController@getSubCatCodeRangeAll')->name('getRangeCodeAll');
+     Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";
-    });
+     });
 });
 

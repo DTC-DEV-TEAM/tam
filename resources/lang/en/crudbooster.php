@@ -331,4 +331,8 @@ return [
     'this_field_is_required' => 'This field is required',
     'text_form' => 'Form',
     "your_file_extension_is_not_allowed " => "Your file extension is not allowed !",
+
+    //exist
+    'alert_exist_data_danger' => ':code FA Code Exist!',
+    'alert_invalid_code_danger' => ':code Invalid Code Range!',
 ];
