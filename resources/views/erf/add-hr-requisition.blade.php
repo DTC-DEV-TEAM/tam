@@ -38,7 +38,7 @@
             }
 
             input.sinput:read-only {
-                background-color: #fff;
+                background-color: #f5f5f5;
             }
 
             input.addinput:read-only {
@@ -57,6 +57,57 @@
             }
             .panel-heading{
                 background-color: #f5f5f5 ;
+            }
+
+            .plus{
+                font-size:20px;
+            }
+            #add-Row{
+                border:none;
+                background-color: #fff;
+            }
+          
+            .iconPlus{
+                background-color: #3c8dbc: 
+            }
+            
+            .iconPlus:before {
+                content: '';
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                /* border: 1px solid rgb(194, 193, 193); */
+                font-size: 35px;
+                color: white;
+                background-color: #3c8dbc;
+       
+            }
+            #bigplus{
+                transition: transform 0.5s ease 0s;
+            }
+            #bigplus:before {
+                content: '\FF0B';
+                background-color: #3c8dbc: 
+                font-size: 50px;
+            }
+            #bigplus:hover{
+                /* cursor: default;
+                transform: rotate(180deg); */
+                -webkit-animation: infinite-spinning 1s ease-out 0s infinite normal;
+                 animation: infinite-spinning 1s ease-out 0s infinite normal;
+               
+            }
+
+            @keyframes infinite-spinning {
+                from {
+                    transform: rotate(0deg);
+                }
+                to {
+                    transform: rotate(360deg);
+                }
             }
         </style>
     @endpush
@@ -79,13 +130,19 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label require"> Company</label>
-                            <input type="text" class="form-control finput"  id="company" name="company" value="TASTELESS"  required readonly>
+                            <input type="text" class="form-control finput"  id="company" name="company" value="Digits Trading Corp."  required readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
                     <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Department</label>
-                            <input type="text" class="form-control finput"  id="department" name="department" value="{{$employeeinfos->department_name}}"  required readonly>
+                            <select required selected data-placeholder="-- Please choose department --" id="department" name="department" class="form-select select2" style="width:100%;">
+                            @foreach($departments as $res)
+                                <option value=""></option>
+                                <option value="{{ $res->id }}">{{ $res->department_name }}</option>
+                            @endforeach
+                            </select>
+                            {{-- <input type="text" class="form-control finput"  id="department" name="department" value="{{$employeeinfos->department_name}}"  required readonly> --}}
                         </div>
                     </div>  
                 </div>
@@ -101,7 +158,12 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Position</label>
-                            <input type="text" class="form-control finput"  id="position" name="position"  required>                                   
+                            <select required selected data-placeholder="-- Please Select Positions/Title --" id="position" name="position" class="form-select select2" style="width:100%;">
+                            {{-- @foreach($positions as $res)
+                                <option value=""></option>
+                                <option value="{{ $res->id }}">{{ $res->position_description }}</option>
+                            @endforeach --}}
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -134,6 +196,9 @@
                                     </label>
                                 </div>
                                 @endforeach
+                                <div class="form-group" id="other_schedule_div" style="display:none;">
+                                    <input type="text" class="form-control finput"  id="other_schedule" name="other_schedule" placeholder="Other Schedule">   
+                                </div>
                         </div>
                         <div class="col-md-6">
                             <label class="require control-label"><span style="color:red">*</span> Allow Wfh</label><br>
@@ -154,16 +219,18 @@
                         <div class="col-md-6">
                             <label class="require control-label"><span style="color:red">*</span> Manpower</label><br>
                                 @foreach($manpower as $data)
-                                <div class="col-md-6" style="margin-bottom:20px">
+                                <div class="col-md-6">
                                     <label class="checkbox-inline control-label col-md-6" ><br>
                                     <input type="checkbox" required   class="manpower" name="manpower" value="{{$data->description}}" >{{$data->description}}
                                     </label>
                                 </div>
                                 @endforeach
+
                                 <div class="form-group" id="show_replacement_of" style="display:none;">
-                              
-                                <label class="control-label"> Replacement Of</label>
-                                    <input type="text" class="form-control finput"  id="replacement_of" name="replacement_of">   
+                                    <input type="text" class="form-control finput"  id="replacement_of" name="replacement_of" placeholder="Replacement Of">   
+                                </div>
+                                <div class="form-group" id="absorption_div" style="display:none;">
+                                    <input type="text" class="form-control finput"  id="absorption" name="absorption" placeholder="Absorption">   
                                 </div>
                         </div>
                         <div class="col-md-6">
@@ -181,7 +248,7 @@
             <div class="card4">
                 <div class="row"> 
                     <div class="col-md-6">
-                        <label class="require control-label"><span style="color:red">*</span> Required Exams</label><br>
+                        <label class="require control-label"> Required Exams</label><br>
                             @foreach($required_exams as $data)
                             <div class="col-md-6">
                                 <label class="checkbox-inline control-label col-md-12" ><br>
@@ -189,6 +256,9 @@
                                 </label>
                             </div>
                             @endforeach
+                            <div class="form-group" id="other_required_exams_div" style="display:none;">
+                                <input type="text" class="form-control finput"  id="other_required_exams" name="other_required_exams" placeholder="Other Required Exams">   
+                            </div>
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"><span style="color:red">*</span> Does the Employee need to shared files?</label><br>
@@ -238,12 +308,16 @@
                             </label>
                         </div>
                         @endforeach
+                       
+                        <div class="form-group" id="other_email_domain" style="display:none;">
+                            <input type="text" class="form-control finput"  id="other_email" name="other_email" placeholder="Other Email">   
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"> Required System</label><br>
                         @foreach($required_system as $data)
-                        <div class="col-md-6">
-                            <label class="checkbox-inline control-label col-md-6" ><br>
+                        <div class="col-md-3">
+                            <label class="checkbox-inline control-label col-md-3" ><br>
                                 <input type="checkbox" required multiple class="required_system" name="required_system[]" value="{{$data->description}}" >{{$data->description}}
                             </label>
                         </div>
@@ -256,7 +330,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label><span style="color:red">*</span> QUALIFICATIONS</label>
-                            <textarea placeholder=" Qualifications ..." rows="3" class="form-control finput" name="qualifications"></textarea>
+                            <textarea placeholder=" Qualifications ..." rows="3" class="form-control finput" name="qualifications" id="qualifications"></textarea>
                         </div>
                     </div>
                 </div>
@@ -264,7 +338,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label><span style="color:red">*</span> JOB DESCRIPTIONS</label>
-                            <textarea placeholder=" Job Descriptions ..." rows="3" class="form-control finput" name="job_descriptions"></textarea>
+                            <textarea placeholder=" Job Descriptions ..." rows="3" class="form-control finput" name="job_descriptions" id="job_descriptions"></textarea>
                         </div>
                     </div>
                 </div>
@@ -296,7 +370,8 @@
                      <table class="table table-bordered" id="asset-items">
                             <tbody id="bodyTable">
                                 <tr class="tbl_header_color dynamicRows">
-                                    <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                                    <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th> 
+                                    <th width="15%" class="text-center">Digits Code</th>
                                     <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
                                     <th width="20%" class="text-center">Sub Category</th> 
                                     <th width="7%" class="text-center">Qty</th> 
@@ -310,8 +385,9 @@
                             </tbody>
                             <tfoot>
                                 <tr id="tr-table1" class="bottom">
-                                    <td colspan="3">
-                                        <input type="button" id="add-Row" name="add-Row" class="btn btn-primary add" value='Add Item' />
+                                    <td colspan="4">
+                                        {{-- <input type="button" id="add-Row" name="add-Row" class="btn btn-primary add" value='Add Item' /> --}}
+                                        <button class="red-tooltip" data-toggle="tooltip" data-placement="right" id="add-Row" name="add-Row" title="Add Row"><div class="iconPlus" id="bigplus"></div></button>
                                     </td>
                                     <td align="left" colspan="1">
                                         <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
@@ -320,9 +396,9 @@
                             </tfoot>
                         </table>
                                               
-                        <div class="col-md-12" id="application_div">
+                        <div class="col-md-12">
                             <hr/>
-                            <div class="row"> 
+                            <div class="row" id="application_div"> 
                                 <label class="require control-label col-md-2" required><span style="color:red">*</span> {{ trans('message.form-label.application') }}</label>
                                     @foreach($applications as $data)
                                         <div class="col-md-2">
@@ -341,7 +417,13 @@
                                     <input type="text" class="form-control"  id="application_others" name="application_others"  required placeholder="e.g. VIBER, WHATSAPP, TELEGRAM" onkeyup="this.value = this.value.toUpperCase();">
                                 </div>
                             </div>
-                            <hr/>
+                        </div>
+                        <hr/>
+                        <div class="col-md-12">
+                            <div class="form-group text-center">
+                                <label>CAN'T FIND WHAT YOU ARE LOOKING FOR?</label>
+                                <a href='{{CRUDBooster::adminpath("header_request/download")."?return_url=".urlencode(Request::fullUrl())}}'>CHECK HERE</a>
+                            </div>
                         </div>
                     </div> 
                </div>
@@ -358,7 +440,9 @@
 @endsection
 @push('bottom')
 <script type="text/javascript">
-
+    $(function(){
+        $('body').addClass("sidebar-collapse");
+    });
     function preventBack() {
         window.history.forward();
     }
@@ -368,7 +452,8 @@
     setTimeout("preventBack()", 0);
 
     var tableRow = 1;
-
+    $('#department').select2({})
+    $('#position').select2({})
     $("#application_div").hide();
     $("#application_others_div").hide();
 
@@ -376,16 +461,14 @@
     $(".application").removeAttr('required');
 
     $(".date").datetimepicker({
-                 minDate:new Date(), // Current year from transactions
-                viewMode: "days",
-                format: "YYYY-MM-DD",
-                dayViewHeaderFormat: "MMMM YYYY",
-            });
+        minDate:moment().millisecond(0).second(0).minute(0).hour(0),
+        viewMode: "days",
+        format: "YYYY-MM-DD",
+        dayViewHeaderFormat: "MMMM YYYY",
+    });
 
     $('#OTHERS').change(function() {
-
         var ischecked= $(this).is(':checked');
-
         if(ischecked == false){
             $("#application_others_div").hide();
             $("#application_others").removeAttr('required');
@@ -393,7 +476,6 @@
             $("#application_others_div").show();
             $("#application_others").attr('required', 'required');
         }	
-
     });
 
     var app_count = 0;
@@ -407,15 +489,65 @@
         }
 
     });
+
      //checkbox validations
      $(".manpower").change(function() {
         var rep = $(this);
-        console.log($(this).val());
-        if(rep.val() === "REPLACEMENT"){
+        if(rep.val() === "REPLACEMENT" && rep.is(':checked')){
             $("#show_replacement_of").show();
         }else{
             $("#show_replacement_of").hide();
             $('#replacement_of').val("");
+        }
+
+    });
+
+      //other schedule
+      //checkbox validations
+      $(".schedule").change(function() {
+        var rep = $(this);
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_schedule_div").show();
+        }else{
+            $("#other_schedule_div").hide();
+            $('#other_schedule').val("");
+        }
+
+    });
+
+    //checkbox validations manpower
+    $(".manpower").change(function() {
+        var rep = $(this);
+        if(rep.val() === "ABSORPTION" && rep.is(':checked')){
+            $("#absorption_div").show();
+        }else{
+            $("#absorption_div").hide();
+            $('#absorption').val("");
+        }
+
+    });
+
+    //other email domain
+      //checkbox validations
+      $(".email_domain").change(function() {
+        var rep = $(this);;
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_email_domain").show();
+        }else{
+            $("#other_email_domain").hide();
+            $('#other_email').val("");
+        }
+    });
+
+     //other Required Exam
+      //checkbox validations
+      $(".required_exams").change(function() {
+        var rep = $(this);
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_required_exams_div").show();
+        }else{
+            $("#other_required_exams_div").hide();
+            $('#other_required_exams').val("");
         }
 
     });
@@ -432,18 +564,39 @@
         }
     });
 
+    //DEPARTMENT CHANGE
+    $('#department').change(function(){
+        var department_id =  this.value;
+        $.ajax
+        ({ 
+            type: 'POST',
+            url: "{{ route('get-positions') }}",
+            data: {
+                "id": department_id
+            },
+            success: function(result) {
+                var i;
+                var showData = [];
+                showData[0] = "<option value=''>-- Please choose position --</option>";
+                for (i = 0; i < result.length; ++i) {
+                    var j = i + 1;
+                    showData[j] = "<option value='"+result[i].position_description+"'>"+result[i].position_description+"</option>";
+                }
+                $('#position').attr('disabled', false);
+                jQuery('#position').html(showData);        
+            }
+        });
+    });
     
 
 
     $(document).ready(function() {
-
         const fruits = [];
-
         $("#add-Row").click(function() {
-
+            event.preventDefault(); 
+            //$("#application_div").show();
             var description = "";
             var count_fail = 0;
-
             $('.itemDesc').each(function() {
                 description = $(this).val();
                 if (description == null) {
@@ -469,31 +622,42 @@
                 '<tr>' +
 
                     '<td >' +
-                    '  <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control finput itemDesc" data-id="' + tableRow + '" id="itemDesc' + tableRow + '"  name="item_description[]"  required maxlength="100">' +
-                    '</td>' +  
+                        '<input type="text" placeholder="Search Item ..." class="form-control text-center finput itemDesc" id="itemDesc'+ tableRow +'" data-id="'+ tableRow +'"   name="item_description[]"  required maxlength="100">' +
+                          '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="'+ tableRow +'" id="ui-id-2'+ tableRow +'" style="display: none; top: 60px; left: 15px; width: 100%;">' +
+                           '<li>Loading...</li>' +
+                          '</ul>' +
+                         '<div id="display-error'+ tableRow +'"></div>'+
+                    '</td>' + 
 
-                    '<td>'+
-                        '<select selected data-placeholder="- Select Category -" class="form-control drop'+ tableRow + '" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required style="width:100%">' +
-                        '  <option value=""></option>' +
-                        '        @foreach($categories as $data)'+
-                        '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
-                        '         @endforeach'+
-                        '</select>'+
+                    '<td>' + 
+                        '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center digits_code sinput" data-id="'+ tableRow +'" id="digits_code'+ tableRow +'"  name="digits_code[]"   maxlength="100" readonly>' +
+                        '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description sinput" data-id="'+ tableRow +'" id="fixed_description'+ tableRow +'"  name="fixed_description[]"   maxlength="100" readonly>' +
+                        '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control class_type sinput" data-id="'+ tableRow +'" id="class_type'+ tableRow +'"  name="class_type[]"   maxlength="100" readonly>' +
                     '</td>' +
 
                     // '<td>'+
-                    //     '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                         
+                    //     '<select selected data-placeholder="- Select Category -" class="form-control drop'+ tableRow + '" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required style="width:100%">' +
+                    //     '  <option value=""></option>' +
+                    //     '        @foreach($categories as $data)'+
+                    //     '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
+                    //     '         @endforeach'+
                     //     '</select>'+
-                    // '</td>' +   
-                    '<td>'+
-                        '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                        '  <option value=""></option>' +
-                        '        @foreach($sub_categories as $data)'+
-                        '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
-                        '         @endforeach'+
-                        '</select>'+
+                    // '</td>' +
+
+                    '<td>' + 
+                        '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id sinput" data-id="'+ tableRow +'" id="category_id'+ tableRow +'"  name="category_id[]"   maxlength="100" readonly>' +
                     '</td>' +
+                    '<td>' + 
+                        '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="'+ tableRow +'" id="sub_category_id'+ tableRow +'"  name="sub_category_id[]"   maxlength="100" readonly>' +
+                    '</td>' +  
+                    // '<td>'+
+                    //     '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
+                    //     '  <option value=""></option>' +
+                    //     '        @foreach($sub_categories as $data)'+
+                    //     '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
+                    //     '         @endforeach'+
+                    //     '</select>'+
+                    // '</td>' +
 
                     '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td>' +
   
@@ -503,68 +667,148 @@
 
                 '</tr>';
                 $(newrow).insertBefore($('table tr#tr-table1:last'));
-                $('#sub_category_id'+tableRow).attr('disabled', true);
-                $('#category_id'+tableRow).select2({});
-                $('.js-example-basic-multiple').select2();
-                $('.sub_category_id').select2({
-                placeholder_text_single : "- Select Sub Category -"});
+                // $('#sub_category_id'+tableRow).attr('disabled', true);
+                // $('#category_id'+tableRow).select2({});
+                // $('.js-example-basic-multiple').select2();
+                // $('.sub_category_id').select2({
+                // placeholder_text_single : "- Select Sub Category -"});
+
                 $('#app_id'+tableRow).change(function(){
+                    if($('#app_id'+$(this).attr("data-id")).val() != null){
+                        var arrx = $(this).val();
+                        execute = 0;
+                    }else{
+                        var arrx = "";
+                        execute++;
+                    }
+                    var s = arrx;
 
-                        if($('#app_id'+$(this).attr("data-id")).val() != null){
-                            var arrx = $(this).val();
-                            execute = 0;
-                        }else{
-                            var arrx = "";
-                            execute++;
-                        }
-                        var s = arrx;
-
-                        if(s.includes("OTHERS")){
-                
-                            $('#AppOthers'+$(this).attr("data-id")).show();
-                            $('#AppOthers'+$(this).attr("data-id")).attr('required', 'required');
-
-                        }else{
-
-                            $('#AppOthers'+$(this).attr("data-id")).hide();
-                            $('#AppOthers'+$(this).attr("data-id")).removeAttr('required');
-
-                        }
+                    if(s.includes("OTHERS")){
+                        $('#AppOthers'+$(this).attr("data-id")).show();
+                        $('#AppOthers'+$(this).attr("data-id")).attr('required', 'required');
+                    }else{                   
+                        $('#AppOthers'+$(this).attr("data-id")).hide();
+                        $('#AppOthers'+$(this).attr("data-id")).removeAttr('required');
+                    }
 
                 });
 
                 $(document).on('keyup', '#itemDesc'+tableRow, function(ev) {
-
                     var category =  $('#category_id'+$(this).attr("data-id")).val();
                     var description = this.value;
-
                     if(description.includes("LAPTOP") && category == "IT ASSETS"){
-                    
-                        // alert(description);
-
                         $('#app_id'+$(this).attr("data-id")).attr('disabled', false);
-
                     }else{
-                    
                         $('#app_id'+$(this).attr("data-id")).attr('disabled', true);
                     }
-
-
                 });
 
+                //SEARCH DIGITS CODE
+                var stack = [];
+                var token = $("#token").val();
+                var searchcount = <?php echo json_encode($tableRow); ?>;
+                let countrow = 1;
+                $(function(){
+                    countrow++;
+                    $('#itemDesc'+tableRow).autocomplete({
+                        source: function (request, response) {
+                        $.ajax({
+                            url: "{{ route('item.erf.it.search') }}",
+                            dataType: "json",
+                            type: "POST",
+                            data: {
+                                "_token": token,
+                                "search": request.term
+                            },
+                            success: function (data) {
+                                if(data.items === null){
+                                    swal({  
+                                        type: 'error',
+                                        title: 'No Found Item',
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9",
+                                    });
+                                }else{ 
+                                //var rowCount = $('#asset-items tr').length;
+                                //myStr = data.sample;   
+                                if (data.status_no == 1) {
+
+                                    $("#val_item").html();
+                                    var data = data.items;
+                                    $('#ui-id-2'+tableRow).css('display', 'none');
+
+                                    response($.map(data, function (item) {
+                                        return {
+                                            id:                         item.id,
+                                            asset_code:                 item.asset_code,
+                                            digits_code:                item.digits_code,
+                                            asset_tag:                  item.asset_tag,
+                                            serial_no:                  item.serial_no,
+                                            value:                      item.item_description,
+                                            category_description:       item.category_description,
+                                            class_description:          item.class_description,
+                                            item_cost:                  item.item_cost,
+                                            class_type:                 item.class_type
+                                        }
+
+                                    }));
+
+                                } else {
+
+                                    $('.ui-menu-item').remove();
+                                    $('.addedLi').remove();
+                                    $("#ui-id-2"+tableRow).append($("<li class='addedLi'>").text(data.message));
+                                    var searchVal = $('#itemDesc'+tableRow).val();
+                                    if (searchVal.length > 0) {
+                                        $("#ui-id-2"+tableRow).css('display', 'block');
+                                    } else {
+                                        $("#ui-id-2"+tableRow).css('display', 'none');
+                                    }
+                                }
+                            }
+                        }
+                        })
+                        },
+                        select: function (event, ui) {
+                            var e = ui.item;
+                            console.log(e);
+                            if (e.id) {
+                                $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
+                                $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
+                                $('#itemDesc'+$(this).attr("data-id")).val(e.value);
+                                $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
+                                $('#fixed_description'+$(this).attr("data-id")).val(e.value);
+                                $('#category_id'+$(this).attr("data-id")).val(e.category_description);
+                                $('#sub_category_id'+$(this).attr("data-id")).val(e.class_description);
+                                $('#class_type'+$(this).attr("data-id")).val(e.class_type);
+                                $('#val_item').html('');
+
+                                if($.inArray(e.class_type,['LAPTOP','DESKTOP','MACBOOK']) > -1){
+                                    $("#application_div").show();
+                                }
+                                return false;
+                            }
+
+                        },
+
+                        minLength: 1,
+                        autoFocus: true
+                    });
+
+                });
 
                 $('#AppOthers'+tableRow).hide();
                 $('#AppOthers'+tableRow).removeAttr('required');
 
+                //SUB CATEGORY CHANGE
                 $('.sub_category_id').change(function(){
-
                     var sub_category_id =  this.value;
                     var fruits = [];
                     $(".sub_category_id :selected").each(function() {
                         fruits.push(this.value.toLowerCase().replace(/\s/g, ''));
                     });
                     console.log(fruits);
-                    if( fruits.includes("laptop") || fruits.includes("desktop")){
+                    if( fruits.includes("COMPUTER EQUIPMENT") || fruits.includes("desktop")){
 
                         $("#application_div").show();
                     }else{
@@ -579,32 +823,7 @@
                     }
 
                 });
-
-                $('#category_id'+tableRow).change(function(){
-                var category =  this.value;
-                var id_data = $(this).attr("data-id");
                 
-                $.ajax
-                ({ 
-                    type: 'POST',
-                    url: "{{ route('asset.sub.categories') }}",
-                    data: {
-                        "id": category
-                    },
-                    success: function(result) {
-                        var i;
-                        var showData = [];
-                        showData[0] = "<option value=''>-- Select Sub Category --</option>";
-                        for (i = 0; i < result.length; ++i) {
-                            var j = i + 1;
-                            showData[j] = "<option value='"+result[i].class_description+"'>"+result[i].class_description+"</option>";
-                        }
-                        $('#sub_category_id'+id_data).attr('disabled', false);
-                        jQuery('#sub_category_id'+id_data).html(showData);        
-                    }
-                });
-
-                });
 
                 $("#quantity_total").val(calculateTotalQuantity());
                 
@@ -614,17 +833,19 @@
         
         //deleteRow
         $(document).on('click', '.removeRow', function() {
-        
+            // $("#application_div").hide();
+            // $("#application_others_div").hide();
+            // $(".application").prop('checked', false);
+            // $(".application_others").prop('checked', false);
+            // $("#application_others").removeAttr('required');
             var id_data = $(this).attr("data-id");
-
-            if($("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "laptop" || $("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "desktop"){
-
-                    $("#application_div").hide();
-                    $("#application_div").val("");
-                    $(".application").prop('checked', false);
-                    $(".application_others").prop('checked', false);
-                    $("#application_others_div").hide();
-                    $("#application_others").removeAttr('required');
+            if($.inArray($("#class_type"+id_data).val().toLowerCase().replace(/\s/g, ''), ['laptop','desktop','macbook']) > -1){
+                $("#application_div").hide();
+                $("#application_div").val("");
+                $(".application").prop('checked', false);
+                $(".application_others").prop('checked', false);
+                $("#application_others_div").hide();
+                $("#application_others").removeAttr('required');
 
             }
 
@@ -711,231 +932,286 @@
         });
     });
 
+    //SUBMIT REQUEST
     $("#btnSubmit").click(function(event) {
-    
         event.preventDefault();
-        var countRow = $('#asset-items tfoot tr').length;
+        var countRow = $('#asset-items tfoot tr').length - 1;
         var reg = /^0/gi;
-            // var value = $('.vvalue').val();
-            if($("#requested_date").val() === ""){
+        // var value = $('.vvalue').val();
+        if($("#requested_date").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Please select Requested Date!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#department").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Please select Department!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#date_needed").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Please select Needed Date!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#position").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Required Position!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#work_location").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Required Work Location!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if($("#salary_range").val() === ""){
+            swal({
+                type: 'error',
+                title: 'Required Salary Range!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if(!$("#salary_range").val().includes("-")){
+            swal({
+                type: 'error',
+                title: 'Invalid Salary Range! please refer to the ff(xx,xxx-xx,xxx).',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+            return false;
+        }else if(!$(".schedule").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Please select Requested Date!',
+                    title: 'Please choose Schedule!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if($("#department").val() === ""){
+        }else if(!$(".allow_wfh").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Please select Department!',
+                    title: 'Please choose Allow Wfh!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if($("#date_needed").val() === ""){
+        }else if(!$(".manpower").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Please select Needed Date!',
+                    title: 'Please choose Manpower!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if($("#position").val() === ""){
+        }else if(!$(".manpower_type").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Required Position!',
+                    title: 'Please choose Manpower Type!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if($("#work_location").val() === ""){
+        }else if(!$(".shared_files").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Required Work Location!',
+                    title: 'Please Shared Files!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if($("#salary_range").val() === ""){
+        }else if(!$(".employee_interaction").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Required Salary Range!',
+                    title: 'Please interact with!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if(!$("#salary_range").val().includes("-")){
+        }else if(!$(".asset_usage").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Invalid Salary Range! please refer to the ff(xx,xxx-xx,xxx).',
+                    title: 'Please choose what will you be using the PC for!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 
                 event.preventDefault(); // cancel default behavior
                 return false;
-            }else if(!$(".schedule").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Schedule!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".allow_wfh").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Allow Wfh!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".manpower").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Manpower!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".manpower_type").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Manpower Type!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".required_exams").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Required Exams!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".shared_files").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please Shared Files!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".employee_interaction").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please interact with!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".asset_usage").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose what will you be using the PC for!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if(!$(".email_domain").is(':checked')){
-                    swal({
-                        type: 'error',
-                        title: 'Please choose Email Domain!',
-                        icon: 'error',
-                        confirmButtonColor: "#367fa9",
-                    }); 
-                    event.preventDefault(); // cancel default behavior
-                    return false;
-            }else if($('#documents').val() === ""){
+        }else if(!$(".email_domain").is(':checked')){
                 swal({
                     type: 'error',
-                    title: 'Upload file documents required!',
+                    title: 'Please choose Email Domain!',
                     icon: 'error',
-                    customClass: 'swal-wide'
-                });
-                event.preventDefault();
+                    confirmButtonColor: "#367fa9",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+        }else if($('#qualifications').val() === ""){
+            swal({
+                type: 'error',
+                title: 'Qualifications required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            });
+            event.preventDefault();
+        }else if($('#job_descriptions').val() === ""){
+            swal({
+                type: 'error',
+                title: 'Job Description required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            });
+            event.preventDefault();
+        }else if($('#documents').val() === ""){
+            swal({
+                type: 'error',
+                title: 'Upload file documents required!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            });
+            event.preventDefault();
+        }
+        // else if (countRow == 1) {
+        //     swal({
+        //         type: 'error',
+        //         title: 'Please add an item!',
+        //         icon: 'error',
+        //         confirmButtonColor: "#367fa9",
+        //     }); 
+        //     event.preventDefault(); // cancel default behavior
+        // }
+        // else if (countRow == 1) {
+        // swal({
+        //     type: 'error',
+        //     title: 'Please add an item!',
+        //     icon: 'error',
+        //     confirmButtonColor: "#367fa9",
+        // }); 
+        //     event.preventDefault(); // cancel default behavior
+        // }
+        else{
+
+            if($('#show_replacement_of').is(":visible")){
+                if($('#replacement_of').val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Replacement Of required!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+                }
             }
-            // else if (countRow == 1) {
-            // swal({
-            //     type: 'error',
-            //     title: 'Please add an item!',
-            //     icon: 'error',
-            //     confirmButtonColor: "#367fa9",
-            // }); 
-            //     event.preventDefault(); // cancel default behavior
-            // }
-            else{
-               
-                 //header image validation
-                 for (var i = 0; i < $("#documents").get(0).files.length; ++i) {
-                    var file1=$("#documents").get(0).files[i].name;
-                    if(file1){                        
-                        var file_size=$("#documents").get(0).files[i].size;
-                            var ext = file1.split('.').pop().toLowerCase();                            
-                            if($.inArray(ext,['xlsx','pdf'])===-1){
-                                swal({
-                                    type: 'error',
-                                    title: 'Invalid File!',
-                                    icon: 'error',
-                                    customClass: 'swal-wide'
-                                });
-                                event.preventDefault();
-                                return false;
-                            }                                          
-                    }
-                 }
-        
-                    var item = $("input[name^='item_description']").length;
-                    var item_value = $("input[name^='item_description']");
-                    for(i=0;i<item;i++){
-                        if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
-                            swal({  
-                                    type: 'error',
-                                    title: 'Item Description cannot be empty!',
-                                    icon: 'error',
-                                    confirmButtonColor: "#367fa9",
-                                });
-                                event.preventDefault();
-                                return false;
-                        } 
                 
+            if($('#absorption_div').is(":visible")){
+                if($('#absorption').val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Absorption required!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+                }
+            }
+
+            if($('#other_email_domain').is(":visible")){
+                if($('#other_email').val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Other Email Domain required!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+                }
+            }
+            
+             //header image validation
+             for (var i = 0; i < $("#documents").get(0).files.length; ++i) {
+                var file1=$("#documents").get(0).files[i].name;
+                if(file1){                        
+                    var file_size=$("#documents").get(0).files[i].size;
+                        var ext = file1.split('.').pop().toLowerCase();                            
+                        if($.inArray(ext,['xlsx','pdf'])===-1){
+                            swal({
+                                type: 'error',
+                                title: 'Invalid File!',
+                                icon: 'error',
+                                customClass: 'swal-wide'
+                            });
+                            event.preventDefault();
+                            return false;
+                        }                                          
+                }
+             }
+    
+                var item = $("input[name^='item_description']").length;
+                var item_value = $("input[name^='item_description']");
+                for(i=0;i<item;i++){
+                    if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                        swal({  
+                                type: 'error',
+                                title: 'Item Description cannot be empty!',
+                                icon: 'error',
+                                confirmButtonColor: "#367fa9",
+                            });
+                            event.preventDefault();
+                            return false;
                     } 
-                    var sub_cat = $(".sub_category_id option").length;
-                    var sub_cat_value = $('.sub_category_id').find(":selected");
-                    for(i=0;i<sub_cat;i++){
-                        if(sub_cat_value.eq(i).val() == ""){
-                            swal({  
-                                    type: 'error',
-                                    title: 'Please select Sub Category!',
-                                    icon: 'error',
-                                    confirmButtonColor: "#367fa9",
-                                });
-                                event.preventDefault();
-                                return false;
-                        } 
-                
+            
+                } 
+                var sub_cat = $(".sub_category_id option").length;
+                var sub_cat_value = $('.sub_category_id').find(":selected");
+                for(i=0;i<sub_cat;i++){
+                    if(sub_cat_value.eq(i).val() == ""){
+                        swal({  
+                                type: 'error',
+                                title: 'Please select Sub Category!',
+                                icon: 'error',
+                                confirmButtonColor: "#367fa9",
+                            });
+                            event.preventDefault();
+                            return false;
                     } 
-                   
-                    var sub_cat = $(".sub_category_id option").length;
-                    var sub_cat_value = $('.sub_category_id').find(":selected");
+            
+                } 
+                if(countRow){
+                    var sub_cat = $("input[name^='class_type']").length;
+                    var sub_cat_value = $("input[name^='class_type']");
                     for(i=0;i<sub_cat;i++){
-                        var val = sub_cat_value.eq(i).val();
-                        if(app_count == 0 && $.inArray((sub_cat_value.eq(i).val() || '').toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                        var val = sub_cat_value.eq(i).val() || '';
+                        if(app_count == 0 && $.inArray((sub_cat_value.eq(i).val() || '').toLowerCase().replace(/\s/g, ''),['laptop','desktop','macbook']) > -1){
                             swal({  
                                     type: 'error',
                                     title: 'Please choose an Application!',
@@ -947,24 +1223,41 @@
                         } 
                 
                     } 
- 
-                    swal({
-                        title: "Are you sure?",
-                        type: "warning",
-                        showCancelButton: true,
-                        confirmButtonColor: "#41B314",
-                        cancelButtonColor: "#F9354C",
-                        confirmButtonText: "Yes, send it!",
-                        width: 450,
-                        height: 200
-                        }, function () {
-                            $("#ERFRequest").submit();                                                   
-                    });
-       
-            }
-        
+                }
+               
+                // if(countRow){
+                //     if(app_count == 0){
+                //                 swal({  
+                //                     type: 'error',
+                //                     title: 'Please choose an Application!',
+                //                     icon: 'error',
+                //                     confirmButtonColor: "#367fa9",
+                                    
+                //                 });
+                //                 event.preventDefault();
+                //                 return false;
+                //     }
+                // }
+               
+                swal({
+                    title: "Are you sure?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#41B314",
+                    cancelButtonColor: "#F9354C",
+                    confirmButtonText: "Yes, send it!",
+                    width: 450,
+                    height: 200
+                    }, function () {
+                        $("#ERFRequest").submit();                                                   
+                });
+                
+   
+        }
+    
     });
 
+    //BACK FORM
     $("#btn-cancel").click(function(event) {
        event.preventDefault();
        swal({
@@ -981,6 +1274,7 @@
         });
     });
 
+    //NUMBERS VALIDATION
     $(document).on("keyup","#salary_range", function (e) {
         if (e.which >= 37 && e.which <= 40) return;
             if (this.value.charAt(0) == ".") {

@@ -66,7 +66,35 @@
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
 
         <div class='panel-body'>
+            
           <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Digits Code</label>
+                    <input type="text" class="form-control auto finput" name="digits_code" id="search" placeholder="Search Item">
+                    <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
+                        <li>Loading...</li>
+                    </ul>
+                </div>
+                <div id="display-error">
+                    <span class="test"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                <label class="control-label">Description</label>
+                    <input type="hidden" class="form-control addinput" name="item_id" id="item_id" readonly>
+                    <input type="text" class="form-control addinput" name="item_description" id="item_description" readonly>
+                </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                <label class="control-label">Cost</label>
+                    <input type="text" class="form-control finput" name="cost" id="cost">
+                </div>
+            </div>
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="control-label">Sub Category</label>
@@ -76,12 +104,6 @@
                             <option value="{{$subData->id}}">{{$subData->class_description}}</option>
                         @endforeach
                     </select>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                <label class="control-label">Description</label>
-                    <input type="text" class="form-control finput" name="item_description" id="item_description">
                 </div>
             </div>
           </div>
@@ -97,12 +119,7 @@
                     </select>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group">
-                <label class="control-label">Cost</label>
-                    <input type="text" class="form-control finput" name="cost" id="cost">
-                </div>
-            </div>
+           
           </div>
         </div>
         
@@ -137,6 +154,89 @@
                         $("#AddAssetForm").submit();                     
                 });
             });
+
+            var stack = [];
+            var token = $("#token").val();
+            $(function(){
+                $('#search').autocomplete({
+                    source: function (request, response) {
+                    $.ajax({
+                        url: "{{ route('search-digits-code') }}",
+                        dataType: "json",
+                        type: "POST",
+                        data: {
+                            "_token": token,
+                            "search": request.term
+                        },
+                        success: function (data) {
+                            if(data.items === null){
+                                swal({  
+                                    type: 'error',
+                                    title: 'No Found Item',
+                                    icon: 'error',
+                                    confirmButtonColor: "#367fa9",
+                                });
+                            }else{ 
+                            //var rowCount = $('#asset-items tr').length;
+                            //myStr = data.sample;   
+                            if (data.status_no == 1) {
+
+                                $("#val_item").html();
+                                var data = data.items;
+                                $('#ui-id-2').css('display', 'none');
+
+                                response($.map(data, function (item) {
+                                    return {
+                                        id:                         item.id,
+                                        digits_code:                item.digits_code,
+                                        value:                      item.item_description,
+                                        category_description:       item.category_description,
+                                        item_cost:                  item.item_cost
+                                    
+                                    }
+
+                                }));
+
+                            } else {
+
+                                $('.ui-menu-item').remove();
+                                $('.addedLi').remove();
+                                $("#ui-id-2").append($("<li class='addedLi'>").text(data.message));
+                                var searchVal = $('#search').val();
+                                if (searchVal.length > 0) {
+                                    $("#ui-id-2").css('display', 'block');
+                                } else {
+                                    $("#ui-id-2").css('display', 'none');
+                                }
+                            }
+                        }
+                    }
+                    })
+                    },
+                    select: function (event, ui) {
+                        var e = ui.item;
+
+                        if (e.id) {
+                        
+     
+                            $('#search').val(e.digits_code);
+                            $('#search').attr('readonly','readonly');
+                            $('#item_description').val(e.value);
+                            $('#item_id').val(e.id);
+                            $("#cost").attr("placeholder", e.item_cost);
+                            return false;
+
+                        }
+                    },
+
+                    minLength: 1,
+                    autoFocus: true
+                });
+
+            });
         });
+
+        
+
     </script>
 @endpush

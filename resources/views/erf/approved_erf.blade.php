@@ -1,7 +1,19 @@
 @extends('crudbooster::admin_template')
     @push('head')
         <style type="text/css">   
- 
+            .select2-selection__choice{
+                    font-size:14px !important;
+                    color:black !important;
+            }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
             .firstRow {
                 border: 1px solid rgba(39, 38, 38, 0.5);
                 padding: 10px;
@@ -20,8 +32,8 @@
                 border-bottom: 1px solid rgba(18, 17, 17, 0.5);
             }
 
-            input.finput:read-only {
-                background-color: #fff;
+            input.readonly:read-only {
+                background-color: #f5f5f5;
             }
 
             input.sinput:read-only {
@@ -46,6 +58,12 @@
             .panel-heading{
                 background-color: #f5f5f5 ;
             }
+
+            table, th, td {
+            border: 1px solid rgba(000, 0, 0, .5);
+            padding: 8px;
+            border-radius: 5px 0 0 5px;
+            }
            
         </style>
     @endpush
@@ -63,19 +81,20 @@
     <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="" name="approval_action" id="approval_action">
+        <input type="hidden" value="{{$Header->requestid}}" name="header_id" id="header_id">
 
             <div class="card">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                         <label class="control-label">Company</i></label>
-                                <input type="text" class="form-control finput" value="{{$Header->company}}" aria-describedby="basic-addon1" readonly>             
+                                <input type="text" class="form-control readonly" value="{{$Header->company}}" aria-describedby="basic-addon1" readonly>             
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"> Requested Date</label>
-                            <input type="text" class="form-control finput" value="{{$Header->date_requested}}" aria-describedby="basic-addon1" readonly>             
+                            <input type="text" class="form-control readonly" value="{{$Header->date_requested}}" aria-describedby="basic-addon1" readonly>             
                         </div>
                     </div>
                 </div>
@@ -84,13 +103,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                         <label class="control-label"> Department</label>
-                        <input type="text" class="form-control finput" value="{{$Header->department}}" aria-describedby="basic-addon1" readonly>             
+                        <input type="text" class="form-control readonly" value="{{$Header->department}}" aria-describedby="basic-addon1" readonly>             
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"> Date Needed</label>
-                            <input type="text" class="form-control finput" value="{{$Header->date_needed}}" aria-describedby="basic-addon1" readonly>             
+                            <input type="text" class="form-control finput date" value="{{$Header->date_needed}}" name="date_needed" id="date_needed" aria-describedby="basic-addon1">             
                         </div>
                     </div>
                 
@@ -99,13 +118,20 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"> Position</label>
-                            <input type="text" class="form-control finput" value="{{$Header->position}}" aria-describedby="basic-addon1" readonly>                                                      
+                            <select required selected data-placeholder="-- Please Select Location --" id="position" name="position" class="form-select select2 white" style="width:100%;">
+                                @foreach($positions as $res)
+                                <option value="{{ $res->position_description }}"
+                                    {{ isset($Header->position) && $Header->position == $res->position_description ? 'selected' : '' }}>
+                                    {{ $res->position_description }} 
+                                </option>>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"> Work Location</label>
-                            <input type="text" class="form-control finput" value="{{$Header->work_location}}" aria-describedby="basic-addon1" readonly>                                                                                    
+                            <input type="text" class="form-control finput" value="{{$Header->work_location}}" id="work_location" name="work_location" aria-describedby="basic-addon1">                                                                                    
                         </div>
                     </div>
                     
@@ -114,7 +140,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"> Salary Range</label>
-                            <input type="text" class="form-control finput" value="{{number_format($Header->salary_range_from) .' - '. number_format($Header->salary_range_to)}}" aria-describedby="basic-addon1" readonly>                                                                                         
+                            <input type="text" class="form-control finput" value="{{number_format(Crypt::decryptString($Header->salary_range_from)) .' - '. number_format(Crypt::decryptString($Header->salary_range_to))}}" aria-describedby="basic-addon1" id="salary_range" name="salary_range">                                                                                         
   
                         </div>
                     </div> 
@@ -125,62 +151,138 @@
                 <div class="row"> 
                     <div class="col-md-6">
                         <label class="require control-label"> Schedule</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->schedule}}" aria-describedby="basic-addon1" readonly>                                                                                    
+                        @foreach($schedule as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" class="schedule" name="schedule" value="{{$res->schedule_description}}" {{ isset($Header->schedule) && $Header->schedule == $res->schedule_description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->schedule_description}} 
+                                </label>
+                            </div>
+                        @endforeach
+                        @if($Header->other_schedule != NULL || $Header->other_schedule != "")
+                            <div class="form-group">
+                                <input type="text" class="form-control finput" name="other_schedule" value="{{$Header->other_schedule}}" aria-describedby="basic-addon1">                                                                                    
+                            </div>
+                        @else
+                            <div class="form-group" id="other_schedule_div" style="display:none;">
+                                <input type="text" class="form-control finput"  id="other_schedule" name="other_schedule" placeholder="Other Schedule">   
+                            </div>
+                        @endif
                     </div>
+                    
                     <div class="col-md-6">
                         <label class="require control-label"> Allow Wfh</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->allow_wfh}}" aria-describedby="basic-addon1" readonly>                                                                                    
+                        @foreach($allow_wfh as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" name="allow_wfh" value="{{$res->description}}" {{ isset($Header->allow_wfh) && $Header->allow_wfh == $res->description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>
+                        @endforeach                                           
                     </div>
                 </div>
+               
                 <br>
                 <div class="row"> 
                     <div class="col-md-6">
                         <label class="require control-label"> Manpower</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->manpower}}" aria-describedby="basic-addon1" readonly>                                                                                    
+                        @foreach($manpower as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" class="manpower" name="manpower" value="{{$res->description}}" {{ isset($Header->manpower) && $Header->manpower == $res->description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>
+                        @endforeach   
+                        @if($Header->replacement_of != NULL || $Header->replacement_of != "")
+                            <div class="form-group">
+                                <input type="text" class="form-control finput" value="{{$Header->replacement_of}}" aria-describedby="basic-addon1">                                                                                    
+                            </div>
+                        @else
+                            <div class="form-group" id="show_replacement_of" style="display:none;">
+                                <input type="text" class="form-control finput"  id="replacement_of" name="replacement_of" placeholder="Replacement Of">   
+                            </div>
+                        @endif
+
+                        @if($Header->absorption != NULL || $Header->absorption != "")
+                            <div class="form-group">
+                                <input type="text" class="form-control finput" name="absorption" value="{{$Header->absorption}}" aria-describedby="basic-addon1">                                                                                    
+                            </div>
+                        @else
+                            <div class="form-group" id="absorption_div" style="display:none;">
+                                <input type="text" class="form-control finput"  id="absorption" name="absorption" placeholder="Absorption">   
+                            </div>
+                        @endif
+                       
+                       
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"> Manpower Type</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->manpower_type}}" aria-describedby="basic-addon1" readonly>                                                                                     
+                        @foreach($manpower_type as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" name="manpower_type" value="{{$res->description}}" {{ isset($Header->manpower_type) && $Header->manpower_type == $res->description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>
+                        @endforeach                                                                                    
                     </div>
                 </div>
                 <br>
-                @if($Header->replacement_of != NULL || $Header->replacement_of != "")
-                <div class="row"> 
-                    <div class="col-md-6">
-                        <label class="require control-label"> Replacement Of</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->replacement_of}}" aria-describedby="basic-addon1" readonly>                                                                                    
-                    </div>
-                </div>
-                @endif
+                
+                
             </div>
             <!-- 3rd row -->
             <div class="card">
                 <div class="row"> 
                     <div class="col-md-6">
                         <label class="require control-label"> Required Exams</label><br>
-                        @foreach($required_exams as $val)
-                        <input type="text" class="form-control finput" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                       
+                        @foreach($required_exams as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-12" ><br>
+                                    <input type="checkbox" name="required_exams[]" value="{{$res->description}}" {{ in_array($res->description, $res_req) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>                                                                                    
                         @endforeach
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"> Does the Employee need to shared files?</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->shared_files}}" aria-describedby="basic-addon1" readonly>                                                                                      
-    
+                        @foreach($shared_files as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" name="shared_files" value="{{$res->description}}" {{ isset($Header->shared_files) && $Header->shared_files == $res->description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>
+                        @endforeach    
                     </div>
                 </div>
+                <br>
+                @if($Header->other_required_exams != NULL || $Header->other_required_exams != "")
+                <div class="row"> 
+                    <div class="col-md-6">
+                        <label class="require control-label"> Other Required Exams</label><br>
+                        <input type="text" class="form-control finput" value="{{$Header->other_required_exams}}" id="other_required_exams" name="other_required_exams" aria-describedby="basic-addon1">                                                                                    
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="card">
                 <div class="row">
                     <div class="col-md-6">
                         <label class="require control-label"> Who will the employee interact with?</label><br>
-                        @foreach($interaction as $val)   
-                        <input type="text" class="form-control finput" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                       
+                        @foreach($interact_with as $res)   
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" name="employee_interaction[]" value="{{$res->description}}" {{ in_array($res->description, $interaction) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>                                                                                                                                                                 
                         @endforeach
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"> What will you be using the PC for?</label><br>
-                        @foreach($asset_usage as $val)   
-                        <input type="text" class="form-control finput" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                       
+                        @foreach($asset_usage as $res)   
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-12" ><br>
+                                    <input type="checkbox" name="asset_usage[]" value="{{$res->description}}" {{ in_array($res->description, $asset_usage_array) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>                                                                                                                                                                 
                         @endforeach
                     </div>
                 </div>
@@ -189,24 +291,46 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label class="require control-label"> Email Domain</label><br>
-                        <input type="text" class="form-control finput" value="{{$Header->email_domain}}" aria-describedby="basic-addon1" readonly>                                                                                      
+                        @foreach($email_domain as $res)
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-6" ><br>
+                                    <input type="checkbox" class="email_domain" name="email_domain" value="{{$res->description}}" {{ isset($Header->email_domain) && $Header->email_domain == $res->description ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>
+                        @endforeach   
+                        @if($Header->other_email_domain != NULL || $Header->other_email_domain != "")                 
+                            <div class="form-group">
+                                <input type="text" class="form-control finput" id="other_email" name="other_email" value="{{$Header->other_email_domain}}" aria-describedby="basic-addon1" >                                                                                    
+                            </div>                  
+                        @else
+                            <div class="form-group" id="other_email_domain" style="display:none;">
+                                <input type="text" class="form-control finput"  id="other_email" name="other_email" placeholder="Other Email">   
+                            </div>   
+                        @endif    
+                                                                                               
                     </div>
                     @if($Header->required_system != "" || $Header->required_system != NULL)
-                    <div class="col-md-6">
-                        <label class="require control-label"> Required System</label><br>
-                        @foreach($required_system as $val) 
-                        <input type="text" class="form-control finput" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                                                                                        
-                        @endforeach
-                    </div>
+                        <div class="col-md-6">
+                            <label class="require control-label"> Required System</label><br>
+                            @foreach($required_system as $res)   
+                                <div class="col-md-6">
+                                    <label class="checkbox-inline control-label col-md-12" ><br>
+                                        <input type="checkbox" name="required_system[]" value="{{$res->description}}" {{ in_array($res->description, $required_system_array) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                    </label>
+                                </div>                                                                                                                                                                 
+                            @endforeach
+                        </div>
                     @endif
                 </div>
+               
             </div>
+          
             <div class="card">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
                             <label> Qualifications</label>
-                            <input type="text" class="form-control finput" value="{{$Header->qualifications}}" aria-describedby="basic-addon1" readonly>                                                                                     
+                            <input type="text" class="form-control finput" value="{{$Header->qualifications}}" name="qualifications" id="qualifications" aria-describedby="basic-addon1">                                                                                     
                         </div>
                     </div>
                 </div>
@@ -214,7 +338,7 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label> Job Descriptions</label>
-                            <input type="text" class="form-control finput" value="{{$Header->job_description}}" aria-describedby="basic-addon1" readonly>                                                                                      
+                            <input type="text" class="form-control finput" value="{{$Header->job_description}}" name="job_descriptions" id="job_descriptions" aria-describedby="basic-addon1">                                                                                      
                         </div>
                     </div>
                 </div>
@@ -237,9 +361,10 @@
                             <div class="table-responsive">
                                 <div class="pic-container">
                                     <div class="pic-row">
-                                        <table id='table_dashboard' class="table table-hover table-striped table-bordered">
+                                        <table style="width:100%">
                                             <tbody>
                                                 <tr class="tbl_header_color dynamicRows">
+                                                    <th width="10%" class="text-center">Digits Code</th>
                                                     <th width="10%" class="text-center">Item Description</th>
                                                     <th width="10%" class="text-center">Category</th> 
                                                     <th width="10%" class="text-center">Sub Category</th>  
@@ -247,6 +372,9 @@
                                                 </tr>
                                                 @foreach($Body as $rowresult)
                                                 <tr>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->digits_code}}
+                                                    </td>
                                                     <td style="text-align:center" height="10">
                                                         {{$rowresult->item_description}}
                                                     </td>
@@ -280,7 +408,7 @@
                 <div class="col-md-6" >
                             <label class="require control-label">{{ trans('message.form-label.application') }}</label>
                             @foreach($application as $val)   
-                            <input type="text" class="form-control finput" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                       
+                            <input type="text" class="form-control readonly" value="{{trim($val)}}" aria-describedby="basic-addon1" readonly>                                                                                       
                             @endforeach  
                     </div>
                     @if($Header->application_others != "")
@@ -320,6 +448,93 @@
 @endsection
 @push('bottom')
 <script type="text/javascript">
+$(function(){
+    $('body').addClass("sidebar-collapse");
+});
+
+
+    $('#position').select2({})
+    $(".date").datetimepicker({
+        minDate:moment().millisecond(0).second(0).minute(0).hour(0),
+        viewMode: "days",
+        format: "YYYY-MM-DD",
+        dayViewHeaderFormat: "MMMM YYYY",
+    });
+
+     //checkbox validations
+     $(".manpower").change(function() {
+        var rep = $(this);
+        if(rep.val() === "REPLACEMENT" && rep.is(':checked')){
+            $("#show_replacement_of").show();
+        }else{
+            $("#show_replacement_of").hide();
+            $('#replacement_of').val("");
+        }
+
+    });
+
+      //other schedule
+      //checkbox validations
+      $(".schedule").change(function() {
+        var rep = $(this);
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_schedule_div").show();
+        }else{
+            $("#other_schedule_div").hide();
+            $('#other_schedule').val("");
+        }
+
+    });
+
+    //checkbox validations manpower
+    $(".manpower").change(function() {
+        var rep = $(this);
+        if(rep.val() === "ABSORPTION" && rep.is(':checked')){
+            $("#absorption_div").show();
+        }else{
+            $("#absorption_div").hide();
+            $('#absorption').val("");
+        }
+
+    });
+
+    //other email domain
+      //checkbox validations
+      $(".email_domain").change(function() {
+        var rep = $(this);
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_email_domain").show();
+        }else{
+            $("#other_email_domain").hide();
+            $('#other_email').val("");
+        }
+    });
+
+     //other Required Exam
+      //checkbox validations
+      $(".required_exams").change(function() {
+        var rep = $(this);
+        if(rep.val() === "OTHERS" && rep.is(':checked')){
+            $("#other_required_exams_div").show();
+        }else{
+            $("#other_required_exams_div").hide();
+            $('#other_required_exams').val("");
+        }
+
+    });
+
+    //checkbox validations
+    $("input[name^='schedule'], input[name^='allow_wfh'], input[name^='manpower'], input[name^='manpower_type'], input[name^='shared_files'], input[name^='email_domain']").on('click', function() {
+        var $box = $(this);
+        if ($box.is(':checked')) {
+            var group = "input:checkbox[name='" + $box.attr("name") + "']";
+            $(group).prop("checked", false);
+            $box.prop('checked', true);
+        } else {
+            $box.prop('checked', false);
+        }
+    });
+
  $('#btnApprove').click(function(event) {
         event.preventDefault();
         swal({
@@ -374,6 +589,8 @@
         });
     });
 
+   
+
     var tds = document
     .getElementById("table_dashboard")
     .getElementsByTagName("td");
@@ -385,7 +602,7 @@
     }
     }
     document.getElementById("table_dashboard").innerHTML +=
-    "<tr><td colspan='3' style='text-align:right'><strong>TOTAL</strong></td><td style='text-align:center'><strong>" +
+    "<tr><td colspan='4' style='text-align:center'><strong>TOTAL</strong></td><td style='text-align:center'><strong>" +
     sumcost +
     "</strong></td></td></tr>";
     

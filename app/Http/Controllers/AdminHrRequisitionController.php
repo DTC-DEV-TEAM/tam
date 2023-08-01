@@ -10,7 +10,10 @@
 	use App\ApprovalMatrix;
 	use App\StatusMatrix;
 	use App\Models\ErfHeaderDocuments;
+	use App\Models\Applicant;
 	use Illuminate\Support\Facades\Response;
+	use Illuminate\Contracts\Encryption\DecryptException;
+	use Illuminate\Support\Facades\Crypt;
 
 	class AdminHrRequisitionController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -236,7 +239,7 @@
 	        */
 	        $this->load_css = array();
 			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
-	        
+			$this->load_css[] = asset("css/font-family.css");
 	    }
 
 
@@ -327,19 +330,22 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 			$fields = Request::all();
-			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['user']       = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$company                   = $fields['company'];
-			$department                = $data['user']->department_id;
+			$department                = $fields['department'];
 			$date_needed               = $fields['date_needed'];
 			$position                  = $fields['position'];
 			$work_location             = $fields['work_location'];
 			$salary_range              = explode("-",$fields['salary_range']);
 			$schedule                  = $fields['schedule'];
+			$other_schedule            = $fields['other_schedule'];
 			$allow_wfh                 = $fields['allow_wfh'];
 			$manpower                  = $fields['manpower'];
 			$replacement_of            = $fields['replacement_of'];
+			$absorption                = $fields['absorption'];
 			$manpower_type             = $fields['manpower_type'];
 			$required_exams            = $fields['required_exams'];
+			$other_required_exams      = $fields['other_required_exams'];
 			$qualifications            = $fields['qualifications'];
 			$job_descriptions          = $fields['job_descriptions'];
 			$quantity_total 	       = $fields['quantity_total'];
@@ -350,6 +356,7 @@
 			$employee_interaction      = $fields['employee_interaction'];
 			$asset_usage               = $fields['asset_usage'];
 			$email_domain              = $fields['email_domain'];
+			$other_email_domain        = $fields['other_email'];
 			$required_system           = $fields['required_system'];
 			$count_header              = DB::table('erf_header_request')->count();
 			$header_ref                = str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);			
@@ -357,21 +364,35 @@
 			$category_id 		       = $fields['category_id'];
 			//dd($fields);
 			$postdata['reference_number']		 	= $reference_number;
-			$postdata['status_id']                  = 1;
+			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
+			    $postdata['status_id']                          = 29;
+				$postdata['approved_immediate_head_by']         = CRUDBooster::myId();
+				$postdata['approved_immediate_head_at']         = date('Y-m-d H:i:s');
+			}else{
+				$postdata['status_id']              = 1;
+			}
 			$postdata['company'] 				    = $company;
 			$postdata['date_requested'] 	        = date('Y-m-d');
 			$postdata['department'] 				= $department;
 			$postdata['position'] 					= $position;
 			$postdata['date_needed'] 			    = date('Y-m-d', strtotime($date_needed));
 			$postdata['work_location'] 				= $work_location;
-			$postdata['salary_range_from'] 			= intval(str_replace(',', '', $salary_range[0]));
-			$postdata['salary_range_to'] 			= intval(str_replace(',', '', $salary_range[1]));
-			$postdata['schedule'] 					= $schedule;
+			$postdata['salary_range_from'] 			= Crypt::encryptString(str_replace(',', '', $salary_range[0]));
+			$postdata['salary_range_to'] 			= Crypt::encryptString(str_replace(',', '', $salary_range[1]));
+
+			if(!empty($schedule)){
+				$postdata['schedule'] 				= $schedule;
+				$postdata['other_schedule'] 	    = $other_schedule;
+			}
+
 			$postdata['allow_wfh'] 		            = $allow_wfh;
 			$postdata['manpower'] 		            = $manpower;
 			$postdata['replacement_of'] 		    = $replacement_of;
+			$postdata['absorption'] 		        = $absorption;
 			$postdata['manpower_type'] 		        = $manpower_type;
+
 			if(!empty($required_exams)){
+				$postdata['other_required_exams'] 	= $other_required_exams;
 				$postdata['required_exams'] 	    = implode(", ",$required_exams);
 			}
 
@@ -389,6 +410,7 @@
 				$postdata['required_system'] 	    = implode(", ",$required_system);
 			}
 			$postdata['email_domain'] 		        = $email_domain;
+			$postdata['other_email_domain'] 		= $other_email_domain;
 			$postdata['created_by'] 				= CRUDBooster::myId();
 			$postdata['created_at'] 				= date('Y-m-d H:i:s');
 			$postdata['request_type_id'] 		    = NULL;
@@ -410,7 +432,7 @@
 	        $fields = Request::all();
 			$dataLines = array();
 			$erf_header = DB::table('erf_header_request')->where(['created_by' => CRUDBooster::myId()])->orderBy('id','desc')->first();
-		
+			$digits_code 	    = $fields['digits_code'];
 			$item_description 	= $fields['item_description'];
 			$category_id 		= $fields['category_id'];
 			$sub_category_id 	= $fields['sub_category_id'];
@@ -441,6 +463,7 @@
 
 			for($x=0; $x < count((array)$item_description); $x++) {		
 				$dataLines[$x]['header_request_id'] = $erf_header->id;
+				$dataLines[$x]['digits_code'] 	    = $digits_code[$x];
 				$dataLines[$x]['item_description'] 	= $item_description[$x];
 				$dataLines[$x]['category_id'] 		= $category_id[$x];
 				$dataLines[$x]['sub_category_id'] 	= $sub_category_id[$x];
@@ -530,20 +553,22 @@
 			$this->cbLoader();
 			$data['page_title'] = 'Create Employee Requisition Form';
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+			
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = DB::table('cms_users')
 										 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
 										 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
 										 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
 										 ->where('cms_users.id', $data['user']->id)->first();
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1])->orderby('category_description', 'asc')->get();
+			$departmentList = array_map('intval',explode(",",$data['employeeinfos']->department_id));
+			$data['departments'] = DB::table('departments')->whereIn('id',$departmentList)->where('status', 'ACTIVE')->get();
+	
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1,2])->orderby('category_description', 'asc')->get();
 			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->where('category_id', 5)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
-			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
+
 			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'HR')->get();
@@ -559,6 +584,7 @@
 			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
 			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
 			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
+			$data['positions'] = DB::table('positions')->where('department_id','LIKE', '%'.$data['employeeinfos']->department_id.'%')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.add-hr-requisition", $data);
 				
 		}
@@ -598,11 +624,11 @@
 			$asset_usage = explode(",",$data['Header']->asset_usage);
 			$application = explode(",",$data['Header']->application);
 			$required_system = explode(",",$data['Header']->required_system);
-			$data['required_exams'] = $res_req;
-			$data['interaction'] = $interact_with;
-			$data['asset_usage'] = $asset_usage;
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
 			$data['application'] = $application;
-			$data['required_system'] = $required_system;
+			$data['required_system_array'] = array_map('trim', $required_system);
 			$data['Body'] = ErfBodyRequest::
 				select(
 				  'erf_body_request.*'
@@ -614,7 +640,25 @@
 				  )
 				  ->where('erf_header_documents.header_id', $id)
 				  ->get();
-	
+			$data['applicants'] = Applicant::leftjoin('statuses', 'applicant_table.status', '=', 'statuses.id')
+			        ->select(
+					'applicant_table.*',
+					'statuses.status_description',
+					'statuses.id as status_id',
+					)
+					->where('applicant_table.erf_number', $data['Header']->reference_number)
+					->get();
+					
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.erf_details", $data);
 		}
 
@@ -663,6 +707,72 @@
 					'cancelled_at'=> date('Y-m-d H:i:s')	
 			]);	
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been cancelled successfully!"), 'info');
+		}
+
+		public function itemErfITSearch(Request $request) {
+			$request = Request::all();
+			$cont = (new static)->apiContext;
+			$search 		= $request['search'];
+			$data = array();
+
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$data['items'] = array();
+
+			//$search_item =  DB::table('digits_code')>where('digits_code','LIKE','%'.$request->search.'%')->first();
+
+			$items = DB::table('assets')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.category_id','=',6)->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotIn('assets.category_id',[3,5])
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.category_id','=',6)->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotIn('assets.category_id',[3,5])
+			->join('category', 'assets.category_id','=', 'category.id')
+			->leftjoin('new_sub_category', 'assets.sub_category_id','=', 'new_sub_category.id')
+			->leftjoin('class','assets.class_id','class.id')
+			->select(
+				'assets.*',
+				'assets.id as assetID',
+				'category.category_description as category_description',
+				'new_sub_category.sub_category_description as sub_category_description',
+				'class.class_description as class_type'
+			)->take(10)->get();
+			
+			if($items){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				$i = 0;
+				foreach ($items as $key => $value) {
+
+					$return_data[$i]['id']                   = $value->assetID;
+					$return_data[$i]['asset_code']           = $value->asset_code;
+					$return_data[$i]['digits_code']          = $value->digits_code;
+					$return_data[$i]['asset_tag']            = $value->asset_tag;
+					$return_data[$i]['serial_no']            = $value->serial_no;
+					$return_data[$i]['item_description']     = $value->item_description;
+					$return_data[$i]['category_description'] = $value->category_description;
+					$return_data[$i]['class_description']    = $value->sub_category_description;
+					$return_data[$i]['class_type']           = $value->class_type;
+					$return_data[$i]['item_cost']            = $value->item_cost;
+					$return_data[$i]['item_type']            = $value->item_type;
+					$return_data[$i]['image']                = $value->image;
+					$return_data[$i]['quantity']             = $value->quantity;
+					$return_data[$i]['total_quantity']       = $value->total_quantity;
+
+					$i++;
+
+				}
+				$data['items'] = $return_data;
+			}
+
+			echo json_encode($data);
+			exit;  
+		}
+
+		public function positions(Request $request){
+			$data = Request::all();	
+			$id = $data['id'];
+			$positions = DB::table('positions')->select('positions.*')->where('department_id', $id)->where('status', "ACTIVE")->orderby('position_description', 'ASC')->get();
+			return($positions);
 		}
 
 	}

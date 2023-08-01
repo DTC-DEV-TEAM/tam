@@ -10,10 +10,13 @@
 	use App\ApprovalMatrix;
 	use App\StatusMatrix;
 	use App\Models\ErfHeaderDocuments;
+	use App\Models\AssetsSuppliesInventory;
+	use App\Models\AssetsInventoryReserved;
 	use Illuminate\Support\Facades\Response;
 	use App\HeaderRequest;
 	use App\BodyRequest;
 	use App\Statuses;
+	use App\Models\Applicant;
 	use Illuminate\Support\Facades\Hash;
 
 	class AdminErfEditStatusController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -24,7 +27,8 @@
 		private $verified;  
 		private $jo_done;    
 		private $onboarding;   
-		private $closed;  
+		private $closed; 
+		private $onboarded;  
 
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
@@ -35,7 +39,8 @@
 			$this->verified         =  30;  
 			$this->jo_done          =  31;    
 			$this->onboarding       =  33;   
-			$this->closed           =  13;  
+			$this->closed           =  13;
+			$this->onboarded        =  43;  
 		}
 	    public function cbInit() {
 
@@ -69,48 +74,16 @@
 			$this->col[] = ["label"=>"Requested Date","name"=>"date_requested"];
 			$this->col[] = ["label"=>"Date Needed","name"=>"date_needed"];
 			$this->col[] = ["label"=>"Requested By","name"=>"created_by","join"=>"cms_users,name"];
+			$this->col[] = ["label"=>"Locking","name"=>"locking_edit","visible"=>false];
+			$this->col[] = ["label"=>"Locking Create Account","name"=>"locking_create_account","visible"=>false];
+			$this->col[] = ["label"=>"Locking Onboarding Date","name"=>"locking_onboarding_date","visible"=>false];
+			$this->col[] = ["label"=>"Locking Close","name"=>"locking_close","visible"=>false];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 
 			# END FORM DO NOT REMOVE THIS LINE
-
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Reference Number","name"=>"reference_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status Id","name"=>"status_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"status,id"];
-			//$this->form[] = ["label"=>"Company","name"=>"company","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Position","name"=>"position","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Salary Range","name"=>"salary_range","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Department","name"=>"department","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Work Location","name"=>"work_location","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Date Requested","name"=>"date_requested","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Date Needed","name"=>"date_needed","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Schedule","name"=>"schedule","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Allow Wfh","name"=>"allow_wfh","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Manpower","name"=>"manpower","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Manpower Type","name"=>"manpower_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Required Exams","name"=>"required_exams","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Qualifications","name"=>"qualifications","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Job Description","name"=>"job_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Shared Files","name"=>"shared_files","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Employee Interaction","name"=>"employee_interaction","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Asset Usage","name"=>"asset_usage","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Email Domain","name"=>"email_domain","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Quantity Total","name"=>"quantity_total","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved Immediate Head By","name"=>"approved_immediate_head_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved Immediate Head At","name"=>"approved_immediate_head_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Rejected At","name"=>"rejected_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Application","name"=>"application","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Application Others","name"=>"application_others","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"request_type,id"];
-			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Arf Id","name"=>"arf_id","type"=>"select2","required"=>TRUE,"validation"=>"required|string|min:5|max:5000","datatable"=>"arf,id"];
-			//$this->form[] = ["label"=>"To Tag Employee","name"=>"to_tag_employee","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -140,13 +113,30 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-				$for_verification =  29;
-				$jo_done =  31;
-				$for_onboarding = 33;
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getEditErf/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[status_id] == $for_verification"];
-				$this->addaction[] = ['title'=>'Create Account','url'=>CRUDBooster::mainpath('getErfCreateAccount/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $jo_done"];
-				$this->addaction[] = ['title'=>'Set Onboarding Date','url'=>CRUDBooster::mainpath('getErfSetOnboardingDate/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding"];
-				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailErf/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[status_id] != $for_verification && [status_id] != $for_onboarding"];
+				$for_verification = 29;
+				$jo_done          = 31;
+				$for_onboarding   = 33; 
+				$onboarded        = 43; 
+                $id = CRUDBooster::myId();
+
+				//locking in edit for verification
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getEditErf/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[status_id] == $for_verification && [locking_edit] == null || [locking_edit] == $id"];
+				$this->addaction[] = ['title'=>'LockEdit','url'=>CRUDBooster::mainpath('getLockingForm/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[status_id] == $for_verification && [locking_edit] != null && [locking_edit] != $id"];
+				
+				//locking in creating  account
+				$this->addaction[] = ['title'=>'Create Account','url'=>CRUDBooster::mainpath('getErfCreateAccount/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $jo_done && [locking_create_account] == null || [locking_create_account] == $id"];
+				$this->addaction[] = ['title'=>'Lock Create Account','url'=>CRUDBooster::mainpath('getLockingErfCreateAccountForm/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $jo_done && [locking_create_account] != null && [locking_create_account] != $id"];
+
+				//Locking onboarding date
+				$this->addaction[] = ['title'=>'Set Onboarding Date','url'=>CRUDBooster::mainpath('getErfSetOnboardingDate/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding && [locking_onboarding_date] == null || [locking_onboarding_date] == $id"];
+				$this->addaction[] = ['title'=>'Locking Onboarding Date','url'=>CRUDBooster::mainpath('getLockingErfSetOnboardingDate/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding && [locking_onboarding_date] != null && [locking_onboarding_date] != $id"];
+				
+				//Closed Request
+				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getErfCloseRequest/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $onboarded && [locking_close] == null || [locking_close] == $id"];
+				$this->addaction[] = ['title'=>'Locking Close Request','url'=>CRUDBooster::mainpath('getLockingErfCloseRequest/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $onboarded && [locking_close] != null && [locking_close] != $id"];
+				
+				
+				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailErf/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[status_id] != $for_verification && [status_id] != $for_onboarding && [status_id] != $onboarded"];
 				
 			}
 
@@ -219,7 +209,156 @@
 	        |
 	        */
 	        $this->script_js = NULL;
+			$this->script_js = "
+			$(document).ready(function() {
+				$('a[title=\"Update\"]').click(function(e){
+					var id = $(this).attr('href').split('/').pop();
+					$.ajaxSetup({
+						headers: {
+									'X-CSRF-TOKEN': $('meta[name=\"csrf-token\"]').attr('content')
+								}
+					});
+					$.ajax({
+						type: 'POST',
+						url: '".route('locking-form')."',
+						dataType: 'json',
+						data: {
+							'header_request_id': id
+						},
+						success: function(response) {
+							if (response.status == \"success\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
 
+								window.location.replace(response.redirect_url);
+								} else if (response.status == \"error\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+								}
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+                   
+				});
+
+				//CREATE ACCOUNT LOCKING
+				$('a[title=\"Create Account\"]').click(function(e){
+					var id = $(this).attr('href').split('/').pop();
+					$.ajaxSetup({
+						headers: {
+									'X-CSRF-TOKEN': $('meta[name=\"csrf-token\"]').attr('content')
+								}
+					});
+					$.ajax({
+						type: 'POST',
+						url: '".route('locking-form-create-account')."',
+						dataType: 'json',
+						data: {
+							'header_request_id': id
+						},
+						success: function(response) {
+							if (response.status == \"success\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+
+								window.location.replace(response.redirect_url);
+								} else if (response.status == \"error\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+								}
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+                   
+				});
+
+				//ONBARDING DATE LOCKING
+				$('a[title=\"Set Onboarding Date\"]').click(function(e){
+					var id = $(this).attr('href').split('/').pop();
+					$.ajaxSetup({
+						headers: {
+									'X-CSRF-TOKEN': $('meta[name=\"csrf-token\"]').attr('content')
+								}
+					});
+					$.ajax({
+						type: 'POST',
+						url: '".route('locking-form-onboarding-date')."',
+						dataType: 'json',
+						data: {
+							'header_request_id': id
+						},
+						success: function(response) {
+							if (response.status == \"success\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+
+								window.location.replace(response.redirect_url);
+								} else if (response.status == \"error\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+								}
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+                   
+				});
+
+				//CLOSE REQUEST LOCKING
+				$('a[title=\"Close Request\"]').click(function(e){
+					var id = $(this).attr('href').split('/').pop();
+					$.ajaxSetup({
+						headers: {
+									'X-CSRF-TOKEN': $('meta[name=\"csrf-token\"]').attr('content')
+								}
+					});
+					$.ajax({
+						type: 'POST',
+						url: '".route('locking-form-close-request')."',
+						dataType: 'json',
+						data: {
+							'header_request_id': id
+						},
+						success: function(response) {
+							if (response.status == \"success\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+
+								window.location.replace(response.redirect_url);
+								} else if (response.status == \"error\") {
+								swal({
+									type: response.status,
+									title: response.message,
+								});
+								}
+						},
+						error: function(e) {
+							console.log(e);
+						}
+					});
+                   
+				});
+			});
+			";
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -279,7 +418,7 @@
 	        */
 	        $this->load_css = array();
 			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	    }
 
 
@@ -305,11 +444,11 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			//if(CRUDBooster::isSuperadmin()){
+			if(CRUDBooster::isSuperadmin()){
 				$query->whereNull('erf_header_request.deleted_at')->orderBy('erf_header_request.status_id', 'DESC')->orderBy('erf_header_request.id', 'DESC');
-			//}else{
-				//$query->whereNull('erf_header_request.deleted_at')->whereIn('status_id',[29,30,31,32,33])->orderBy('erf_header_request.id', 'DESC');
-			//}
+			}else{
+				$query->whereNull('erf_header_request.deleted_at')->whereIn('status_id',[13,29,30,31,33,43])->orderBy('erf_header_request.id', 'DESC');
+			}
 	            
 	            
 	    }
@@ -327,7 +466,8 @@
 			$for_verification =  DB::table('statuses')->where('id', $this->for_verification)->value('status_description');  
 			$verified         =  DB::table('statuses')->where('id', $this->verified)->value('status_description');  
 			$jo_done          =  DB::table('statuses')->where('id', $this->jo_done)->value('status_description');    
-			$onboarding       =  DB::table('statuses')->where('id', $this->onboarding)->value('status_description');   
+			$onboarding       =  DB::table('statuses')->where('id', $this->onboarding)->value('status_description'); 
+			$onboarded        =  DB::table('statuses')->where('id', $this->onboarded)->value('status_description');   
 			$closed           =  DB::table('statuses')->where('id', $this->closed)->value('status_description');   
 			if($column_index == 1){
 				if($column_value == $pending){
@@ -342,6 +482,8 @@
 					$column_value = '<span class="label label-info">'.$jo_done.'</span>';
 				}else if($column_value == $onboarding){
 					$column_value = '<span class="label label-info">'.$onboarding.'</span>';
+				}else if($column_value == $onboarded){
+					$column_value = '<span class="label label-info">'.$onboarded.'</span>';
 				}else if($column_value == $closed){
 					$column_value = '<span class="label label-success">'.$closed.'</span>';
 				}else if($column_value == $cancelled){
@@ -400,6 +542,7 @@
 				    'hr_comments'	                    => $hr_comments,
 				    'approved_hr_by' 		            => CRUDBooster::myId(),
 				    'approved_hr_at' 		            => date('Y-m-d H:i:s'),
+					'locking_edit'                      => NULL,
 				]);	
 				//add in arf heaader request table
 			$count_header       = DB::table('header_request')->count();
@@ -408,12 +551,12 @@
 				$arfHeaderContainer = [];
 				foreach($req_type as $arfHeadKey => $arfHeadVal){
 					if($arfHeadVal['request_type_id'] == 1){
-						$arfHeaderContainer['status_id']              = 4;
+						$arfHeaderContainer['status_id']              = 14;
 						$arfHeaderContainer['application'] 			  = $erf_header->application;
 						$arfHeaderContainer['application_others'] 	  = $erf_header->application_others;
 						$arfHeaderContainer['to_reco']                = 1;
 					}else{
-						$arfHeaderContainer['status_id']              = 7;
+						$arfHeaderContainer['status_id']              = 14;
 						$arfHeaderContainer['application'] 			  = NULL;
 						$arfHeaderContainer['application_others'] 	  = NULL;  
 						$arfHeaderContainer['to_reco']                = 0;
@@ -421,7 +564,7 @@
 					$arfHeaderContainer['reference_number']		      = "ARF-".str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);
 					$count_header ++;
 					$arfHeaderContainer['employee_name' ]		      = $erf_header->reference_number;
-					$arfHeaderContainer['company_name'] 			  = "TASTELESS";
+					$arfHeaderContainer['company_name'] 			  = "DIGITS";
 					$arfHeaderContainer['position'] 				  = $erf_header->position;
 					$arfHeaderContainer['department' ]				  = $erf_header->department;
 					$arfHeaderContainer['store_branch']		          = NULL;
@@ -433,13 +576,16 @@
 					$arfHeaderContainer['requestor_comments'] 		  = NULL;
 					$arfHeaderContainer['created_by'] 				  = NULL;
 					$arfHeaderContainer['created_at'] 				  = date('Y-m-d H:i:s');
+					$arfHeaderContainer['approved_by'] 		          = CRUDBooster::myId();
+				    $arfHeaderContainer['approved_at'] 		          = date('Y-m-d H:i:s');
 					$arfHeaderContainer['request_type_id']		 	  = $arfHeadVal['request_type_id'];
 					$arfHeaderContainer['privilege_id']		 	      = NULL;
 					$arfHeaderContainer['if_from_erf' ]		          = $erf_header->reference_number;
 				
 					$arfHeaderSave[] = $arfHeaderContainer;
 				}
-				HeaderRequest::insert($arfHeaderSave);
+				$result = HeaderRequest::insert($arfHeaderSave);
+                $arfHeaderId = $result->id;
 				$itId = DB::table('header_request')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',1)->first();
 				$faId = DB::table('header_request')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',5)->first();
 				$SuppliesId = DB::table('header_request')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',7)->first();
@@ -500,7 +646,7 @@
 				$insertContainer = [];
 				foreach($erf_body as $key => $val){
 					$insertContainer['header_request_id']   = $val['header_request_id'];
-					$insertContainer['digits_code'] 	    = NULL;
+					$insertContainer['digits_code'] 	    = $val['digits_code'];
 					$insertContainer['item_description'] 	= $val['item_description'];
 					$insertContainer['category_id'] 		= $val['category_id'];
 					$insertContainer['sub_category_id'] 	= $val['sub_category_id'];
@@ -511,7 +657,7 @@
 					if($request_type_id == 5){
 						$insertContainer['to_reco'] = 0;
 					}else{
-						if (str_contains($val['sub_category_id'], 'LAPTOP') || str_contains($val['sub_category_id'], 'DESKTOP')) {
+						if (str_contains($val['sub_category_id'], 'ITA-COMPUTER EQUIPMENT')) {
 							$insertContainer['to_reco'] = 1;
 						}else{
 							$insertContainer['to_reco'] = 0;
@@ -525,6 +671,113 @@
 				try {
 					BodyRequest::insert($insertData);
 					DB::commit();
+
+					// //manage replenishment
+					$arf_header = HeaderRequest::where(['id' => $itId->id])->whereNull('deleted_at')->first();
+					$arf_body = BodyRequest::where(['header_request_id' => $itId->id])->whereNull('deleted_at')->get();
+					//GET ASSETS INVENTORY AVAILABLE COUNT
+					$inventoryList = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
+					//GET RESERVED QTY 
+					$reservedList = DB::table('assets_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+					
+					$resultInventory = [];
+					foreach($inventoryList as $invKey => $invVal){
+						$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
+						if($i !== false){
+							$invVal->reserved_value = $reservedList[$i];
+							$resultInventory[] = $invVal;
+						}else{
+							$invVal->reserved_value = "";
+							$resultInventory[] = $invVal;
+						}
+					}
+					//get the final available qty
+					$finalInventory = [];
+					foreach($resultInventory as $fKey => $fVal){
+						$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
+						$finalInventory[] = $fVal;
+					}
+
+					$finalItFaBodyValue = [];
+					foreach($arf_body as $bodyItFafKey => $bodyItFaVal){
+						$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
+						if($i !== false){
+							$bodyItFaVal->inv_qty = $finalInventory[$i];
+							$finalItFaBodyValue[] = $bodyItFaVal;
+						}else{
+							$bodyItFaVal->inv_qty = "";
+							$finalItFaBodyValue[] = $bodyItFaVal;
+						}
+					}
+                   
+					foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
+						$countAvailQty = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->where('digits_code',$fBodyItFaVal->digits_code)->groupBy('digits_code')->count();
+                        $reservedListCount = DB::table('assets_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->groupBy('digits_code')->count();
+						$available_quantity = max($countAvailQty - $reservedListCount,0);
+			
+						if($available_quantity >= $fBodyItFaVal->quantity){
+							//add to reserved taable
+							AssetsInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => $fBodyItFaVal->quantity,
+									'for_po'              => NULL,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							); 
+							
+							//update details in body table
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $fBodyItFaVal->quantity,
+								'reorder_qty'        =>  NULL,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
+								'unserved_ro_qty'    =>  NULL
+							]);	
+
+							HeaderRequest::where('id',$itId->id)
+							->update([
+								'to_mo' => 1
+							]);
+							 
+						}else{
+							$reorder = $fBodyItFaVal->quantity - $available_quantity;
+							AssetsInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => NULL,
+									'for_po'              => 1,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							);  
+
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $available_quantity,
+								'reorder_qty'        =>  $reorder,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $available_quantity,
+								'unserved_ro_qty'    =>  $reorder
+							]);	
+
+							
+					    }
+					}
 				} catch (\Exception $e) {
 					DB::rollback();
 					CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_database_error",['database_error'=>$e]), 'danger');
@@ -539,6 +792,7 @@
 				    'hr_comments'	                    => $hr_comments,
 				    'approved_hr_by' 		            => CRUDBooster::myId(),
 				    'approved_hr_at' 		            => date('Y-m-d H:i:s'),
+					'locking_edit'                      => NULL,
 				]);	
 			}
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans('Successfully Rejected!'), 'success');
@@ -606,6 +860,7 @@
 				->leftjoin('departments', 'erf_header_request.department', '=', 'departments.id')
 				->leftjoin('cms_users as approver', 'erf_header_request.approved_immediate_head_by', '=', 'approver.id')
 				->leftjoin('cms_users as verifier', 'erf_header_request.approved_hr_by', '=', 'verifier.id')
+				->leftjoin('cms_users as currentUser', 'erf_header_request.locking_edit', '=', 'currentUser.id')
 				->leftJoin('applicant_table', function($join) 
 				{
 					$join->on('erf_header_request.reference_number', '=', 'applicant_table.erf_number')
@@ -616,6 +871,7 @@
 						'erf_header_request.id as requestid',
 						'approver.name as approved_head_by',
 						'verifier.name as verified_by',
+						'currentUser.name as current_user',
 						'departments.department_name as department',
 						'applicant_table.*'
 						)
@@ -626,11 +882,11 @@
 			$asset_usage = explode(",",$data['Header']->asset_usage);
 			$application = explode(",",$data['Header']->application);
 			$required_system = explode(",",$data['Header']->required_system);
-			$data['required_exams'] = $res_req;
-			$data['interaction'] = $interact_with;
-			$data['asset_usage'] = $asset_usage;
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
 			$data['application'] = $application;
-			$data['required_system'] = $required_system;
+			$data['required_system_array'] = array_map('trim', $required_system);
 			$data['Body'] = ErfBodyRequest::
 				select(
 				  'erf_body_request.*'
@@ -647,7 +903,16 @@
 				  )
 				  ->whereIn('id', [29,30,31,32])
 				  ->get();
-	
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.erf_hr_approval", $data);
 		}
 
@@ -687,11 +952,11 @@
 			$asset_usage = explode(",",$data['Header']->asset_usage);
 			$application = explode(",",$data['Header']->application);
 			$required_system = explode(",",$data['Header']->required_system);
-			$data['required_exams'] = $res_req;
-			$data['interaction'] = $interact_with;
-			$data['asset_usage'] = $asset_usage;
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
 			$data['application'] = $application;
-			$data['required_system'] = $required_system;
+			$data['required_system_array'] = array_map('trim', $required_system);
 			$data['Body'] = ErfBodyRequest::
 				select(
 				  'erf_body_request.*'
@@ -708,7 +973,25 @@
 				  )
 				  ->whereIn('id', [29,30,31,32])
 				  ->get();
-	
+
+			$data['applicants'] = Applicant::leftjoin('statuses', 'applicant_table.status', '=', 'statuses.id')
+				  ->select(
+				  'applicant_table.*',
+				  'statuses.status_description',
+				  'statuses.id as status_id',
+				  )
+				  ->where('applicant_table.erf_number', $data['Header']->reference_number)
+				  ->get();
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.erf_details", $data);
 		}
 
@@ -726,6 +1009,7 @@
 			$data['Header'] = ErfHeaderRequest::
 				leftjoin('companies', 'erf_header_request.company', '=', 'companies.id')
 				->leftjoin('departments', 'erf_header_request.department', '=', 'departments.id')
+				->leftjoin('cms_users as currentUser', 'erf_header_request.locking_create_account', '=', 'currentUser.id')
 				->leftJoin('applicant_table', function($join) 
 				{
 					$join->on('erf_header_request.reference_number', '=', 'applicant_table.erf_number')
@@ -735,6 +1019,7 @@
 						'erf_header_request.*',
 						'erf_header_request.id as requestid',
 						'departments.department_name as department',
+						'currentUser.name as current_user',
 						'applicant_table.*'
 						)
 				->where('erf_header_request.id', $id)->first();
@@ -824,6 +1109,7 @@
 			erfHeaderRequest::where(['id' => $fields['id']])
 					->update([
 							'status_id' => $this->onboarding, 
+							'locking_create_account' => NULL,
 							]);
 			$message = ['status'=>'success', 'message' => 'Created Successfully!'];
 			echo json_encode($message);
@@ -875,6 +1161,7 @@
 			$data['Header'] = ErfHeaderRequest::
 				leftjoin('companies', 'erf_header_request.company', '=', 'companies.id')
 				->leftjoin('departments', 'erf_header_request.department', '=', 'departments.id')
+				->leftjoin('cms_users as currentUser', 'erf_header_request.locking_onboarding_date', '=', 'currentUser.id')
 				->leftJoin('applicant_table', function($join) 
 				{
 					$join->on('erf_header_request.reference_number', '=', 'applicant_table.erf_number')
@@ -884,6 +1171,7 @@
 						'erf_header_request.*',
 						'erf_header_request.id as requestid',
 						'departments.department_name as department',
+						'currentUser.name as current_user',
 						'applicant_table.*'
 						)
 				->where('erf_header_request.id', $id)->first();
@@ -893,11 +1181,11 @@
 			$asset_usage = explode(",",$data['Header']->asset_usage);
 			$application = explode(",",$data['Header']->application);
 			$required_system = explode(",",$data['Header']->required_system);
-			$data['required_exams'] = $res_req;
-			$data['interaction'] = $interact_with;
-			$data['asset_usage'] = $asset_usage;
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
 			$data['application'] = $application;
-			$data['required_system'] = $required_system;
+			$data['required_system_array'] = array_map('trim', $required_system);
 			$data['Body'] = ErfBodyRequest::
 				select(
 				  'erf_body_request.*'
@@ -909,6 +1197,16 @@
 				  )
 				  ->where('erf_header_documents.header_id', $id)
 				  ->get();
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.erf-set-onboarding-date", $data);
 		}
 
@@ -916,10 +1214,212 @@
 			$fields = Request::all();
 			erfHeaderRequest::where(['id' => $fields['id']])
 					->update([
-							'status_id' => $this->closed, 
+							'status_id' => $this->onboarded, 
 							'onboarding_date' => $fields['date'],
+							'locking_onboarding_date' => NULL,
 							]);
 			$message = ['status'=>'success', 'message' => 'Set Successfully!'];
 			echo json_encode($message);
+		}
+
+		public function setUpdateOnboarding(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['id']])
+					->update([
+							'onboarding_date' => $fields['date'],
+							]);
+			$message = ['status'=>'success', 'message' => 'Update Successfully!'];
+			echo json_encode($message);
+		}
+
+		public function getDownload($id) {
+			$getFile = DB::table('erf_header_documents')->where('id',$id)->first();
+			$file= public_path(). "/vendor/crudbooster/erf_folder/".$getFile->file_name;
+
+			$headers = array(
+					'Content-Type: application/pdf',
+					);
+
+			return Response::download($file, $getFile->file_name, $headers);
+		}
+
+		//LOCKING FORM EDIT
+		public function lockForm(Request $request) {	
+			$fields = Request::all();
+			$check = DB::table('erf_header_request')->where('id',$fields['header_request_id'])->whereNull('locking_edit')->count();
+			if($check == 1){
+				erfHeaderRequest::where(['id' => $fields['header_request_id']])
+				->update([
+						'locking_edit' => CRUDBooster::myId(),
+						]);
+			}
+		}
+
+		public function lockDeleteForm(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['header_request_id']])
+					->update([
+							'locking_edit' => NULL,
+							]);
+		}
+
+		public function getLockingFormView($id) {	
+			$data = [];
+			$data['user'] = DB::table('erf_header_request')->leftjoin('cms_users as currentUser', 'erf_header_request.locking_edit', '=', 'currentUser.id')->select('currentUser.name as current_user')->where('erf_header_request.id',$id)->first();
+			return response()->view('errors.form-used-page',$data);
+		}
+
+		//LOCKING FORM CREATE ACCOUNT
+		public function lockFormCreateAccount(Request $request) {	
+			$fields = Request::all();
+			$check = DB::table('erf_header_request')->where('id',$fields['header_request_id'])->whereNull('locking_create_account')->count();
+			if($check == 1){
+				erfHeaderRequest::where(['id' => $fields['header_request_id']])
+				->update([
+						'locking_create_account' => CRUDBooster::myId(),
+						]);
+			}
+		}
+
+		public function createAccountlockDelete(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['header_request_id']])
+					->update([
+							'locking_create_account' => NULL,
+							]);
+		}
+
+		public function getLockingErfCreateAcountFormView($id) {	
+			$data = [];
+			$data['user'] = DB::table('erf_header_request')->leftjoin('cms_users as currentUser', 'erf_header_request.locking_create_account', '=', 'currentUser.id')->select('currentUser.name as current_user')->where('erf_header_request.id',$id)->first();
+			return response()->view('errors.form-used-erf-create-account-page',$data);
+		}
+
+		//LOCKING ONBOARDING DATE
+		public function lockFormOnboardingDate(Request $request) {	
+			$fields = Request::all();
+			$check = DB::table('erf_header_request')->where('id',$fields['header_request_id'])->whereNull('locking_onboarding_date')->count();
+			if($check == 1){
+				erfHeaderRequest::where(['id' => $fields['header_request_id']])
+				->update([
+						'locking_onboarding_date' => CRUDBooster::myId(),
+						]);
+			}
+		}
+
+		public function onboardingDatelockDelete(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['header_request_id']])
+					->update([
+							'locking_onboarding_date' => NULL,
+							]);
+		}
+
+		public function getLockingErfOnboardingDateFormView($id) {	
+			$data = [];
+			$data['user'] = DB::table('erf_header_request')->leftjoin('cms_users as currentUser', 'erf_header_request.locking_onboarding_date', '=', 'currentUser.id')->select('currentUser.name as current_user')->where('erf_header_request.id',$id)->first();
+			return response()->view('errors.form-used-erf-onboarding-date-page',$data);
+		}
+
+		//CLOSE REQUEST
+		public function getRequestClose($id){
+			
+			$this->cbLoader();
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+			$data = array();
+
+			$data['page_title'] = 'Close Request';
+
+			$data['Header'] = ErfHeaderRequest::
+				leftjoin('companies', 'erf_header_request.company', '=', 'companies.id')
+				->leftjoin('departments', 'erf_header_request.department', '=', 'departments.id')
+				->leftjoin('cms_users as currentUser', 'erf_header_request.locking_close', '=', 'currentUser.id')
+				->leftJoin('applicant_table', function($join) 
+				{
+					$join->on('erf_header_request.reference_number', '=', 'applicant_table.erf_number')
+					->where('applicant_table.status',$this->jo_done);
+				})
+				->select(
+						'erf_header_request.*',
+						'erf_header_request.id as requestid',
+						'departments.department_name as department',
+						'currentUser.name as current_user',
+						'applicant_table.*'
+						)
+				->where('erf_header_request.id', $id)->first();
+		
+			$res_req = explode(",",$data['Header']->required_exams);
+			$interact_with = explode(",",$data['Header']->employee_interaction);
+			$asset_usage = explode(",",$data['Header']->asset_usage);
+			$application = explode(",",$data['Header']->application);
+			$required_system = explode(",",$data['Header']->required_system);
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
+			$data['application'] = $application;
+			$data['required_system_array'] = array_map('trim', $required_system);
+			$data['Body'] = ErfBodyRequest::
+				select(
+				  'erf_body_request.*'
+				)
+				->where('erf_body_request.header_request_id', $id)
+				->get();
+			$data['erf_header_documents'] = ErfHeaderDocuments::select(
+					'erf_header_documents.*'
+				  )
+				  ->where('erf_header_documents.header_id', $id)
+				  ->get();
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
+			return $this->view("erf.erf-close-request", $data);
+		}
+
+		//LOCKING CLOSE REQUEST
+		public function lockFormCloseRequest(Request $request) {	
+			$fields = Request::all();
+			$check = DB::table('erf_header_request')->where('id',$fields['header_request_id'])->whereNull('locking_onboarding_date')->count();
+			if($check == 1){
+				erfHeaderRequest::where(['id' => $fields['header_request_id']])
+				->update([
+						'locking_close' => CRUDBooster::myId(),
+						]);
+			}
+		}
+
+		public function closeRequestlockDelete(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['header_request_id']])
+					->update([
+							'locking_close' => NULL,
+							]);
+		}
+
+		public function setRequestClose(Request $request) {	
+			$fields = Request::all();
+			erfHeaderRequest::where(['id' => $fields['id']])
+					->update([
+							'status_id'     => $this->closed, 
+							'regular_date'  => $fields['date'],
+							'locking_close' => NULL,
+							]);
+			$message = ['status'=>'success', 'message' => 'Closed Successfully!'];
+			echo json_encode($message);
+		}
+
+		public function getLockingCloseErfFormView($id) {	
+			$data = [];
+			$data['user'] = DB::table('erf_header_request')->leftjoin('cms_users as currentUser', 'erf_header_request.locking_close', '=', 'currentUser.id')->select('currentUser.name as current_user')->where('erf_header_request.id',$id)->first();
+			return response()->view('errors.form-used-page',$data);
 		}
 	}

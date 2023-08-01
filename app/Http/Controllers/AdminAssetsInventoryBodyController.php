@@ -9,6 +9,7 @@
 	use App\AssetsInventoryBody;
 	use App\CommentsGoodDefect;
 	use App\GoodDefectLists;
+	use App\WarehouseLocationModel;
 	use App\Exports\ExportMultipleSheet;
 	use Maatwebsite\Excel\Facades\Excel;
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -157,13 +158,14 @@
 	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
+				$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 			    $this->index_button[] = ["label"=>"Export Data","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('asset-lists-export'),"color"=>"primary"];
 				if(CRUDBooster::isSuperadmin()){
-				$this->index_button[] = [
-					"title"=>"Upload Inventory",
-					"label"=>"Upload Inventory",
-					"icon"=>"fa fa-download",
-					"url"=>CRUDBooster::mainpath('inventory-upload')];
+				// $this->index_button[] = [
+				// 	"title"=>"Upload Inventory",
+				// 	"label"=>"Upload Inventory",
+				// 	"icon"=>"fa fa-download",
+				// 	"url"=>CRUDBooster::mainpath('inventory-upload')];
 				}
 				// 	$this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::adminPath('assets_inventory_header/add-inventory'),"color"=>"success"];
 			// 	//$this->index_button[] = ["label"=>"Return Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-return'),"color"=>"success"];
@@ -307,17 +309,19 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
-			$for_approval  =    DB::table('statuses')->where('id', 20)->value('status_description');
-			$available  =  		DB::table('statuses')->where('id', 6)->value('status_description');
-			$reserved  =  		DB::table('statuses')->where('id', 2)->value('status_description');
-			$deployed  =  		DB::table('statuses')->where('id', 3)->value('status_description');
-			$defective  =  		DB::table('statuses')->where('id', 23)->value('status_description');
-			$forReturn =  		DB::table('statuses')->where('id', 26)->value('status_description');
-			$forTransfer =  		DB::table('statuses')->where('id', 27)->value('status_description');
-			$notAvailabe =  		DB::table('statuses')->where('id', 28)->value('status_description');
+			$for_approval   = DB::table('statuses')->where('id', 20)->value('status_description');
+			$available      = DB::table('statuses')->where('id', 6)->value('status_description');
+			$reserved       = DB::table('statuses')->where('id', 2)->value('status_description');
+			$deployed       = DB::table('statuses')->where('id', 3)->value('status_description');
+			$defective      = DB::table('statuses')->where('id', 23)->value('status_description');
+			$forReturn      = DB::table('statuses')->where('id', 26)->value('status_description');
+			$forTransfer    = DB::table('statuses')->where('id', 27)->value('status_description');
+			$notAvailabe    = DB::table('statuses')->where('id', 28)->value('status_description');
+			$for_receiving  = DB::table('statuses')->where('id', 16)->value('status_description');
+
 			if($column_index == 4){
-				if($column_value == $for_approval){
-					$column_value = '<span class="label label-success">'.$for_approval.'</span>';
+				if($column_value == $for_receiving){
+					$column_value = '<span class="label label-warning">'.$for_receiving.'</span>';
 				}else if($column_value == $available){
 					$column_value = '<span class="label label-success">'.$available.'</span>';
 				}else if($column_value == $reserved){
@@ -334,7 +338,7 @@
 					$column_value = '<span class="label label-danger">'.$notAvailabe.'</span>';
 				}
 			}
-
+	
 			if($column_index == 7){
 				if($column_value == "Good"){
 					$column_value = '<span class="label label-success">GOOD</span>';
@@ -352,8 +356,41 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-			app(\App\Http\Controllers\AdminAssetsInventoryHeaderController::class)->hook_before_add($postdata);
-
+			$fields           = Request::all();
+		
+			$sub_id           = $fields['sub_category_id'];
+			$item_description = $fields['item_description'];
+			$location         = $fields['location'];
+			$digits_code      = $fields['digits_code'];
+			$item_id          = $fields['item_id'];
+			$cost             = $fields['cost'];
+			$getSubData = DB::table('class')->where('id', $sub_id)->first();
+			$assetCount = DB::table('assets_inventory_body')->where('sub_category_id', $sub_id)->count();
+            if($assetCount == 0){
+				$assetCode = $getSubData->from_code;	
+			}else{
+				$assetCode = $getSubData->from_code + $assetCount;
+			}
+    
+			if($assetCode > $getSubData->to_code){
+				DB::table('class')->where('id',$sub_id)
+					->update([
+						'limit_code'   => "Code exceed in Item Master",
+					]);	
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-asset"),"Asset Code Exceed!","danger");
+			}else{
+				$postdata['statuses_id']      = 16;
+				$postdata['item_id']          = $item_id;
+				$postdata['location']         = $location;
+				$postdata['asset_code']       = $assetCode;
+				$postdata['digits_code']      = $digits_code;
+				$postdata['item_description'] = $item_description;
+				$postdata['item_category']    = $getSubData->category_id;
+				$postdata['item_condition']   = "Good";
+				$postdata['sub_category_id']  = $sub_id;
+				$postdata['value']            = $cost;
+				$postdata['quantity']         = 1;
+			}
 	    }
 
 	    /* 
@@ -586,59 +623,7 @@
 			}
 		}
 
-		public function getExportAssetsBody() {
-			$data = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
-			->leftjoin('cms_users', 'assets_inventory_body.created_by', '=', 'cms_users.id')
-			->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
-			->leftjoin('assets_inventory_header', 'assets_inventory_body.header_id', '=', 'assets_inventory_header.id')
-			->select(
-			  'assets_inventory_body.*',
-			  'assets_inventory_body.id as aib_id',
-			  'statuses.*',
-			  'cms_users.*',
-			  'assets.item_type as itemType',
-			  'assets_movement_body.location as body_location',
-			  'assets_inventory_header.location as location',
-			  'assets_inventory_body.created_at as date_created'
-			)->get();
-			$data_array [] = array("Asset Code",
-									"Digits Code",
-									"Serial No",
-									"Status",
-									"Location",
-									"Item Condition",
-									"Item Description",
-									"Value","Item Type",
-									"Quantity",
-									"Warranty Coverage Year",
-									"Created By",
-									"Date Created");
-			foreach($data as $data_item)
-			{
-				$data_array[] = array(
-					'Asset Code' => $data_item->asset_code,
-					'Digit Code' => $data_item->digits_code,
-					'Serial No' =>$data_item->serial_no,
-					'Status' =>$data_item->status_description,
-					'Location' =>$data_item->body_location,
-					'Item Condition' =>$data_item->item_condition,
-					'Item Description' => $data_item->item_description,
-					'Value' => $data_item->value,
-					'Item Type' =>$data_item->itemType,
-					'Quantity' =>$data_item->quantity,
-					'Warranty Coverage Year' =>$data_item->warranty_coverage,
-					'Created By' =>$data_item->name,
-					'Date Created' =>$data_item->date_created,
-				);
-			}
-			$this->ExportExcel($data_array);
-		}
-
-		public function getAssetListsExport() 
-		{
-			return Excel::download(new ExportMultipleSheet, 'asset_lists.xlsx');
-		}
-
+		
 
 		public function getInventory(Request $request){
         $AssetsInventoryBody = AssetsInventoryBody::select('assets_inventory_body.*');
@@ -676,6 +661,64 @@
 		
 			}
 			CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), $errors[0], 'danger');
+		}
+
+		public function getAddAsset() {
+
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
+
+			$this->cbLoader();
+			$data['page_title'] = 'Add Asset';
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [6,4])->orderby('category_description', 'asc')->get();
+			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
+			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			return $this->view("masterfile.add-asset", $data);
+
+		}
+
+		public function digitsCodeSearch(Request $request) {
+
+			$request = Request::all();
+			$search 		= $request['search'];
+			$data = array();
+
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$data['items'] = array();
+
+			$items = DB::table('assets')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
+			->join('tam_categories', 'assets.category_id','=', 'tam_categories.id')
+			->select(	'assets.*',
+						'assets.id as assetID',
+						'tam_categories.category_description as category_description'
+					)->take(10)->get();
+    
+			if($items){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				$i = 0;
+				foreach ($items as $key => $value) {
+
+					$return_data[$i]['id']                   = 	$value->assetID;
+					$return_data[$i]['digits_code']          = 	$value->digits_code;
+					$return_data[$i]['item_description']     = 	$value->item_description;
+					$return_data[$i]['category_description'] = 	$value->category_description;
+					$return_data[$i]['item_cost']            = 	$value->item_cost;
+				
+					$i++;
+
+				}
+				$data['items'] = $return_data;
+			}
+
+			echo json_encode($data);
+			exit;  
 		}
 
 		

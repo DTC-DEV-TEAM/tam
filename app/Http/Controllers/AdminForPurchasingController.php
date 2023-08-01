@@ -9,10 +9,18 @@
 	use App\ApprovalMatrix;
 	use App\StatusMatrix;
 	use App\MoveOrder;
+	use App\Imports\FulfillmentUpload;
+	use App\Exports\ExportConso;
+	use Maatwebsite\Excel\Facades\Excel;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
+	
 
 	class AdminForPurchasingController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -21,8 +29,6 @@
 			//$this->request = $request;
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
 		}
-
-		private static $apiContext; 
 
 	    public function cbInit() {
 
@@ -34,7 +40,7 @@
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = true;
+			$this->button_add = false;
 			$this->button_edit = false;
 			$this->button_delete = true;
 			$this->button_detail = false;
@@ -62,6 +68,7 @@
 			$this->col[] = ["label"=>"Processed By","name"=>"purchased2_by","join"=>"cms_users,name", "visible"=>false];
 
 			$this->col[] = ["label"=>"MO By","name"=>"mo_by","visible"=>false];
+			$this->col[] = ["label"=>"MO SO NO","name"=>"mo_so_num","visible"=>false];
 			
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -72,33 +79,6 @@
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Reference Number","name"=>"reference_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status Id","name"=>"status_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"status,id"];
-			//$this->form[] = ["label"=>"Employee Name","name"=>"employee_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Company Name","name"=>"company_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Position","name"=>"position","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Department","name"=>"department","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Store Branch","name"=>"store_branch","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Purpose","name"=>"purpose","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Conditions","name"=>"conditions","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Quantity Total","name"=>"quantity_total","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Cost Total","name"=>"cost_total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Total","name"=>"total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved At","name"=>"approved_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Rejected At","name"=>"rejected_at","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Requestor Comments","name"=>"requestor_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"request_type,id"];
-			//$this->form[] = ["label"=>"Privilege Id","name"=>"privilege_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"privilege,id"];
-			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"To Reco","name"=>"to_reco","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"It Comments","name"=>"it_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Recommended By","name"=>"recommended_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Recommended At","name"=>"recommended_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Cancelled By","name"=>"cancelled_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Cancelled At","name"=>"cancelled_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
 			# OLD END FORM
 
 			/* 
@@ -129,23 +109,29 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
+				$for_tagging    =  DB::table('statuses')->where('id', 7)->value('id');
+				$processing     =  DB::table('statuses')->where('id', 11)->value('id');
+				$for_move_order =  DB::table('statuses')->where('id', 14)->value('id');
+				$for_closing    =  DB::table('statuses')->where('id', 19)->value('id');
 
-				$processing  = 		DB::table('statuses')->where('id', 11)->value('id');
-				$picked =  			DB::table('statuses')->where('id', 15)->value('id');
-				$for_closing =  			DB::table('statuses')->where('id', 19)->value('id');
-
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestPurchasing/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[purchased2_by] == null"];
+				if(CRUDBooster::myPrivilegeId() == 14){
+					$this->addaction[] = ['title'=>'View','url'=>CRUDBooster::mainpath('getRequestPurchasingManagerView/[id]'),'icon'=>'fa fa-eye'];
+				}else if(CRUDBooster::myPrivilegeId() == 19 || CRUDBooster::myPrivilegeId() == 18){
+					//$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye'];
+					//option 2
+					//$this->addaction[] = ['title'=>'Add MO/SO','url'=>CRUDBooster::adminpath('[id]'),'icon'=>'fa fa-plus-circle', "showIf"=>"[status_id] == $for_closing && [mo_so_num] == null"];
+					//option 3
+					$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestPurchasingForMoSo/[id]'),'icon'=>'fa fa-eye' , "showIf"=>"[status_id] == $for_move_order || [status_id] == $for_closing || [status_id] == $for_tagging"];
+				}else{			
+					$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye'];
+					$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestPurchasing/[id]'),'icon'=>'fa fa-pencil' , "showIf"=>"[purchased2_by] == null"];
+					//option 2
+					//$this->addaction[] = ['title'=>'Add MO/SO','url'=>CRUDBooster::adminpath('[id]'),'icon'=>'fa fa-plus-circle', "showIf"=>"[status_id] == $for_closing && [mo_so_num] == null"];
+					//option 3
+					//$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestPurchasingForMoSo/[id]'),'icon'=>'fa fa-eye' , "showIf"=>"[status_id] == $for_move_order || [status_id] == $for_closing || [status_id] == $for_tagging"];
+				}
 				
-
-				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailPurchasing/[id]'),'icon'=>'fa fa-eye'];
-
-				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getRequestClose/[id]'),'icon'=>'fa fa-check-circle', "showIf"=>"[status_id] == $for_closing"];
-				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintPickList/[id]'),'icon'=>'fa fa-print', "showIf"=>"[purchased2_by] != null && [status_id] == $processing"];
-				
-				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrint/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status_id] == $picked"];
-
-				//$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrint/[id]'),'icon'=>'fa fa-print', "showIf"=>"[purchased2_by] != null"];
-				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
+			
 			}
 
 
@@ -184,8 +170,16 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+			   if(CRUDBooster::myPrivilegeId() == 18 || CRUDBooster::myPrivilegeId() == 19){
+			     $this->index_button[] = ["label"=>"Upload Fulfillment","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('fulfillment-upload'),'color'=>'success'];
+			   }
+			   $this->index_button[] = ["label"=>"Consolidation","icon"=>"fa fa-download",'url'=>"javascript:showConsoExport()"];
+			   $this->index_button[] = ["label"=>"Upload PO","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('po-upload'),'color'=>'success'];
+			   if(CRUDBooster::myPrivilegeId() == 18 || CRUDBooster::myPrivilegeId() == 19){
+			     $this->index_button[] = ["label"=>"Cancellation","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('cancellation-upload'),'color'=>'warning'];
+			   }
+			}
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -218,25 +212,107 @@
 	        |
 	        */
 	        $this->script_js = NULL;
-			$this->script_js = "
+            $this->script_js = "
+			$(document).ready(function() {
+				$('a[title=\"Add MO/SO\"]').removeAttr('onclick');
+				// $('.fa.fa-check-circle').click(function(event){
+				// 	event.preventDefault();	
+				// 	$(\"#myModal\").modal('show');	
+				// });
+				$('a[title=\"Add MO/SO\"]').attr('id', 'request_tag');
 
-			$('.fa.fa-check-circle').click(function(){
-					var strconfirm = confirm('Are you sure you want to close this request?');
+				$('a[title=\"Add MO/SO\"]').click(function(e){
+					e.preventDefault();
+					var id = $(this).attr('href').split('/').pop();
+					$(\"#request_id\").val(id);	
+					$(\"#myModal\").modal('show');	
+				});
 
-					if (strconfirm == true) {
+				$('#submit').click(function(event) {
+					event.preventDefault();
+					if($('#mo_so_num').val() === ''){
+						swal({
+							type: 'error',
+							title: 'MO/SO No required!',
+							icon: 'error',
+							customClass: 'swal-wide'
+						});
+						event.preventDefault();
+				    }else {
+						swal({
+							title: 'Are you sure?',
+							type: 'warning',
+							showCancelButton: true,
+							confirmButtonColor: '#41B314',
+							cancelButtonColor: '#F9354C',
+							confirmButtonText: 'Yes, proceed!',
+							}, function () {
+									var mo_so_num = $('#mo_so_num').val();
+									var id = $('#request_id').val();
+									$.ajax({
+										type: 'POST',
+										url: '".route('purchasing-request-close')."',
+										dataType: 'json',
+										data: {
+											'_token': $(\"#token\").val(),
+											'header_request_id': id,
+											'mo_so_num' : mo_so_num
+										},
+										success: function(response) {
+											if (response.status == \"success\") {
+												swal({
+													type: response.status,
+													title: response.message,
+												});
 
-						return true;
-						
-					}else{
-						
-						return false;
-						window.stop();
-
+												window.location.replace(response.redirect_url);
+												} else if (response.status == \"error\") {
+												swal({
+													type: response.status,
+													title: response.message,
+												});
+												}
+										},
+										error: function(e) {
+											console.log(e);
+										}
+									});
+							});
 					}
-				
-			});
+					
+				});
+				$('.date').datetimepicker({
+						viewMode: \"days\",
+						format: \"YYYY-MM-DD\",
+						dayViewHeaderFormat: \"MMMM YYYY\",
+				});
+
+				$('#category').select2({});
+
+				$('#exportBtn').click(function(event) {
+					event.preventDefault();
+					var from = $('#from').val();
+					var to = $('#to').val();
+					if(from > to){
+						swal({
+							type: 'error',
+							title: 'Invalid Date of Range',
+							icon: 'error',
+							confirmButtonColor: \"#367fa9\",
+						}); 
+						event.preventDefault(); // cancel default behavior
+						return false;
+					}else{
+						$('#filterForm').submit(); 
+					}
+				   
+				});
+		    });
+			function showConsoExport() {
+				$('#modal-conso-export').modal('show');
+			}
 			
-		";
+			";
 
             /*
 	        | ---------------------------------------------------------------------- 
@@ -246,8 +322,66 @@
 	        | $this->pre_index_html = "<p>test</p>";
 	        |
 	        */
+	
 	        $this->pre_index_html = null;
-	        
+	        $this->pre_index_html = "
+            
+			   <!-- Modal HTML -->
+			   <div id=\"modal-conso-export\" class=\"modal fade\" tabindex=\"-1\">
+				   <div class=\"modal-dialog\">
+					   <div class=\"modal-content\">
+						   <div class=\"modal-header\">
+						   <button type=\"button\" class=\"close\" data-dismiss=\"modal\">&times;</button>
+							   <h4 class=\"modal-title\"><strong>Filter Export</strong></h4>
+							  
+						   </div>
+						   <div class=\"modal-body\">
+						    <form  id=\"filterForm\" method='post' target='_blank' name=\"filterForm\" action='".route('export-conso')."'>
+						      <div class='row'>
+							  <input type=\"hidden\" name=\"request_id\" id=\"request_id\">
+								<input type=\"hidden\" value='".csrf_token()."' name=\"_token\" id=\"token\">
+
+								<div class='col-md-6'>
+								  <div class=\"form-group\">
+									<label class=\"control-label require\"> Approved Date From</label>
+								     <input type\"text\" class=\"form-control date\" name=\"from\"  id=\"from\" placeholder=\"Please Select Date From\">
+								  </div>
+								</div>
+
+								<div class='col-md-6'>
+								   <div class=\"form-group\">
+                                    <label class=\"control-label require\"> Approved Date To</label>
+								    <input type\"text\" class=\"form-control date\" name=\"to\"  id=\"to\" placeholder=\"Please Select Date To\">
+								   </div>
+								</div>
+
+								<div class=\"col-md-6\">
+									<div class=\"form-group\">
+										<label class=\"control-label require\">Category</label>
+										<select selected data-placeholder=\"-- Select Category --\" id=\"category\" name=\"category\" class=\"form-select erf\" style=\"width:100%;\">
+											<option value=\"\"></option>
+											<option value=\"1\">IT ASSETS</option>
+												<option value=\"5\">FA</option>
+												<option value=\"7\">SUPPLIES</option>
+										</select>
+									</div>
+								</div>  
+								
+								<br>	
+							  </div>
+						    </form>
+						   </div>
+						   <div class=\"modal-footer\">
+							   <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Cancel</button>
+							   <button type='button' id=\"exportBtn\" class=\"btn btn-primary btn-sm\">
+                                <i class=\"fa fa-save\"></i> Export
+                                </button>
+						   </div>
+					   </div>
+				   </div>
+			   </div>
+			
+			";
 	        
 	        
 	        /*
@@ -283,13 +417,31 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = ".fa.fa-check-circle{
+	        $this->style_css = "
+			.fa.fa-plus-circle{
 				color:green;
-				font-size:20px;
-			}";
-	        
-	        
-	        
+				font-size:18px;
+				margin-top: 3px;
+			}
+			.modal-content  {
+				-webkit-border-radius: 5px !important;
+				-moz-border-radius: 5px !important;
+				border-radius: 5px !important; 
+			}
+			.select2-selection__choice{
+				font-size:14px !important;
+				color:black !important;
+			}
+			.select2-selection__rendered {
+				line-height: 31px !important;
+			}
+			.select2-container .select2-selection--single {
+				height: 35px !important;
+			}
+			.select2-selection__arrow {
+				height: 34px !important;
+			}
+			";
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Include css File 
@@ -299,8 +451,8 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
-	        
+	        $this->load_css[] = asset("css/font-family.css");
+	        $this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
 	    }
 
 
@@ -349,7 +501,48 @@
 
 				$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
 			
-			}else{
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[18,19])){ 
+				$query->where(function($sub_query){
+
+					$for_tagging    =  DB::table('statuses')->where('id', 7)->value('id');
+					$processing     =  DB::table('statuses')->where('id', 11)->value('id');
+					$for_move_order =  DB::table('statuses')->where('id', 14)->value('id');
+					$for_closing    =  DB::table('statuses')->where('id', 19)->value('id');
+
+					//$sub_query->where('header_request.request_type_id', 7)->where('header_request.to_reco', 0)->where('header_request.status_id', $approved)->whereNull('header_request.deleted_at')->whereNull('mo_by'); 
+					$sub_query->whereIn('header_request.status_id', [$for_tagging, $for_move_order, $for_closing])->where('header_request.request_type_id', 7)->whereNull('header_request.deleted_at')->whereNull('mo_by');
+					//$sub_query->orwhere('header_request.status_id', $processing)->where('header_request.request_type_id', 7)->whereNull('header_request.deleted_at')->whereNull('mo_by');
+					//$sub_query->orwhereNotNull('header_request.purchased2_by')->where('header_request.request_type_id', 7)->where('header_request.closing_plug', 0)->whereNull('mo_by');
+
+					//$sub_query->orwhere('header_request.status_id', $picked)->whereNull('header_request.deleted_at');
+				});
+
+				$query->orderBy('header_request.status_id', 'desc')->orderBy('header_request.id', 'asc');
+
+			}
+			// else if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){ 
+			// 	$query->where(function($sub_query){
+
+			// 		$approved =  		DB::table('statuses')->where('id', 7)->value('id');
+
+			// 		$it_reco  = 		DB::table('statuses')->where('id', 4)->value('id');
+
+			// 		$processing = 		DB::table('statuses')->where('id', 11)->value('id');
+
+			// 		$picked =  			DB::table('statuses')->where('id', 15)->value('id');
+
+			// 		$sub_query->where('header_request.request_type_id', 1)->where('header_request.to_reco', 0)->where('header_request.status_id', $approved)->whereNull('header_request.deleted_at')->whereNull('mo_by'); 
+			// 		$sub_query->orwhere('header_request.to_reco', 1)->where('header_request.request_type_id', 1)->where('header_request.status_id', $approved)->whereNull('header_request.deleted_at')->whereNull('mo_by');
+			// 		$sub_query->orwhere('header_request.status_id', $processing)->where('header_request.request_type_id', 1)->whereNull('header_request.deleted_at')->whereNull('mo_by');
+			// 		$sub_query->orwhereNotNull('header_request.purchased2_by')->where('header_request.request_type_id', 1)->where('header_request.closing_plug', 0)->whereNull('mo_by');
+
+			// 		//$sub_query->orwhere('header_request.status_id', $picked)->whereNull('header_request.deleted_at');
+			// 	});
+
+			// 	$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'desc');
+
+			// }
+			else{
 
 				$query->where(function($sub_query){
 
@@ -369,7 +562,7 @@
 					//$sub_query->orwhere('header_request.status_id', $picked)->whereNull('header_request.deleted_at');
 				});
 
-				$query->orderBy('header_request.status_id', 'desc')->orderBy('header_request.id', 'asc');
+				$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'desc');
 
 			}
 	    }
@@ -433,6 +626,12 @@
 				}
 			}
 
+			if($column_index == 6){
+				if($column_value == null){
+					$column_value = "ERF";
+				}
+			}
+
 	    }
 
 	    /*
@@ -443,8 +642,35 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+			$fields    = Request::all();
+			$ids       = $fields['ids'];
+			$header_id = $fields['header_id'];
+			$mo_so_num = $fields['mo_so_num'];
+			$serve_qty = $fields['reserve_qty'];
+			$action    = $fields['action'];
 
+			if($action == 1){
+				HeaderRequest::where('id',$header_id)
+				->update([
+						'closing_plug'=> 1,
+						'status_id'=> 13,
+						'closed_by'=> CRUDBooster::myId(),
+						'closed_at'=> date('Y-m-d H:i:s'),
+	
+				]);	
+				 CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been closed successfully!"), 'success');
+			}else{
+				for ($i = 0; $i < count($ids); $i++) {
+					BodyRequest::where(['id' => $ids[$i]])
+						->update([
+								'mo_so_num'    => $mo_so_num[$i],
+								'serve_qty'    => DB::raw("IF(serve_qty IS NULL, '".(int)$serve_qty[$i]."', serve_qty + '".(int)$serve_qty[$i]."')"), 
+								'unserved_qty' => DB::raw("unserved_qty - '".(int)$serve_qty[$i]."'")
+								]);
+				}  
+				 CRUDBooster::redirect(CRUDBooster::mainpath('getRequestPurchasingForMoSo/'.$header_id), trans("Request updated successfully!"), 'success');
+			}
+			
 	    }
 
 	    /* 
@@ -508,7 +734,8 @@
 			$processing 			 		= DB::table('statuses')->where('id', 11)->value('id');
 
 			//$postdata['status_id'] 			 = $processing;
-			if($arf_header->request_type_id == 5){
+			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			//if($arf_header->request_type_id == 5){
 
 				$postdata['status_id']		 			=	 StatusMatrix::where('current_step', 3)
 																		   ->where('request_type', $arf_header->request_type_id)
@@ -524,7 +751,7 @@
 
 			}
 
-			
+
 			for($x=0; $x < count((array)$ids); $x++) {
 
 				BodyRequest::where('id',	$ids[$x])
@@ -602,34 +829,61 @@
 			}
 			*/
 
-			if($action == 1){
+            //First Option same proccess
+			// if($action == 1){
+			// 	$postdata['purchased2_by'] 		= CRUDBooster::myId();
+			// 	$postdata['purchased2_at'] 		= date('Y-m-d H:i:s');
+			// 	if(in_array($arf_header->request_type_id, [5, 6, 7])){
+            //     //if($arf_header->request_type_id == 5){
+			// 		//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
+			// 		$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
+			// 		->where('request_type', $arf_header->request_type_id)
+			// 		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+			// 		->value('status_id');
+			// 	}else{
 
+			// 		//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
+			// 		$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
+			// 		->where('request_type', $arf_header->request_type_id)
+			// 		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+			// 		->value('status_id');
+			// 	}
+			// }
+
+			 //Second Option and 3rd Option
+			 if($action == 1){
 				$postdata['purchased2_by'] 		= CRUDBooster::myId();
 				$postdata['purchased2_at'] 		= date('Y-m-d H:i:s');
-
-
-
-
-				if($arf_header->request_type_id == 5){
-					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
+				
+                if($arf_header->request_type_id == 5){
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
+					->where('request_type', $arf_header->request_type_id)
+					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
+					->value('status_id');
+				}else if(in_array($arf_header->request_type_id, [6, 7])){
 					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 9)
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 4)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
-
 				}else{
-					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
-					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
+
+					//$postdata['status_id']		 	=	StatusMatrix::where('current_step', 10)
+					$postdata['status_id']		 	=	StatusMatrix::where('current_step', 5)
 					->where('request_type', $arf_header->request_type_id)
 					//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 					->value('status_id');
-
 				}
+			}
+			for($x=0; $x < count((array)$ids); $x++) {
+
+				BodyRequest::where('id',$ids[$x])
+				->update([
+					'line_status_id'       => 		$postdata['status_id'],
+				]);	
 
 			}
-
-			//dd($arf_header, $postdata);
-
 	    }
 
 	    /* 
@@ -726,8 +980,6 @@
 
 	    //By the way, you can still create your own method in here... :) 
 		public function getRequestPurchasing($id){
-			
-
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -757,7 +1009,150 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
+						'header_request.employee_name as header_emp_name',
+						'header_request.created_by as header_created_by',
+						//'employees.company_name_id as company_name',
+						'departments.department_name as department',
+						//'positions.position_description as position',
+						//'locations.store_name as store_branch',
+						'approved.name as approvedby',
+						'recommended.name as recommendedby',
+						'header_request.created_at as created_at'
+						)
+				->where('header_request.id', $id)->first();
+
+			$data['Body'] = BodyRequest::
+				select(
+				  'body_request.*'
+				)
+				->where('body_request.header_request_id', $id)
+				->whereNull('deleted_at')
+				->get();
+
+			$data['BodyReco'] = DB::table('recommendation_request')
+				->select(
+				  'recommendation_request.*'
+				)
+				->where('recommendation_request.header_request_id', $id)
+				->get();				
+
+			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();
+
+			return $this->view("assets.purchasing-request", $data);
+		}
+
+		public function getRequestPurchasingForMoSo($id){
+			$this->cbLoader();
+			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}  
+
+			$data = array();
+
+			$data['page_title'] = 'Fulfillment';
+
+			$data['Header'] = HeaderRequest::
+				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
+				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
+				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
+				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
+				->leftjoin('locations', 'employees.location_id', '=', 'locations.id')
+				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
+				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
+				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
+				->leftjoin('cms_users as processed', 'header_request.purchased2_by','=', 'processed.id')
+				->leftjoin('cms_users as picked', 'header_request.picked_by','=', 'picked.id')
+				->leftjoin('cms_users as received', 'header_request.received_by','=', 'received.id')
+				->leftjoin('cms_users as closed', 'header_request.closed_by','=', 'closed.id')
+				->select(
+						'header_request.*',
+						'header_request.id as requestid',
+						'header_request.created_at as created',
+						'request_type.*',
+						'condition_type.*',
+						'requested.name as requestedby',
+						'employees.bill_to as employee_name',
+						'header_request.employee_name as header_emp_name',
+						'header_request.created_by as header_created_by',
+						//'employees.company_name_id as company_name',
+						'departments.department_name as department',
+						//'positions.position_description as position',
+						//'locations.store_name as store_branch',
+						'approved.name as approvedby',
+						'recommended.name as recommendedby',
+						'picked.name as pickedby',
+						'received.name as receivedby',
+						'processed.name as processedby',
+						'closed.name as closedby',
+						'header_request.created_at as created_at'
+						)
+				->where('header_request.id', $id)->first();
+
+			$data['Body'] = BodyRequest::
+				select(
+				  'body_request.*'
+				)
+				->where('body_request.header_request_id', $id)
+				->whereNull('deleted_at')
+				->get();
+			$data['bodyTotal'] = BodyRequest::
+				select(
+				  'body_request.*',
+				  DB::raw('SUM(body_request.quantity) as quantity')
+				)
+				->where('body_request.header_request_id', $id)
+				->whereNull('deleted_at')
+				->get();
+
+			$data['BodyReco'] = DB::table('recommendation_request')
+				->select(
+				  'recommendation_request.*'
+				)
+				->where('recommendation_request.header_request_id', $id)
+				->get();				
+            
+			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();
+           
+			return $this->view("assets.purchasing-request-per-line-closing", $data);
+		}
+
+		public function getRequestPurchasingManagerView($id){
+			
+
+			$this->cbLoader();
+			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}  
+
+
+			$data = array();
+
+			$data['page_title'] = 'List of Request';
+
+			$data['Header'] = HeaderRequest::
+				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
+				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
+				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
+				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
+				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
+				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
+				->leftjoin('locations', 'employees.location_id', '=', 'locations.id')
+				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
+				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
+				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
+				->select(
+						'header_request.*',
+						'header_request.id as requestid',
+						'header_request.created_at as created',
+						'request_type.*',
+						'condition_type.*',
+						'requested.name as requestedby',
+						'employees.bill_to as employee_name',
+						'header_request.employee_name as header_emp_name',
+						'header_request.created_by as header_created_by',
+						//'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
 						'locations.store_name as store_branch',
@@ -784,7 +1179,7 @@
 
 			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();
 
-			return $this->view("assets.purchasing-request", $data);
+			return $this->view("assets.purchasing-manager-view", $data);
 		}
 
 		public function getRequestPrint($id){
@@ -820,7 +1215,9 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'header_request.employee_name as header_emp_name',
+						'header_request.created_by as header_created_by',
+						//'companies.company_name as company_name',
 						'departments.department_name as department',
 						'positions.position_description as position',
 						'locations.store_name as store_branch',
@@ -955,7 +1352,9 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'companies.company_name as company_name',
+						'header_request.employee_name as header_emp_name',
+						'header_request.created_by as header_created_by',
+						//'companies.company_name as company_name',
 						'departments.department_name as department',
 						'positions.position_description as position',
 						'locations.store_name as store_branch',
@@ -1034,11 +1433,14 @@
 				->where('assets_inventory_body.quantity','>', 0)
 				->where('assets_inventory_body.statuses_id', 6)
 				->where('assets_inventory_body.item_condition', "Good")
-				//->orWhere('assets.item_description','LIKE','%'.$request->search.'%')
 				->orWhere('assets_inventory_body.asset_code','LIKE','%'.$search.'%')
 				->where('assets_inventory_body.quantity','>', 0)
 				->where('assets_inventory_body.statuses_id', 6)
 				->where('assets_inventory_body.item_condition', "Good")
+				// ->orWhere('assets_inventory_body.item_description','LIKE','%'.$search.'%')
+				// ->where('assets_inventory_body.quantity','>', 0)
+				// ->where('assets_inventory_body.statuses_id', 6)
+				// ->where('assets_inventory_body.item_condition', "Good")
 				//->join('category', 'assets_inventory_body.category_id','=', 'category.id')
 				//->join('digits_imfs', 'assets.digits_code','=', 'digits_imfs.id')
 				->select(	'assets_inventory_body.*'
@@ -1088,6 +1490,66 @@
 
 		}
 
+		//for supplies and marketing
+		public function itemSearchSuppliesMarketing(Request $request) {
+			$data = array();
+
+			$fields = Request::all();
+			$search 				= $fields['search'];
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$data['items'] = array();
+			//$search_item =  DB::table('digits_code')>where('digits_code','LIKE','%'.$request->search.'%')->first();
+			$items = DB::table('assets')
+			    // ->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.category_id','=',1)
+				// ->orwhere('assets.digits_code','LIKE','%'.$search.'%')->where('assets.category_id','=',5)
+				// ->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.category_id','=',1)
+				// ->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.category_id','=',5)
+				->where('assets.digits_code','LIKE','%'.$search.'%')
+				->orWhere('assets.item_description','LIKE','%'.$search.'%')
+				->join('category', 'assets.category_id','=', 'category.id')
+				//->join('digits_imfs', 'assets.digits_code','=', 'digits_imfs.id')
+				->select(	'assets.*',
+				            'category.id as cat_id',
+							'assets.id as assetID',
+							//'digits_imfs.digits_code as dcode',
+							'category.category_description as category_description'
+						)
+				->take(10)->get();
+			
+			if($items){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				$i = 0;
+				foreach ($items as $key => $value) {
+
+					$return_data[$i]['id'] = 				$value->assetID;
+					$return_data[$i]['cat_id'] = 				$value->cat_id;
+					$return_data[$i]['asset_code'] = 		$value->asset_code;
+					$return_data[$i]['digits_code'] = 		$value->digits_code;
+					$return_data[$i]['asset_tag'] = 		$value->asset_tag;
+					$return_data[$i]['serial_no'] = 		$value->serial_no;
+					$return_data[$i]['item_description'] = 	$value->item_description;
+					$return_data[$i]['category_description'] = 		$value->category_description;
+					$return_data[$i]['item_cost'] = 				$value->item_cost;
+					$return_data[$i]['item_type'] = 				$value->item_type;
+					$return_data[$i]['image'] = 				$value->image;
+					$return_data[$i]['quantity'] = 				$value->quantity;
+					$return_data[$i]['total_quantity'] = 				$value->total_quantity;
+
+					$i++;
+
+				}
+				$data['items'] = $return_data;
+			}
+
+
+			echo json_encode($data);
+			exit;  
+		}
+
 		public function getDetailPurchasing($id){
 			
 
@@ -1120,7 +1582,8 @@
 						'condition_type.*',
 						'requested.name as requestedby',
 						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
+						'header_request.employee_name as header_emp_name',
+						//'employees.company_name_id as company_name',
 						'departments.department_name as department',
 						//'positions.position_description as position',
 						'locations.store_name as store_branch',
@@ -1167,24 +1630,52 @@
 				->get();				
 
 			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();
-
-
-			
-			
+	
 			return $this->view("assets.mo-detail", $data);
 		}
 
-		public function getRequestClose($id) {
+		public function getRequestClose(Request $request) {
 
+			$fields = Request::all();
+			$id = $fields['header_request_id'];
+			$mo_so = $fields['mo_so_num'];
+ 
 			HeaderRequest::where('id',$id)
 			->update([
-				    'closing_plug'=> 1,
-					'status_id'=> 13,
-					'closed_by'=> CRUDBooster::myId(),
-					'closed_at'=> date('Y-m-d H:i:s')	
+					'mo_so_num' => $mo_so,
 			]);	
-			
-			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been closed successfully!"), 'info');
+			BodyRequest::where(['header_request_id' => $id])
+					->update([
+							'mo_so_num' => $mo_so
+							]);
+			$message = ['status'=>'success', 'message'=>'Successfully Saved!','redirect_url'=>CRUDBooster::mainpath('request-purchasing-for-mo-so/'.$id)];
+			echo json_encode($message);
+			//CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been closed successfully!"), 'info');
 		}
+
+		//upload fulfillment
+		public function UploadFulfillment() {
+			$data['page_title']= 'Fulfillment Upload';
+			return view('import.fulfillment-upload', $data)->render();
+		}
+
+		//Export Conso
+		public function ExportConso(Request $request){
+			$data = Request::all();
+			return Excel::download(new ExportConso($data), 'Consolidation-'.date('Y-m-d H:i:s') .'.xlsx');
+		}
+
+		//UPLOAD PO
+		public function UploadPo() {
+			$data['page_title']= 'PO Upload';
+			return view('import.po-upload', $data)->render();
+		}
+
+		//CANCELLATION UPLOAD
+		public function UploadCancellation() {
+			$data['page_title']= 'Cancellation Upload';
+			return view('import.cancellation-upload', $data)->render();
+		}
+       
 
 	}

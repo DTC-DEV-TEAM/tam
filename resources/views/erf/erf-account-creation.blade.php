@@ -63,13 +63,15 @@
 @endif
 
     <div class='panel-heading'>
-        Creation of Account Form
+        Creation of Account Form @if($Header->locking_create_account !== CRUDBooster::myId()) <span style="color: red">(This form request currently used by {{$Header->current_user}}!)</span> @endif
     </div>
 
     <form method='post' id="createAccount">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="" name="approval_action" id="approval_action">
         <input type="hidden" name="id" id="id" value="{{$Header->requestid}}">
+        <input type="hidden" value="{{$Header->locking_create_account}}" name="locking" id="locking">
+        <input type="hidden" value="{{CRUDBooster::myId()}}" name="current_user" id="current_user">
      
             <div class="card">
                 <div class="row">
@@ -119,7 +121,9 @@
                 </div>
                 
                 <a href="{{ CRUDBooster::mainpath() }}" id="btn-cancel" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
+                @if($Header->locking_create_account === CRUDBooster::myId())
                 <button class="btn btn-success pull-right" type="button" id="btnCreateAccount"> Create Account</button>
+                @endif
             </div>
         
     </form>
@@ -127,6 +131,46 @@
 @endsection
 @push('bottom')
 <script type="text/javascript">
+    $(function(){
+        $('body').addClass("sidebar-collapse");
+    });
+    window.onbeforeunload = function() {
+        return "";
+    };
+    function preventBack() {
+        window.history.forward();
+    }
+    setTimeout("preventBack()", 0);
+
+    if($('#locking').val() === $('#current_user').val()){
+        const pageHideListener = (event) => {
+            var id = $('#id').val();
+            $.ajaxSetup({
+                headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        }
+            });
+            $.ajax({
+                type: 'POST',
+                url: "{{ route('delete-locking-create-account') }}",
+                dataType: 'json',
+                data: {
+                    'header_request_id': id
+                },
+                success: function ()
+                {
+                    
+                }
+            });  
+        };
+        window.addEventListener("pagehide", pageHideListener);
+
+        var online = navigator.onLine;
+        if(online == false){
+            window.addEventListener("pagehide", pageHideListener);
+        }
+    }
+
  $('#btnCreateAccount').click(function(event) {
         event.preventDefault();
         if($('#email').val() === ""){

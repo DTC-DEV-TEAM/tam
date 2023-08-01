@@ -37,7 +37,7 @@
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = false;
-			$this->button_delete = true;
+			$this->button_delete = false;
 			$this->button_detail = false;
 			$this->button_show = true;
 			$this->button_filter = true;
@@ -72,48 +72,6 @@
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ['label'=>'Reference Number','name'=>'reference_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Status Id','name'=>'status_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'status,id'];
-			//$this->form[] = ['label'=>'Employee Name','name'=>'employee_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Company Name','name'=>'company_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Position','name'=>'position','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Department','name'=>'department','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Store Branch','name'=>'store_branch','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purpose','name'=>'purpose','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Conditions','name'=>'conditions','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Quantity Total','name'=>'quantity_total','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Cost Total','name'=>'cost_total','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Total','name'=>'total','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Approved By','name'=>'approved_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Approved At','name'=>'approved_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Rejected At','name'=>'rejected_at','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Requestor Comments','name'=>'requestor_comments','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Request Type Id','name'=>'request_type_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'request_type,id'];
-			//$this->form[] = ['label'=>'Privilege Id','name'=>'privilege_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-10','datatable'=>'privilege,id'];
-			//$this->form[] = ['label'=>'Approver Comments','name'=>'approver_comments','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'To Reco','name'=>'to_reco','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'It Comments','name'=>'it_comments','type'=>'textarea','validation'=>'required|string|min:5|max:5000','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Recommended By','name'=>'recommended_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Recommended At','name'=>'recommended_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Cancelled By','name'=>'cancelled_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Cancelled At','name'=>'cancelled_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased1 By','name'=>'purchased1_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased1 At','name'=>'purchased1_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased2 By','name'=>'purchased2_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased2 At','name'=>'purchased2_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased3 By','name'=>'purchased3_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Purchased3 At','name'=>'purchased3_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Quote Date','name'=>'quote_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Po Date','name'=>'po_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Po Number','name'=>'po_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Employee Dr Date','name'=>'employee_dr_date','type'=>'date','validation'=>'required|date','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Dr Number','name'=>'dr_number','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Received By','name'=>'received_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Received At','name'=>'received_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Picked By','name'=>'picked_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-10'];
-			//$this->form[] = ['label'=>'Picked At','name'=>'picked_at','type'=>'datetime','validation'=>'required|date_format:Y-m-d H:i:s','width'=>'col-sm-10'];
 			# OLD END FORM
 
 			/* 
@@ -278,7 +236,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+			$this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -308,33 +266,47 @@
 	        //Your code here
 	        //$released  = 		DB::table('statuses')->where('id', 12)->value('id');
 			$for_receiving =  	DB::table('statuses')->where('id', 16)->value('id');
-
-			$query->where('header_request.created_by', CRUDBooster::myId())
-				  ->where('mo_body_request.status_id', $for_receiving); 
-
-
-			$List = MoveOrder::orderby('mo_body_request.id', 'asc')->where('mo_body_request.status_id', $for_receiving)->get();
-
-				  $list_array = array();
-	  
-				  $id_array = array();
-	  
-				  foreach($List as $matrix){
-	  
-					  if(! in_array($matrix->mo_reference_number,$list_array)) {
-	  
-						  array_push($list_array, $matrix->mo_reference_number);
-						  array_push($id_array, $matrix->id);
-					  }
-						  
-	  
-				  }
-	  
-				  $list_string = implode(",",$id_array);
-	  
-				  $MOList = array_map('intval',explode(",",$list_string));	
-				  
-			$query->whereIn('mo_body_request.id', $MOList)->orderBy('header_request.id', 'asc');
+			if(CRUDBooster::isSuperadmin()){
+				$query->where('mo_body_request.status_id', $for_receiving); 
+				$List = MoveOrder::orderby('mo_body_request.id', 'asc')->where('mo_body_request.status_id', $for_receiving)->get();
+						$list_array = array();
+						$id_array = array();
+						foreach($List as $matrix){
+			
+							if(! in_array($matrix->mo_reference_number,$list_array)) {
+			
+								array_push($list_array, $matrix->mo_reference_number);
+								array_push($id_array, $matrix->id);
+							}
+								
+			
+						}
+			
+				$list_string = implode(",",$id_array);
+				$MOList = array_map('intval',explode(",",$list_string));	  
+				$query->whereIn('mo_body_request.id', $MOList)->orderBy('header_request.id', 'asc');
+			}else{
+				$query->where('header_request.created_by', CRUDBooster::myId())
+				->where('mo_body_request.status_id', $for_receiving); 
+				$List = MoveOrder::orderby('mo_body_request.id', 'asc')->where('mo_body_request.status_id', $for_receiving)->get();
+						$list_array = array();
+						$id_array = array();
+						foreach($List as $matrix){
+			
+							if(! in_array($matrix->mo_reference_number,$list_array)) {
+			
+								array_push($list_array, $matrix->mo_reference_number);
+								array_push($id_array, $matrix->id);
+							}
+								
+			
+						}
+			
+				$list_string = implode(",",$id_array);
+				$MOList = array_map('intval',explode(",",$list_string));	  
+				$query->whereIn('mo_body_request.id', $MOList)->orderBy('header_request.id', 'asc');
+			}
+			
 	    }
 
 	    /*
@@ -510,7 +482,7 @@
 							'deployed_at'=> 			date('Y-m-d H:i:s'),
 							'location'=> 				4
 						]);
-						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity');
+						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->update(['quantity'=>0]);
 					}else{
 						MoveOrder::where('id',$item_id[$x])
 						->update([
@@ -521,7 +493,7 @@
 				}	
 		    
 			
-			if($arf_header->received_by == null){
+			//if($arf_header->received_by == null){
 				if(in_array($arf_header->request_type_id, [1, 5])){
 					HeaderRequest::where('id', $arf_header->id)
 					->update([
@@ -541,7 +513,7 @@
 						
 					]);	
 				}
-			}
+			//}
             //save in IN assets
 			// $inAssets 	= MoveOrder::whereIn('id',$item_id)->get();
 	
@@ -784,7 +756,7 @@
 							'deployed_at'=> 			date('Y-m-d H:i:s'),
 							'location'=> 				4
 						]);
-					DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)->decrement('quantity');
+					DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)->update(['quantity'=>0]);
 					MoveOrder::where('id', $request_value->id)
 					->update([
 						'status_id'=> 	$for_closing
@@ -800,14 +772,14 @@
 
 			
 				if(in_array($arf_header->request_type_id, [1, 5])){
-					if($arf_header->received_by == null){
+					//if($arf_header->received_by == null){
 						HeaderRequest::where('id', $arf_header->id)
 						->update([
 							'status_id'=> 	 	$for_closing,
 							'received_by'=> 	$arf_header->created_by,
 							'received_at'=> 	date('Y-m-d H:i:s')
 						]);	
-			    	}
+			    	//}
 			    }else{
 					if($arf_header->received_by == null){
 						HeaderRequest::where('id',$arf_header->id)

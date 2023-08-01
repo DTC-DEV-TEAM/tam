@@ -1,5 +1,52 @@
 @extends('crudbooster::admin_template')
+    @push('head')
+        <style type="text/css">   
+            #footer th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+                /* border-radius: 5px 0 0 5px; */
+            }
+            #asset-items1 th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+            }
+            #asset-items th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                //padding: 8px;
+            }
+            table { border-collapse: collapse; empty-cells: show; }
 
+            td { position: relative; }
+
+            tr.strikeout td:before {
+            content: " ";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            border-bottom: 1px solid #111;
+            width: 100%;
+            }
+
+            tr.strikeout td:after {
+            content: "\00B7";
+            font-size: 1px;
+            }
+
+            /* Extra styling */
+            td { width: 100px; }
+            th { text-align: left; }
+
+            .finput {
+                border:none;
+                border-bottom: 1px solid rgba(18, 17, 17, 0.5);
+            }
+
+            input.finput:read-only {
+                background-color: #fff;
+            }
+
+        </style>
+    @endpush
 @section('content')
 
 @if(g('return_url'))
@@ -312,12 +359,11 @@
 
                                             <div class="pic-container">
                                                 <div class="pic-row">
-                                                    <table class="table table-bordered" id="asset-items1">
+                                                    <table id="asset-items1">
                                                         <tbody id="bodyTable">
                                                             <tr class="tbl_header_color dynamicRows">
 
-                                                                <!--<th width="5%" class="text-center">{{ trans('message.table.action') }}</th>-->
-
+                                                                <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                                 <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
                                                                 <th width="9%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
                                                                 <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
@@ -330,21 +376,7 @@
                                                                 @endif 
                                                             <!-- <th width="8%" class="text-center">{{ trans('message.table.image') }}</th> 
                                                                 <th width="5%" class="text-center">{{ trans('message.table.action') }}</th> -->
-                                                            </tr>
-                                                            
-                                                            <!--tr class="tableInfo">
-                                                                <td colspan="6" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                                <td align="left" colspan="1">
-
-
-                                                                    <input type='hidden' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-
-                                                                    <input type='hidden' name="cost_total" class="form-control text-center" id="cost_total" readonly>
-
-                                                                    <input type='number' name="total" class="form-control text-center" id="total" readonly>
-                                                                </td>
-                                                                <td colspan="1"></td>
-                                                            </tr> -->
+                                                            </tr>                                                           
 
                                                             <tr id="tr-table">
                                                                         <?php   $tableRow = 1; ?>
@@ -356,27 +388,13 @@
 
                                                                         <tr>
 
-                                                                            <!--
-                                                                            <td>
-
-                                                                                <input type="hidden"  class="form-control"  name="item_id[]" id="item_id{{$tableRow}}"  required  value="{{$rowresult->id}}">
-                                                                                
-                                                                                <input type="hidden"  class="form-control"  name="item_description[]" id="item_description{{$tableRow}}"  required  value="{{$rowresult->item_description}}">
-
-
-                                                                                <button type="button"  data-id="{{$tableRow}}"  class="btn btn-info search" id="searchrow{{$tableRow}}" name="searchrow" tabindex="-1" data-toggle="modal" data-target="#search-items"><i class="glyphicon glyphicon-search"></i></button>
-
-
-                                                                            </td>
-                                                                            -->
-
-
                                                                             <td style="text-align:center" height="10">
-                                                                                
-                                                                                   <!-- <input type="hidden"  class="form-control"  name="item_id[]" id="item_id{{$tableRow}}"  required  value="{{$rowresult->id}}"> -->
-                                                                                
+                                                                                    <input type="hidden"  class="form-control"  name="digits_code[]" id="digits_code{{$tableRow}}"  required  value="{{$rowresult->id}}">
+                                                                                    {{$rowresult->digits_code}}
+                                                                            </td>
+                              
+                                                                            <td style="text-align:center" height="10">
                                                                                    <input type="hidden"  class="form-control"  name="ids[]" id="ids{{$tableRow}}"  required  value="{{$rowresult->id}}">
-                                                                                   
                                                                                     {{$rowresult->item_description}}
                                                                             </td>
                                                                             <td style="text-align:center" height="10">
@@ -449,37 +467,6 @@
 
                                                                             @endif
 
-                                                                            <!--
-                                                                            <td>
-
-                                                                            
-
-                                                                                <button id="add-row-button" name="add-row-button" class="btn btn-info add-row-button" data-id="{{$tableRow}}" ><i class="glyphicon glyphicon-plus"></i></button>
-
-
-                                                                                <table id="reco-table-delete{{$tableRow}}" class="reco-table-delete" style="width: 100%;">
-                                                                                    <tbody>
-
-                                                                                        <tr id="tr-reco-delete">
-
-                                                                                            <tr>
-
-                                                                                                
-                                                                                            </tr>
-                                                                                            
-
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tfoot>
-                                                                                        <tr id="tr-table-reco-delete{{$tableRow}}" class="bottom">
-                                                                                            
-                                                                                        </tr>
-                                                                                    </tfoot>
-
-                                                                                </table>
-
-                                                                            </td> -->
-
                                                                         </tr>
 
                                                                     @endforeach
@@ -493,7 +480,7 @@
 
                                                             <tr id="tr-table1" class="bottom">
                 
-                                                                <td colspan="3">
+                                                                <td colspan="4">
                                                                     <!-- <input type="button" id="add-Row" name="add-Row" class="btn btn-info add" value='Add Item' /> -->
                                                                 </td> 
                                                                 <td align="center" colspan="1">
@@ -537,67 +524,15 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label>{{ trans('message.table.note') }}:</label>
-                        <textarea placeholder="{{ trans('message.table.note') }} ..." rows="3" class="form-control" name="ac_comments">{{$Header->ac_comments}}</textarea>
+                        <textarea placeholder="{{ trans('message.table.note') }} ..." rows="3" class="form-control finput" name="ac_comments">{{$Header->ac_comments}}</textarea>
                     </div>
                 </div>
             </div>
-
-      
-            <!--
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-                    </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                        <div class="pic-container">
-                                            <div class="pic-row">
-                                                <table class="table table-bordered" id="asset-items">
-                                                    <tbody>
-                                                        <tr class="tbl_header_color dynamicRows">
-                                                            <th width="15%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                            <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">{{ trans('message.table.serial_no') }}</th>
-                                                            <th width="15%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
-                                                            <th width="5%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
-                                                            <th width="10%" class="text-center">{{ trans('message.table.item_cost') }}</th>
-                                                            <th width="10%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
-                                                            <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
-                                                        </tr>
-                                                        
-                                                        <tr class="tableInfo">
-                                                            <td colspan="6" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                            <td align="left" colspan="1">
-
-
-                                                                <input type='hidden' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-
-                                                                <input type='hidden' name="cost_total" class="form-control text-center" id="cost_total" readonly>
-
-                                                                <input type='number' name="total" class="form-control text-center" id="total" readonly>
-                                                            </td>
-                                                            <td colspan="1"></td>
-                                                        </tr>
-                                                    
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                
-                                    </div>
-                                    <br>
-                                </div>
-                </div>
-          
-            </div> 
-            -->
-
         </div>
 
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.new') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.new') }}</button>
             <!-- <button class="btn btn-warning pull-right" type="submit" id="btnPrint" style="margin-right: 10px;"> <i class="fa fa-print" ></i> {{ trans('message.form.print') }}</button> -->
              <button class="btn btn-warning pull-right" type="submit" id="btnUpdate" style="margin-right: 10px;"> <i class="fa fa-circle-o" ></i> {{ trans('message.form.update') }}</button> 
         </div>

@@ -331,6 +331,7 @@
 			$query->whereIn('mo_body_request.id', $MOList)
 				  ->orderBy('mo_body_request.id', 'asc');
 
+
 			//$query->where('header_request.status_id', $received)->orderBy('header_request.status_id', 'desc')->orderBy('header_request.id', 'asc');
 	            
 	    }
@@ -513,11 +514,11 @@
 
 			}
 
+			$cancelled  = 		DB::table('statuses')->where('id', 8)->value('id');
 
 			$body_request 		= BodyRequest::where(['header_request_id' => $arf_header->id])->count();
 
-			$mo_request 		= MoveOrder::where(['header_request_id' => $arf_header->id])->where(['status_id' => $closed])->count();
-
+			$mo_request 		= MoveOrder::where(['header_request_id' => $arf_header->id])->where('status_id',$closed)->count();
 
 			if($body_request == $mo_request){
 
@@ -631,6 +632,7 @@
 				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
 				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
 				->leftjoin('cms_users as processed', 'header_request.purchased2_by','=', 'processed.id')
+				->leftjoin('cms_users as mo_by', 'header_request.mo_by','=', 'mo_by.id')
 				->leftjoin('cms_users as picked', 'header_request.picked_by','=', 'picked.id')
 				->leftjoin('cms_users as received', 'header_request.received_by','=', 'received.id')
 				->select(
@@ -646,6 +648,7 @@
 						'locations.store_name as store_branch',
 						'approved.name as approvedby',
 						'recommended.name as recommendedby',
+						'mo_by.name as mo_by',
 						'picked.name as pickedby',
 						'received.name as receivedby',
 						'processed.name as processedby',
@@ -680,7 +683,7 @@
 				->get();
 
 			$data['HeaderID'] = MoveOrder::where('id', $id)->first();
-
+			
 			return $this->view("assets.closing-request", $data);
 		}
 

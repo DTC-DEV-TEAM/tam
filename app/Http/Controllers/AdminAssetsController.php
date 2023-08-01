@@ -53,11 +53,11 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 
-			$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
+			//$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
-			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"category,category_description"];
+			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"tam_categories,category_description"];
 			$this->col[] = ["label"=>"Sub Category","name"=>"sub_category_id","join"=>"class,class_description"];
-			$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
+			//$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
 			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
 
@@ -499,6 +499,7 @@
 			$sub_id = $fields['sub_category_id'];
 			$item_description = $fields['item_description'];
 			$location = $fields['location'];
+			$digits_code = $fields['digits_code'];
 			$cost = $fields['cost'];
 			$getSubData = DB::table('class')->where('id', $sub_id)->first();
 			$assetCount = DB::table('assets')->where('sub_category_id', $sub_id)->count();
@@ -516,6 +517,7 @@
 				return CRUDBooster::redirect(CRUDBooster::mainpath("add-asset"),"Asset Code Exceed!","danger");
 			}else{
 				$postdata['asset_code'] = $assetCode;
+				$postdata['digits_code'] = $digits_code;
 				$postdata['item_description'] = $item_description;
 				$postdata['category_id'] = $getSubData->category_id;
 				$postdata['sub_category_id'] = $sub_id;
@@ -631,7 +633,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Add Asset Masterfile';
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1])->orderby('category_description', 'asc')->get();
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [6,4])->orderby('category_description', 'asc')->get();
 			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("masterfile.add-asset", $data);

@@ -71,7 +71,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="control-label">FA Code From</label>
-                    <input type="text" class="form-control finput" name="from_code" id="from_code" onKeyPress="if(this.value.length==8) return false;" onChange="checkCodeRangeFromAvailability()">
+                    <input type="text" class="form-control finput" name="from_code" id="from_code" onKeyPress="if(this.value.length==8) return false;" onPaste="if(this.value.length==8) return false;" onChange="checkCodeRangeFromAvailability()">
                     <input type="hidden" id="from_value">
                     <div id="code-range-from-availability-status"></div>
                 </div>

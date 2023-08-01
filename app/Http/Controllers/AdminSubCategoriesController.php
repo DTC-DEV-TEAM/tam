@@ -402,7 +402,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Add Sub Category';
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [5,1])->orderby('category_description', 'asc')->get();
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [4,6])->orderby('category_description', 'asc')->get();
 			return $this->view("sub_categories.add-sub-category", $data);
 
 		}

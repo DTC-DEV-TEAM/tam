@@ -146,14 +146,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span>  Invoice Date</label>
-                            <input type="text" class="form-control date" placeholder="Select Date" name="invoice_date" id="invoice_date">
+                            <input type="text" class="form-control date" placeholder="Select Date" value="{{$Header->invoice_date}}" name="invoice_date" id="invoice_date" readonly>
                         
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span>  Invoice No.</label>
-                            <input type="text" class="form-control" style="" placeholder="Invoice NO" name="invoice_no" id="invoice_no">
+                            <input type="text" class="form-control" style="" placeholder="Invoice NO" value="{{$Header->invoice_no}}" name="invoice_no" id="invoice_no" readonly>
                         </div>
                     </div>
                     
@@ -165,13 +165,13 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> RR Date</label>
-                            <input class="form-control date" type="text" placeholder="Select Date" name="rr_date" id="rr_date">
+                            <input class="form-control date" type="text" placeholder="Select Date" value="{{$Header->rr_date}}" name="rr_date" id="rr_date" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Upload SI/DR</label>
-                            <input type="file" class="form-control" style="" name="si_dr[]" id="si_dr" multiple accept="image/png, image/gif, image/jpeg">
+                            <label class="control-label"><span style="color:red">*</span> Uploaded SI/DR</label>
+                            {{-- <input type="file" class="form-control" style="" name="si_dr[]" id="si_dr" multiple accept="image/png, image/gif, image/jpeg"> --}}
                             <div class="gallery" style="margin-bottom:5px; margin-top:15px"></div>
                             <a class="btn btn-xs btn-danger" style="display:none; margin-left:10px" id="removeImageHeader" href="#"><i class="fa fa-remove"></i></a>
                             @foreach($header_images as $res_header_images)                                    
@@ -200,6 +200,7 @@
                 <table id='table_dashboard' class="table table-hover table-striped table-bordered">
                     <thead>
                         <tr>
+                            <th>Asset Code</th>
                             <th>Digits Code</th>   
                             <th>Item Condition</th>    
                             <th>Value</th>                                            
@@ -216,34 +217,23 @@
                                 <input class="form-control" type="text"name="body_id[]" value="{{$res->for_approval_body_id}}">
                                 <input class="form-control text-center" type="text" id="dc" name="digits_code[]" value="{{$res->digits_code}}">
                             </td>
+                            <td>{{$res->asset_code}}</td>
                             <td>{{$res->digits_code}}</td>
                             <td>{{$res->item_description}}</td>   
                             <td>{{$res->value}}</td>
                             <td>{{$res->quantity}}</td> 
-                            <th>
-                                <input class="form-control serial_no"  type="text" placeholder="Serial No (Put N/A if not applicable)" name="serial_no[]" style="width:100%" data-index="1" value="{{ $res->serial_no ? $res->serial_no : "" }}">
-                            </th>    
-                            <td>{{$res->warranty_coverage}}</td>                                                                                                                  
+                            <td>{{$res->serial_no}}</td>   
+                            <td>{{$res->body_location}}</td>                                                                                                                  
                             </tr>
                         @endforeach
                     </tbody>
                 </table> 
             </div>
         </div>
-        <div class="row">
-                <div class="col-md-12">
-                <div class="col-md-6">
-                <span style="color:red; font-style: italic">*Put remarks when Receiving or Cancelling</span>
-                <div class="form-group">
-                    <label class="control-label"> Remarks</label>
-                    <input class="form-control" type="text" placeholder="Remarks" name="remarks" id="remarks">
-                </div>
-                </div>
-        </div> 
+    
         @if(CRUDBooster::myPrivilegeName() == "IT" OR CRUDBooster::myPrivilegeName() == "Admin" OR CRUDBooster::myPrivilegeName() == "Super Administrator")
-            @if($Header->header_approval_status == 20)
-            <button class="btn btn-danger pull-right" value="approvercancel" type="button" id="btnReject" style="margin-left: 5px; margin-right:30px"><i class="fa fa-thumbs-down" ></i> Cancel</button>
-            <button class="btn btn-success pull-right" value="approved" type="button" id="btnApprove" style="margin-left: 5px;"><i class="fa fa-thumbs-up" ></i> Receive</button>
+            @if($Header->header_approval_status == 22)
+            <button class="btn btn-success pull-right" value="approvercancel" type="button" id="btnClose" style="margin-left: 5px; margin-right:30px"><i class="fa fa-times-circle" ></i> Close</button>
             @endif 
          @endif 
         
@@ -296,223 +286,9 @@
         format: "YYYY-MM-DD",
         dayViewHeaderFormat: "MMMM YYYY",
     });
-    /**Approved Request*/
-    $('#btnApprove').on('click', function (event) {
-    event.preventDefault();
-    var fired_button = $(this).val();
-    var id = $('#header_id').val();
-    var remarks = $('#remarks').val();
-    if($('#invoice_date').val() === ""){
-        swal({
-            type: 'error',
-            title: 'Invoice Date required!',
-            icon: 'error',
-            customClass: 'swal-wide'
-        });
-        event.preventDefault();
-    }else if($('#invoice_no').val() === ""){
-        swal({
-            type: 'error',
-            title: 'Invoice No required!',
-            icon: 'error',
-            customClass: 'swal-wide'
-        });
-        event.preventDefault();
-    }else if($('#rr_date').val() === ""){
-        swal({
-            type: 'error',
-            title: 'RR Date required!',
-            icon: 'error',
-            customClass: 'swal-wide'
-        });
-        event.preventDefault();
-    }else if($('#si_dr').val() === ""){
-        swal({
-            type: 'error',
-            title: 'Upload SR/DR required!',
-            icon: 'error',
-            customClass: 'swal-wide'
-        });
-        event.preventDefault();
-    }else{
-        $.ajax({
-            url: "{{ route('assets.check.row') }}",
-            dataType: "json",
-            type: "POST",
-            data: {},
-            success: function (data) {
-                var n = $("input[name^='digits_code']").length;
-                var dc_codes = $("input[name^='digits_code']");
-                var serial_no = $("input[name^='serial_no']");
-
-                var remove_na = [];
-                for(i=0;i<n;i++){
-                    remove_na_value = serial_no.eq(i).val();
-                    remove_na.push(remove_na_value);
-                }
-                var removeItem = 'N/A';
-                remove_na = jQuery.grep(remove_na, function(value) {
-                return value != removeItem;
-                });
-                var checker = remove_na ? remove_na.length : n;
-                //FOR NA
-                var cont_one = [];
-                for(i=0;i<checker;i++){
-                    //dc_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
-                    dc_value =  dc_codes.eq(i).val().concat('-',remove_na[i]);
-                    cont_one.push(dc_value);
-                }
-                //FOR NOT NA
-                var for_not_na = [];
-                for(i=0;i<n;i++){
-                    for_not_na_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
-                    for_not_na.push(for_not_na_value);
-                }
-                var checkRowForNa = cont_one;
-                var checkRow = cont_one.length !== 0 ? cont_one : for_not_na;
-                var checkRowFinal = checkRow.filter(function(elem, index, self) {
-                    return index === self.indexOf(elem);
-                });
-               
-                //header image validation
-                for (var i = 0; i < $("#si_dr").get(0).files.length; ++i) {
-                    var file1=$("#si_dr").get(0).files[i].name;
-                    if(file1){                        
-                        var file_size=$("#si_dr").get(0).files[i].size;
-                        if(file_size<2097152){
-                            var ext = file1.split('.').pop().toLowerCase();                            
-                            if($.inArray(ext,['jpg','jpeg','gif','png'])===-1){
-                                swal({
-                                    type: 'error',
-                                    title: 'Invalid Image Extension for SI/DR!',
-                                    icon: 'error',
-                                    customClass: 'swal-wide'
-                                });
-                                event.preventDefault();
-                                return false;
-                            }
-
-                        }else{
-                            alert("Screenshot size is too large.");
-                            return false;
-                        }                        
-                    }
-                }
-                //not allowed duplicate
-                var finalDuplicateData = checkRowForNa;
-                var dupArrData = finalDuplicateData.sort(); 
-
-                if(dupArrData.length !== 0){
-                    if($('.serial_no').val() != ""){
-                        for (var i = 0; i < dupArrData.length - 1; i++) {
-                        if (dupArrData[i + 1] == dupArrData[i]) {
-                            swal({
-                                    type: 'error',
-                                    title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na)',
-                                    icon: 'error'
-                                }); 
-                                event.preventDefault();
-                                return false;
-                            }
-                        }
-                    }
-                }
-                
-
-                 //each value validation
-                 var v = $("input[name^='serial_no']").length;
-                 var value = $("input[name^='serial_no']");
-                    for(i=0;i<v;i++){
-                        if(value.eq(i).val() == 0){
-                            swal({  
-                                    type: 'error',
-                                    title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
-                                    icon: 'error',
-                                    customClass: 'swal-wide'
-                                });
-                                event.preventDefault();
-                                return false;
-                        }
-                
-                    }
-
-               
-       
-                //check existing
-                $.each(checkRowFinal, function(index, item) {
-                    if($.inArray(item, data.items) != -1){
-                        swal({
-                                type: 'error',
-                                title: 'Digits Code and Serial Already Exist! (' + item + ')',
-                                icon: 'error'
-                            }); 
-                            event.preventDefault();
-                            return false;
-                    }else{
-                        swal({
-                            title: "Are you sure?",
-                            type: "warning",
-                            showCancelButton: true,
-                            confirmButtonColor: "#41B314",
-                            cancelButtonColor: "#F9354C",
-                            confirmButtonText: "Yes, receive it!",
-                            width: 450,
-                            height: 200
-                            }, function () {
-                            showLoading();   
-                            $.ajaxSetup({
-                                headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    }
-                            });
-                            var formData = new FormData();
-                            const totalImages = $("#si_dr")[0].files.length;
-                            let images = $("#si_dr")[0];
-                            for (let i = 0; i < totalImages; i++) {
-                                formData.append('si_dr[]', images.files[i]);
-                            }
-
-                            formData.append('form_data', $('#ForApprovalForm').serialize());
-                            formData.append('remarks', remarks);
-                            formData.append('id', id);
-                            $.ajax({
-                                url: "{{ route('assets.get.approvedProcess') }}",
-                                dataType: "json",
-                                type: "POST",
-                                data: formData,
-                                processData : false,
-                                contentType : false,
-                                // data: {
-                                //     "form_data": $('#ForApprovalForm').serialize(),
-                                //     "id": id,
-                                //     "remarks": remarks
-                                // },
-                                success: function (data) {
-                                    if (data.status == "success") {
-                                        swal({
-                                            type: data.status,
-                                            title: data.message,
-                                        });
-                                        window.location.replace(data.redirect_url);
-                                        } else if (data.status == "error") {
-                                        swal({
-                                            type: data.status,
-                                            title: data.message,
-                                        });
-                                    }
-                                }
-                            })
-                        });
-                    }
-                                
-                });
-            }    
-        });
-    }
-    });
-
+   
     /**Rejected Request*/
-    $('#btnReject').on('click', function (event) {
+    $('#btnClose').on('click', function (event) {
     event.preventDefault();
     var fired_button = $(this).val();
     var id = $('#header_id').val();
@@ -534,22 +310,22 @@
         //             swal.showInputError("Remarks required for this process!");
         //             return false
         //         }
-        if(remarks === ""){
-            swal({
-                type: 'error',
-                title: 'Remarks required for this process!',
-                icon: 'error'
-            }); 
-            event.preventDefault();
-            return false;
-        }else{
+        // if(remarks === ""){
+        //     swal({
+        //         type: 'error',
+        //         title: 'Remarks required for this process!',
+        //         icon: 'error'
+        //     }); 
+        //     event.preventDefault();
+        //     return false;
+        // }else{
             swal({
                 title: "Are you sure?",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#41B314",
                 cancelButtonColor: "#F9354C",
-                confirmButtonText: "Yes, cancel it!",
+                confirmButtonText: "Yes, close it!",
                 width: 450,
                 height: 200
                 }, function () {
@@ -560,18 +336,18 @@
                         }
                 });
                 var formData = new FormData();
-                const totalImages = $("#si_dr")[0].files.length;
-                let images = $("#si_dr")[0];
-                for (let i = 0; i < totalImages; i++) {
-                    formData.append('si_dr[]', images.files[i]);
-                }
+                // const totalImages = $("#si_dr")[0].files.length;
+                // let images = $("#si_dr")[0];
+                // for (let i = 0; i < totalImages; i++) {
+                //     formData.append('si_dr[]', images.files[i]);
+                // }
 
                 formData.append('form_data', $('#ForApprovalForm').serialize());
                 formData.append('approvalMethod', fired_button);
                 formData.append('remarks', remarks);  
                 formData.append('id', id);
                 $.ajax({
-                    url: "{{ route('assets.get.rejectedProcess') }}",
+                    url: "{{ route('assets.get.closeProcess') }}",
                     dataType: "json",
                     type: "POST",
                     data: formData,
@@ -600,7 +376,7 @@
                     }
                 })
             }); 
-        }
+        //}
                  
         //});
     });

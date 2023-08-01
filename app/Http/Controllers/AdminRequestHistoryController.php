@@ -282,7 +282,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -320,8 +320,8 @@
 			
 			}else if(in_array(CRUDBooster::myPrivilegeId(), [3, 10, 11, 13,14])){ 
 
-				//$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
-				$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+				$approvalMatrix = Users::where('cms_users.approver_id', 'like', '%'.CRUDBooster::myId().'%')->get();
+				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 				
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){

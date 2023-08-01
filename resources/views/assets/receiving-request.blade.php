@@ -1,6 +1,18 @@
 @extends('crudbooster::admin_template')
 @section('content')
-
+    @push('head')
+        <style type="text/css">   
+            table, th, td {
+            border: 1px solid rgba(000, 0, 0, .5);
+            padding: 8px;
+            border-radius: 5px 0 0 5px;
+            }
+            #asset-items th, td, tr {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+            }
+        </style>
+    @endpush
 @if(g('return_url'))
 	<p class="noprint"><a title='Return' href='{{g("return_url")}}'><i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}</a></p>       
 @else
@@ -68,6 +80,15 @@
                 </div>
             @endif
 
+            @if($Header->if_from_erf != null || $Header->if_from_erf != "")
+                <div class="row">                           
+                    <label class="control-label col-md-2">Erf Number:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->if_from_erf}}</p>
+                    </div>
+                </div>
+            @endif
+
             <hr/>
 
             <div class="row">                           
@@ -106,66 +127,32 @@
             <hr/>
 
             <div class="row">                           
-
-
                 <label class="control-label col-md-2">{{ trans('message.form-label.approved_by') }}:</label>
                 <div class="col-md-4">
-                        <p>{{$Header->approvedby}}</p>
+                        <p>{{$Header->approvedby}} / <strong>{{$Header->approved_at}}</strong></p>
                 </div>
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.approved_at') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->approved_at}}</p>
-                </div>
-
-            </div>
-            @endif
-
-
-            @if($Header->approver_comments != null || $Header->approver_comments != "")
-                <div class="row">                           
+                @if($Header->approver_comments != null || $Header->approver_comments != "")          
                     <label class="control-label col-md-2">{{ trans('message.table.approver_comments') }}:</label>
-                    <div class="col-md-10">
+                    <div class="col-md-4">
                             <p>{{$Header->approver_comments}}</p>
                     </div>
-
-            
-                </div>
-            @endif 
-
-            
-
+                @endif 
+            </div>
+            @endif      
 
             @if($Header->recommendedby != null || $Header->recommendedby != "")
-
-            <hr/>
-
-            <div class="row">                           
-
+                <hr/>
+                <div class="row">                           
                     <label class="control-label col-md-2">{{ trans('message.form-label.recommended_by') }}:</label>
                     <div class="col-md-4">
-                            <p>{{$Header->recommendedby}}</p>
+                            <p>{{$Header->recommendedby}} / <strong>{{$Header->recommended_at}}</strong> </p>
                     </div>
-
-                    <label class="control-label col-md-2">{{ trans('message.form-label.recommended_at') }}:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->recommended_at}}</p>
-                    </div>
-
-                </div>
-
-            @endif 
-
-
-            @if($Header->it_comments != null || $Header->it_comments != "")
-
-                <div class="row">                           
-                    <label class="control-label col-md-2">{{ trans('message.table.it_comments') }}:</label>
-                    <div class="col-md-10">
-                            <p>{{$Header->it_comments}}</p>
-                    </div>
-
-            
+                    @if($Header->it_comments != null || $Header->it_comments != "")                        
+                        <label class="control-label col-md-2">{{ trans('message.table.it_comments') }}:</label>
+                        <div class="col-md-4">
+                                <p>{{$Header->it_comments}}</p>
+                        </div>
+                    @endif 
                 </div>
             @endif 
 
@@ -181,7 +168,7 @@
                                     <div class="table-responsive">
                                             <div class="pic-container">
                                                 <div class="pic-row">
-                                                    <table class="table table-bordered" id="asset-items">
+                                                    <table id="asset-items">
                                                         <tbody>
                                                             <tr class="tbl_header_color dynamicRows">
                                                                 <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
@@ -244,35 +231,30 @@
                                                                             {{$rowresult->serial_no}}
                                                                         </td>
     
-                                                                        <td style="text-align:center" height="10">
+                                                                        <td style="text-align:center" height="10" class="mo_qty">
                                                                             {{$rowresult->quantity}}
                                                                         </td>
     
-                                                                        <td style="text-align:center" height="10">
+                                                                        <td style="text-align:center" height="10" class="mo_unit_cost">
                                                                             {{$rowresult->unit_cost}}
                                                                         </td>
     
-                                                                        <td style="text-align:center" height="10">
+                                                                        <td style="text-align:center" height="10" class="mo_total_cost">
                                                                             {{$rowresult->total_unit_cost}}
                                                                         </td>
-    
-                                                                        
-    
-                                                                    </tr>
-    
-    
+                                                                         
+                                                                    </tr> 
                                                                 @endforeach
     
     
                                                             @endif
                                                             
-                                                            <tr class="tableInfo">
+                                                            {{-- <tr class="tableInfo">
                                                                 <td colspan="7" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
                                                                 <td align="center" colspan="1">
                                                                     <label>{{$Header->total}}</label>
                                                                 </td>
-                                                                <td colspan="1"></td>
-                                                            </tr>
+                                                            </tr> --}}
                                                         
                                                         </tbody>
                                                     </table>
@@ -283,81 +265,52 @@
                                 </div>
                 </div>
             </div>
-
-            <hr/>
-
-            <div class="row">  
-
-                @if($Header->po_number != null)
-                    <label class="control-label col-md-2">{{ trans('message.form-label.po_number') }}:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->po_number}}</p>
+            <hr>
+            @if( $Header->processedby != null )
+                <div class="row">
+                    <div class="col-md-6">
+                        <table style="width:100%">
+                            <tbody id="footer">
+                                <tr>
+                                    <th class="control-label col-md-2">{{ trans('message.form-label.mo_by') }}:</th>
+                                    <td class="col-md-4">{{$Header->mo_by}} / {{$Header->mo_at}}</td>     
+                                </tr>
+                                @if($Header->ac_comments != null)
+                                    <tr>
+                                        <th class="control-label col-md-2">{{ trans('message.table.ac_comments') }}:</th>
+                                        <td class="col-md-4">{{$Header->ac_comments}}</td>
+                                    </tr>
+                                @endif
+                                @if( $Header->pickedby != null )
+                                    <tr>
+                                        <th class="control-label col-md-2">{{ trans('message.form-label.picked_by') }}:</th>
+                                        <td class="col-md-4">{{$Header->pickedby}} / {{$Header->picked_at}}</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
-                @endif
 
-                @if($Header->po_date != null)
-                    <label class="control-label col-md-2">{{ trans('message.form-label.po_date') }}:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->po_date}}</p>
+                    <div class="col-md-6">
+                        <table style="width:100%">
+                            <tbody id="footer">
+                                @if( $Header->receivedby != null )
+                                    <tr>
+                                        <th class="control-label col-md-2">{{ trans('message.form-label.received_by') }}:</th>
+                                        <td class="col-md-4">{{$Header->receivedby}} / {{$Header->received_at}}</td>
+                                    </tr>
+                                @endif
+                                @if( $Header->closedby != null )
+                                    <tr>
+                                        <th class="control-label col-md-2">{{ trans('message.form-label.closed_by') }}:</th>
+                                        <td class="col-md-4">{{$Header->closedby}} / {{$Header->closed_at}}</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
                     </div>
-                @endif
-            </div>
-
-            <div class="row">   
-                @if($Header->quote_date != null)
-                    <label class="control-label col-md-2">{{ trans('message.form-label.quote_date') }}:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->quote_date}}</p>
-                    </div>
-                @endif
-            </div>
-
-
-            <div class="row">                           
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.processed_by') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->processedby}}</p>
                 </div>
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.processed_date') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->purchased2_at}}</p>
-                </div>
-
-            </div>
-
-            <hr/>
-
-            <div class="row">                           
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.mo_by') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->moby}}</p>
-                </div>
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.mo_at') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->mo_at}}</p>
-                </div>
-
-            </div>
-
-            <hr/>
-
-            <div class="row">                           
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.picked_by') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->pickedby}}</p>
-                </div>
-
-                <label class="control-label col-md-2">{{ trans('message.form-label.picked_at') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->picked_at}}</p>
-                </div>
-
-            </div>
+            @endif
  
 
         </div>
@@ -392,14 +345,6 @@
     setTimeout("preventBack()", 0);
 
     $('#btnSubmit').click(function(event) {
-        // var strconfirm = confirm("Are you sure you want to receive this request?");
-        // if (strconfirm == true) {
-        //     $(this).attr('disabled','disabled');
-        //     $('#myform').submit(); 
-        // }else{
-        //     return false;
-        //     window.stop();
-        // }
         event.preventDefault();
         swal({
             title: "Are you sure?",
@@ -416,6 +361,43 @@
         });
 
     });
+
+    var tds = document.getElementById("asset-items").getElementsByTagName("td");
+        var moQty        = 0;
+        var moUnitCost   = 0;
+        var moTotalCost  = 0;
+
+        for (var i = 0; i < tds.length; i++) {
+            if(tds[i].className == "mo_qty") {
+                moQty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+            }else if(tds[i].className == "mo_unit_cost"){
+                moUnitCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+            }else if(tds[i].className == "mo_total_cost"){
+                moTotalCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+            }
+        }
+        document.getElementById("asset-items").innerHTML +=
+        "<tr>"+
+            "<td colspan='5' style='text-align:right'>"+
+                    "<strong>TOTAL</strong>"+
+                "</td>"+
+                
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        moQty +
+                    "</strong>"+
+                "</td>"+
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        moUnitCost +
+                    "</strong>"+
+                "</td>"+
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        moTotalCost +
+                    "</strong>"+
+                "</td>"+       
+        "</tr>";
 
 </script>
 @endpush

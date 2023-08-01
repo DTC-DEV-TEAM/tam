@@ -18,6 +18,13 @@
                 margin-bottom:0;
             }
             .select2-container--default .select2-selection--multiple .select2-selection__choice{color:black;}
+            #asset-items th, td, tr {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+            }
+            .select2-results .select2-disabled {
+                display:none;
+            }
         </style>
     @endpush
 @section('content')
@@ -43,13 +50,10 @@
                 <div class="col-md-4">
                         <p>{{$Header->reference_number}}</p>
                 </div>
-
                 <label class="control-label col-md-2">{{ trans('message.form-label.created_at') }}:</label>
                 <div class="col-md-4">
                         <p>{{$Header->created}}</p>
                 </div>
-
-
             </div>
 
             <div class="row">                           
@@ -65,8 +69,6 @@
             </div>
 
             <div class="row">                           
-
-
                 <label class="control-label col-md-2">{{ trans('message.form-label.department') }}:</label>
                 <div class="col-md-4">
                         <p>{{$Header->department}}</p>
@@ -76,7 +78,6 @@
                 <div class="col-md-4">
                         <p>{{$Header->position}}</p>
                 </div>
-
             </div>
 
             @if($Header->store_branch != null || $Header->store_branch != "")
@@ -88,6 +89,15 @@
                 </div>
             @endif
 
+            @if($Header->if_from_erf != null || $Header->if_from_erf != "")
+                <div class="row">                           
+                    <label class="control-label col-md-2">Erf Number:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->if_from_erf}}</p>
+                    </div>
+                </div>
+            @endif
+
             <hr/>
 
             <div class="row">                           
@@ -95,20 +105,15 @@
                 <div class="col-md-4">
                         <p>{{$Header->request_description}}</p>
                 </div>
-
-        
             </div>
   
-
             @if($Header->requestor_comments != null || $Header->requestor_comments != "")
                 <hr/>
                 <div class="row">                           
                     <label class="control-label col-md-2">{{ trans('message.table.requestor_comments') }}:</label>
                     <div class="col-md-10">
                             <p>{{$Header->requestor_comments}}</p>
-                    </div>
-
-            
+                    </div>   
                 </div>
             @endif  
 
@@ -119,167 +124,152 @@
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
                     </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                            <div class="pic-container">
-                                                <div class="pic-row">
-                                                    <table class="table table-bordered" id="asset-items">
-                                                        <tbody id="bodyTable">
-                                                            <tr class="tbl_header_color dynamicRows">
-                                                                <!-- <th width="13%" class="text-center">{{ trans('message.table.action') }}</th>  -->
-                                                                <th width="5%" class="text-center">Good</th> 
-                                                                <th class="text-center">Defective</th>
-                                                                <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
-                                                                <!-- <th width="13%" class="text-center">{{ trans('message.table.status_id') }}</th> -->
-                                                                <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                                <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
-                                                                <th width="26%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                                <th width="13%" class="text-center">{{ trans('message.table.serial_no') }}</th>
-                                                                <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
-                                                                <!-- <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
-                                                                <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
-                                                                -->
-                                                                <th>Comments</th>
-                                                                
-                                                            </tr>
-                                                            
-                                                            <?php   $tableRow1 = 0; ?>
+                    <div class="box-body no-padding">
+                        <div class="pic-container">
+                            <div class="pic-row">
+                                <table id="asset-items">
+                                    <tbody id="bodyTable">
+                                        <tr class="tbl_header_color dynamicRows">
+                                            <!-- <th width="13%" class="text-center">{{ trans('message.table.action') }}</th>  -->
+                                            {{-- <th width="5%" class="text-center">Good</th> 
+                                            <th width="5%" class="text-center">Defective</th> --}}
+                                            <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
+                                            <!-- <th width="13%" class="text-center">{{ trans('message.table.status_id') }}</th> -->
+                                            <th width="8%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                            <th width="8%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
+                                            <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                                            <th width="8%" class="text-center">{{ trans('message.table.serial_no') }}</th>
+                                            <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
+                                            <!-- <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
+                                            <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
+                                            -->
+                                            {{-- <th width="8%">Comments</th> --}}
+                                            <th width="8%">Asset Code Tagging</th>
+                                        </tr>
+                                        
+                                        <?php   $tableRow1 = 0; ?>
 
-                                                            <?Php   $item_count = 0; ?>
+                                        <?Php   $item_count = 0; ?>
 
-                                                            @if( !empty($MoveOrder) )
-    
-                                                              
-    
-                                                                @foreach($MoveOrder as $rowresult)
-    
-                                                                    <?php   $tableRow1++; ?>
+                                        @if( !empty($MoveOrder) )
+                                            
+                                            @foreach($MoveOrder as $rowresult)
 
-                                                                    <?Php $item_count++; ?>
-    
-                                                                    <tr>
-                                                                        <td style="text-align:center" height="10">
+                                                <?php   $tableRow1++; ?>
 
-                                                                            <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
+                                                <?Php $item_count++; ?>
 
-                                                                            <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" value="0" />
+                                                <tr>
+                                                    {{-- <td style="text-align:center" height="10"> --}}
+                                                        <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
+                                                        <input type="hidden" value="{{$rowresult->body_request_id}}" name="body_id[]">
+                                                        <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" value="0" />
 
-                                                                            <input type="checkbox" name="good[]" id="good{{$tableRow1}}" class="good" required data-id="{{$tableRow1}}" value="{{$rowresult->asset_code}}"/>
-                                                                            <!-- for good and defect comment -->
-                                                                            <input type="hidden" name="arf_number" id="arf_number" value="{{$Header->reference_number}}" />
-                                                                            <input type="hidden" name="digits_code[]" id="digits_code{{$tableRow1}}" value="{{$rowresult->digits_code}}" />
-                                                                            <input type="hidden" name="asset_code[]" id="asset_code{{$tableRow1}}" value="{{$rowresult->asset_code}}" />
-                                                                        </td>
+                                                        {{-- <input type="checkbox" name="good[]" id="good{{$tableRow1}}" class="good" required data-id="{{$tableRow1}}" value="{{$rowresult->asset_code}}"/> --}}
+                                                        <!-- for good and defect comment -->
+                                                        <input type="hidden" name="arf_number" id="arf_number" value="{{$Header->reference_number}}" />
+                                                        <input type="hidden" name="digits_code[]" id="digits_code{{$tableRow1}}" value="{{$rowresult->digits_code}}" />
+                                                        <input type="hidden" name="asset_code[]" id="asset_code{{$tableRow1}}" value="{{$rowresult->asset_code}}" />
+                                                    {{-- </td> --}}
 
-                                                                        <td style="text-align:center" height="10">
+                                                    {{-- <td style="text-align:center" height="10"> --}}
+                                                        <input type="hidden" name="defective_text[]" id="defective_text{{$tableRow1}}" value="0" />
+                                                        {{-- <input type="checkbox" name="defective[]" id="defective{{$tableRow1}}" class="defective" required data-id="{{$tableRow1}}"  value="{{$rowresult->asset_code}}"/> --}}
+                                                    {{-- </td> --}}
 
-                                                                            <input type="hidden" name="defective_text[]" id="defective_text{{$tableRow1}}" value="0" />
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->mo_reference_number}}
+                                                    </td>
 
-                                                                            <input type="checkbox" name="defective[]" id="defective{{$tableRow1}}" class="defective" required data-id="{{$tableRow1}}"  value="{{$rowresult->asset_code}}"/>
-                                                                        </td>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->digits_code}}
+                                                    </td>
 
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->mo_reference_number}}
-                                                                        </td>
-    
-                                                                        <!--<td style="text-align:center" height="10">
-    
-                                                                            <label style="color: #3c8dbc;">
-                                                                                {{$rowresult->status_description}}
-                                                                            </label>
-                                                                           
-    
-                                                                        </td>-->
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->digits_code}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->asset_code}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->item_description}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->serial_no}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->quantity}}
-                                                                        </td>
-    
-                                                                        <!-- <td style="text-align:center" height="10">
-                                                                            {{$rowresult->unit_cost}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->total_unit_cost}}
-                                                                        </td> -->
-                                                                        <td>
-                                                                        <select required selected data-placeholder="-- Select Comments --" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">
-                                                                            @foreach($good_defect_lists as $good_defect_list)
-                                                                                <option value=""></option>
-                                                                                <option value="{{ $rowresult->asset_code. '|' .$rowresult->digits_code. '|' .$good_defect_list->defect_description }}">{{ $good_defect_list->defect_description }}</option>
-                                                                            @endforeach
-                                                                        </select>
-                                                                        </td>
-                                                                       
-                                                                    </tr>
-  
-                                                                    <tr id="others{{$tableRow1}}" style="display:none">
-                                                                    <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                                                                    <td><input type="text" class="form-control" placeholder="Please input other comments" id="inputValue{{$tableRow1}}" name="other_comment[]"></td>                                                   
-                                                                    </tr>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->asset_code}}
+                                                    </td>
 
-                                                                    <?Php $cost_total = $rowresult->total_unit_cost; ?>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->item_description}}
+                                                    </td>
 
-                                                                @endforeach
-    
-    
-                                                            @endif
-                                                        
-                                                        </tbody>
-                                                        
-                                                        <tfoot>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->serial_no}}
+                                                    </td>
 
-                                                            <tr id="tr-table1" class="bottom">
-                
-                                                               <!-- <td colspan="6" align="right">
-                                                                    <label>Total Qty:</label>
+                                                    <td style="text-align:center" height="10">
+                                                        {{$rowresult->quantity}}
+                                                    </td>
+                  
+                                                    {{-- <td>
+                                                        <select required selected data-placeholder="Select Comments" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">
+                                                            @foreach($good_defect_lists as $good_defect_list)
+                                                                <option value=""></option>
+                                                                <option value="{{ $rowresult->asset_code. '|' .$rowresult->digits_code. '|' .$good_defect_list->defect_description }}">{{ $good_defect_list->defect_description }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td> --}}
 
-                                                                 
-                                                                </td> 
-                                                                <td align="center" colspan="1">
-                                                                    
-                                                                    <label>{{$Header->quantity_total}}</label>
+                                                    <td>
+                                                        <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
+                                                            @foreach($assets_code as $asset_code)
+                                                                <option value=""></option>
+                                                                <option value="{{ $asset_code->id }}">{{ $asset_code->asset_code }} | {{ $asset_code->digits_code }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        </td>
+                                                    
+                                                </tr>
 
-                                                                </td> -->
-                                                                        
-                                                                <!-- 
-                                                                <td align="right" colspan="8">
-                                                                    <label>Total Cost:</label>
-                                                                </td>
+                                                <tr id="others{{$tableRow1}}" style="display:none">
+                                                <td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                                                <td><input type="text" class="form-control" placeholder="Please input other comments" id="inputValue{{$tableRow1}}" name="other_comment[]"></td>                                                   
+                                                </tr>
 
-                                                                <td align="center">
-                                                                    @if($item_count == 1)
-                                                                        <label>{{$cost_total}}</label>
-                                                                    @else
-                                                                        <label>{{$Header->total}}</label>
-                                                                    @endif
-                                                                </td>
-                                                                -->
-                                                            </tr>
-                                                        </tfoot>
+                                                <?Php $cost_total = $rowresult->total_unit_cost; ?>
 
-                                                    </table>
-                                                </div>
-                                            </div>
-                                    </div>
-            
-                                </div>
+                                            @endforeach
+
+
+                                        @endif
+                                    
+                                    </tbody>
+                                    
+                                    <tfoot>
+
+                                        <tr id="tr-table1" class="bottom">
+
+                                            <!-- <td colspan="6" align="right">
+                                                <label>Total Qty:</label>
+
+                                                
+                                            </td> 
+                                            <td align="center" colspan="1">
+                                                
+                                                <label>{{$Header->quantity_total}}</label>
+
+                                            </td> -->
+                                                    
+                                            <!-- 
+                                            <td align="right" colspan="8">
+                                                <label>Total Cost:</label>
+                                            </td>
+
+                                            <td align="center">
+                                                @if($item_count == 1)
+                                                    <label>{{$cost_total}}</label>
+                                                @else
+                                                    <label>{{$Header->total}}</label>
+                                                @endif
+                                            </td>
+                                            -->
+                                        </tr>
+                                    </tfoot>
+
+                                </table>
+                            </div>
+                        </div>            
+                    </div>
                 </div>
             </div>
 
@@ -305,7 +295,7 @@
             @endif 
            
              <!-- Comment Section -->
-            <div class="row">  
+            {{-- <div class="row">  
                 <div class="col-md-12">
                 <hr>
                     <div class="form-group">
@@ -323,37 +313,29 @@
                         <!-- <textarea placeholder="Comment ..." rows="3" class="form-control" name="comments"></textarea> -->
                     </div>
                  </div>
-            </div>  
+            </div>   --}}
         </div>
       
 
         <div class='panel-footer'>
-
-            <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-           
-            
+            <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>    
             <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-circle-o" ></i> {{ trans('message.form.pick') }}</button>
-
-        
         </div>
-
-         
-
     </form>
-
-
-
 </div>
 
 @endsection
 @push('bottom')
 <script type="text/javascript">
-$(function(){
-    $('body').addClass("sidebar-collapse");
-});
-$('.select2').select2({
+    $(function(){
+        $('body').addClass("sidebar-collapse");
+    });
+
+    $('.select2').select2({
     placeholder_text_single : "-- Select --",
     multiple: true});
+
+    $('.asset_code_tag').select2({allowClear: true});
     var searchfield = $(this).find('.select2-search--inline');
     var selection = $(this).find('.select2-selection__rendered');
     $(this).find('.select2-search__field').html("");
@@ -366,7 +348,7 @@ $('.select2').select2({
     };
     setTimeout("preventBack()", 0);
 
-    $('#btnSubmit').attr("disabled", true);
+    //$('#btnSubmit').attr("disabled", true);
 
     var count_pick = 0;
 
@@ -375,7 +357,7 @@ $('.select2').select2({
     $('.good').change(function() {
         var asset_code = $(this).val();
         var id = $(this).attr("data-id");
-  
+        $("#defective_text"+id).val("0");
         var ischecked= $(this).is(':checked');
         if(ischecked == false){
             $(".comment_div").html("");
@@ -386,6 +368,7 @@ $('.select2').select2({
                 $('#btnSubmit').attr("disabled", true);
             }                
         }else{
+            $("#good_text"+id).val("1");
             $('#defective'+id).not(this).prop('checked', false); 
             $.ajax({
             url: "{{ route('assets.get.comments') }}",
@@ -412,7 +395,7 @@ $('.select2').select2({
                 
             }
         });
-            $("#good_text"+id).val("1");
+            // $("#good_text"+id).val("1");
             //$("#defective"+id).val("1");
             count_pick++;
             $('#btnSubmit').attr("disabled", false);
@@ -425,11 +408,11 @@ $('.select2').select2({
         // $('.good').not(this).prop('checked', false);    
         var asset_code = $(this).val();
         var id = $(this).attr("data-id");
-            
+        $("#good_text"+id).val("0");
         var ischecked= $(this).is(':checked');
             if(ischecked == false){
 
-                //$("#good"+id).val("0");
+                
                 $(".comment_div").html("");
                 $("#defective_text"+id).val("0");
 
@@ -441,6 +424,7 @@ $('.select2').select2({
 
                     
             }else{
+                $("#defective_text"+id).val("1");
                 $('#good'+id).not(this).prop('checked', false); 
                 $.ajax({
                 url: "{{ route('assets.get.comments') }}",
@@ -469,7 +453,7 @@ $('.select2').select2({
             });
                 //$("#good"+id).val("1");
 
-                $("#defective_text"+id).val("1");
+                // $("#defective_text"+id).val("1");
 
                 count_pick++;
 
@@ -477,6 +461,30 @@ $('.select2').select2({
             }
 
     });
+
+    $(document).ready(function () {
+        var $selects = $('select');
+        $selects.select2();
+        $('.asset_code_tag').change(function () {
+            $('option:hidden', $selects).each(function () {
+                var self = this,
+                    toShow = true;
+                $selects.not($(this).parent()).each(function () {
+                    if (self.value == this.value) toShow = false;
+                })
+                if (toShow) {
+                    $(this).removeAttr('disabled');
+                    $(this).parent().select2();
+                }
+            });
+            if (this.value != "") {
+                //$selects.not(this).children('option[value=' + this.value + ']').attr('disabled', 'disabled');
+                $selects.not(this).children('option[value=' + this.value + ']').remove();
+                $selects.select2();
+            }
+   
+        });
+    })
 
     $('.comments').each(function(){
         var eachData = this.value;
@@ -506,27 +514,42 @@ $('.select2').select2({
         });
     });
     $('#btnSubmit').click(function(event) {
-        // var strconfirm = confirm("Are you sure you want to pick this request?");
-        // if (strconfirm == true) {
-        //     $(this).attr('disabled','disabled');
-        //     $('#myform').submit(); 
-        // }else{
-        //     return false;
-        //     window.stop();
-        // }
+    
         event.preventDefault();
-        swal({
-            title: "Are you sure?",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#41B314",
-            cancelButtonColor: "#F9354C",
-            confirmButtonText: "Yes, pick it!",
-            width: 450,
-            height: 200
-            }, function () {
-                $(this).attr('disabled','disabled');
-                $('#myform').submit();                                                  
+        //each value validation
+        $('.asset_code_tag').each(function() {
+            asset_code = $(this).val();
+            if (asset_code == null) {
+                swal({
+                    type: 'error',
+                    title: 'Asset Code Tagging Required',
+                    icon: 'error',
+                    confirmButtonColor: "#367fa9",
+                }); 
+                event.preventDefault(); // cancel default behavior
+            } else if (asset_code == "") {
+                swal({
+                    type: 'error',
+                    title: 'Asset Code Tagging Required',
+                    icon: 'error',
+                    confirmButtonColor: "#367fa9",
+                }); 
+                event.preventDefault(); // cancel default behavior
+            }else{
+                swal({
+                    title: "Are you sure?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#41B314",
+                    cancelButtonColor: "#F9354C",
+                    confirmButtonText: "Yes, pick it!",
+                    width: 450,
+                    height: 200
+                    }, function () {
+                        $(this).attr('disabled','disabled');
+                        $('#myform').submit();                                                  
+                });
+            }
         });
     });
 

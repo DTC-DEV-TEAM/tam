@@ -13,6 +13,7 @@
 	use Illuminate\Support\Facades\Response;
 	use App\HeaderRequest;
 	use App\BodyRequest;
+	use Illuminate\Support\Facades\Crypt;
 
 	class AdminErfApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -188,7 +189,7 @@
 	        |
 	        */
 	        $this->load_js = array();
-	        
+			$this->load_js[] = asset("datetimepicker/bootstrap-datetimepicker.min.js");
 	        
 	        
 	        /*
@@ -212,8 +213,8 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
-	        
+	        $this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
+	        $this->load_css[] = asset("css/font-family.css");
 	    }
 
 
@@ -329,13 +330,45 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
+			//dd($fields);
 			$dataLines = array();
 			$approval_action 		= $fields['approval_action'];
 			$approver_comments 		= $fields['additional_notess'];
-           
+			$salary_range           = explode("-",$fields['salary_range']);
+
 			if($approval_action  == 1){
 				$postdata['status_id'] 	                        = 29;
 				$postdata['approver_comments'] 	                = $approver_comments;
+				$postdata['date_needed']                        = $fields['date_needed'];
+				$postdata['work_location']                      = $fields['work_location'];
+				$postdata['position']                           = $fields['position'];
+				$postdata['salary_range_from'] 			        = Crypt::encryptString(str_replace(',', '', $salary_range[0]));
+			    $postdata['salary_range_to'] 			        = Crypt::encryptString(str_replace(',', '', $salary_range[1]));
+				$postdata['schedule']                           = $fields['schedule'];
+				$postdata['other_schedule']                     = $fields['other_schedule'];
+				$postdata['allow_wfh']                          = $fields['allow_wfh'];
+				$postdata['manpower']                           = $fields['manpower'];
+				$postdata['replacement_of']                     = $fields['replacement_of'];
+				$postdata['absorption']                         = $fields['absorption'];
+				$postdata['manpower_type']                      = $fields['manpower_type'];
+				if(!empty($fields['required_exams'])){
+					$postdata['other_required_exams'] 	        = $fields['other_required_exams'];
+					$postdata['required_exams'] 	            = implode(", ",$fields['required_exams']);
+				}
+				if(!empty($fields['employee_interaction'])){
+					$postdata['employee_interaction'] 	        = implode(", ",$fields['employee_interaction']);
+				}
+				if(!empty($fields['asset_usage'])){
+					$postdata['asset_usage'] 	                = implode(", ",$fields['asset_usage']);
+				}
+				if(!empty($fields['required_system'])){
+					$postdata['required_system'] 	            = implode(", ",$fields['required_system']);
+				}
+				$postdata['shared_files']                       = $fields['shared_files'];
+				$postdata['email_domain']                       = $fields['email_domain'];
+				$postdata['other_email_domain']                 = $fields['other_email_domain'];
+				$postdata['qualifications']                     = $fields['qualifications'];
+				$postdata['job_description']                    = $fields['job_descriptions'];
 				$postdata['approved_immediate_head_by']         = CRUDBooster::myId();
 				$postdata['approved_immediate_head_at']         = date('Y-m-d H:i:s');
 				
@@ -405,16 +438,16 @@
 						)
 				->where('erf_header_request.id', $id)->first();
 		
-			$res_req = explode(",",$data['Header']->required_exams);
+			$res_req = explode(",",trim($data['Header']->required_exams));
 			$interact_with = explode(",",$data['Header']->employee_interaction);
 			$asset_usage = explode(",",$data['Header']->asset_usage);
 			$application = explode(",",$data['Header']->application);
 			$required_system = explode(",",$data['Header']->required_system);
-			$data['required_exams'] = $res_req;
-			$data['interaction'] = $interact_with;
-			$data['asset_usage'] = $asset_usage;
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
 			$data['application'] = $application;
-			$data['required_system'] = $required_system;
+			$data['required_system_array'] = array_map('trim', $required_system);
 			$data['Body'] = ErfBodyRequest::
 				select(
 				  'erf_body_request.*'
@@ -426,7 +459,18 @@
 				  )
 				  ->where('erf_header_documents.header_id', $id)
 				  ->get();
-	
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
+			$data['positions'] = DB::table('positions')->where('status', 'ACTIVE')->get();
+			//dd($data['res_req']);
 			return $this->view("erf.approved_erf", $data);
 		}
 

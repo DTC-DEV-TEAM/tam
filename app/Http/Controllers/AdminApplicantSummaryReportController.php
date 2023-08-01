@@ -368,17 +368,31 @@
 				 $join->on('applicant_table.id', '=', 'cancelled.id')
 				 ->where('applicant_table.status',8);
 			 })
-			 
+			 ->leftJoin('applicant_table as rejected', function($join) 
+			 {
+				 $join->on('applicant_table.id', '=', 'rejected.id')
+				 ->where('applicant_table.status',5);
+			 })
+			 ->leftJoin('applicant_table as for_comparison', function($join) 
+			 {
+				 $join->on('applicant_table.id', '=', 'for_comparison.id')
+				 ->where('applicant_table.status',42);
+			 })
+			 	 
 			 ->select(
 				'applicant_table.*',
 			    DB::raw('COUNT(jo_done.erf_number) as jo_done'),
 				DB::raw('COUNT(first_interview.erf_number) as first_interview'),
 				DB::raw('COUNT(final_interview.erf_number) as final_interview'),
 				DB::raw('COUNT(cancelled.erf_number) as cancelled'),
+				DB::raw('COUNT(rejected.erf_number) as rejected'),
+				DB::raw('COUNT(for_comparison.erf_number) as for_comparison'),
 				'jo_done.status as jo_status',
 				'first_interview.status as first_interview_status',
 				'final_interview.status as final_interview_status',
 				'cancelled.status as cancelled_status',
+				'rejected.status as rejected_status',
+				'for_comparison.status as for_comparison_status',
 				)
 				->groupBy('applicant_table.erf_number')
 				->get();

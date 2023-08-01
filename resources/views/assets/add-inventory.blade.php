@@ -16,6 +16,13 @@
             .select2-selection__arrow {
                 height: 34px !important;
             }
+       
+            /* .select2-results__option--highlighted { 
+                background-color: #41B314! important; 
+                border-radius: 10px;
+            }
+
+            .select2-results__option[aria-selected=true] { background-color: #41B314 !important; } */
 
             img[data-action="zoom"] {
             cursor: pointer;
@@ -40,7 +47,7 @@
             filter: "alpha(opacity=0)";
             opacity: 0;
             -webkit-transition:      opacity 300ms;
-                -o-transition:      opacity 300ms;
+                 -o-transition:      opacity 300ms;
                     transition:      opacity 300ms;
             }
             .zoom-overlay-open .zoom-overlay {
@@ -107,6 +114,64 @@
                     width:480px !important;
                     height:315px !important;
                 }
+
+                .finput {
+                border:none;
+                border-bottom: 1px solid rgba(18, 17, 17, 0.5);
+                }
+
+                input.finput:read-only {
+                    background-color: #fff;
+                }
+
+                input.ginput:read-only {
+                    background-color: #f5f5f5;
+                }
+                #asset-items th, td {
+                    border: 1px solid rgba(000, 0, 0, .5);
+                    padding: 8px;
+                }
+
+                /* ::-webkit-scrollbar-track
+                {
+                    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+                    border-radius: 10px;
+                    background-color: #F5F5F5;
+                }
+
+                ::-webkit-scrollbar
+                {
+                    width: 12px;
+                    background-color: #F5F5F5;
+                }
+
+                ::-webkit-scrollbar-thumb
+                {
+                    border-radius: 10px;
+                    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+                    background-color: #555;
+                } */
+                ::-webkit-scrollbar-track
+                {
+                    /* -webkit-box-shadow: inset 0 0 6px rgba(32, 83, 178, 0.3); */
+                    background-color: #F5F5F5;
+                }
+
+                ::-webkit-scrollbar
+                {
+                    width: 10px;
+                    background-color: #F5F5F5;
+                }
+
+                ::-webkit-scrollbar-thumb
+                {
+                    background-color: #3c8dbc;
+                    /* border: px solid #367fa9; */
+                }
+                /* .select2-container--default .select2-selection--multiple .select2-selection__choice{color:black;}
+                .select2-results .select2-disabled {
+                    display:none;
+                } */
         </style>
     @endpush
 @section('content')
@@ -121,7 +186,7 @@
     Asset Inventory Form
     </div>
     
-    <form action='{{CRUDBooster::mainpath('add-save')}}' method="POST" id="InventoryForm" enctype="multipart/form-data">
+    <form id="InventoryForm" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
 
@@ -129,106 +194,79 @@
         <section id="loading">
             <div id="loading-content"></div>
         </section>
-           <div class="row">
-             <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> PO NO</label>
-                            <input class="form-control" type="text"  placeholder="PO NO" name="po_no" id="po_no">
+                            <input class="form-control finput" type="text"  placeholder="PO NO" name="po_no" id="po_no">
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Location</label>
-                            <select required selected data-placeholder="-- Please Select Location --" id="location" name="location" class="form-select select2" style="width:100%;">
+                            <select  id="location" name="location" class="form-select select2" style="width:100%;">
                             @foreach($warehouse_location as $res)
-                                <option value=""></option>
                                 <option value="{{ $res->id }}">{{ $res->location }}</option>
                             @endforeach
                             </select>
                         </div>
-                       </div>
-                    <!-- <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> RR Date</label>
-                            <input class="form-control date" type="text" placeholder="Select Date" name="rr_date" id="rr_date">
-                        </div>
-                    </div> -->
-             </div>
-            </div>
-            <!-- <div class="row">
-              <div class="col-md-12">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span>  Invoice Date</label>
-                            <input type="text" class="form-control date" placeholder="Select Date" name="invoice_date" id="invoice_date">
-                        
-                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span>  Invoice No.</label>
-                            <input type="text" class="form-control" style="" placeholder="Invoice NO" name="invoice_no" id="invoice_no">
-                        </div>
-                    </div>
-                    
                 </div>
-            </div> -->
+            </div>
 
             <div class="row">
-              <div class="col-md-12">
-                    <!-- <div class="col-md-6">
+                <div class="col-md-12">
+                      <div class="col-md-6">
+                          <div class="form-group">
+                              <label class="control-label"><span style="color:red">*</span>  Invoice Date</label>
+                              <input type="text" class="form-control date finput" placeholder="Select Date" name="invoice_date" id="invoice_date">
+                          
+                          </div>
+                      </div>
+                      <div class="col-md-6">
+                          <div class="form-group">
+                              <label class="control-label"><span style="color:red">*</span>  Invoice No.</label>
+                              <input type="text" class="form-control finput" style="" placeholder="Invoice NO" name="invoice_no" id="invoice_no">
+                          </div>
+                      </div>
+                      
+                  </div>
+              </div>
+          
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Warranty Coverage Date</label>
-                            <input class="form-control" type="text" style="" placeholder="(Years)" name="expiration_date" id="expiration_date">
+                            <label class="control-label"><span style="color:red">*</span> RR Date</label>
+                            <input class="form-control date finput" type="text" placeholder="Select Date" name="rr_date" id="rr_date">
                         </div>
                     </div>
-                       <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Location</label>
-                            <select required selected data-placeholder="-- Please Select Location --" id="location" name="location" class="form-select select2" style="width:100%;">
-                            @foreach($warehouse_location as $res)
-                                <option value=""></option>
-                                <option value="{{ $res->location }}">{{ $res->location }}</option>
-                            @endforeach
-                            </select>
-                        </div>
-                       </div> -->
-                    <!-- <div class="col-md-6">
+                    <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Upload SI/DR</label>
-                            <input type="file" class="form-control" style="" name="si_dr[]" id="si_dr" multiple accept="image/png, image/gif, image/jpeg">
+                            <input type="file" class="form-control finput" style="" name="si_dr[]" id="si_dr" multiple accept="image/png, image/gif, image/jpeg">
                             <div class="gallery" style="margin-bottom:5px; margin-top:15px"></div>
                             <a class="btn btn-xs btn-danger" style="display:none; margin-left:10px" id="removeImageHeader" href="#"><i class="fa fa-remove"></i></a>
+                            @foreach($header_images as $res_header_images)                                    
+                                @if ($res_header_images->file_name)
+                                <img style="margin-right:5px" width="120px"; height="90px"; src="{{URL::to('vendor/crudbooster/inventory_header').'/'.$res_header_images->file_name}}" alt="" data-action="zoom"> 
+                                @else
+                                
+                                @endif                                         
+                            @endforeach
                         </div>
-                    </div> -->
-                    <!-- <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label">Wattage</label>
-                            <input class="form-control" type="text" style="" name="wattage" id="wattage">
-                        </div>
-                    </div> -->
-                  
+                    </div>          
                 </div>
             </div>
-            <div class="row">
-              <div class="col-md-12">
-              <!-- <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label">3 Phase</label>
-                            <input class="form-control" type="text" style="" name="phase" id="phase">
-                        </div>
-                    </div> -->
-                    
-                </div>
-            </div>
+       
             <br>
             <div class="row">
              <div class="col-md-12">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> {{ trans('message.form-label.add_item') }}</label>
-                            <input class="form-control auto" placeholder="Search Item" id="search">
+                            <input class="form-control auto finput" placeholder="Search Item..." id="search">
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
                                 <li>Loading...</li>
                             </ul>
@@ -245,66 +283,56 @@
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>Asset Details</b></h3>
                     </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                        <div class="pic-container">
-                                            <div class="pic-row">
-                                                <table class="table table-bordered" id="asset-items" style="overflow-x: auto; height:auto;">
-                                                    <tbody id="bodyTable">
-                                                        <tr class="tbl_header_color dynamicRows">
-                                                            <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                            <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                            <th width="8%" class="text-center">Value</th>
-                                                            <!-- <th width="10%" class="text-center">{{ trans('message.table.item_type') }}</th>      -->
-                                                            <th width="15%" class="text-center">{{ trans('message.table.quantity_text') }}</th>
-                                                            <!-- <th width="15%" class="text-center"> Serial No</th>                                                                                                   -->
-                                                            <th width="15%" class="text-center"> Warranty Coverage(Year)</th>                                                     
-                                                            <!-- <th width="10%" class="text-center">{{ trans('message.table.image') }}</th>  -->
-                                                            <th width="8%" class="text-center">Action</th>
-                                                        </tr>
-                                                
-                                                        <!--tr class="tableInfo">
-                                                            <td colspan="6" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                            <td align="left" colspan="1">
-
-
-                                                                <input type='hidden' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-
-                                                                <input type='hidden' name="cost_total" class="form-control text-center" id="cost_total" readonly>
-
-                                                                <input type='number' name="total" class="form-control text-center" id="total" readonly>
-                                                            </td>
-                                                            <td colspan="1"></td>
-                                                        </tr> -->
-
-                                                        <tr id="tr-table">
-                                                            <tr>
-                                            
-                                                            </tr>
-                                                        </tr>
-                                                    
-                                                    </tbody>
-
-                                                    <tfoot>
-
-                                                        <tr id="tr-table1" class="bottom">
-            
-                                                            <!--<td colspan="3">
-                                                                <input type="button" id="add-Row" name="add-Row" class="btn btn-info add" value='Add Item' />
-                                                            </td>
-                                                            <td align="left" colspan="1">
-                                                                <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-                                                            </td> -->
-                                                        </tr>
-                                                    </tfoot>
-
-                                                </table>
-                                            </div>
-                                        </div>
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <div class="pic-container">
+                                <div class="pic-row">
+                                    <table id="asset-items" style="width: 130%">
+                                        <tbody id="bodyTable">
+                                            <tr class="tbl_header_color dynamicRows">
+                                                <th width="6%" class="text-center">Asset Code</th>
+                                                <th width="7%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                                <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                                                <th width="6%" class="text-center">Category</th>
+                                                <th width="2%" class="text-center">{{ trans('message.table.quantity_text') }}</th>
+                                                <th width="5%" class="text-center">Value</th>
+                                                <th width="7%" class="text-center"> Serial No <span style="font-style: italic; font-size:12px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
+                                                <th width="5%" class="text-center"> Warranty Month Expiration <span style="font-style: italic; font-size:12px; color:red"> <br>(Note: 1 is equivalent of 1 month)</span></th>                                                     
+                                                <th width="5%" class="text-center">UPC Code</th>     
+                                                <th width="6%" class="text-center" >Brand</th>
+                                                <th width="7%" class="text-center" >Specs <span style="font-style: italic; font-size:12px; color:red"><br>(Ex: ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD)</span></th>    
+                                                <th width="10%" class="text-center">For Re Order Items(ARF Number)<span style="font-style: italic; font-size:12px; color:red"> <br>(Please check if item is assign to ARF)</span></th>
+                                                <th width="3%" class="text-center">Action</th>
+                                            </tr>
+                                    
+                                            <tr id="tr-table">
+                                                <tr>
                                 
-                                    </div>
-                                    <br>
+                                                </tr>
+                                            </tr>
+                                        
+                                        </tbody>
+
+                                        <tfoot>
+
+                                            <tr id="tr-table1" class="bottom">
+
+                                                <td colspan="3" class="text-center">
+                                                    <span ><strong>Total</strong></span>
+                                                </td>
+                                                <td align="left">
+                                                    <input type='text' name="quantity_total" class="form-control text-center finput" id="quantity_total" readonly>
+                                                </td> 
+                                                <td colspan="8"></td>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
                                 </div>
+                            </div>
+                        </div>
+                        <br>
+                    </div>
                 </div>
             </div>
 
@@ -326,9 +354,14 @@
 @endsection
 
 @push('bottom')
+
     <script type="text/javascript">
+        $(function(){
+            $('body').addClass("sidebar-collapse");
+        });
         //preview image before save
         $(function() {
+     
         // Multiple images preview in browser
         var imagesPreview = function(input, placeToInsertImagePreview) {
 
@@ -367,6 +400,7 @@
          window.onunload = function() {
             null;
         };
+        var tableRow = 1;
         setTimeout("preventBack()", 0);
         function selectRefresh() {
         $('.main .select2').select2({
@@ -379,6 +413,7 @@
         }
         $(document).ready(function() {
             $('.select2').select2({placeholder_text_single : "-- Select --"})
+            
             $("#InventoryForm").submit(function(event) {
                 $("#btnSubmit").attr("disabled", true);
                 return true;
@@ -397,47 +432,297 @@
                     dayViewHeaderFormat: "MMMM YYYY",
             });
 
-        
-            // $table  = $('#asset-items'),            // cache the target table DOM element
-            // $rows   = $('tbody > tr', $table);     // cache all rows from the target table body
-
-            // $rows.sort(function(a, b) {
-
-            //     var keyA = $('td',a).text();
-            //     var keyB = $('td',b).text();
-
-            //     //if (sortAsc) {
-            //         return (keyA > keyB) ? 1 : 0;     // A bigger than B, sorting ascending
-            //     // } else {
-            //     //     return (keyA < keyB) ? 1 : 0;     // B bigger than A, sorting descending
-            //     // }
-            // });
-
-            // $rows.each(function(index, row){
-            // $table.append(row);                    // append rows after sort
-            // });
         });
        
   
-        $("#btnSubmit").click(function(event) {
-            event.preventDefault();
-            var countRow = $('#asset-items tbody tr').length;
-            // bind test on any change event
+        // $("#btnSubmit").click(function(event) {
+        //     event.preventDefault();
+        //     var countRow = $('#asset-items tbody tr').length;
+        //     // bind test on any change event
        
+        //     if($('#po_no').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'PO No required!',
+        //             icon: 'error',
+        //                 confirmButtonColor: "#367fa9",
+        //         });
+        //                 event.preventDefault();
+        //     }else if($('#rr_date').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'RR Date required!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault();
+        //     }else if($('#invoice_date').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'Invoice Date required!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault();
+        //     }else if($('#invoice_no').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'Invoice No required!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault();
+        //     }else if($('#expiration_date').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'Warranty Coverage Date required!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault();
+        //     }else if($('#si_dr').val() === ""){
+        //         swal({
+        //             type: 'error',
+        //             title: 'Upload SR/DR required!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault();
+        //     }else if (countRow == 3) {
+        //         swal({
+        //             type: 'error',
+        //             title: 'Please add an item!',
+        //             icon: 'error',
+        //              confirmButtonColor: "#367fa9",
+        //         });
+        //         event.preventDefault(); // cancel default behavior
+        //     }else{
+
+        //     $.ajax({
+        //             url: "{{ route('assets.check.row') }}",
+        //             dataType: "json",
+        //             type: "POST",
+        //             data: {
+        //                 "_token": token,
+        //                 //"search": request.term
+        //             },
+        //             success: function (data) {
+        //                 var n = $("input[name^='digits_code']").length;
+        //                 var dc_codes = $("input[name^='digits_code']");
+        //                 var serial_no = $("input[name^='serial_no']");
+        //                 var cont_one = [];
+        //                 for(i=0;i<n;i++){
+        //                 dc_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
+        //                 cont_one.push(dc_value);
+        //                 }
+                     
+        //                 var n_qty = $("input[name^='digits_code_on_qty']").length;
+        //                 var dc_codes_qty = $("input[name^='digits_code_on_qty']");
+        //                 var serial_no_qty = $("input[name^='serial_no_on_qty']");
+        //                 var cont_two = [];
+        //                 for(i=0;i<n_qty;i++){
+        //                 dc_value_qty =  dc_codes_qty.eq(i).val().concat('-',serial_no_qty.eq(i).val());
+        //                 cont_two.push(dc_value_qty);
+        //                 }
+        //                 var checkRow = $.merge(cont_one, cont_two);
+        //                 console.log(checkRow);
+        //                 var checkRowFinal = checkRow.filter(function(elem, index, self) {
+        //                     return index === self.indexOf(elem);
+        //                 });
+
+        //                 header image validation
+        //                 for (var i = 0; i < $("#si_dr").get(0).files.length; ++i) {
+        //                     var file1=$("#si_dr").get(0).files[i].name;
+        //                     if(file1){                        
+        //                         var file_size=$("#si_dr").get(0).files[i].size;
+        //                         if(file_size<2097152){
+        //                             var ext = file1.split('.').pop().toLowerCase();                            
+        //                             if($.inArray(ext,['jpg','jpeg','gif','png'])===-1){
+        //                                 swal({
+        //                                     type: 'error',
+        //                                     title: 'Invalid Image Extension for SI/DR!',
+        //                                     icon: 'error',
+        //                                     customClass: 'swal-wide'
+        //                                 });
+        //                                 event.preventDefault();
+        //                                 return false;
+        //                             }
+
+        //                         }else{
+        //                             alert("Screenshot size is too large.");
+        //                             return false;
+        //                         }                        
+        //                     }
+        //                 }
+
+        //                 //location
+        //                 var sub_cat = $("#location option").length;
+        //                     var sub_cat_value = $('#location').find(":selected");
+        //                     for(i=0;i<sub_cat;i++){
+        //                         if(sub_cat_value.eq(i).val() == ""){
+        //                             swal({  
+        //                                     type: 'error',
+        //                                     title: 'Please choose Location!',
+        //                                     icon: 'error',
+        //                                     confirmButtonColor: "#367fa9",
+        //                                 });
+        //                                 event.preventDefault();
+        //                                 return false;
+        //                         } 
+                        
+        //                     } 
+
+        //                 //each value validation
+        //                 var v = $("input[name^='value']").length;
+        //                 var value = $("input[name^='value']");
+        //                 for(i=0;i<v;i++){
+        //                     if(value.eq(i).val() === ""){
+        //                         swal({
+        //                                 type: 'error',
+        //                                 title: 'Value should not be empty(put zero if n/a)',
+        //                                 icon: 'error',
+        //                                   confirmButtonColor: "#367fa9",
+        //                             });
+        //                             event.preventDefault();
+        //                             return false;
+        //                     }else 
+        //                     if(value.eq(i).val() < 0){
+        //                         swal({
+        //                             type: 'error',
+        //                             title: 'Value should not be negative!',
+        //                             icon: 'error',
+        //                               confirmButtonColor: "#367fa9",
+        //                         });
+        //                         event.preventDefault();
+        //                         return false;
+        //                     }
+                        
+        //                 }
+
+        //                 // var finalDuplicateData = checkRow;
+        //                 // var dupArrData = finalDuplicateData.sort(); 
+        //                 // if($('.serial_no').val() != ""){
+        //                 //     for (var i = 0; i < dupArrData.length - 1; i++) {
+        //                 //     if (dupArrData[i + 1] == dupArrData[i]) {
+        //                 //         swal({
+        //                 //                 type: 'error',
+        //                 //                 title: 'Not allowed duplicate Serial No. and Digits Code!',
+        //                 //                 icon: 'error'
+        //                 //             }); 
+        //                 //            event.preventDefault();
+        //                 //             return false;
+        //                 //         }
+        //                 //     }
+        //                 // }
+
+        //                 //Each Warranty Coverage Validation
+        //                 var w = $("input[name^='warranty_coverage']").length;
+        //                 var warranty_coverage = $("input[name^='warranty_coverage']");
+        //                 for(i=0;i<w;i++){
+        //                     if(warranty_coverage.eq(i).val() === ""){
+        //                         swal({
+        //                                 type: 'error',
+        //                                 title: 'Warranty Month Expiration cannot be empty(put zero if n/a)',
+        //                                 icon: 'error',
+        //                                 confirmButtonColor: "#367fa9",
+        //                             });
+        //                             event.preventDefault();
+        //                             return false;
+        //                     }
+        //                     // else if(warranty_coverage.eq(i).val() <= 0){
+        //                     //     swal({
+        //                     //             type: 'error',
+        //                     //             title: 'Warranty Coverage Year Cannot be zero!',
+        //                     //             icon: 'error'
+        //                     //         });
+        //                     //         event.preventDefault();
+        //                     //         return false;
+        //                     // }
+                        
+        //                 }
+
+        //                 //limit adding per row by 90
+        //                 var quantity = $(".add_quantity").length;              
+        //                     if(quantity > 90){
+        //                         swal({
+        //                                 type: 'error',
+        //                                 title: 'Quantity cannot be greater than 90!',
+        //                                 icon: 'error',
+        //                                 confirmButtonColor: "#367fa9",
+        //                             });
+        //                             event.preventDefault();
+        //                             return false;
+        //                     }
+                        
+                        
+
+        //                 $.each(checkRowFinal, function(index, item) {
+        //                     if($.inArray(item, data.items) != -1){
+        //                         swal({
+        //                                 type: 'error',
+        //                                 title: 'Digits Code and Serial Already Exist! (' + item + ')',
+        //                                 icon: 'error',
+        //                                 confirmButtonColor: "#367fa9",
+        //                             }); 
+        //                            event.preventDefault();
+        //                             return false;
+        //                     }
+        //                     // else if($('#warranty_coverage').val() === ""){
+        //                     //     swal({
+        //                     //         type: 'error',
+        //                     //         title: 'Warranty Month Expiration cannot be empty(put zero if n/a)',
+        //                     //         icon: 'error',
+        //                     //         customClass: 'swal-wide',
+        //                     //         confirmButtonColor: "#367fa9",
+        //                     //     });
+        //                     //     event.preventDefault();
+        //                     // }
+        //                     else{
+        //                         swal({
+        //                         title: "Are you sure?",
+        //                         type: "warning",
+        //                         showCancelButton: true,
+        //                         confirmButtonColor: "#41B314",
+        //                         cancelButtonColor: "#F9354C",
+        //                         confirmButtonText: "Yes, submit it!",
+        //                         customClass: 'swal-wide'
+        //                         }, function () {
+        //                             $("#InventoryForm").submit();  
+        //                             showLoading();                      
+        //                         });
+        //                     }
+                            
+        //                 });
+        //                 }
+        //             });
+        //         }       
+          
+        //     var qty = 0;
+   
+        // });
+
+        
+        //VERSION 2 SUBMIT
+        $('#btnSubmit').on('click', function (event) {
+            event.preventDefault();
+            var fired_button = $(this).val();
+            var id = $('#header_id').val();
+            var remarks = $('#remarks').val();
             if($('#po_no').val() === ""){
-                        swal({
-                            type: 'error',
-                            title: 'PO No required!',
-                            icon: 'error',
-                            customClass: 'swal-wide'
-                        });
-                        event.preventDefault();
-            }else if($('#rr_date').val() === ""){
                 swal({
                     type: 'error',
-                    title: 'RR Date required!',
+                    title: 'PO No required!',
                     icon: 'error',
-                    customClass: 'swal-wide'
+                        confirmButtonColor: "#367fa9",
+                });
+                        event.preventDefault();
+            }else if($('#location').val() === ""){
+                swal({
+                    type: 'error',
+                    title: 'Please select location!',
+                    icon: 'error',
+                    customClass: 'swal-wide',
+                    confirmButtonColor: "#367fa9"
                 });
                 event.preventDefault();
             }else if($('#invoice_date').val() === ""){
@@ -445,7 +730,8 @@
                     type: 'error',
                     title: 'Invoice Date required!',
                     icon: 'error',
-                    customClass: 'swal-wide'
+                    customClass: 'swal-wide',
+                    confirmButtonColor: "#367fa9"
                 });
                 event.preventDefault();
             }else if($('#invoice_no').val() === ""){
@@ -453,15 +739,17 @@
                     type: 'error',
                     title: 'Invoice No required!',
                     icon: 'error',
-                    customClass: 'swal-wide'
+                    customClass: 'swal-wide',
+                    confirmButtonColor: "#367fa9"
                 });
                 event.preventDefault();
-            }else if($('#expiration_date').val() === ""){
+            }else if($('#rr_date').val() === ""){
                 swal({
                     type: 'error',
-                    title: 'Warranty Coverage Date required!',
+                    title: 'RR Date required!',
                     icon: 'error',
-                    customClass: 'swal-wide'
+                    customClass: 'swal-wide',
+                    confirmButtonColor: "#367fa9"
                 });
                 event.preventDefault();
             }else if($('#si_dr').val() === ""){
@@ -469,136 +757,103 @@
                     type: 'error',
                     title: 'Upload SR/DR required!',
                     icon: 'error',
-                    customClass: 'swal-wide'
+                    customClass: 'swal-wide',
+                    confirmButtonColor: "#367fa9"
                 });
                 event.preventDefault();
-            }else if (countRow == 3) {
-                swal({
-                    type: 'error',
-                    title: 'Please add an item!',
-                    icon: 'error',
-                    customClass: 'swal-wide'
-                });
-                event.preventDefault(); // cancel default behavior
             }else{
-
-            $.ajax({
+                $.ajax({
                     url: "{{ route('assets.check.row') }}",
                     dataType: "json",
                     type: "POST",
-                    data: {
-                        "_token": token,
-                        //"search": request.term
-                    },
+                    data: {},
                     success: function (data) {
                         var n = $("input[name^='digits_code']").length;
                         var dc_codes = $("input[name^='digits_code']");
                         var serial_no = $("input[name^='serial_no']");
-                        var cont_one = [];
+
+                        var remove_na = [];
                         for(i=0;i<n;i++){
-                        dc_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
-                        cont_one.push(dc_value);
+                            remove_na_value = serial_no.eq(i).val();
+                            remove_na.push(remove_na_value);
                         }
-                     
-                        var n_qty = $("input[name^='digits_code_on_qty']").length;
-                        var dc_codes_qty = $("input[name^='digits_code_on_qty']");
-                        var serial_no_qty = $("input[name^='serial_no_on_qty']");
-                        var cont_two = [];
-                        for(i=0;i<n_qty;i++){
-                        dc_value_qty =  dc_codes_qty.eq(i).val().concat('-',serial_no_qty.eq(i).val());
-                        cont_two.push(dc_value_qty);
+                        var removeItem = 'N/A';
+                        remove_na = jQuery.grep(remove_na, function(value) {
+                        return value != removeItem;
+                        });
+                        var checker = remove_na ? remove_na.length : n;
+                        //FOR NA
+                        var cont_one = [];
+                        for(i=0;i<checker;i++){
+                            //dc_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
+                            dc_value =  dc_codes.eq(i).val().concat('-',remove_na[i]);
+                            cont_one.push(dc_value);
                         }
-                        var checkRow = $.merge(cont_one, cont_two);
-                        console.log(checkRow);
+                        //FOR NOT NA
+                        var for_not_na = [];
+                        for(i=0;i<n;i++){
+                            for_not_na_value =  dc_codes.eq(i).val().concat('-',serial_no.eq(i).val());
+                            for_not_na.push(for_not_na_value);
+                        }
+                        var checkRowForNa = cont_one;
+                        var checkRow = cont_one.length !== 0 ? cont_one : for_not_na;
                         var checkRowFinal = checkRow.filter(function(elem, index, self) {
                             return index === self.indexOf(elem);
                         });
-
+                    
                         //header image validation
-                        // for (var i = 0; i < $("#si_dr").get(0).files.length; ++i) {
-                        //     var file1=$("#si_dr").get(0).files[i].name;
-                        //     if(file1){                        
-                        //         var file_size=$("#si_dr").get(0).files[i].size;
-                        //         if(file_size<2097152){
-                        //             var ext = file1.split('.').pop().toLowerCase();                            
-                        //             if($.inArray(ext,['jpg','jpeg','gif','png'])===-1){
-                        //                 swal({
-                        //                     type: 'error',
-                        //                     title: 'Invalid Image Extension for SI/DR!',
-                        //                     icon: 'error',
-                        //                     customClass: 'swal-wide'
-                        //                 });
-                        //                 event.preventDefault();
-                        //                 return false;
-                        //             }
+                        for (var i = 0; i < $("#si_dr").get(0).files.length; ++i) {
+                            var file1=$("#si_dr").get(0).files[i].name;
+                            if(file1){                        
+                                var file_size=$("#si_dr").get(0).files[i].size;
+                                if(file_size<2097152){
+                                    var ext = file1.split('.').pop().toLowerCase();                            
+                                    if($.inArray(ext,['jpg','jpeg','gif','png'])===-1){
+                                        swal({
+                                            type: 'error',
+                                            title: 'Invalid Image Extension for SI/DR!',
+                                            icon: 'error',
+                                            customClass: 'swal-wide',
+                                            confirmButtonColor: "#367fa9"
+                                        });
+                                        event.preventDefault();
+                                        return false;
+                                    }
 
-                        //         }else{
-                        //             alert("Screenshot size is too large.");
-                        //             return false;
-                        //         }                        
-                        //     }
-                        // }
+                                }else{
+                                    alert("Screenshot size is too large.");
+                                    return false;
+                                }                        
+                            }
+                        }
+                        
+                        //check category
+                        var cat = $("input[name^='item_category']").length;
+                        var item_category = $("input[name^='item_category']");
+                        for(i=0;i<cat;i++){
+                            if($.inArray(item_category.eq(i).val(),['IT ASSETS','FIXED ASSETS','APPLIANCES','MAINTENANCE HARDWARE','OFFICE EQUIPMENT','FIXED ASSET']) === -1){
+                                swal({
+                                        type: 'error',
+                                        title: 'Invalid Category. please check Category!',
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9",
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }
+                        
+                        }
 
-                        //each value validation
-                        var v = $("input[name^='value']").length;
-                        var value = $("input[name^='value']");
-                        for(i=0;i<v;i++){
-                            if(value.eq(i).val() == 0){
+                        //Value
+                        var cost = $("input[name^='value']").length;
+                        var valueCost = $("input[name^='value']");
+                        for(i=0;i<cost;i++){
+                            if(valueCost.eq(i).val() == ""){
                                 swal({
                                         type: 'error',
                                         title: 'Value required!',
                                         icon: 'error',
-                                        customClass: 'swal-wide'
-                                    });
-                                    event.preventDefault();
-                                    return false;
-                            }else if(value.eq(i).val() < 0){
-                                swal({
-                                    type: 'error',
-                                    title: 'Value should not be negative!',
-                                    icon: 'error',
-                                    customClass: 'swal-wide'
-                                });
-                                event.preventDefault();
-                                return false;
-                            }
-                        
-                        }
-
-                        // var finalDuplicateData = checkRow;
-                        // var dupArrData = finalDuplicateData.sort(); 
-                        // if($('.serial_no').val() != ""){
-                        //     for (var i = 0; i < dupArrData.length - 1; i++) {
-                        //     if (dupArrData[i + 1] == dupArrData[i]) {
-                        //         swal({
-                        //                 type: 'error',
-                        //                 title: 'Not allowed duplicate Serial No. and Digits Code!',
-                        //                 icon: 'error'
-                        //             }); 
-                        //            event.preventDefault();
-                        //             return false;
-                        //         }
-                        //     }
-                        // }
-
-                        //Each Warranty Coverage Validation
-                        var w = $("input[name^='warranty_coverage']").length;
-                        var warranty_coverage = $("input[name^='warranty_coverage']");
-                        for(i=0;i<w;i++){
-                            if(warranty_coverage.eq(i).val() === ""){
-                                swal({
-                                        type: 'error',
-                                        title: 'Warranty Coverage Year required!',
-                                        icon: 'error',
-                                        customClass: 'swal-wide'
-                                    });
-                                    event.preventDefault();
-                                    return false;
-                            }else if(warranty_coverage.eq(i).val() <= 0){
-                                swal({
-                                        type: 'error',
-                                        title: 'Warranty Coverage Year Cannot be zero!',
-                                        icon: 'error'
+                                        confirmButtonColor: "#367fa9",
                                     });
                                     event.preventDefault();
                                     return false;
@@ -606,142 +861,190 @@
                         
                         }
 
-                        //limit adding per row by 90
-                        var quantity = $(".add_quantity").length;              
-                            if(quantity > 90){
-                                swal({
+                        //not allowed duplicate
+                        var finalDuplicateData = checkRowForNa;
+                        var dupArrData = finalDuplicateData.sort(); 
+
+                        if(dupArrData.length !== 0){
+                            if($('.serial_no').val() != ""){
+                                for (var i = 0; i < dupArrData.length - 1; i++) {
+                                if (dupArrData[i + 1] == dupArrData[i]) {
+                                    swal({
+                                            type: 'error',
+                                            title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na)',
+                                            icon: 'error',
+                                            confirmButtonColor: "#367fa9"
+                                        }); 
+                                        event.preventDefault();
+                                        return false;
+                                    }
+                                }
+                            }
+                        }
+                        
+
+                        //each value validation
+                        var v = $("input[name^='serial_no']").length;
+                        var value = $("input[name^='serial_no']");
+                        for(i=0;i<v;i++){
+                            if(value.eq(i).val() == 0){
+                                swal({  
                                         type: 'error',
-                                        title: 'Quantity cannot be greater than 90!',
+                                        title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
                                         icon: 'error',
-                                        customClass: 'swal-wide'
+                                        confirmButtonColor: "#367fa9"
                                     });
                                     event.preventDefault();
                                     return false;
                             }
-                        
-                        
+                    
+                        }
+        
+                        //upc code each value validation
+                        var u = $("input[name^='upc_code']").length;
+                        var upcValue = $("input[name^='upc_code']");
+                        for(i=0;i<u;i++){
+                            if(upcValue.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'UPC Code Required!',
+                                        icon: 'error',
+                                        customClass: 'swal-wide',
+                                        confirmButtonColor: "#367fa9"
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }
+                    
+                        }
 
+                        //upc code each value validation
+                        var b = $("input[name^='brand']").length;
+                        var brandValue = $("input[name^='brand']");
+                        for(i=0;i<b;i++){
+                            if(brandValue.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'Brand Required!',
+                                        icon: 'error',
+                                        customClass: 'swal-wide',
+                                        confirmButtonColor: "#367fa9"
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }
+                    
+                        }
+
+                        //upc code each value validation
+                        var s = $("input[name^='specs']").length;
+                        var specsValue = $("input[name^='specs']");
+                        for(i=0;i<s;i++){
+                            if(specsValue.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'Specs Required!',
+                                        icon: 'error',
+                                        customClass: 'swal-wide',
+                                        confirmButtonColor: "#367fa9"
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }
+                    
+                        }
+
+                    
+                        //check existing
                         $.each(checkRowFinal, function(index, item) {
                             if($.inArray(item, data.items) != -1){
                                 swal({
                                         type: 'error',
                                         title: 'Digits Code and Serial Already Exist! (' + item + ')',
-                                        icon: 'error'
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9",
                                     }); 
-                                   event.preventDefault();
+                                    event.preventDefault();
                                     return false;
-                            }
-                            else if($('#warranty_coverage').val() === ""){
+                            }else{
+                                $('.arf_tag').attr('disabled',false);
                                 swal({
-                                    type: 'error',
-                                    title: 'Warranty Coverage Year required!',
-                                    icon: 'error',
-                                    customClass: 'swal-wide'
-                                });
-                                event.preventDefault();
-                            }
-                            else{
-                                swal({
-                                title: "Are you sure?",
-                                type: "warning",
-                                showCancelButton: true,
-                                confirmButtonColor: "#41B314",
-                                cancelButtonColor: "#F9354C",
-                                confirmButtonText: "Yes, submit it!",
-                                customClass: 'swal-wide'
-                                }, function () {
-                                    $("#InventoryForm").submit();  
-                                    showLoading();                      
-                                });
-                            }
-                            
-                        });
-                        }
-                    });
-                }
-           
-            // var value = $('.vvalue').val();
-            // input validation goes here
-            // var rowTotalQty = 0;
-            // $('.add_quantity').each(function () {
-            //     rowTotalQty += parseFloat($(this).val());
-            //     if(rowTotalQty > 90){
-            //         swal({
-            //         type: 'error',
-            //         title: 'Quantity cannot be greater than 90!',
-            //         icon: 'error',
-            //         width: 450,
-            //         height: 200
-            //     });
-            //     event.preventDefault(); 
-            //     }
-            // });
-       
-          
-            var qty = 0;
-            // $('.add_quantity').each(function() {
-            // var qty = $(this).val();
-            //    if (qty == 0) {
-            //     swal({
-            //         type: 'error',
-            //         title: 'Quantity cannot be empty or zero!',
-            //         icon: 'error',
-            //         width: 450,
-            //         height: 200
-            //     });
-            //     event.preventDefault(); // cancel default behavior
-            // } else 
-            // if (qty < 0) {
-            //     swal({
-            //         type: 'error',
-            //         title: 'Negative Value is not allowed!',
-            //         icon: 'error',
-            //         width: 450,
-            //         height: 200
-            //     });
-            //     event.preventDefault(); // cancel default behavior
-            // }
-            // });
+                                    title: "Are you sure?",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonColor: "#41B314",
+                                    cancelButtonColor: "#F9354C",
+                                    confirmButtonText: "Yes, receive it!",
+                                    width: 450,
+                                    height: 200
+                                    }, function () {
+                                    showLoading();   
+                                    $.ajaxSetup({
+                                        headers: {
+                                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                            }
+                                    });
+                                    var formData = new FormData();
+                                    const totalImages = $("#si_dr")[0].files.length;
+                                    let images = $("#si_dr")[0];
+                                    for (let i = 0; i < totalImages; i++) {
+                                        formData.append('si_dr[]', images.files[i]);
+                                    }
 
-           //body image validation
-        //    var image = 0;
-        //    $('.body_image').each(function () {
-        //         image = $(this).val();
-        //         if($('#checkImage').val() === "null" && image === ""){
-        //             swal({
-        //             type: 'error',
-        //             title: 'Please upload image for this item!',
-        //             icon: 'error',
-        //             width: 450,
-        //             height: 200
-        //         });
-        //         event.preventDefault(); 
-        //         }else if($('#checkImage').val() != "null" && image != ""){
-        //                 swal({
-        //                     type: 'error',
-        //                     title: 'Item has already image!',
-        //                     icon: 'error',
-        //                     width: 450,
-        //                     height: 200
-        //                 });
-        //                 event.preventDefault();
-        //             }
-             
-        //     });
- 
+                                    formData.append('form_data', $('#InventoryForm').serialize());
+                                    formData.append('remarks', remarks);
+                                    formData.append('id', id);
+                                    $.ajax({
+                                        url: "{{ route('assets.get.approvedProcess') }}",
+                                        dataType: "json",
+                                        type: "POST",
+                                        data: formData,
+                                        processData : false,
+                                        contentType : false,
+                                        // data: {
+                                        //     "form_data": $('#ForApprovalForm').serialize(),
+                                        //     "id": id,
+                                        //     "remarks": remarks
+                                        // },
+                                        success: function (data) {
+                                            if (data.status == "success") {
+                                                swal({
+                                                    type: data.status,
+                                                    title: data.message,
+                                                });
+                                                //window.location.replace(data.redirect_url);
+                                                setTimeout(function(){
+                                                    window.location.replace(document.referrer);
+                                                }, 1000); 
+                                                } else if (data.status == "error") {
+                                                swal({
+                                                    type: data.status,
+                                                    title: data.message,
+                                                });
+                                            }
+                                        }
+                                    })
+                                });
+                            }
+                                        
+                        });
+                    }    
+                });
+            }
         });
-        
+
+        var tableRow = 1;
         var stack = [];
         var token = $("#token").val();
-
+        var arf_array = [];
         $(document).ready(function(){
-            selectRefresh();
+            //selectRefresh();
             $(function(){
                 $("#search").autocomplete({
 
                     source: function (request, response) {
                     $.ajax({
-                        url: "{{ route('asset.item.search') }}",
+                        url: "{{ route('search-assets') }}",
                         dataType: "json",
                         type: "POST",
                         data: {
@@ -749,14 +1052,13 @@
                             "search": request.term
                         },
                         success: function (data) {
-                            console.log(data.items);
+                            //console.log(data.items);
                             if(data.items === null){
                                 swal({
                                 type: 'error',
                                 title: 'Item not Found!',
                                 icon: 'error',
-                                width: 450,
-                                height: 200
+                                confirmButtonColor: "#367fa9",
                                });
                             }else{                              
                             var rowCount = $('#asset-items tr').length;
@@ -781,7 +1083,7 @@
                                         item_type:                  item.item_type,
                                         image:                      item.image,
                                         quantity:                   item.quantity,
-                                        total_quantity:                   item.total_quantity,
+                                        total_quantity:             item.total_quantity,
                                      
                                     }
 
@@ -805,48 +1107,132 @@
                     
                 },
                 select: function (event, ui) {
-                        var e = ui.item;               
+                        var e = ui.item;  
+                        $.ajax({
+                            url: "{{ route('check-reserve-digits-code') }}",
+                            dataType: "json",
+                            type: "POST",
+                            data: {
+                                "_token": token,
+                                "search": e.digits_code
+                            },
+                            success: function (data) {
+                                if(data.items != arf_array.length){
+                                    swal({
+                                    type: 'info',
+                                    title: 'There is a reorder for this Digits Code. Please select the ARF before saving.',
+                                    icon: 'info',
+                                });
+                                }
+                               
+                            }
+                        })
+                        tableRow++;
                         if (e.id) {   
                            // if (!in_array(e.id, stack)) {
                                 if (!stack.includes(e.id)) {            
-                                    //stack.push(e.id);                                                                                
-                                    // if(e.item_type == "SERIAL"){
-                                    //    console.log(e.item_type);
-                                        // if(e.quantity != 0){
-                                        //     swal({
-                                        //         type: 'error',
-                                        //         title: 'Only 1 quantity is allowed in serialized items!',
-                                        //         icon: 'error',
-                                        //         width: 450,
-                                        //         height: 200
-                                        //     });
+                                    stack.push(e.id);                                                                                
+                                                           
+                                    var new_row = '<tr class="nr" id="rowid' + e.id + '" rows>' +
+                                        '<input class="form-control text-center ginput" type="hidden" name="body_id[]" readonly value="' + e.id + '">' +
+                                        '<td><input class="form-control text-center ginput" type="text" name="asset_code[]" readonly value="' + e.asset_code + '"></td>' +
+                                        '<td><input class="form-control text-center ginput" type="text" id="dc" name="digits_code[]" readonly value="' + e.digits_code + '"></td>' +
+                                        '<td><input class="form-control text-center ginput" type="text" name="item_description[]" readonly value="' + e.value + '"></td>' +
+                                        '<td><input class="form-control text-center ginput amount" placeholder="Value" type="text" readonly value="' + e.category_description + '"></td>' +
+                                        '<td><input class="form-control text-center ginput text-center add_quantity" placeholder="Quantity" type="text" value="1" readonly name="add_quantity[]" id="add_quantity' + e.id  + '" data-id="' + e.id  + '"  min="0" max="9999999999" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validity.valid||(value=1);"></td>' +               
+                                        '<td><input class="form-control ginput text-center" placeholder="' + e.item_cost + '" type="text" name="value[]" id="value" required min="1" min="0" max="9999999999"></td>' +                                           
+                                        '<td><input class="form-control finput serial_no" type="text" placeholder="Serial No." name="serial_no[]" value="" data-index="1"></td>' + 
+                                        '<td><input class="form-control finput text-center" type="text" placeholder="(Month)" name="warranty_coverage[]" id="warranty_coverage" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57" value="0"></td>' +                                                                                                                                       
+                                        '<td><input class="form-control upc_code finput" type="text" placeholder="UPC Code" name="upc_code[]" style="width:100%" data-index="1"></td>' + 
+                                        '<td><input class="form-control brand finput" type="text" placeholder="Brand" name="brand[]" style="width:100%" data-index="1"></td>' +
+                                        '<td><input class="form-control specs finput" type="text" placeholder="ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD" name="specs[]" style="width:100%" data-index="1"></td>' +  
 
-                                        // }else{
-                                            var new_row = '<tr class="nr" id="rowid' + e.id + '" rows>' +
-                                                '<td><input class="form-control text-center" type="text" id="dc" name="digits_code[]" readonly value="' + e.digits_code + '" style="width:150px;"></td>' +
-                                                '<td><input class="form-control" type="text" name="item_description[]" readonly value="' + e.value + '" style="width:250px;"></td>' +
-                                                '<td><input class="form-control amount" placeholder="Value" type="text" name="value[]" id="value" style="width:160px;" required min="1" max="9999999999"></td>' +
-                                                //'<td><select required selected data-placeholder="-- Select Type --" id="item_type' + e.id + '" name="item_type[]" class="select2 item_type" style="width:150px;"><option value=""></option><option value="Serial" data-id="' + e.digits_code + '">Serial</option><option value="General" data-id="' + e.digits_code + '">GENERAL</option></select></td>' +
-                                                '<td><input class="form-control text-center add_quantity" placeholder="Quantity" style="width:160px;" type="text" value="1" readonly name="add_quantity[]" id="add_quantity' + e.id  + '" data-id="' + e.id  + '"  min="0" max="9999999999" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validity.valid||(value=1);"></td>' +   
-                                                // '<td><input class="form-control serial_no" type="text" placeholder="Serial No (Optional)" name="serial_no[]" value="" style="width:150px;" data-index="1"></td>' + 
-                                                '<td><input class="form-control" type="text" placeholder="(Year)" name="warranty_coverage[]" style="width:160px;" id="warranty_coverage" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57"></td>' +                                                                           
-                                                //'<td class="images_flex"><input type="file" class="form-control body_image" onchange="readURL(this);" id="body_image_body' + e.id + '" name="item_photo[]" style="width:200px;" accept="image/png, image/gif, image/jpeg"><br><div class="body_gallery_image' + e.id + '"></div></td>' + 
-                                                //'<td><img width="50px"; height="50px"; src="{{URL::to('+e.image+')}}" alt="" data-action="zoom"></td>' +
-                                                '<td class="text-center" style="width:20px;"><a id="delete_item' +e.id + '" class="btn btn-xs btn-danger delete_item" style="margin-right:100px;margin-top:5px;" ><i class="fa fa-remove"></i> remove</a></td>' +
-                                                '<input type="hidden" name="item_id[]" readonly value="' +e.id + '">' +
-                                                '<td><input type="hidden" id="checkImage" value="' + e.image + '" readonly></td>' +
-                                                '<td><input type="hidden" name="item_category[]" id="item_cat" value="' + e.category_description + '"></td>' +
-                                                '<td><input type="hidden" name="category_id[]" id="catid" value="' + e.category_id + '"></td>' +
-                                                '</tr>';
-                                           
+                                        '<td>'+
+                                            '<select selected data-placeholder="RO items(Optional)" class="form-control arf_tag" name="arf_tag[]" data-id="' +  e.id + '" id="arf_tag' + tableRow + '" required style="width:100%">' +
+                                            // '  <option value=""></option>' +
+                                            // '         @foreach($reserved_assets as $reserve)'+
+                                            //             '<option value="{{$reserve->served_id}}" data-code="{{$reserve->digits_code}}">{{$reserve->reference_number}} | {{$reserve->digits_code}} | id: {{$reserve->served_id}}</option> '+
+                                            // '         @endforeach'+
+                                            '</select>'+
+                                        '</td>' +
+                
+                                        '<td style="text-align:center"><a id="delete_item' +e.id + '" class="btn btn-sm btn-danger delete_item btn-lg"><i class="fa fa-trash"></i></a></td>' +
+                                        '<input type="hidden" name="item_id[]" readonly value="' +e.id + '">' +
+                                        '<input type="hidden" id="checkImage" value="' + e.image + '" readonly>' +
+                                        '<input type="hidden" name="item_category[]" id="item_cat" value="' + e.category_description + '">' +
+                                        '<input type="hidden" name="category_id[]" id="catid" value="' + e.category_id + '">' +
+                                        '</tr>';
+                                        //alert($reserved_assets);
                                         //}
-                         
+                                    
                                     //$(new_row).insertAfter($('table tr.dynamicRows:last'));
-                                    $("table tbody").append(new_row);
-                                    $('.select2').select2({placeholder_text_single : "-- Select --"})
+                                  
 
+                                    $("table tbody").append(new_row);
+
+                                    $('.arf_tag').select2({allowClear: true});
+                                                     
+                                    $('#arf_tag'+tableRow).change(function () {
+                                        arf_array.push(parseInt(this.value));
+                                        $(this).attr('disabled','disabled');
+                                        var $selects = $('select');
+                                        console.log(arf_array);
+                                        $selects.select2({allowClear: true});
+                                        $('option:hidden', $selects).each(function () {
+                                            var self = this,
+                                                toShow = true;
+                                            $selects.not($(this).parent()).each(function () {
+                                                if (self.value == this.value) toShow = false;
+                                            })
+                                            if (toShow) {
+                                                $(this).removeAttr('disabled');
+                                                $(this).parent().select2({allowClear: true});
+                                            }
+                                        });
+                                        if (this.value != "") {
+                                            //$selects.not(this).children('option[value=' + this.value + ']').attr('disabled', 'disabled');
+                                            $selects.not(this).children('option[value=' + this.value + ']').remove();
+                                            $selects.select2({allowClear: true});
+                                        }
+                                    });
+
+                                    $.ajax
+                                    ({ 
+                                        type: 'POST',
+                                        url: "{{ route('selection-digits-code') }}",
+                                        data: {
+                                            "digits_code": e.digits_code
+                                        },
+
+                                        success: function(result) {
+                                            var pushData = [];
+                                            $.each( result, function( index, value ){
+                                                if(jQuery.inArray(value.id, arf_array) === -1){
+                                                    pushData.push(value);
+                                                }
+                                            });
+                                            var x;
+                                            var showData = [];
+                                            showData[0] = "<option value=''></option>";
+                                            for (x = 0; x < pushData.length; ++x) {               
+                                                var j = x + 1;
+                                                showData[j] = "<option value='"+pushData[x].served_id+"'>"+pushData[x].reference_number+" | "+ pushData[x].digits_code +"</option>";
+                                            }
+                                            $('#arf_tag' + tableRow).html(showData);        
+                                    
+                                        }
+                                    });
+                                  
+                                                                     
                                     $(document).on('click', '#delete_item' + e.id, function () {
                                         var parentTR = $(this).parents('tr');  
+
+                                        var removeItem =  $(this).parents('tr').find('select').val();
+
+                                        arf_array = jQuery.grep(arf_array, function(value) {
+                                          return value != removeItem;
+                                        });
+                        
                                         $(parentTR).remove();
                                         $(".nr"+e.id).remove();
                                         $(".serial_qty"+e.id).val('');
@@ -854,44 +1240,16 @@
                                         $("#dcqty"+e.id).val('');
                                         $(".delete_serial_row").remove();
                                         $('#rowid').load('#rowid');
+                                        $("#quantity_total").val(calculateTotalQuantity());
                                        
                                     });
-                                    
-                                    // $(function() {
-                                    // // single images preview in browser
-                                    // var imagesPreview = function(input, placeToInsertImagePreview) {
-
-                                    //     if (input.files) {
-                                    //         var filesAmount = input.files.length;
-
-                                    //         for (i = 0; i < filesAmount; i++) {
-                                    //             var reader = new FileReader();
-
-                                    //             reader.onload = function(event) {
-                                    //                 $($.parseHTML('<img height="120px" id="body_image_id' + e.id + '" class="body_image_class" width="180px;" hspace="10"  data-action="zoom">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
-                                    //             }
-
-                                    //             reader.readAsDataURL(input.files[i]);
-                                    //         }
-                                    //     }
-
-                                    // };
-                                    //     $('#body_image_body' + e.id).on('change', function() {
-                                    //         var imgs = $('div.body_gallery_image' + e.id).find('img').attr('src');
-                                      
-                                    //             imagesPreview(this, 'div.body_gallery_image' + e.id);
-                                                                        
-                                    //         //$("#removeImage").toggle(); 
-                                    //     });
-                                    // });
-                                    //remove image from preview
-                                    // $("#removeImage").click(function(e) {
-                                    //     e.preventDefault(); // prevent default action of link
-                                    //     $('.body_image_class').attr('src', ""); //clear image src
-                                    //     $('#body_image_body' + e.id).val(""); // clear image input value
-                                    //     $('.body_image_class').remove();
-                                    //     $("#removeImage").toggle(); // hide remove link.
-                                    // });
+                                   
+                                    $(".date").datetimepicker({
+                                            viewMode: "days",
+                                            format: "YYYY-MM-DD",
+                                            dayViewHeaderFormat: "MMMM YYYY",
+                                    });
+                              
                                     $(document).on("keyup","#quantity, #amount, #value", function (e) {
                                         if (e.which >= 37 && e.which <= 40) return;
                                         if (this.value.charAt(0) == ".") {
@@ -916,112 +1274,25 @@
                                             return parts.join(".");
                                         });
                                      });
-                                    $(document).ready(function() {
-                                        // $('#item_type' + e.id).change(function() {
-                                        // var parentTR = $(this).parents('tr');   
-                                        // var item_type = $('#item_type' + e.id).val().toLowerCase().replace(/\s/g, '');
-                                        //     if(item_type == "serial"){
-                                        //         $(parentTR).find(".serial_no").prop('readonly', false);
-                                        //         $(parentTR).find(".serial_no").attr("required", true);
-                                        //     }
-                                        //     if(item_type != "serial"){
-                                        //         $(parentTR).find(".serial_no").prop('readonly', true);
-                                        //         $(parentTR).find(".serial_no").attr("required", false);
-                                        //         $(parentTR).find(".serial_no").val("");
-                                        //     }
-                                        // });
-                                        // add serial per line
-                                        // if(e.category_description == "SUPPLIES"){
-                                        //     $("#add_quantity"+ e.id).prop('readonly', false);
-                                        //     $("#add_quantity"+ e.id).val("");   
-                                        // }
-
-                                        // adding serial fields per quantity
-                                        $("#add_quantity"+ e.id).on("input", function(){
-                                            // Not checking for Invalid input
-                                                //var item_type_serial = $('#item_type' + e.id).val().toLowerCase().replace(/\s/g, '');
-                                                if (this.value != '') {
-                                                    var val = parseInt(this.value, 10) - 1;
-                                                    var parentTR = $(this).parents('tr');  
-                                                    for (var i = 0; i < val; i++) {
-                                                        var serial_row = '<tr class="nr'+e.id+'" id="rowid' + e.id + '" rows>' +
-                                                    
-                                                            '<td><input class="form-control id="dcqty'+e.id+'" text-center" type="text" name="digits_code_on_qty[]" readonly value="' + e.digits_code + '" style="display:none"></td>' +
-                                                            '<td></td>' +
-                                                            '<td></td>' +
-                                                            '<td></td>' + 
-                                                       
-                                                            '<td><input class="form-control serial_qty'+e.id+'" placeholder="Serial No (Optional)" id="serial_qty" type="text" name="serial_no_on_qty[]" value="" data-index="2"></td>' +                                            
-                                                            '<td class="text-center"><a id="' +e.id + '" class="btn btn-xs btn-danger delete_serial_row'+e.id+'" style="margin-right:150px;margin-top:5px"><i class="fa fa-remove" ></i></a></td>' +
-                                                            '<td></td>' +
-                                                            '<td></td>' +
-                                                            '<td></td>' +
-                                                            '</tr>';
-                                                        $(serial_row).insertAfter(parentTR);
-                                                    }
-                                                }
-                                                // if(item_type_serial == "serial"){  
-                                                //     $('#item_type' + e.id).change(function() {
-                                                //     var parentTR = $(this).parents('tr');   
-                                                //     var item_type = $('#item_type' + e.id).val().toLowerCase().replace(/\s/g, '');
-                                                //         if(item_type == "general"){
-                                                //             $(".nr"+e.id).remove();
-                                                //             $(".serial_qty"+e.id).val('');
-                                                //             $("#dcqty"+e.id).remove();
-                                                //             $("#dcqty"+e.id).val('');
-                                                //             $(".delete_serial_row"+e.id).remove();
-                                                //         }
-                                                        
-                                                //     }); 
-                                                    
-                                                // }
-                                            });
-                                        
-
-                                        // Delete per row Serial Fields
-                                        $(document).on('click', '.delete_serial_row'+e.id, function () {
-                                            var parentTR = $(this).parents('tr');  
-                                            var bal = $('#add_quantity' + e.id).val();
-                                            var res = bal - 1;
-                                            $("#add_quantity" + e.id).val(res);
-                                            $(parentTR).remove();
-                                        });
-                                        // Add per row Serial Fields Value using keypress
-                                        $('#InventoryForm').on('keydown', 'input',function (event) {
-                                            var keyCode = event.keyCode || event.which;
-                                            if (event.which == 13) {
-                                                event.preventDefault();
-                                                var $this = $(event.target);
-                                                var index = parseFloat($this.attr('data-index'));
-                                                $('[data-index="' + (index + 1) + '"]').focus();
-                                            }
-                                        });                                       
-
-                                    });
+                                     $("#quantity_total").val(calculateTotalQuantity());
+                                   
+                                 
                                     //blank++;
-                                    $("#total").val(calculateTotalValue2());
+                                    
 
                                     $(this).val('');
                                     $('#val_item').html('');
 
                                     return false;
-                                
+                                  
                                 }else{
 
-                                    // if(e.item_type == "SERIAL"){
-                                    //     swal({
-                                    //         type: 'error',
-                                    //         title: 'Only 1 quantity is allowed in serialized items!',
-                                    //         icon: 'error',
-                                    //         width: 450,
-                                    //         height: 200
-                                    //     });
-                                    //     $(this).val('');
-                                    //     $('#val_item').html('');
-                                    //     return false;
-
-                                    // }else{
-
+                                        swal({
+                                            type: 'error',
+                                            title: 'Item Already Added!',
+                                            icon: 'error',
+                                            confirmButtonColor: "#367fa9",
+                                        }); 
                                         $('#add_quantity' + e.id).val(function (i, oldval) {
                                             return ++oldval;
                                         });
@@ -1031,17 +1302,6 @@
                                         var q = parseInt($('#add_quantity' +e.id).val());
                                         var r = parseInt($("#quantity" + e.id).val());
 
-                                        /*$('#quantity' + e.id).val(function (i, amount) {
-                                            if (q != 0) {
-                                                var itemPrice = (q * r);
-                                                return itemPrice;
-                                            } else {
-                                                return 0;
-                                            }
-                                        });*/
-
-                                       //$('#'+temp_qty).val(q);
-
                                         var price = calculatePrice(q, r); 
 
                                         if(price == 0){
@@ -1050,12 +1310,8 @@
                                         
 
                                         $("#total_quantity" + e.id).val(price);
-
-
-                                        //var subTotalQuantity = calculateTotalQuantity();
-                                        //$("#totalQuantity").val(subTotalQuantity);
-
-
+                                        
+                                     
                                         $(this).val('');
                                         $('#val_item').html('');
                                         return false;
@@ -1063,150 +1319,36 @@
 
                                 }
                                 
-
+                             
                         }
+                    
                 },
-              
+                        
                 minLength: 1,
                 autoFocus: true
+                
                 });
             });
-           
-        });
 
-        $('#employee_name').change(function() {
-    
-                var employee_name =  this.value;
-                
-                //var id_data = $(this).attr("data-id");
-                // $('.account'+id_data).prop("disabled", false);
+        }); 
 
-                $.ajax
-                ({ 
-                    url: "{{ URL::to('/employees')}}",
-                    type: "POST",
-                    data: {
-                        'employee_name': employee_name,
-                        _token: '{!! csrf_token() !!}'
-                        },
-                        
-                    
-                        
-                    success: function(result)
-                    {   
-                        //alert(result.length);
-                       
-                        //$('#company_name').val(result[0].company_name);
-                        $('#position').val(result[0].position_description);
-                        $('#department').val(result[0].department_name);
-                        
-                        if(result[0].department_name.includes("STORE")){
-
-
-                            $('#div_store_branch').show();
-                            
-                            $('#store_branch').attr('required', 'required');
-
-                        }else{
-
-                            $('#div_store_branch').hide();
-                            $('#store_branch').removeAttr('required');
-
-                        }
-
-                        /*var i;
-                        var showData = [];
-
-                        for (i = 0; i < result.length; ++i) {
-                            var j = i + 1;
-                            showData[i] = "<option value='"+result[i].id+"'>"+result[i].sub_department_name+"</option>";
-                        }
-                        //$('.account'+id_data).find('option').remove();
-                        //jQuery('.account'+id_data).html(showData);          
-                        
-                        jQuery('#sub_department_id').html(showData);*/
-                    }
-                });
-
-        });
-
-
-        $('#company_name').change(function() {
-    
-                var company_name =  this.value;
-                
-                //var id_data = $(this).attr("data-id");
-                // $('.account'+id_data).prop("disabled", false);
-
-                $.ajax
-                ({ 
-                    url: "{{ URL::to('/companies')}}",
-                    type: "POST",
-                    data: {
-                        'company_name': company_name,
-                        _token: '{!! csrf_token() !!}'
-                        },
-                        
-                    
-                        
-                    success: function(result)
-                    {   
-                        //alert(result.length);
-                    
-                        var i;
-                        var showData = [];
-
-                        showData[0] = "<option value=''>-- Select Employee Name --</option>";
-                        
-                        for (i = 0; i < result.length; ++i) {
-                            var j = i + 1;
-                            showData[j] = "<option value='"+result[i].bill_to+"'>"+result[i].bill_to+"</option>";
-                        }
-                            
-                        $('#employee_name').attr('disabled', false);
-                        
-                        jQuery('#employee_name').html(showData);        
-                        
-   
-
-                    }
-                });
-
-        });
-
-        
-        $(document).on('keyup', '.quantity_item', function(ev) {
-
-            //var id = $(this).attr("data-id");
-            //var rate = parseFloat($(this).val());
-            //var qty = $("#unit_cost" + id).val();
-
-            //var price = calculatePrice(rate, qty).toFixed(2); 
-
-           // $("#total_unit_cost" + id).val(price);
+        $(document).on('keyup', '.add_quantity', function(ev) {
             $("#quantity_total").val(calculateTotalQuantity());
-           // $("#cost_total").val(calculateTotalValue());
-           // $("#total").val(calculateTotalValue2());
+        });
+              
+        $(document).on('keyup', '.quantity_item', function(ev) {
+            $("#quantity_total").val(calculateTotalQuantity());
         });
 
         $(document).on('keyup', '.add_quantity', function(ev) {
 
-       
-
                 var id = $(this).attr("data-id");
                 var rate = parseInt($(this).val());
-
                 var qty = parseInt($("#quantity" + id).val());
-
-              
-
                 var price = calculatePrice(qty, rate); // this is for total Value in row
-
-
                 if(price == 0){
                     price = rate * 1;
                 }
-
                 $("#total_quantity" + id).val(price);
 
 
@@ -1223,7 +1365,7 @@
 
         function calculateTotalQuantity() {
             var totalQuantity = 0;
-            $('.quantity_item').each(function() {
+            $('.add_quantity').each(function() {
 
             totalQuantity += parseInt($(this).val());
             });

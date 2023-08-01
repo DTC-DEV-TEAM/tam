@@ -21,6 +21,7 @@
 
 	class AdminApplicantModuleController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $cancelled;
+		private $rejected;
 		private $first_interview;
 		private $final_interview;
 		private $job_offer;
@@ -28,7 +29,8 @@
 		
 		public function __construct() {
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-			$this->cancelled        =  8;        
+			$this->cancelled        =  8; 
+			$this->rejected         =  5;        
 			$this->first_interview  =  34;  
 			$this->final_interview  =  35;  
 			$this->job_offer        =  36;    
@@ -101,7 +103,8 @@
 			if(CRUDBooster::isUpdate()) {
 				$for_job_offer =  $this->jo_done;
 				$cancelled     =  $this->cancelled;
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('edit-applicant'),'icon'=>'fa fa-pencil' , "showIf"=>"[status] != $for_job_offer && [status] != $cancelled"];
+
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('edit-applicant'),'icon'=>'fa fa-pencil' , "showIf"=>"[status] != $for_job_offer && [status] != $cancelled && [status] != $rejected"];
 				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('detail-applicant'),'icon'=>'fa fa-eye', "showIf"=>"[status] == $for_job_offer || [status] == $cancelled"];
 
 			}
@@ -209,7 +212,7 @@
 	        */
 	        $this->load_css = array();
 			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	    }
 
 	    /*
@@ -231,7 +234,8 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	$cancelled        =  DB::table('statuses')->where('id', $this->cancelled)->value('status_description');        
+	    	$cancelled        =  DB::table('statuses')->where('id', $this->cancelled)->value('status_description');  
+			$rejected         =  DB::table('statuses')->where('id', $this->rejected)->value('status_description');     
 			$first_interview  =  DB::table('statuses')->where('id', $this->first_interview)->value('status_description');  
 			$final_interview  =  DB::table('statuses')->where('id', $this->final_interview)->value('status_description');  
 			$job_offer        =  DB::table('statuses')->where('id', $this->job_offer)->value('status_description');    
@@ -244,7 +248,10 @@
 				}else if($column_value == $jo_done){
 					$column_value = '<span class="label label-success">'.$jo_done.'</span>';
 				}else if($column_value == $cancelled){
+					dd($column_value);
 					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
+				}else if($column_value == $rejected){
+					$column_value = '<span class="label label-danger">'.$rejected.'</span>';
 				}
 			}
 	    }
@@ -258,29 +265,28 @@
 	    */
 	    public function hook_before_add(&$postdata) {       
 			$fields = Request::all();
-			$erf_number  = $fields['erf_number'];
-			$screen_date = $fields['screen_date'];
-			$first_name  = $fields['first_name'];
-			$last_name   = $fields['last_name'];
+			$erf_number   = $fields['erf_number'];
+			$screen_date  = $fields['screen_date'];
+			$first_name   = $fields['first_name'];
+			$last_name    = $fields['last_name'];
+			$job_portal   = $fields['job_portal'];
+			$remarks      = $fields['remarks'];
 
 			//Jo Done
-			$checkRowDbJoDone = DB::table('applicant_table')->select(DB::raw("(full_name) AS fullname"))->where('status', 31)->get()->toArray();
+			$checkRowDbJoDone = DB::table('applicant_table')->select(DB::raw("(full_name) AS fullname"))->where('erf_number',$erf_number)->get()->toArray();
 			$checkRowDbColumnJoDone = array_column($checkRowDbJoDone, 'fullname');
-			//Cancelled
-			$checkRowDbCancelled = DB::table('applicant_table')->select(DB::raw("(full_name) AS fullname"))->where('status', 8)->get()->toArray();
-			$checkRowDbColumnCancelled = array_column($checkRowDbCancelled, 'fullname');
-		
-			if (in_array(strtolower(trim($first_name)).''.strtolower(trim($last_name)), $checkRowDbColumnJoDone)) {
-				return CRUDBooster::redirect(CRUDBooster::mainpath("add-applicant"),"Applicant Already Exist!","danger");
-			}else if(in_array(strtolower(trim($first_name)).''.strtolower(trim($last_name)), $checkRowDbColumnCancelled)){
-				return CRUDBooster::redirect(CRUDBooster::mainpath("add-applicant"),"Applicant Already Exist!/Cancelled","danger");
+
+			if (in_array(strtolower(str_replace(' ', '', trim($first_name))).''.strtolower(str_replace(' ', '', trim($last_name))), $checkRowDbColumnJoDone)) {
+				return CRUDBooster::redirect(CRUDBooster::mainpath("add-applicant"),"Applicant Already Exist in this ERF!","danger");
 			}else{
 				$postdata['status']      = 34;
 				$postdata['erf_number']  = $erf_number;
 				$postdata['screen_date'] = $screen_date;
 				$postdata['first_name']  = $first_name;
 				$postdata['last_name']   = $last_name;
-				$postdata['full_name']   = strtolower(trim($postdata['first_name'])).''.strtolower(trim($postdata['last_name']));
+				$postdata['job_portal']  = $job_portal;
+				$postdata['remarks']     = $remarks;
+				$postdata['full_name']   = strtolower(str_replace(' ', '', trim($postdata['first_name']))).''.strtolower(str_replace(' ', '', trim($postdata['last_name'])));
 				$postdata['created_by']  = CRUDBooster::myId();
 
 			}
@@ -312,20 +318,31 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
+			
 			$erf_number = $fields['erf_number'];
 			// dd($fields);
 			$status = $fields['status'];
-			if($status == 36){
-				ErfHeaderRequest::where('reference_number',$erf_number)
-				->update([
-					'status_id'		 => 31
-				]);	
-			    $postdata['status']      = 31;
+			$update_remarks = $fields['update_remarks'];
+			//Jo Done
+			$checkRowDbJoDone = DB::table('applicant_table')->select('*')->where('erf_number', $erf_number)->where('status', 31)->get()->count();
+
+			if ($checkRowDbJoDone != 0 && $status == 36) {
+				return CRUDBooster::redirect(CRUDBooster::mainpath(),"Invalid! Erf has done JO!","danger");
 			}else{
-				$postdata['status']      = $status;
+				if($status == 36){
+					ErfHeaderRequest::where('reference_number',$erf_number)
+					->update([
+						'status_id'		 => 31
+					]);	
+					$postdata['status']              = 31;
+					$postdata['update_remarks']      = $update_remarks;
+				}else{
+					$postdata['status']              = $status;
+					$postdata['update_remarks']      = $update_remarks;
+				}
+				
+				$postdata['updated_by']  = CRUDBooster::myId();
 			}
-			
-			$postdata['updated_by']  = CRUDBooster::myId();
 	    }
 
 	    /* 
@@ -404,7 +421,7 @@
 			$data['statuses'] = Statuses::select(
 					'statuses.*'
 				  )
-				  ->whereIn('id', [34,35,36,8])
+				  ->whereIn('id', [5,34,35,36,8,42])
 				  ->get();
 
 			return $this->view("applicant.edit_applicant_status", $data);
@@ -511,17 +528,51 @@
 		}
 
 		function downloadApplicantTemplate() {
+			//FIRST SHEET
 			$arrHeader = [
 				"erf_number"         => "erf_number",
 				"status"             => "status",
 				"first_name"         => "first_name",
 				"last_name"          => "last_name",
 				"screen_date"        => "screen_date",
+				"Job Portal"         => "job_portal",
+				"Remarks"            => "remarks"
 			];
-		   
+			$arrData = [
+				"erf_number"         => "ERF-0000001",
+				"status"             => "1ST Interviewed",
+				"first_name"         => "John",
+				"last_name"          => "Doe",
+				"screen_date"        => "2023-01-01",
+				"job_portal"         => "Indeed",
+				"remarks"            => "Remarks"
+			];
+			//2ND SHEET
+			// $statusHeader = [
+			// 	"statuses"           => "statuses",
+			// ];
+			// $statusData = [
+			// 	["statuses"          => "1st Interviewed"],
+			// 	["statuses"          => "Final Interview"],
+			// 	["statuses"          => "Job Offer"],
+			// 	["statuses"          => "Cancelled"],
+			// 	["statuses"          => "For Comparison"],
+			// 	["statuses"          => "Rejected"]	
+			// ];
 			$spreadsheet = new Spreadsheet();
+			//$spreadsheet->setActiveSheetIndex(0);
 			$spreadsheet->getActiveSheet()->fromArray(array_values($arrHeader), null, 'A1');
-			$filename = "applicant-template";
+			$spreadsheet->getActiveSheet()->fromArray($arrData, null, 'A2');
+			$spreadsheet->getActiveSheet()->setTitle('applicant-template');
+			//$spreadsheet->createSheet();
+
+			// Add some data to the second sheet, resembling some different data types
+			// $spreadsheet->setActiveSheetIndex(1);
+			// $spreadsheet->getActiveSheet()->fromArray(array_values($statusHeader), null, 'A1');
+			// $spreadsheet->getActiveSheet()->fromArray($statusData, null, 'A2');
+			// $spreadsheet->getActiveSheet()->setTitle('Status');
+
+			$filename = "applicant-template-".date('Y-m-d');
 			header('Content-Type: application/vnd.ms-excel');
 			header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
 			header('Cache-Control: max-age=0');

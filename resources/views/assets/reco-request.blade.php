@@ -1,4 +1,52 @@
 @extends('crudbooster::admin_template')
+    @push('head')
+        <style type="text/css">   
+            #footer th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+                /* border-radius: 5px 0 0 5px; */
+            }
+            #asset-items1 th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+            }
+            #asset-items th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                //padding: 8px;
+            }
+            table { border-collapse: collapse; empty-cells: show; }
+
+            td { position: relative; }
+
+            tr.strikeout td:before {
+            content: " ";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            border-bottom: 1px solid #111;
+            width: 100%;
+            }
+
+            tr.strikeout td:after {
+            content: "\00B7";
+            font-size: 1px;
+            }
+
+            /* Extra styling */
+            td { width: 100px; }
+            th { text-align: left; }
+
+            .finput {
+                border:none;
+                border-bottom: 1px solid rgba(18, 17, 17, 0.5);
+            }
+
+            input.finput:read-only {
+                background-color: #fff;
+            }
+
+        </style>
+    @endpush
 @section('content')
 
 @if(g('return_url'))
@@ -158,33 +206,18 @@
 
                                             <div class="pic-container">
                                                 <div class="pic-row">
-                                                    <table class="table table-bordered" id="asset-items">
+                                                    <table id="asset-items">
                                                         <tbody id="bodyTable">
                                                             <tr class="tbl_header_color dynamicRows">
+                                                                <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                                 <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                                <th width="9%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
-                                                                <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+                                                                <th width="7%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
+                                                                <th width="7%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                                                                 <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
-                                                                <th width="13%" class="text-center">{{ trans('message.table.recommendation_text') }}</th> 
+                                                                <th width="17%" class="text-center">{{ trans('message.table.recommendation_text') }}</th> 
                                                                 <th width="14%" class="text-center">{{ trans('message.table.reco_digits_code_text') }}</th> 
                                                                 <th width="24%" class="text-center">{{ trans('message.table.reco_item_description_text') }}</th> 
-                                                            <!-- <th width="8%" class="text-center">{{ trans('message.table.image') }}</th> 
-                                                                <th width="5%" class="text-center">{{ trans('message.table.action') }}</th> -->
-                                                            </tr>
-                                                            
-                                                            <!--tr class="tableInfo">
-                                                                <td colspan="6" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                                <td align="left" colspan="1">
-
-
-                                                                    <input type='hidden' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-
-                                                                    <input type='hidden' name="cost_total" class="form-control text-center" id="cost_total" readonly>
-
-                                                                    <input type='number' name="total" class="form-control text-center" id="total" readonly>
-                                                                </td>
-                                                                <td colspan="1"></td>
-                                                            </tr> -->
+                                                     
 
                                                             <tr id="tr-table">
                                                                         <?php   $tableRow = 1; ?>
@@ -195,10 +228,12 @@
                                                                         <?php   $tableRow++; ?>
 
                                                                         <tr>
-                                                                            <td style="text-align:center" height="10">
-                                                                                
-                                                                                    <input type="hidden"  class="form-control"  name="item_id[]" id="item_id{{$tableRow}}"  required  value="{{$rowresult->id}}">
-                                                                                
+                                                                            <td style="text-align:center" height="10">                                                                               
+                                                                                    <input type="hidden"  class="form-control"  name="digits_code[]" id="digits_code{{$tableRow}}"  required  value="{{$rowresult->id}}">                          
+                                                                                    {{$rowresult->digits_code}}
+                                                                            </td>
+                                                                            <td style="text-align:center" height="10">                                                                               
+                                                                                    <input type="hidden"  class="form-control"  name="item_id[]" id="item_id{{$tableRow}}"  required  value="{{$rowresult->id}}">                          
                                                                                     {{$rowresult->item_description}}
                                                                             </td>
                                                                             <td style="text-align:center" height="10">
@@ -242,34 +277,13 @@
                                                                                     </select> -->
                                                                                 @endif
 
-                                                                            <!--  <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control Reco" data-id="{{$tableRow}}" id="recommendation{{$tableRow}}"  name="recommendation[]"  required maxlength="100">
-                                        
-                                                                                <table id="reco-table" style="width: 100%;">
-                                                                                    <tbody>
-
-                                                                                        <tr id="tr-reco">
-
-                                                                                            <tr>
-
-                                                                                                
-                                                                                            </tr>
-                                                                                            
-
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tfoot>
-                                                                                        <tr id="tr-table-reco{{$tableRow}}" class="bottom">
-                                                                                            
-                                                                                        </tr>
-                                                                                    </tfoot>
-
-                                                                                </table> -->
+                                              
 
                                                                             </td>
                                                                                
                                                                             <td>
                                                                                     <div class="form-group">
-                                                                                        <input class="form-control auto" type="text" style="width: 100%;" placeholder="Search Item" id="search{{$tableRow}}" data-id="{{$tableRow}}"  name="reco_digits_code[]">
+                                                                                        <input class="form-control auto" type="text" style="width: 100%; margin-top:12px" placeholder="Search Item" id="search{{$tableRow}}" data-id="{{$tableRow}}"  name="reco_digits_code[]">
                                                                                         <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="{{$tableRow}}" id="ui-id-2{{$tableRow}}" style="display: none; top: 60px; left: 15px; width: 100%;">
                                                                                             <li>Loading...</li>
                                                                                         </ul>
@@ -279,38 +293,7 @@
                                                                             <td>
                                                                                 <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control itemDesc" data-id="{{$tableRow}}" id="item_description{{$tableRow}}"  name="reco_item_description[]"   maxlength="100" readonly>
                                                                             </td>
-
-                                                                            <!--
-                                                                            <td>
-
-                                                                            
-
-                                                                                <button id="add-row-button" name="add-row-button" class="btn btn-info add-row-button" data-id="{{$tableRow}}" ><i class="glyphicon glyphicon-plus"></i></button>
-
-
-                                                                                <table id="reco-table-delete{{$tableRow}}" class="reco-table-delete" style="width: 100%;">
-                                                                                    <tbody>
-
-                                                                                        <tr id="tr-reco-delete">
-
-                                                                                            <tr>
-
-                                                                                                
-                                                                                            </tr>
-                                                                                            
-
-                                                                                        </tr>
-                                                                                    </tbody>
-                                                                                    <tfoot>
-                                                                                        <tr id="tr-table-reco-delete{{$tableRow}}" class="bottom">
-                                                                                            
-                                                                                        </tr>
-                                                                                    </tfoot>
-
-                                                                                </table>
-
-                                                                            </td> -->
-
+                    
                                                                         </tr>
 
                                                                     @endforeach
@@ -324,7 +307,7 @@
 
                                                             <tr id="tr-table1" class="bottom">
                 
-                                                                <td colspan="3">
+                                                                <td colspan="4">
                                                                     <!-- <input type="button" id="add-Row" name="add-Row" class="btn btn-info add" value='Add Item' /> -->
                                                                 </td> 
                                                                 <td align="center" colspan="1">
@@ -332,6 +315,7 @@
                                                                     <label>{{$Header->quantity_total}}</label>
 
                                                                 </td>
+                                                                <td colspan="3"></td>
                                                             </tr>
                                                         </tfoot>
 
@@ -367,7 +351,7 @@
                     <hr/>
                     <div class="form-group">
                         <label>{{ trans('message.table.note') }}</label>
-                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control" name="it_comments"></textarea>
+                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="it_comments"></textarea>
                     </div>
                 </div>
          
@@ -398,7 +382,7 @@
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
            
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.new') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.new') }}</button>
         </div>
 
     </form>

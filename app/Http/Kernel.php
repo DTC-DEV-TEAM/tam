@@ -58,5 +58,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'check.orderschedule' => \App\Http\Middleware\CheckOrderSchedule::class,
         'check.approvalschedule' => \App\Http\Middleware\CheckApprovalSchedule::class,
+        'check.suppliescheckrestriction' => \App\Http\Middleware\RestrictSuppliesRequisition::class,
     ];
 }
