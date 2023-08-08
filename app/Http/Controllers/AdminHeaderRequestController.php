@@ -924,7 +924,7 @@
 			$data['categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
 													   ->orderby('category_description', 'asc')
 													   ->get();
-			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereIn('category_id', [1,4,7,8])->orderby('class_description', 'asc')->get();
+			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->whereIn('category_id', [1,4,7,8])->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
 			
@@ -1525,7 +1525,7 @@
 							'assets.id as assetID',
 			
 							'tam_categories.category_description as category_description',
-							'tam_subcategories.subcategory_description as class_type'
+							'tam_subcategories.subcategory_description as subcategory_description'
 						)->take(10)->get();
 
 				$arraySearch = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as wh_qty'))->where('statuses_id',6)->groupBy('digits_code')->get()->toArray();
@@ -1582,21 +1582,19 @@
 					$i = 0;
 					foreach ($finalInventory as $key => $value) {
 	
-						$return_data[$i]['id']                   = 	$value->assetID;
+						$return_data[$i]['id']                       = 	$value->assetID;
 		
-						$return_data[$i]['digits_code']          = 	$value->digits_code;
+						$return_data[$i]['digits_code']              = 	$value->digits_code;
 			
 
-						$return_data[$i]['item_description']     = 	$value->item_description;
-						$return_data[$i]['category_description'] = 	$value->category_description;
-						$return_data[$i]['class_description']    =  $value->sub_category_description;
-						$return_data[$i]['class_type']           =  $value->class_type;
-						$return_data[$i]['item_cost']            = 	$value->item_cost;
-
-						$return_data[$i]['quantity']             = 	$value->quantity;
-						$return_data[$i]['total_quantity']       = 	$value->total_quantity;
-						$return_data[$i]['wh_qty']               =  $value->available_qty  ? $value->available_qty : 0;
-						$return_data[$i]['unserved_qty']         =  $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
+						$return_data[$i]['item_description']         = 	$value->item_description;
+						$return_data[$i]['category_description']     = 	$value->category_description;
+						$return_data[$i]['sub_category_description'] =  $value->subcategory_description;
+						$return_data[$i]['item_cost']                = 	$value->item_cost;
+						$return_data[$i]['quantity']                 = 	$value->quantity;
+						$return_data[$i]['total_quantity']           = 	$value->total_quantity;
+						$return_data[$i]['wh_qty']                   =  $value->available_qty  ? $value->available_qty : 0;
+						$return_data[$i]['unserved_qty']             =  $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
 
 						$i++;
 	

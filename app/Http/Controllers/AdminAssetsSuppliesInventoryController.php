@@ -1,14 +1,23 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	//use Request;
 	use DB;
 	use CRUDBooster;
-	use App\Users;
-	use App\MoveOrder;
-	use App\Models\ReturnTransferAssets;
-	use App\Models\ReturnTransferAssetsHeader;
-	class AdminReturnApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
+	use Excel;
+	use Illuminate\Http\Request;
+	use Illuminate\Support\Facades\Input;
+	use Illuminate\Support\Facades\Log;
+	use Illuminate\Support\Facades\Redirect;
+	use Maatwebsite\Excel\HeadingRowImport;
+	use App\Imports\SuppliesInventoryImport;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use App\Exports\ExportSuppliesInventory;
+
+	class AdminAssetsSuppliesInventoryController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
@@ -21,47 +30,46 @@
 			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = false;
+			if(CRUDBooster::isSuperadmin()){
+			    $this->button_edit = true;
+			}else{
+				$this->button_edit = false;
+			}
 			$this->button_delete = false;
-			$this->button_detail = false;
+			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "return_transfer_assets_header";
+			$this->table = "assets_supplies_inventory";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Status","name"=>"status","join"=>"statuses,status_description"];
-			$this->col[] = ["label"=>"Reference No","name"=>"reference_no"];
-			$this->col[] = ["label"=>"Name","name"=>"requestor_name","join"=>"cms_users,name"];
-			$this->col[] = ["label"=>"Return Type","name"=>"request_type_id","join"=>"requests,request_name"];
-			$this->col[] = ["label"=>"Type of Request","name"=>"request_type"];
-			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
-			$this->col[] = ["label"=>"Transacted By","name"=>"transacted_by"];
-			$this->col[] = ["label"=>"Transacted Date","name"=>"transacted_date"];
-		
+			$this->col[] = ["label"=>"Digits Code","name"=>"digits_code"];
+			$this->col[] = ["label"=>"Description","name"=>"description"];
+			$this->col[] = ["label"=>"Quantity","name"=>"quantity"];
+			$this->col[] = ["label"=>"Status","name"=>"status"];
+			$this->col[] = ["label"=>"Created By","name"=>"created_by", "join" => "cms_users,name"];
+			$this->col[] = ["label"=>"Created At","name"=>"created_at"];
+			$this->col[] = ["label"=>"Updated By","name"=>"updated_by", "join" => "cms_users,name"];
+			$this->col[] = ["label"=>"Updated At","name"=>"updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-
+			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
+				$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'text','validation'=>'required|integer|min:0','width'=>'col-sm-5','readonly'=>true];
+			}else{
+				$this->form[] = ['label'=>'Digits Code','name'=>'digits_code','type'=>'select','datatable'=>'assets,digits_code','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
+			}
+			
+			$this->form[] = ['label'=>'Description','name'=>'description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
+			$this->form[] = ['label'=>'Quantity','name'=>'quantity','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Reference No","name"=>"reference_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Code","name"=>"asset_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Digits Code","name"=>"digits_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Type","name"=>"asset_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
 			# OLD END FORM
 
 			/* 
@@ -91,13 +99,6 @@
 	        | 
 	        */
 	        $this->addaction = array();
-			if(CRUDBooster::isUpdate()) {
-				
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalReturn/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == $pending"];
-				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
-			}
 
 
 	        /* 
@@ -135,7 +136,14 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				// $this->index_button[] = ["label"=>"Add Data","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-supplies-inventory'),"color"=>"success"];
+				$this->index_button[] = ["label"=>"Upload Inventory","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('supplies-inventory-upload'),'color'=>'primary'];
+				$this->index_button[] = ["label"=>"Export","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('supplies-inventory-export'),'color'=>'success'];
+				// if(CRUDBooster::myPrivilegeId() == 18 || CRUDBooster::isSuperadmin()){
+				// 	$this->index_button[] = ["label"=>"Restrict Supplies Requisition","icon"=>"fa fa-ban","url"=>CRUDBooster::mainpath('restrict-supplies-requisition'),"color"=>"danger"];
+				// }
+			}
 
 
 	        /* 
@@ -228,7 +236,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-			$this->load_css[] = asset("css/font-family.css");
+	        
 	        
 	    }
 
@@ -255,33 +263,7 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			if(CRUDBooster::isSuperadmin()){
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				$query->orderBy('return_transfer_assets_header.status', 'DESC')->where('return_transfer_assets_header.status', $pending)->orderBy('return_transfer_assets_header.id', 'DESC');
-			
-			}else{
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
-				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
-				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
-			
-				$approval_array = array();
-				foreach($approvalMatrix as $matrix){
-				    array_push($approval_array, $matrix->id);
-				}
-				$approval_string = implode(",",$approval_array);
-				$userslist = array_map('intval',explode(",",$approval_string));
-	
-				$query->whereIn('return_transfer_assets_header.requested_by', $userslist)
-				//->whereIn('return_transfer_assets_header.company_name', explode(",",$user_data->company_name_id))
-				->where('return_transfer_assets_header.status', $pending) 
-				->orderBy('return_transfer_assets_header.id', 'DESC');
-
-			}
+	        //Your code here
 	            
 	    }
 
@@ -292,12 +274,7 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	$pending  =  		DB::table('statuses')->where('id', 1)->value('status_description');
-			if($column_index == 1){
-				if($column_value == $pending){
-					$column_value = '<span class="label label-warning">'.$pending.'</span>';
-				}
-			}
+	    	//Your code here
 	    }
 
 	    /*
@@ -307,8 +284,9 @@
 	    | @arr
 	    |
 	    */
-	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+	    public function hook_before_add(&$postdata) {       
+			dd($postdata); 
+			$postdata['created_by']=CRUDBooster::myId();
 
 	    }
 
@@ -333,59 +311,7 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	         //Your code here
-			$fields = Request::all();
-			$header_id 					= $fields['header_id'];
-			$mo_id 					= $fields['mo_id'];
-			$dataLines = array();
-			$approval_action 		= $fields['approval_action'];
-			$approver_comments 		= $fields['approver_comments'];
-			$approved =  		DB::table('statuses')->where('id', 4)->value('id');
-			$rejected =  		DB::table('statuses')->where('id', 5)->value('id');
-			$forturnover =  		DB::table('statuses')->where('id', 24)->value('id');
-			$forReturn =  		DB::table('statuses')->where('id', 26)->value('id');
-			$forTransfer =  		DB::table('statuses')->where('id', 27)->value('id');
-
-			$header 	= 	ReturnTransferAssetsHeader::where('id',$header_id)->first();
-			$inventory_id 	= 	MoveOrder::whereIn('id',$mo_id)->get();
-			$finalinventory_id = [];
-			foreach($inventory_id as $invData){
-				array_push($finalinventory_id, $invData['inventory_id']);
-			}
-
-			if($approval_action  == 1){
-				for($x=0; $x < count((array)$mo_id); $x++) {
-	
-					$postdata['status']		 	    = $forturnover;
-					$postdata['approved_by'] 		= CRUDBooster::myId();
-					$postdata['approved_date'] 		= date('Y-m-d H:i:s');
-					ReturnTransferAssets::where('return_header_id',$id)
-					->update([
-							'status' => $forturnover
-					]);	
-					if(in_array($header->request_type_id, [1,5])){
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			$forReturn,
-						]);
-					}else{
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			$forTransfer,
-						]);
-					}
-					
-			    }
-			}else{
-				$postdata['status'] 			= $rejected;
-				$postdata['approver_comments'] 	= $approver_comments;
-				$postdata['approved_by'] 		= CRUDBooster::myId();
-				$postdata['rejected_date'] 		= date('Y-m-d H:i:s');
-				ReturnTransferAssets::where('return_header_id',$id)
-				->update([
-					    'status' => $rejected
-				]);	
-			}
+			$postdata['updated_by']=CRUDBooster::myId();
 
 	    }
 
@@ -425,49 +351,64 @@
 
 	    }
 
-		public function getRequestApprovalReturn($id){
-			
+		 //By the way, you can still create your own method in here... :) 
+		 public function getAddSuppliesInventory() {
+
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
 
 			$this->cbLoader();
-			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
-				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-			}  
-
-
-			$data = array();
-
-			$data['page_title'] = 'Approve Return/Transfer Request';
-			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
-				->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
-				->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
-				->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
-				->leftjoin('cms_users as transfer_to', 'return_transfer_assets_header.transfer_to','=', 'transfer_to.id')
-				->select(
-						'return_transfer_assets_header.*',
-						'return_transfer_assets_header.id as requestid',
-						'requests.request_name as request_name',
-						'employees.name as employee_name',
-						'employees.company_name_id as company',
-						'employees.position_id as position',
-						'departments.department_name as department_name',
-						'locations.store_name as store_branch',
-						'transfer_to.bill_to as transfer_to',
-						)
-				->where('return_transfer_assets_header.id', $id)->first();
-           
-			$data['return_body'] = ReturnTransferAssets::
-			           leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
-				
-				->select(
-						'return_transfer_assets.*',
-						'statuses.*',
-						)
-						->where('return_transfer_assets.return_header_id', $id)->get();	
-			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-			return $this->view("assets.approval-request-return", $data);
+			$data['page_title'] = 'Add Supplies Inventory';
+			$data['digits_code'] = DB::table('assets')->where('category_id', 2)->get();
+			return $this->view("inventory-supplies.add-supplies-inventory", $data);
+		
 		}
 
+		public function UploadSuppliesInventory() {
+			$data['page_title']= 'Assets Supplies Inventory Upload';
+			return view('import.asset-supplies-upload', $data)->render();
+		}
 
+		public function SuppliesInventoryUpload(Request $request) {
+			$path_excel = $request->file('import_file')->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+			Excel::import(new SuppliesInventoryImport, $path);	
+			CRUDBooster::redirect(CRUDBooster::adminpath('assets_supplies_inventory'), trans("Upload Successfully!"), 'success');
+		}
+
+		function downloadSuppliesInventoryTemplate() {
+			$arrHeader = [
+				"digits_code"        => "digits_code",
+				"quantity"           => "quantity"
+			];
+			$arrData = [
+				"digits_code"        => "40000054",
+				"quantity"           => "1"
+			];
+			$spreadsheet = new Spreadsheet();
+			$spreadsheet->getActiveSheet()->fromArray(array_values($arrHeader), null, 'A1');
+			$spreadsheet->getActiveSheet()->fromArray($arrData, null, 'A2');
+			$filename = "supplies-inventory";
+			header('Content-Type: application/vnd.ms-excel');
+			header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
+			header('Cache-Control: max-age=0');
+			$writer = new Xlsx($spreadsheet);
+			$writer->save('php://output');
+		}	
+
+		public function getSuppliesInventoryExport(){
+			return Excel::download(new ExportSuppliesInventory, 'SuppliesInventory.xlsx');
+		}
+
+		//SUPPLIES REQUEST RESTRICTION
+		public function getRestrictSuppliesRequisition() {
+			$this->cbLoader();
+			$data['page_title'] = 'Restrict Supplies Requisition';
+			$data['privileges'] = DB::table('cms_privileges')->select('id')->whereNull('cannot_create')->get();
+	
+			return $this->view("inventory-supplies.restrict-supplies-requisition", $data);
+		
+		}
 
 	}

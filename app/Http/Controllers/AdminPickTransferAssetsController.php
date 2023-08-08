@@ -25,7 +25,7 @@
 			$this->button_edit = false;
 			$this->button_delete = false;
 			$this->button_detail = true;
-			$this->button_show = true;
+			$this->button_show = false;
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
@@ -102,7 +102,7 @@
 				
 				$forturnover           = DB::table('statuses')->where('id', 24)->value('id');
 
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == $forturnover"];
+				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == $forturnover"];
 				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
 			}
 
@@ -234,7 +234,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -342,26 +342,39 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
-           
-			$item_id 					= $fields['item_id'];
-			$mo_id 					= $fields['mo_id'];
-			//$pick_value 				= $fields['pick_value'];
+        
+			$selectedItem       = $fields['item_to_receive_id'];
+			$selectedItem_array = array();
+			foreach($selectedItem as $select){
+				array_push($selectedItem_array, $select);
+			}
+			$selectedItem_string = implode(",",$selectedItem_array);
+			$selectedItemlist = array_map('intval',explode(",",$selectedItem_string));
 
-			$good_text 					= $fields['good_text'];
+			$getSelectedItemList = DB::table('return_transfer_assets')->whereIn('id',$selectedItemlist)->get();
 
-			$defective_text 			= $fields['defective_text'];
- 
+			//MO ID, Item ID
+			$mo_id       = [];
+			$item_id     = [];
+			$arf_number  = [];
+	
+			foreach($getSelectedItemList as $selectItem){
+				array_push($mo_id, $selectItem->mo_id);
+				array_push($item_id, $selectItem->id);
+				array_push($arf_number, $selectItem->reference_no);
+		
+			}
+
+			$filter_good_text 		    = array_filter($fields['good_text'], fn($value) => !is_null($value) && $value !== '');
+			$good_text                  = array_values($filter_good_text);
+			$filter_defective_text 		= array_filter($fields['defective_text'], fn($value) => !is_null($value) && $value !== '');
+			$defective_text             = array_values($filter_defective_text);
+			
+
 			//good and defect value
-			$arf_number = $fields['arf_number'];
-			$digits_code = $fields['digits_code'];
-			$asset_code = $fields['asset_code'];
 			$comments = $fields['comments'];
 			$other_comment = $fields['other_comment'];
         
-			$HeaderID 					= ReturnTransferAssets::where('id', $id)->first();
-			
-			//dd($HeaderID->header_request_id);
-
 			$arf_header 	= ReturnTransferAssetsHeader::where(['id' => $id])->first();
 			
 			$inventory_id 	= MoveOrder::whereIn('id',$mo_id)->get();
@@ -394,17 +407,28 @@
 					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
 					$deployed  = 		DB::table('statuses')->where('id',3)->value('id');
 					$mo_info 	= 		MoveOrder::where('id',$mo_id[$x])->first();
-					ReturnTransferAssets::where('return_header_id',$id)
+
+					ReturnTransferAssets::where('id',$selectedItemlist[$x])
 					->update([
 							'status' => $to_close,
 					]);	
+
+					$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
 					
 					ReturnTransferAssetsHeader::where('id', $id)
 					->update([
-						'status'=> 	   $to_close,
-						'transacted_by' => CRUDBooster::myId(),
+						'transacted_by'   => CRUDBooster::myId(),
 						'transacted_date' => date('Y-m-d H:i:s')
 					]);	
+
+                    if($countItem == 0){
+						ReturnTransferAssetsHeader::where('id', $id)
+						->update([
+							'status'          => $to_close,
+							'transacted_by'   => CRUDBooster::myId(),
+							'transacted_date' => date('Y-m-d H:i:s')
+						]);	
+					}
 				
 					DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
 					->update([
@@ -433,17 +457,27 @@
 				}else{
 					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
 					
-					ReturnTransferAssets::where('return_header_id',$id)
+					ReturnTransferAssets::where('id',$selectedItemlist[$x])
 					->update([
 							'status' => $to_close
 					]);	
 
+					$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
+					
 					ReturnTransferAssetsHeader::where('id', $id)
 					->update([
-						'status'=> 	   $to_close,
-						'transacted_by' => CRUDBooster::myId(),
+						'transacted_by'   => CRUDBooster::myId(),
 						'transacted_date' => date('Y-m-d H:i:s')
 					]);	
+
+                    if($countItem == 0){
+						ReturnTransferAssetsHeader::where('id', $id)
+						->update([
+							'status'          => $to_close,
+							'transacted_by'   => CRUDBooster::myId(),
+							'transacted_date' => date('Y-m-d H:i:s')
+						]);	
+					}
 					
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
 					->update([
@@ -470,6 +504,53 @@
 
 				}
 			}
+
+			//save defect and good comments
+			$container = [];
+			$containerSave = [];
+			foreach((array)$comments as $key => $val){
+				$container['arf_number'] = $arf_number[$key] ? $arf_number[$key] : NULL;
+				$container['digits_code'] = explode("|",$val)[1];
+				$container['asset_code'] = explode("|",$val)[0];
+				$container['comments'] = explode("|",$val)[2];
+				$container['users'] = CRUDBooster::myId();
+				$container['created_at'] = date('Y-m-d H:i:s');
+				$containerSave[] = $container;
+			}
+			$otherCommentContainer = [];
+			$otherCommentFinalData = [];
+			foreach((array)$asset_code as $aKey => $aVal){
+				$otherCommentContainer['asset_code'] = $aVal;
+				$otherCommentContainer['digits_code'] = $digits_code[$aKey];
+				$otherCommentContainer['other_comment'] = $other_comment[$aKey];
+				$otherCommentFinalData[] = $otherCommentContainer;
+			}
+			//search other comment in another array
+			$finalData = [];
+			foreach((array)$containerSave as $csKey => $csVal){
+				$i = array_search($csVal['asset_code'], array_column($otherCommentFinalData,'asset_code'));
+				if($i !== false){
+					$csVal['other_comment'] = $otherCommentFinalData[$i];
+					$finalData[] = $csVal;
+				}else{
+					$csVal['other_comment'] = "";
+					$finalData[] = $csVal;
+				}
+			}
+			$finalContainerSave = [];
+			$finalContainer = [];
+			foreach((array)$finalData as $key => $val){
+				$finalContainer['arf_number'] = $val['arf_number'];
+				$finalContainer['digits_code'] = $val['digits_code'];
+				$finalContainer['asset_code'] = $val['asset_code'];
+				$finalContainer['comments'] = $val['comments'];
+				$finalContainer['other_comment'] = $val['other_comment']['other_comment'];
+				$finalContainer['users'] = $val['users'];
+				$finalContainer['created_at'] = $val['created_at'];
+				$finalContainerSave[] = $finalContainer;
+			}
+ 
+			CommentsGoodDefect::insert($finalContainerSave);
 
 	    }
 
@@ -545,9 +626,12 @@
 				
 				->select(
 						'return_transfer_assets.*',
+						'return_transfer_assets.id as body_id',
 						'statuses.*',
 						)
-						->where('return_transfer_assets.return_header_id', $id)->get();	
+						->where('return_transfer_assets.return_header_id', $id)
+						->where('return_transfer_assets.status', 24)
+						->get();	
 			// dd($data['return_body']);
 			$data['good_defect_lists'] = GoodDefectLists::all();
 			return $this->view("assets.transfer-picking-request", $data);
