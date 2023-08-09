@@ -195,7 +195,7 @@ Route::group(['middleware' => ['web']], function() {
 
     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/getLockingErfSetOnboardingDate','AdminErfEditStatusController@lockFormOnboardingDate')->name('locking-form-onboarding-date'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/deleteLockformOnboardingDate','AdminErfEditStatusController@onboardingDatelockDelete')->name('delete-locking-onboarding-date'); 
-    Route::get('/admin/erf_edit_status/getErfSetOnboardingDate/{id}','AdminErfEditStatusController@getErfSetOnboardingDate')->name('set-onboarding-erf'); 
+    Route::get('/admin/erf_edit_status/getLockingErfSetOnboardingDateForm/{id}','AdminErfEditStatusController@getLockingErfOnboardingDateFormView')->name('get-locking-onboarding-erf-form'); 
 
     //ERF closed request
     Route::get('/admin/erf_edit_status/getErfCloseRequest/{id}','AdminErfEditStatusController@getRequestClose')->name('close-request'); //new

@@ -92,17 +92,30 @@
                 </div>
 
                 <div class="row"> 
-                    
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> First Name</label>
+                            <label class="control-label"> First Name</label>
                             <input type="text" class="form-control finput"  id="first_name" name="first_name"  value="{{$applicant->first_name}}" readonly>                                   
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Last Name</label>
+                            <label class="control-label"> Last Name</label>
                             <input type="text" class="form-control finput"  id="last_name" name="last_name"  value="{{$applicant->last_name}}" readonly>                                   
+                        </div>
+                    </div>
+                </div>
+                <div class="row"> 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"> Job Portal</label>
+                            <input type="text" class="form-control finput"  id="job_portal" name="job_portal"  value="{{$applicant->job_portal}}" readonly>                                   
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"> Remarks</label>
+                            <input type="text" class="form-control finput"  id="remarks" name="remarks"  value="{{$applicant->remarks}}" readonly>                                   
                         </div>
                     </div>
                 </div>
@@ -119,6 +132,14 @@
                                 </option>>
                                 @endforeach
                             </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label> Additional Notes</label>
+                            <textarea placeholder="Additional Notes ..." rows="3" class="form-control finput" name="update_remarks">{{$applicant->update_remarks}}</textarea>
                         </div>
                     </div>
                 </div>

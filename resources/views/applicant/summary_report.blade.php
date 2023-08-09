@@ -17,7 +17,7 @@
             }
 
             #table_dashboard td.hover:hover {
-                background-color:#00a65a;
+                background-color:#3c8dbc;
                 color: #fff !important;
                 font-weight: bold;
                 font-size: 14px;
@@ -26,35 +26,6 @@
 
             a{
                 color: #000;
-            }
-
-            .pagination > li > a
-            {
-                background-color: white;
-                color: #5A4181;
-            }
-
-            .pagination > li > a:focus,
-            .pagination > li > a:hover,
-            .pagination > li > span:focus,
-            .pagination > li > span:hover
-            {
-                color: #5a5a5a;
-                background-color: #eee;
-                border-color: #ddd;
-            }
-
-            .pagination > .active > a
-            {
-                color: white;
-                background-color: #00a65a !Important;
-                border: solid 1px #00a65a !Important;
-            }
-
-            .pagination > .active > a:hover
-            {
-                background-color: #00a65a !Important;
-                border: solid 1px #00a65a;
             }
 
         </style>
@@ -67,7 +38,7 @@
         <div class='panel-body'>
         <div class="row" style="margin:5px">   
        
-        <button type="button" id="btn-export" class="btn btn-success btn-sm btn-export" style="margin-bottom:10px"><i class="fa fa-download"></i>
+        <button type="button" id="btn-export" class="btn btn-primary btn-sm btn-export" style="margin-bottom:10px"><i class="fa fa-download"></i>
             <span>Export Data</span>
         </button>
         <form   method='post' target='_blank'>
@@ -78,7 +49,9 @@
                         <th width="auto" style="text-align:center">Jo Done</th>
                         <th width="auto" style="text-align:center">First Interview</th>
                         <th width="auto" style="text-align:center">Final Interview</th>
+                        <th width="auto" style="text-align:center">For Comparison</th>
                         <th width="auto" style="text-align:center">Cancelled</th>
+                        <th width="auto" style="text-align:center">Rejected</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -91,8 +64,10 @@
                     <td style="text-align:center"> {{$val->erf_number}}</td>
                     <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."31")}}'></a>{{$val->jo_done}}</td>  
                     <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."34")}}'></a>{{$val->first_interview}}</td>
-                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."35")}}'></a>{{$val->final_interview}}</td>    
-                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."8")}}'></a>{{$val->cancelled}}</td>     
+                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."35")}}'></a>{{$val->final_interview}}</td> 
+                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."42")}}'></a>{{$val->for_comparison}}</td>    
+                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."8")}}'></a>{{$val->cancelled}}</td>
+                    <td class="hover" id="hover" style="text-align:center"><a href='{{CRUDBooster::mainpath("summary-report/".$val->erf_number."-"."5")}}'></a>{{$val->rejected}}</td>     
                 </tr>
                     
                 @endforeach

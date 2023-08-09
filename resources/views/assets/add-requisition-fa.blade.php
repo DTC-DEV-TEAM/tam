@@ -154,7 +154,7 @@
                                                     <tbody id="bodyTable">
                                                         <tr class="tbl_header_color dynamicRows">
                                                             <th width="35%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">Digits Code</th>
+                                                            <th width="20%" class="text-center">Tasteless Code</th>
                                                             <th width="20%" class="text-center">{{ trans('message.table.category_id_text') }}</th>      
                                                             <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th>
                                                             <th width="15%" class="text-center"> Wh Quantity</th>
@@ -309,7 +309,7 @@
                         '</ul>' +
                         '<div id="display-error'+ tableRow +'"></div>'+
                         '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code finput" data-id="'+ tableRow +'" id="digits_code'+ tableRow +'"  name="digits_code[]"   maxlength="100" readonly>' +
+                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code text-center finput" data-id="'+ tableRow +'" id="digits_code'+ tableRow +'"  name="digits_code[]"   maxlength="100" readonly>' +
                             '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="'+ tableRow +'" id="fixed_description'+ tableRow +'"  name="fixed_description[]"   maxlength="100" readonly>' +
                         '</td>' +
 
@@ -322,14 +322,18 @@
                             '</select>'+
                         '</td>' +
 
-                        '<td>'+
-                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                            '  <option value=""></option>' +
-                            '        @foreach($sub_categories as $data)'+
-                            '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
-                            '         @endforeach'+
-                            '</select>'+
-                        '</td>' +  
+                        '<td>' + 
+                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="'+ tableRow +'" id="sub_category_id'+ tableRow +'"  name="sub_category_id[]"   maxlength="100" readonly>' +
+                        '</td>' +
+
+                        // '<td>'+
+                        //     '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
+                        //     '  <option value=""></option>' +
+                        //     '        @foreach($sub_categories as $data)'+
+                        //     '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
+                        //     '         @endforeach'+
+                        //     '</select>'+
+                        // '</td>' +  
 
                         '<td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +
                         
@@ -350,8 +354,8 @@
                     $('#category_id'+tableRow).select2({
                     placeholder_text_single : "- Select Category -",
                     minimumResultsForSearch: -1});
-                    $('#sub_category_id'+tableRow).select2({
-                    placeholder_text_single : "- Select Sub Category -"});
+                    // $('#sub_category_id'+tableRow).select2({
+                    // placeholder_text_single : "- Select Sub Category -"});
 
                     //$('#sub_category_id'+tableRow).attr('disabled', true);
 
@@ -422,6 +426,7 @@
                                             serial_no:                  item.serial_no,
                                             value:                      item.item_description,
                                             category_description:       item.category_description,
+                                            sub_category_description:   item.sub_category_description,
                                             item_cost:                  item.item_cost,
                                             wh_qty:                     item.wh_qty,
                                             unserved_qty:               item.unserved_qty,
@@ -451,6 +456,7 @@
                             if (e.id) {
                             
                                 $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
+                                $('#sub_category_id'+$(this).attr("data-id")).val(e.sub_category_description);
                                 $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
                                 $('#itemDesc'+$(this).attr("data-id")).val(e.value);
                                 $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');

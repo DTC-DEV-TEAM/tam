@@ -90,13 +90,12 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Screen Date</label>
-                            <input class="form-control finput date" type="text" placeholder="Select Date" name="screen_date" id="screen_date">
+                            <input class="form-control finput date" type="text" placeholder="Select Date" name="screen_date" id="screen_date" autocomplete="off">
                         </div>
                     </div>  
                 </div>
 
                 <div class="row"> 
-                    
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> First Name</label>
@@ -107,6 +106,21 @@
                         <div class="form-group">
                             <label class="control-label"><span style="color:red">*</span> Last Name</label>
                             <input type="text" class="form-control finput"  id="last_name" name="last_name"  required>                                   
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row"> 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"><span style="color:red">*</span> Job Portal</label>
+                            <input type="text" class="form-control finput"  id="job_portal" name="job_portal"  required>                                   
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"> Remarks</label>
+                            <input type="text" class="form-control finput"  id="remarks" name="remarks"  required>                                   
                         </div>
                     </div>
                 </div>
@@ -133,7 +147,6 @@
     setTimeout("preventBack()", 0);
     $('.erf').select2({})
     $(".date").datetimepicker({
-        minDate:new Date(), // Current year from transactions
         viewMode: "days",
         format: "YYYY-MM-DD",
         dayViewHeaderFormat: "MMMM YYYY",
@@ -178,6 +191,15 @@
                 swal({
                     type: 'error',
                     title: 'Last Name Required!',
+                    icon: 'error',
+                    confirmButtonColor: "#367fa9",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }else if($("#job_portal").val() === ""){
+                swal({
+                    type: 'error',
+                    title: 'Job Portal Required!',
                     icon: 'error',
                     confirmButtonColor: "#367fa9",
                 }); 

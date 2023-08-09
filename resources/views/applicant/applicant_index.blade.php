@@ -50,13 +50,17 @@
                 @foreach($getData as $val)
                 <tr>
                     <td style="text-align:center">   
-                    @if($val->status != 31 && $val->status != 8)     
-                    <a class='btn btn-xs' href='{{CRUDBooster::mainpath("edit-applicant/".$val->apid)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-pencil'></i></a>                                         
+                    @if(!in_array($val->status, [5,8,31]))     
+                    <a data-toggle="tooltip" data-placement="right" title="Edit" class='btn btn-xs btn-success' href='{{CRUDBooster::mainpath("edit-applicant/".$val->apid)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-pencil'></i></a>                                         
                     @else
-                    <a class='btn  btn-xs' href='{{CRUDBooster::mainpath("detail-applicant/".$val->apid)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-eye'></i></a>   
+                    <a data-toggle="tooltip" data-placement="right" title="View" class='btn btn-xs btn-primary' href='{{CRUDBooster::mainpath("detail-applicant/".$val->apid)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-eye'></i></a>   
                     @endif
                     </td>  
                     @if($val['status'] == 8)
+                    <td style="text-align:center">
+                     <label class="label label-danger" style="align:center; font-size:10px">{{$val['status_description']}}</label>
+                    </td>
+                    @elseif($val['status'] == 5)
                     <td style="text-align:center">
                      <label class="label label-danger" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>
@@ -65,6 +69,10 @@
                      <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>
                     @elseif($val['status'] == 35)
+                    <td style="text-align:center">
+                     <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
+                    </td>
+                    @elseif($val['status'] == 42)
                     <td style="text-align:center">
                      <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>

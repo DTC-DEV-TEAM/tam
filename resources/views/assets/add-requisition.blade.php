@@ -166,7 +166,7 @@
                                             <tbody id="bodyTable">
                                                 <tr class="tbl_header_color dynamicRows">
                                                     <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                    <th width="20%" class="text-center">Digits Code</th>
+                                                    <th width="20%" class="text-center">Tasteless Code</th>
                                                     <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
                                                     <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                                                     <th width="15%" class="text-center"> Wh Quantity</th>
@@ -202,7 +202,7 @@
                         
                             </div>
                         </div>
-                    <label for=""><span><input type="checkbox" id="checkApplications" style="margin-left:10px"> Applications for Laptop or Desktop</span></label>      
+                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox" id="checkApplications"> <span style="font-style: italic"> Applications for Laptop or Desktop</span></label>      
                 </div>
                
                 <div class="col-md-12" id="application_div">
@@ -232,7 +232,7 @@
 
                 <div class="col-md-12" style="margin-top: 10px">
                     <div class="form-group">
-                        <label class="require control-label col-md-2">{{ trans('message.table.note') }}</label>
+                        <label>{{ trans('message.table.note') }}</label>
                         <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="requestor_comments"></textarea>
                     </div>
                 </div>

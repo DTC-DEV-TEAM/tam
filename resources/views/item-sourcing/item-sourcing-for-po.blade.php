@@ -614,7 +614,7 @@
                        <div class='row'>
                          <div class='col-md-12'>
                             @if(in_array($Header->request_type_id, [1,5,7]))
-                             <input oninput="validate(this)" type"text" class="form-control" name="digits_code"  id="digits_code" placeholder="Please input Digits Code" onKeyPress="if(this.value.length==8) return false;">
+                             <input oninput="validate(this)" type"text" class="form-control" name="digits_code"  id="digits_code" placeholder="Please input Digits Code" onKeyPress="if(this.value.length==10) return false;">
                             @else
                              <input oninput="validate(this)" type"text" class="form-control" placeholder="Please input Digits Code" onKeyPress="if(this.value.length==8) return false;">
                             @endif
