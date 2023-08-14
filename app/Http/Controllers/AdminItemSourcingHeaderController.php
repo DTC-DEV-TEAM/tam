@@ -1026,7 +1026,7 @@
 
 			$subcategories = DB::table('tam_subcategories')
 							->select('tam_subcategories.*')
-							->whereIn('categories_id', [273])
+							//->whereIn('categories_id', [273])
 							->where('status', "ACTIVE")
 							->orderby('subcategory_description', 'ASC')->get();
 	

@@ -450,6 +450,12 @@
 
 			}
 
+			if($column_index == 6){
+				if($column_value == null){
+					$column_value = "ERF";
+				}
+			}
+
 	    }
 
 	    /*

@@ -472,14 +472,14 @@
 				$dataLines[$x]['sub_category_id'] 	= $sub_category_id[$x];
 				$dataLines[$x]['quantity'] 			= $quantity[$x];
 				$dataLines[$x]['created_at'] 		= date('Y-m-d H:i:s');
-				if($category_id[$x] == "IT ASSETS"){
+				//if($category_id[$x] == "IT ASSETS"){
 					$dataLines[$x]['request_type_id'] = 1;
 					
-				}else if($category_id[$x] == "FIXED ASSETS"){
-					$dataLines[$x]['request_type_id'] = 5;
-				}else{
-					$dataLines[$x]['request_type_id'] = 7;
-				}
+				// }else if($category_id[$x] == "FIXED ASSETS"){
+				// 	$dataLines[$x]['request_type_id'] = 5;
+				// }else{
+				// 	$dataLines[$x]['request_type_id'] = 7;
+				// }
 			}
 
 			DB::beginTransaction();

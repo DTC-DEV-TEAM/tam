@@ -211,8 +211,8 @@
                                                 <th>Digits Code</th>
                                                 <th width="12%" class="text-center">Category</th> 
                                                 <th width="12%" class="text-center">Sub Category</th>
-                                                <th width="12%" class="text-center">Class</th> 
-                                                <th width="12%" class="text-center">Sub Class</th> 
+                                                {{-- <th width="12%" class="text-center">Class</th> 
+                                                <th width="12%" class="text-center">Sub Class</th>  --}}
                                                 <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>   
                                                 <th width="7%" class="text-center">Brand</th> 
                                                 <th width="7%" class="text-center">Model</th>  
@@ -243,14 +243,14 @@
                                                                 {{$rowresult->category_description}}                               
                                                             </td>
                                                             <td style="text-align:center" height="10">
-                                                                {{$rowresult->sub_category_description}}                              
+                                                                {{$rowresult->subcategory_description}}                              
                                                             </td>
-                                                            <td style="text-align:center" height="10">
+                                                            {{-- <td style="text-align:center" height="10">
                                                                 {{$rowresult->class_description}}                               
                                                             </td>
                                                             <td style="text-align:center" height="10">
                                                                 {{$rowresult->sub_class_description}}                               
-                                                            </td>                                                        
+                                                            </td>                                                         --}}
                                                             <td style="text-align:center" height="10">
                                                                 {{$rowresult->item_description}}                               
                                                             </td>
