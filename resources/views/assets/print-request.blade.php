@@ -2,6 +2,14 @@
 @extends('crudbooster::admin_template')
 @push('head')
 <style type="text/css">   
+   .signature {
+    border-bottom: 1px solid #000;
+    }
+    @media print {
+        .signature {
+         border-bottom: 1px solid #000;
+        }
+    }
 </style>
 @endpush
 @section('content')
@@ -49,7 +57,7 @@
                         <tr>
                             @if($Header->store_branch != null || $Header->store_branch != "")
                                 <td width="20%"><label><strong>Store/Branch:<strong></label></td>
-                                <td width="40%"><p>{{$Header->store_branch}}</p></td>
+                                <td width="40%"><p>{{$Header->store_name}}</p></td>
                             @endif
                             <td width="20%"><label><strong>Date:<strong></label></td>
                             <td><p>{{ date('Y-m-d') }}</p></td>
@@ -75,6 +83,7 @@
                                     <thead>
                                         <tr><th colspan="5"><h4 align="center" ><strong>Item Details</strong></h4></th></tr>
                                         <tr>
+                                            <th style="text-align:center" height="10">Asset Code</th>
                                             <th style="text-align:center" height="10">Digits Code</th>
                                             <th style="text-align:center" height="10">Item Description</th>          
                                             <th style="text-align:center" height="10">Serial#</th>
@@ -92,6 +101,7 @@
 
                                             <tr>
                                                 @if($rowresult->digits_code != null)
+                                                <td height="10">{{$rowresult->asset_code}}</td>
                                                     <td height="10">
 
                                                         <input type="hidden" value="{{$rowresult->id}}" name="mo_id[]">
@@ -117,7 +127,7 @@
                                     </tbody>
 
                                     <tr>
-                                        <td colspan="4" style="text-align:right">
+                                        <td colspan="5" style="text-align:right">
                                             <label>Total:</label>
                                         </td>
 
@@ -222,6 +232,34 @@
 
                         </tr>
 
+                        <tr>
+                        
+                            <td width="20%">
+                            
+                                <label><strong>Received By:<strong></label>
+                            </td>
+                            <td width="40%">
+                                <p></p>
+                            </td>
+                            <td width="20%">
+                            
+                                <label><strong>Received Date:<strong></label>
+                            </td>
+                            <td>
+                                <p></p>
+                            </td>
+
+                        </tr>
+
+                        <tr>
+                        @if($Header->if_from_erf != null || $Header->if_from_erf != "")
+                        <td width="20%"> <br>
+                               <h3>____________________________</h3>
+                            <label style="margin-left:60px;"><strong>received by HR<strong></label>
+                        </td>
+                        @endif
+                    </tr>
+
                     </table> 
                 </div>
 
@@ -247,7 +285,6 @@
 @endsection
 @push('bottom')
     <script type="text/javascript">
-
         function printDivision(divName) {
          //alert('Please print 2 copies!');
             var generator = window.open(",'printableArea,");
@@ -275,6 +312,8 @@
                   });
                   return false;
         });
+
+        
 
     </script>
 @endpush

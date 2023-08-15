@@ -551,7 +551,7 @@
 			  )
 			  ->where('assets_header_images.header_id', $id)
 			  ->get();
-			  
+
 			return $this->view("assets.add-inventory", $data);
 
 		}
@@ -771,7 +771,7 @@
 	         
 			//update reserved table
 			if($tag_id){
-				//get asset code
+				// //get asset code
 				// $array_assetcode = [];
 				// $array_cont      = [];
 				// foreach($asset_code as $aKey => $aVal){
@@ -779,6 +779,9 @@
 				// 	$array_cont['asset_code'] = $aVal;
 				// 	$array_assetcode[] = $array_cont;
 				// }
+
+				// $count_header 		= MoveOrder::count();
+			    // $count_header1  	= $count_header + 1;
 				
 				for ($t = 0; $t < count($tag_id); $t++) {
 
@@ -812,11 +815,21 @@
 				// 		}
 				// 	}
 
-				// 	dd($finalBodyValue	);
+				// 	dd($finalBodyValue);
 				// 	//Process the data
 				// 	foreach($finalBodyValue as $fKey => $fVal){
 				// 		if($fVal->item_master->fulfillment_type === "DELIVERY-DIRECT"){
+				// 			AssetsInventoryReserved::where(['id' => $fVal->id])
+				// 			->update([
+				// 					'reserved' => 1,
+				// 					'for_po'   => NULL
+				// 					]);
 
+				// 			//CREATE MO		
+				// 			$count_header++;
+				// 			$header_ref       = str_pad($count_header, 7, '0', STR_PAD_LEFT);			
+				// 			$reference_number = "MO-".$header_ref.$ref_inventory;
+							
 				// 		}else{
 
 				// 		}
@@ -858,6 +871,7 @@
 				'statuses_id'           => 6,
 				'header_id'             => $id,
 				'serial_no'             => $serial_no[$key],
+				'location'              => $location,
 				'value'                 => str_replace(',', '', $value[$key]),
 				'warranty_coverage'     => $warranty_coverage[$key],
 				'upc_code'              => $upc_code[$key],
