@@ -911,6 +911,7 @@
 
 			return $this->view("item-sourcing.item-sourcing-detail", $data);
 		}
+		
 		public function getDetailReject($id){
 			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
@@ -1023,11 +1024,11 @@
 			$id = $data['id'];
 			//$categories = DB::table('new_category')->where('category_description', $id)->first();
 
-			$subcategories = DB::table('new_sub_category')
-							->select('new_sub_category.*')
-							->where('category_id', $id)
-							->where('sub_status', "ACTIVE")
-							->orderby('sub_category_description', 'ASC')->get();
+			$subcategories = DB::table('tam_subcategories')
+							->select('tam_subcategories.*')
+							//->whereIn('categories_id', [273])
+							->where('status', "ACTIVE")
+							->orderby('subcategory_description', 'ASC')->get();
 	
 			return($subcategories);
 		}

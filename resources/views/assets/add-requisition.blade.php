@@ -158,55 +158,56 @@
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
                     </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                        <div class="pic-container">
-                                            <div class="pic-row">
-                                                <table class="table table-bordered" id="asset-items">
-                                                    <tbody id="bodyTable">
-                                                        <tr class="tbl_header_color dynamicRows">
-                                                            <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">Digits Code</th>
-                                                            <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
-                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
-                                                            <th width="15%" class="text-center"> Wh Quantity</th>
-                                                            <th width="15%" class="text-center"> Unserved Quantity</th> 
-                                                            <th width="7%" class="text-center">*Request Qty</th> 
-                                                            <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
-                                                        </tr>
+                        <div class="box-body no-padding">
+                            <div class="table-responsive">
+                                <div class="pic-container">
+                                    <div class="pic-row">
+                                        <table class="table table-bordered" id="asset-items">
+                                            <tbody id="bodyTable">
+                                                <tr class="tbl_header_color dynamicRows">
+                                                    <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
+                                                    <th width="20%" class="text-center">Tasteless Code</th>
+                                                    <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
+                                                    <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+                                                    <th width="15%" class="text-center"> Wh Quantity</th>
+                                                    <th width="15%" class="text-center"> Unserved Quantity</th> 
+                                                    <th width="7%" class="text-center">*Request Qty</th> 
+                                                    <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
+                                                </tr>
 
-                                                        <tr id="tr-table">
-                                                            <tr>
+                                                <tr id="tr-table">
+                                                    <tr>
+                                    
+                                                    </tr>
+                                                </tr>
                                             
-                                                            </tr>
-                                                        </tr>
-                                                    
-                                                    </tbody>
+                                            </tbody>
 
-                                                    <tfoot>
+                                            <tfoot>
 
-                                                        <tr id="tr-table1" class="bottom">
-            
-                                                            <td colspan="6">
-                                                                <input type="button" id="add-Row" name="add-Row" class="btn btn-success add" value='Add Item' />
-                                                            </td>
-                                                            <td align="left" colspan="1">
-                                                                <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-                                                            </td>
-                                                        </tr>
-                                                    </tfoot>
+                                                <tr id="tr-table1" class="bottom">
+    
+                                                    <td colspan="6">
+                                                        <input type="button" id="add-Row" name="add-Row" class="btn btn-success add" value='Add Item' />
+                                                    </td>
+                                                    <td align="left" colspan="1">
+                                                        <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
+                                                    </td>
+                                                </tr>
+                                            </tfoot>
 
-                                                </table>
-                                            </div>
-                                        </div>
-                                
+                                        </table>
                                     </div>
-                                    <br>
                                 </div>
+                        
+                            </div>
+                        </div>
+                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox" id="checkApplications"> <span style="font-style: italic"> Applications for Laptop or Desktop</span></label>      
                 </div>
-
+               
                 <div class="col-md-12" id="application_div">
                     <hr/>
+                    
                     <div class="row"> 
                         <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
                             @foreach($applications as $data)
@@ -229,9 +230,7 @@
                     <hr/>
                 </div>
 
-
-
-                <div class="col-md-12">
+                <div class="col-md-12" style="margin-top: 10px">
                     <div class="form-group">
                         <label>{{ trans('message.table.note') }}</label>
                         <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="requestor_comments"></textarea>
@@ -286,9 +285,7 @@
 
 
         $('#OTHERS').change(function() {
-
 		    var ischecked= $(this).is(':checked');
-
 		    if(ischecked == false){
                 $("#application_others_div").hide();
                 $("#application_others").removeAttr('required');
@@ -296,8 +293,19 @@
                 $("#application_others_div").show();
                 $("#application_others").attr('required', 'required');
             }	
-
 		});
+
+        $('#checkApplications').change(function() {
+            if(this.checked) {
+                $("#application_div").show();
+            }else{
+                $("#application_div").hide();
+                $("#application_others_div").hide();
+                $(".application").prop('checked', false);
+                $(".application_others").prop('checked', false);
+                $("#application_others").removeAttr('required');
+            }
+        });
 
         var app_count = 0;
 
@@ -399,15 +407,17 @@
                             '</select>'+
                         '</td>' +
 
-
-                        '<td>'+
-                            '<select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                            '  <option value=""></option>' +
-                            '        @foreach($sub_categories as $data)'+
-                            '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
-                            '         @endforeach'+
-                            '</select>'+
+                        '<td>' + 
+                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="'+ tableRow +'" id="sub_category_id'+ tableRow +'"  name="sub_category_id[]"   maxlength="100" readonly>' +
                         '</td>' +
+                        // '<td>'+
+                        //     '<select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
+                        //     '  <option value=""></option>' +
+                        //     '        @foreach($sub_categories as $data)'+
+                        //     '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
+                        //     '         @endforeach'+
+                        //     '</select>'+
+                        // '</td>' +
 
                         '<td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +
                         
@@ -429,8 +439,8 @@
                     $('#category_id'+tableRow).select2({
                     placeholder_text_single : "- Select Category -",
                     minimumResultsForSearch: -1});
-                    $('.sub_category_id').select2({
-                    placeholder_text_single : "- Select Sub Category -"});
+                    // $('.sub_category_id').select2({
+                    // placeholder_text_single : "- Select Sub Category -"});
                     $('#app_id'+tableRow).change(function(){
 
                             if($('#app_id'+$(this).attr("data-id")).val() != null){
@@ -505,6 +515,7 @@
                                                 serial_no:                  item.serial_no,
                                                 value:                      item.item_description,
                                                 category_description:       item.category_description,
+                                                sub_category_description:   item.sub_category_description,
                                                 item_cost:                  item.item_cost,
                                                 wh_qty:                     item.wh_qty,
                                                 unserved_qty:               item.unserved_qty,
@@ -535,6 +546,7 @@
                                 if (e.id) {
                                 
                                     $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
+                                    $('#sub_category_id'+$(this).attr("data-id")).val(e.sub_category_description);
                                     $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
                                     $('#itemDesc'+$(this).attr("data-id")).val(e.value);
                                     $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
@@ -809,8 +821,9 @@
                     
                         } 
    
-                    $(".sub_category_id :selected").each(function() {
-                        if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                    //$(".sub_category_id :selected").each(function() {
+                        //if(app_count == 0 && $.inArray($(this).val().toLowerCase().replace(/\s/g, ''),['laptop','desktop']) > -1){
+                        if(app_count == 0 && $("#checkApplications").is(':checked')){
                             swal({  
                                 type: 'error',
                                 title: 'Please choose an Application!',
@@ -834,7 +847,7 @@
                                     $("#AssetRequest").submit();                                                   
                             });
                         }
-                    }); 
+                    //}); 
                   
                 }
             

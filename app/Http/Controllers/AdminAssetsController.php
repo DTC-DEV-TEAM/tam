@@ -53,7 +53,7 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 
-			//$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
+			$this->col[] = ["label"=>"Tasteless Code","name"=>"digits_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"tam_categories,category_description"];
 			$this->col[] = ["label"=>"Sub Category","name"=>"sub_category_id","join"=>"class,class_description"];

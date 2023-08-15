@@ -237,10 +237,19 @@
                         @foreach($required_exams as $res)
                             <div class="col-md-6">
                                 <label class="checkbox-inline control-label col-md-12" ><br>
-                                    <input type="checkbox" name="required_exams[]" value="{{$res->description}}" {{ in_array($res->description, $res_req) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                    <input type="checkbox" class="required_exams" name="required_exams[]" id="{{$res->description}}" value="{{$res->description}}" {{ in_array($res->description, $res_req) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
                                 </label>
                             </div>                                                                                    
                         @endforeach
+                        @if($Header->other_required_exams != NULL || $Header->other_required_exams != "")
+                            <div class="form-group">
+                                <input type="text" class="form-control finput" name="other_required_exams" value="{{$Header->other_required_exams}}" aria-describedby="basic-addon1">                                                                                    
+                            </div>
+                        @else
+                            <div class="form-group" id="other_required_exams_div" style="display:none;">
+                                <input type="text" class="form-control finput"  id="other_required_exams" name="other_required_exams" placeholder="Other Schedule">   
+                            </div>
+                        @endif
                     </div>
                     <div class="col-md-6">
                         <label class="require control-label"> Does the Employee need to shared files?</label><br>
@@ -309,18 +318,18 @@
                         @endif    
                                                                                                
                     </div>
-                    @if($Header->required_system != "" || $Header->required_system != NULL)
-                        <div class="col-md-6">
-                            <label class="require control-label"> Required System</label><br>
-                            @foreach($required_system as $res)   
-                                <div class="col-md-6">
-                                    <label class="checkbox-inline control-label col-md-12" ><br>
-                                        <input type="checkbox" name="required_system[]" value="{{$res->description}}" {{ in_array($res->description, $required_system_array) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
-                                    </label>
-                                </div>                                                                                                                                                                 
-                            @endforeach
-                        </div>
-                    @endif
+            
+                    <div class="col-md-6">
+                        <label class="require control-label"> Required System</label><br>
+                        @foreach($required_system as $res)   
+                            <div class="col-md-6">
+                                <label class="checkbox-inline control-label col-md-12" ><br>
+                                    <input type="checkbox" name="required_system[]" value="{{$res->description}}" {{ in_array($res->description, $required_system_array) ? 'checked' : '' }} aria-describedby="basic-addon1">{{$res->description}} 
+                                </label>
+                            </div>                                                                                                                                                                 
+                        @endforeach
+                    </div>
+                 
                 </div>
                
             </div>
@@ -512,15 +521,15 @@ $(function(){
 
      //other Required Exam
       //checkbox validations
-      $(".required_exams").change(function() {
-        var rep = $(this);
-        if(rep.val() === "OTHERS" && rep.is(':checked')){
-            $("#other_required_exams_div").show();
-        }else{
+      $("#OTHERS").change(function() {
+        var ischecked= $(this).is(':checked');
+        if(ischecked == false){
             $("#other_required_exams_div").hide();
-            $('#other_required_exams').val("");
+            $("#other_required_exams").removeAttr('required');
+        }else{
+            $("#other_required_exams_div").show();
+            $("#other_required_exams").attr('required', 'required');
         }
-
     });
 
     //checkbox validations

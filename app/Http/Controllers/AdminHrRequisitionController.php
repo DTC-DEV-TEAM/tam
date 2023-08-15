@@ -299,6 +299,7 @@
 			$verified         =  DB::table('statuses')->where('id', 30)->value('status_description');  
 			$jo_done          =  DB::table('statuses')->where('id', 31)->value('status_description');    
 			$onboarding       =  DB::table('statuses')->where('id', 33)->value('status_description');   
+			$onboarded        =  DB::table('statuses')->where('id', 43)->value('status_description'); 
 			$closed           =  DB::table('statuses')->where('id', 13)->value('status_description'); 
 			if($column_index == 1){
 				if($column_value == $pending){
@@ -313,6 +314,8 @@
 					$column_value = '<span class="label label-info">'.$jo_done.'</span>';
 				}else if($column_value == $onboarding){
 					$column_value = '<span class="label label-info">'.$onboarding.'</span>';
+				}else if($column_value == $onboarded){
+					$column_value = '<span class="label label-info">'.$onboarded.'</span>';
 				}else if($column_value == $cancelled){
 					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
 				}else if($column_value == $closed){
@@ -469,14 +472,14 @@
 				$dataLines[$x]['sub_category_id'] 	= $sub_category_id[$x];
 				$dataLines[$x]['quantity'] 			= $quantity[$x];
 				$dataLines[$x]['created_at'] 		= date('Y-m-d H:i:s');
-				if($category_id[$x] == "IT ASSETS"){
+				//if($category_id[$x] == "IT ASSETS"){
 					$dataLines[$x]['request_type_id'] = 1;
 					
-				}else if($category_id[$x] == "FIXED ASSETS"){
-					$dataLines[$x]['request_type_id'] = 5;
-				}else{
-					$dataLines[$x]['request_type_id'] = 7;
-				}
+				// }else if($category_id[$x] == "FIXED ASSETS"){
+				// 	$dataLines[$x]['request_type_id'] = 5;
+				// }else{
+				// 	$dataLines[$x]['request_type_id'] = 7;
+				// }
 			}
 
 			DB::beginTransaction();
@@ -711,7 +714,7 @@
 
 		public function itemErfITSearch(Request $request) {
 			$request = Request::all();
-			$cont = (new static)->apiContext;
+
 			$search 		= $request['search'];
 			$data = array();
 
@@ -719,20 +722,18 @@
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
 
-			//$search_item =  DB::table('digits_code')>where('digits_code','LIKE','%'.$request->search.'%')->first();
-
 			$items = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.category_id','=',6)->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotIn('assets.category_id',[3,5])
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.category_id','=',6)->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotIn('assets.category_id',[3,5])
-			->join('category', 'assets.category_id','=', 'category.id')
-			->leftjoin('new_sub_category', 'assets.sub_category_id','=', 'new_sub_category.id')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+			->leftjoin('tam_categories', 'assets.category_id','=', 'tam_categories.id')
+			->leftjoin('tam_subcategories', 'assets.class_id','=', 'tam_subcategories.id')
 			->leftjoin('class','assets.class_id','class.id')
 			->select(
 				'assets.*',
 				'assets.id as assetID',
-				'category.category_description as category_description',
-				'new_sub_category.sub_category_description as sub_category_description',
-				'class.class_description as class_type'
+				'tam_categories.category_description as category_description',
+				'tam_subcategories.subcategory_description as subcategory_description',
+				'tam_subcategories.subcategory_description as class_type'
 			)->take(10)->get();
 			
 			if($items){
@@ -750,7 +751,7 @@
 					$return_data[$i]['serial_no']            = $value->serial_no;
 					$return_data[$i]['item_description']     = $value->item_description;
 					$return_data[$i]['category_description'] = $value->category_description;
-					$return_data[$i]['class_description']    = $value->sub_category_description;
+					$return_data[$i]['class_description']    = $value->subcategory_description;
 					$return_data[$i]['class_type']           = $value->class_type;
 					$return_data[$i]['item_cost']            = $value->item_cost;
 					$return_data[$i]['item_type']            = $value->item_type;

@@ -15,34 +15,6 @@
                 -moz-border-radius: 3px !important;
                 border-radius: 3px !important; 
             }
-            .pagination > li > a
-            {
-                background-color: white;
-                color: #5A4181;
-            }
-
-            .pagination > li > a:focus,
-            .pagination > li > a:hover,
-            .pagination > li > span:focus,
-            .pagination > li > span:hover
-            {
-                color: #5a5a5a;
-                background-color: #eee;
-                border-color: #ddd;
-            }
-
-            .pagination > .active > a
-            {
-                color: white;
-                background-color: #00a65a !Important;
-                border: solid 1px #00a65a !Important;
-            }
-
-            .pagination > .active > a:hover
-            {
-                background-color: #00a65a !Important;
-                border: solid 1px #00a65a;
-            }
         </style>
     @endpush
 @section('content')
@@ -77,11 +49,19 @@
                     <td style="text-align:center">
                      <label class="label label-danger" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>
+                    @elseif($val['status'] == 5)
+                    <td style="text-align:center">
+                     <label class="label label-danger" style="align:center; font-size:10px">{{$val['status_description']}}</label>
+                    </td>
                     @elseif($val['status'] == 34)
                     <td style="text-align:center">
                      <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>
                     @elseif($val['status'] == 35)
+                    <td style="text-align:center">
+                     <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
+                    </td>
+                    @elseif($val['status'] == 42)
                     <td style="text-align:center">
                      <label class="label label-info" style="align:center; font-size:10px">{{$val['status_description']}}</label>
                     </td>

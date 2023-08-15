@@ -252,7 +252,7 @@
                             @foreach($required_exams as $data)
                             <div class="col-md-6">
                                 <label class="checkbox-inline control-label col-md-12" ><br>
-                                <input type="checkbox" required   class="required_exams" name="required_exams[]" value="{{$data->description}}" >{{$data->description}}
+                                <input type="checkbox" required  class="required_exams" id="{{$data->description}}" name="required_exams[]" value="{{$data->description}}" >{{$data->description}}
                                 </label>
                             </div>
                             @endforeach
@@ -541,15 +541,15 @@
 
      //other Required Exam
       //checkbox validations
-      $(".required_exams").change(function() {
-        var rep = $(this);
-        if(rep.val() === "OTHERS" && rep.is(':checked')){
-            $("#other_required_exams_div").show();
-        }else{
+      $("#Others").change(function() {
+        var ischecked= $(this).is(':checked');
+        if(ischecked == false){
             $("#other_required_exams_div").hide();
-            $('#other_required_exams').val("");
+            $("#other_required_exams").removeAttr('required');
+        }else{
+            $("#other_required_exams_div").show();
+            $("#other_required_exams").attr('required', 'required');
         }
-
     });
 
     //checkbox validations
@@ -783,7 +783,7 @@
                                 $('#class_type'+$(this).attr("data-id")).val(e.class_type);
                                 $('#val_item').html('');
 
-                                if($.inArray(e.class_type,['LAPTOP','DESKTOP','MACBOOK']) > -1){
+                                if($.inArray(e.class_type,['OEQ-LAPTOP','OEQ-COMPUTER MONITOR','LAPTOP','DESKTOP','MACBOOK']) > -1){
                                     $("#application_div").show();
                                 }
                                 return false;

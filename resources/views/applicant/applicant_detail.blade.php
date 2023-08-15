@@ -112,6 +112,12 @@
                             <input type="text" class="form-control finput"  id="status" name="status"  value="{{$applicant->status_desc}}" readonly>                                   
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"><span style="color:red">*</span> Remarks</label>
+                            <input type="text" class="form-control finput"  id="remarks" name="remarks"  value="{{$applicant->update_remarks}}" readonly>                                   
+                        </div>
+                    </div>
                 </div>
                 <hr>
             </div>

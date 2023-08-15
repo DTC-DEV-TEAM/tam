@@ -93,7 +93,7 @@
 				$forTurnOver  = 		DB::table('statuses')->where('id', 24)->value('id');
 
 				$this->addaction[] = ['title'=>'Cancel Request','url'=>CRUDBooster::mainpath('getRequestCancelReturn/[id]'),'icon'=>'fa fa-times', "showIf"=>"[status] == $pending"];
-				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintTF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status] == $forTurnOver"];
+				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintTF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status] == $forTurnOver || [status] == 25 || [status] == 13"];
 				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
 			}
 
@@ -248,7 +248,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -437,9 +437,11 @@
 				
 				->select(
 					'return_transfer_assets.*',
+					'return_transfer_assets.status as body_status',
 					'statuses.*',
 					)
 					->where('return_transfer_assets.return_header_id', $id)->get();	
+					
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 
 			return $this->view("assets.view-return-details", $data);
@@ -609,7 +611,7 @@
 				array_push($finalinventory_id, $invData['inventory_id']);
 			}
 			
-			if(in_array(CRUDBooster::myPrivilegeId(), [10,11,13,14])){ 
+			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
 				$status		 			= $forturnover;
 				for($x=0; $x < count($moId); $x++) {
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
@@ -629,6 +631,9 @@
 				$conHeader['request_type'] = "RETURN";
 				$conHeader['requested_by'] = CRUDBooster::myId(); 
 				$conHeader['requested_date'] = date('Y-m-d H:i:s');
+				if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
+					$conHeader['approved_date'] = date('Y-m-d H:i:s');
+				}
 				if($hData == 1){
 					$conHeader['location_to_pick'] = 3; 
 				}else{
@@ -741,7 +746,7 @@
 				array_push($finalinventory_id, $invData['inventory_id']);
 			}
 			
-			if(in_array(CRUDBooster::myPrivilegeId(), [10,11,13,14])){ 
+			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
 				$status		 			= $forturnover;
 				for($x=0; $x < count($moId); $x++) {
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
@@ -757,7 +762,11 @@
 			// Header Area
 			$count_header       = DB::table('return_transfer_assets_header')->count();
 			$reference_no = "1".str_pad($count_header + 1, 7, '0', STR_PAD_LEFT)."AT";
-
+			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
+				$approved = date('Y-m-d H:i:s');
+			}else{
+			    $approved = NULL;
+			}
 			$id = ReturnTransferAssetsHeader::Create(
                 [
                     'status' => $status, 
@@ -767,6 +776,7 @@
                     'request_type' => "TRANSFER",
                     'requested_by' => CRUDBooster::myId(),
                     'requested_date' => date('Y-m-d H:i:s'),
+					'approved_date'  => $approved,
                     'location_to_pick' => 5,
                     'store_branch' => $location,
                     'transfer_to' => $user_id,
@@ -881,8 +891,9 @@
 					'statuses.*',
 					)
 					->where('return_transfer_assets.return_header_id', $id)->get();	
+		
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-
+			
 			return $this->view("assets.print-request-trf", $data);
 		}
 	}

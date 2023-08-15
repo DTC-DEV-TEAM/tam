@@ -2072,13 +2072,7 @@
 				->update([
 					'to_print'=> 	0
 				]);	
-				
-				$item_string = implode(",",$itemID);
 
-				$itemList = array_map('intval',explode(",",$item_string));
-
-				$items = MoveOrder::wherein('id',$id)->get();
-				
 				$infos['assign_to'] = $employee_name->bill_to;
 				$infos['reference_number'] = $arf_header->reference_number;
 				//if(app()->environment('production')) {
@@ -2098,7 +2092,12 @@
 				
 				//CRUDBooster::sendEmail(['to'=>$employee_name->email,'data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
 				CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
-
+				
+				$item_string = implode(",",$itemID);
+				$itemList = array_map('intval',explode(",",$item_string));
+				$items = MoveOrder::wherein('id',$id)->get();
+				
+				
 		}
 
 

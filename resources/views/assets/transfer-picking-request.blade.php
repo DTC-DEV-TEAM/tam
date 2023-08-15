@@ -1,6 +1,7 @@
 @extends('crudbooster::admin_template')
 @push('head')
         <style type="text/css">   
+      
             .comment_div {
                 box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
                 background: #f5f5f5;
@@ -76,24 +77,36 @@
                     </div>
                 @endif
             </div>
-            <hr>
+
+            <hr/>
             <div class="row">
-                @if($Header->transfer_to != null)    
-                    <label class="control-label col-md-2">Purpose:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->request_type}}</p>
-                    </div>                    
-                    <label class="control-label col-md-2">Transfer To:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->transfer_to}}</p>
-                    </div>
-                    @else
-                    <label class="control-label col-md-2">Purpose:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->request_type}}</p>
-                    </div>
-                @endif
+                <label class="control-label col-md-2">Purpose:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->request_type}}</p>
+                </div>                    
             </div>
+
+            <hr/>
+            @if($Header->approvedby != null || $Header->approvedby != "")
+            <div class="row">                           
+                <label class="control-label col-md-2">{{ trans('message.form-label.approved_by') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->approvedby}}</p>
+                </div>
+                <label class="control-label col-md-2">{{ trans('message.form-label.approved_at') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->approved_date}}</p>
+                </div>
+            </div>
+            @endif
+            @if($Header->approver_comments != null || $Header->approver_comments != "")
+                <div class="row">                           
+                    <label class="control-label col-md-2">{{ trans('message.table.approver_comments') }}:</label>
+                    <div class="col-md-10">
+                            <p>{{$Header->approver_comments}}</p>
+                    </div>
+                </div>
+            @endif 
             <hr>
         
             <div class="box-header text-center">
@@ -103,14 +116,18 @@
             <table  class='table table-striped table-bordered'>
                 <thead>
                     <tr>
-                        <th class="text-center">Good</th> 
-                        <th class="text-center">Defective</th>
+                        <th width="10%" class="text-center">Item to Receive <br> <span>Check All <br> <input type="checkbox" id="check_all"> </span></th> 
+                        <th width="5%" class="text-center">Good</th> 
+                        <th width="5%" class="text-center">Defective</th>
                         <th width="10%" class="text-center">Reference No</th>
-                        <th width="10%" class="text-center">Asset Code</th>
-                        <th width="10%" class="text-center">Digits Code</th>
+                        <th width="7%" class="text-center">Asset Code</th>
+                        <th width="7%" class="text-center">Digits Code</th>
                         <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                        <th width="25%" class="text-center">Asset Type</th>                                                         
-                        <th>Comments</th>
+                        <th width="10%" class="text-center">Asset Type</th>                                                         
+                        <th width="12%" class="text-center">Comments</th>
+                        @if(CRUDBooster::myPrivilegeId() == 6)
+                        <th width="10%">Location</th>
+                        @endif
                     </tr>
                     <?php   $tableRow1 = 0; ?>
                     <?Php   $item_count = 0; ?>
@@ -121,16 +138,19 @@
                     <?Php $item_count++; ?>
                         <tr>
                             <td style="text-align:center" height="10">
+                                <input type="checkbox" name="item_to_receive_id[]" id="item_to_receive_id{{$tableRow1}}" class="item_to_receive_id" required data-id="{{$tableRow1}}" value="{{$rowresult->body_id}}"/>
+                            </td>
+                            <td style="text-align:center" height="10">
                             <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
                             <input type="hidden" value="{{$rowresult->mo_id}}" name="mo_id[]">
-                            <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" value="0" />
+                            <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" />
                             <input type="checkbox" name="good[]" id="good{{$tableRow1}}" class="good" required data-id="{{$tableRow1}}" value="{{$rowresult->asset_code}}"/>
                             <input type="hidden" name="arf_number[]" id="arf_number[]" value="{{$rowresult->reference_no}}" />
                             <input type="hidden" name="digits_code[]" id="digits_code{{$tableRow1}}" value="{{$rowresult->digits_code}}" />
                             <input type="hidden" name="asset_code[]" id="asset_code{{$tableRow1}}" value="{{$rowresult->asset_code}}" />
                             </td>
                             <td style="text-align:center" height="10">
-                            <input type="hidden" name="defective_text[]" id="defective_text{{$tableRow1}}" value="0" />
+                            <input type="hidden" name="defective_text[]" id="defective_text{{$tableRow1}}" />
                             <input type="checkbox" name="defective[]" id="defective{{$tableRow1}}" class="defective" required data-id="{{$tableRow1}}"  value="{{$rowresult->asset_code}}"/>
                             </td>
                             <td style="text-align:center" height="10">{{$rowresult->reference_no}}</td>
@@ -138,14 +158,24 @@
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
-                            <td>
-                                <select required selected data-placeholder="-- Select Comments --" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">
+                            <td style="text-align:center" height="10">
+                                <select required selected data-placeholder="Select Comments" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">
                                     @foreach($good_defect_lists as $good_defect_list)
                                         <option value=""></option>
                                         <option value="{{ $rowresult->asset_code. '|' .$rowresult->digits_code. '|' .$good_defect_list->defect_description }}">{{ $good_defect_list->defect_description }}</option>
                                     @endforeach
                                 </select>
-                            </td>          
+                            </td>   
+                            <!-- @if(CRUDBooster::myPrivilegeId() == 9)
+                            <td>
+                                <select required selected data-placeholder="-- Select Location --" id="location{{$tableRow1}}" data-id="{{$tableRow1}}" name="location" class="form-select location" style="width:100%;">
+                                    @foreach($warehouse_location as $locations)
+                                        <option value=""></option>
+                                        <option value="{{ $locations->id}}">{{ $locations->location }}</option>
+                                    @endforeach
+                                </select>
+                            </td>   
+                            @endif      -->
                         </tr>
                         <tr id="others{{$tableRow1}}" style="display:none">
                         <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
@@ -175,13 +205,41 @@
 @endsection
 @push('bottom')
 <script type="text/javascript">
- $('.select2').select2({
-    placeholder_text_single : "-- Select --",
-    multiple: true});
-    var searchfield = $(this).find('.select2-search--inline');
-    var selection = $(this).find('.select2-selection__rendered');
-    $(this).find('.select2-search__field').html("");
-    selection.prepend(searchfield);
+    $(function(){
+        $('body').addClass("sidebar-collapse");
+    });
+    $('.select2').select2({multiple: true});
+
+    $('#check_all').change(function() {
+        if(this.checked) {
+            $(".item_to_receive_id").prop("checked", true);
+            $('.good').attr("disabled", false);
+            $('.defective').attr("disabled", false);
+            $('.comments').attr("disabled", false);
+            
+            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }if ($('.good:checked').length == 0 || $('.defective:checked').length == 0) {
+                    $('#btnSubmit').attr("disabled", true);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }
+        }
+        else{
+            $('#btnSubmit').attr("disabled", true);
+            $(".item_to_receive_id").prop("checked", false);
+            $('.good').attr("disabled", true);
+            $('.good').prop("checked", false);
+            $('.defective').attr("disabled", true);
+            $('.defective').prop("checked", false);
+            $('.comments').attr("disabled", true);
+        }
+    });
+
     function preventBack() {
         window.history.forward();
     }
@@ -193,24 +251,103 @@
     setTimeout("preventBack()", 0);
 
     $('#btnSubmit').attr("disabled", true);
+    $('.good').attr("disabled", true);
+    $('.defective').attr("disabled", true);
+    $('.comments').attr("disabled", true);
     var count_pick = 0;
+    //ITEM TO SELECT
+    $('.item_to_receive_id').change(function() {
+        var asset_code = $(this).val();
+        var id = $(this).attr("data-id");
+        $("#defective_text"+id).val("0");
+        var ischecked= $(this).is(':checked');
+        if(ischecked == false){
+            count_pick--;
+           
+            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }
+
+            if ($('#good'+id).is(':checked')) {
+                $('#btnSubmit').attr("disabled", false);
+            }else if ($('#defective'+id).is(':checked')) {
+                $('#btnSubmit').attr("disabled", false);
+            }else{
+                $('#btnSubmit').attr("disabled", true);  
+            }
+
+            if ($('.item_to_receive_id:checked').length == 0) {
+                $('#btnSubmit').attr("disabled", true); 
+            }
+
+            $('#good'+id).attr("disabled", true);
+            $('#good'+id).not(this).prop('checked', false); 
+
+            $('#defective'+id).attr("disabled", true);
+            $('#defective'+id).not(this).prop('checked', false); 
+           
+            $('#comments'+id).attr("disabled", true);
+                    
+        }else{
+            count_pick++;
+            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }else{
+                if ($('#good'+id).is(':checked').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }
+         
+            $('#good'+id).removeAttr("disabled");
+            $('#defective'+id).removeAttr("disabled");
+            $('#comments'+id).removeAttr("disabled");
+        }
+
+    });
 
     var a = 0;
     var alreadyAdded = [];
     $('.good').change(function() {
         var asset_code = $(this).val();
         var id = $(this).attr("data-id");
-
+        $("#defective_text"+id).val("0");
         var ischecked= $(this).is(':checked');
         if(ischecked == false){
             $(".comment_div").html("");
             $("#good_text"+id).val("0");
-            //$("#defective"+id).val("0");
             count_pick--;
-            if(count_pick == 0){
-                $('#btnSubmit').attr("disabled", true);
-            }                
+
+            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }else{
+                if(count_pick == 0){
+                    $('#btnSubmit').attr("disabled", true);
+                }   
+                $('#btnSubmit').attr("disabled", true);  
+            }
+             
         }else{
+            $("#good_text"+id).val("1");
             $('#defective'+id).not(this).prop('checked', false); 
             $.ajax({
             url: "{{ route('assets.get.comments') }}",
@@ -240,7 +377,26 @@
             $("#good_text"+id).val("1");
             //$("#defective"+id).val("1");
             count_pick++;
-            $('#btnSubmit').attr("disabled", false);
+            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                }
+            }else{
+                if ($('.good:checked').length == $('.good').length) {
+                    $('#btnSubmit').attr("disabled", false);
+                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                    $('#btnSubmit').attr("disabled", false);
+                }else{
+                    $('#btnSubmit').attr("disabled", true);  
+                } 
+            }
+            //$('#btnSubmit').attr("disabled", false);
+            
+            
         }
 
     });
@@ -250,22 +406,31 @@
         // $('.good').not(this).prop('checked', false);    
         var asset_code = $(this).val();
         var id = $(this).attr("data-id");
-            
+        $("#good_text"+id).val("0");
         var ischecked= $(this).is(':checked');
             if(ischecked == false){
-
                 //$("#good"+id).val("0");
                 $(".comment_div").html("");
                 $("#defective_text"+id).val("0");
-
                 count_pick--;
 
-                if(count_pick == 0){
-                    $('#btnSubmit').attr("disabled", true);
-                }
-
-                    
+                if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                    if ($('.defective:checked').length == $('.defective').length) {
+                        $('#btnSubmit').attr("disabled", false);
+                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                        $('#btnSubmit').attr("disabled", false);
+                    }else{
+                        $('#btnSubmit').attr("disabled", true);  
+                    }
+                }else{
+                    if(count_pick == 0){
+                        $('#btnSubmit').attr("disabled", true);
+                    }   
+                    $('#btnSubmit').attr("disabled", true);  
+                }    
+        
             }else{
+                $("#defective_text"+id).val("1");
                 $('#good'+id).not(this).prop('checked', false); 
                 $.ajax({
                 url: "{{ route('assets.get.comments') }}",
@@ -298,7 +463,25 @@
 
                 count_pick++;
 
-                $('#btnSubmit').attr("disabled", false);
+                if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                    if ($('.defective:checked').length == $('.defective').length) {
+                        $('#btnSubmit').attr("disabled", false);
+                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                        $('#btnSubmit').attr("disabled", false);
+                    }else{
+                        $('#btnSubmit').attr("disabled", true);  
+                    }
+                }else{ 
+                    if ($('.good:checked').length == $('.good').length) {
+                        $('#btnSubmit').attr("disabled", false);
+                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                        $('#btnSubmit').attr("disabled", false);
+                    }else{
+                        $('#btnSubmit').attr("disabled", true);  
+                    } 
+                }    
+                
+                
             }
 
     });
@@ -333,19 +516,31 @@
 
     $('#btnSubmit').click(function(event) {
             event.preventDefault();
-            swal({
-                title: "Are you sure?",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#41B314",
-                cancelButtonColor: "#F9354C",
-                confirmButtonText: "Yes, receive it!",
-                width: 450,
-                height: 200
-                }, function () {
-                    $(this).attr('disabled','disabled');
-                    $('#myform').submit();                                                  
-            });
+            // if(!$(".item_to_receive_id").is(':checked')){
+            //     swal({
+            //         type: 'error',
+            //         title: 'Please select item to receive!',
+            //         icon: 'error',
+            //         confirmButtonColor: "#367fa9",
+            //     }); 
+            //     event.preventDefault(); // cancel default behavior
+            //     return false;
+            // }else{
+                swal({
+                    title: "Are you sure?",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#41B314",
+                    cancelButtonColor: "#F9354C",
+                    confirmButtonText: "Yes, receive it!",
+                    width: 450,
+                    height: 200
+                    }, function () {
+                        $(this).attr('disabled','disabled');
+                        $('#myform').submit();                                                  
+                });
+           // }
+           
         });
 
 

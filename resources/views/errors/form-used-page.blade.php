@@ -36,7 +36,7 @@
             <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
               <img src="{{asset('img/stop-order.gif')}}" alt="Warning" class="text-center" width="200" height="200">
               <h4>This transaction currently used by <span class="text-info">{{$user->current_user}} </span></h4>
-              <p><span>ERF Module - DAM</span></p>
+              <p><span>ERF Module - TAM</span></p>
             </div>
           </div>
         </div>

@@ -528,7 +528,6 @@
     }
 
     $(".date").datetimepicker({
-            minDate: moment().millisecond(0).second(0).minute(0).hour(0),
             viewMode: "days",
             format: "YYYY-MM-DD",
             dayViewHeaderFormat: "MMMM YYYY",

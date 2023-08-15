@@ -129,7 +129,7 @@
 
 				//Locking onboarding date
 				$this->addaction[] = ['title'=>'Set Onboarding Date','url'=>CRUDBooster::mainpath('getErfSetOnboardingDate/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding && [locking_onboarding_date] == null || [locking_onboarding_date] == $id"];
-				$this->addaction[] = ['title'=>'Locking Onboarding Date','url'=>CRUDBooster::mainpath('getLockingErfSetOnboardingDate/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding && [locking_onboarding_date] != null && [locking_onboarding_date] != $id"];
+				$this->addaction[] = ['title'=>'Locking Onboarding Date','url'=>CRUDBooster::mainpath('getLockingErfSetOnboardingDateForm/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $for_onboarding && [locking_onboarding_date] != null && [locking_onboarding_date] != $id"];
 				
 				//Closed Request
 				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getErfCloseRequest/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $onboarded && [locking_close] == null || [locking_close] == $id"];
@@ -1053,6 +1053,7 @@
 			
 			$getErfDetail              = DB::table('erf_header_request')->where('id', $fields['id'])->first();
 			$getDepartment             = DB::table('cms_users')->where('id', $getErfDetail->created_by)->first();
+			$privilegeId               = DB::table('positions')->where('position_description', $getErfDetail->position)->first();
 			$status                    = 'ACTIVE';
 			$name                      = $fields['first_name'].' '.$fields['last_name'];
 			$first_name                = $fields['first_name'];
@@ -1060,8 +1061,8 @@
 			$user_name                 = $fields['last_name'].''.substr($fields['first_name'], 0, 1);
 			$email                     = $fields['email'];
 			$password                  = Hash::make('qwerty');
-			$privilege                 = 2;
-			$department                = $getDepartment->department_id;
+			$privilege                 = $privilegeId->privilege_id;
+			$department                = $getErfDetail->department;
 			$company                   = "DIGITS";
 			$location                  = 115;
 			$approver                  = $getErfDetail->created_by;

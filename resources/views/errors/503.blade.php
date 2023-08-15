@@ -39,7 +39,7 @@
             <div class="col-lg-8 col-12 col-sm-10 offset-lg-2 offset-sm-1">
               <h1 class="m-0">503</h1>
               <h4><span class="server" style="margin-right:6px">Server Maintenance</span>  | <img src="{{asset('img/gear-set.gif')}}" alt="Warning" style="margin-left:2px"></h4>
-              <p><span class="text-info">DAM</span> currently in <span class="text-info">maintenance mode</span>. We will be back <span class="text-info">soon.</span></p>
+              <p><span class="text-info">TAM</span> currently in <span class="text-info">maintenance mode</span>. We will be back <span class="text-info">soon.</span></p>
               <p><span class="text-info">Thank you for understanding.</span></p>
             </div>
           </div>

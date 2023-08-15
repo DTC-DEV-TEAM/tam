@@ -1293,11 +1293,11 @@
                                             icon: 'error',
                                             confirmButtonColor: "#367fa9",
                                         }); 
-                                        $('#add_quantity' + e.id).val(function (i, oldval) {
-                                            return ++oldval;
-                                        });
+                                        // $('#add_quantity' + e.id).val(function (i, oldval) {
+                                        //     return ++oldval;
+                                        // });
 
-                                        var temp_qty = $('#add_quantity'+ e.id).attr("data-id");
+                                        //var temp_qty = $('#add_quantity'+ e.id).attr("data-id");
 
                                         var q = parseInt($('#add_quantity' +e.id).val());
                                         var r = parseInt($("#quantity" + e.id).val());

@@ -717,62 +717,114 @@
 			$rr_date      = $fields['rr_date'];
 			$body_id      = $fields['body_id'];
 			$serial_no    = $fields['serial_no'];
+			$asset_code   = $fields['asset_code'];
 			$tag_id       = $fields['arf_tag'];
 			$upc_code     = $fields['upc_code'];
 			$brand        = $fields['brand'];
 			$specs        = $fields['specs'];
 
-			$getLastId = AssetsInventoryHeaderForApproval::Create(
-				[
-					'po_no'                  => $po_no, 
-					'invoice_date'           => $invoice_date,
-					'invoice_no'             => $invoice_no,
-					'rr_date'                => $rr_date,
-					'location'               => $location,
-					'header_approval_status' => 22,
-					'created_by'             => CRUDBooster::myId(),
-					'created_at'             => date('Y-m-d H:i:s'),
-					'updated_by'             => CRUDBooster::myId(), 
-					'date_updated'           => date('Y-m-d H:i:s')
-				]
-			);     
+			// $getLastId = AssetsInventoryHeaderForApproval::Create(
+			// 	[
+			// 		'po_no'                  => $po_no, 
+			// 		'invoice_date'           => $invoice_date,
+			// 		'invoice_no'             => $invoice_no,
+			// 		'rr_date'                => $rr_date,
+			// 		'location'               => $location,
+			// 		'header_approval_status' => 22,
+			// 		'created_by'             => CRUDBooster::myId(),
+			// 		'created_at'             => date('Y-m-d H:i:s'),
+			// 		'updated_by'             => CRUDBooster::myId(), 
+			// 		'date_updated'           => date('Y-m-d H:i:s')
+			// 	]
+			// );     
 			
-			$id = $getLastId->id;
+			// $id = $getLastId->id;
 	
-			$images = [];
-			if (isset($files)) {
-				$counter = 0;
-				foreach($files as $file){
-					$counter++;
-					$name = time().rand(1,50) . '.' . $file->getClientOriginalExtension();
-					$filename = $name;
-					$file->move('vendor/crudbooster/inventory_header',$filename);
-					$images[]= $filename;
+			// $images = [];
+			// if (isset($files)) {
+			// 	$counter = 0;
+			// 	foreach($files as $file){
+			// 		$counter++;
+			// 		$name = time().rand(1,50) . '.' . $file->getClientOriginalExtension();
+			// 		$filename = $name;
+			// 		$file->move('vendor/crudbooster/inventory_header',$filename);
+			// 		$images[]= $filename;
 
-					$header_images = new AssetsHeaderImages;
-					$header_images->header_id 		        = $id;
-					$header_images->file_name 		        = $filename;
-					$header_images->ext 		            = $file->getClientOriginalExtension();
-					$header_images->created_by 		        = CRUDBooster::myId();
-					$header_images->save();
-				}
-			}
+			// 		$header_images = new AssetsHeaderImages;
+			// 		$header_images->header_id 		        = $id;
+			// 		$header_images->file_name 		        = $filename;
+			// 		$header_images->ext 		            = $file->getClientOriginalExtension();
+			// 		$header_images->created_by 		        = CRUDBooster::myId();
+			// 		$header_images->save();
+			// 	}
+			// }
 	         
 			//update reserved table
 			if($tag_id){
+				//get asset code
+				$array_assetcode = [];
+				$array_cont      = [];
+				foreach($asset_code as $aKey => $aVal){
+					$array_cont['reserve_id'] = $tag_id[$aKey];
+					$array_cont['asset_code'] = $aVal;
+					$array_assetcode[] = $array_cont;
+				}
+				
 				for ($t = 0; $t < count($tag_id); $t++) {
-					AssetsInventoryReserved::where(['id' => $tag_id[$t]])
-					   ->update([
-							   'reserved' => 1,
-							   'for_po'   => NULL
-							   ]);
-					$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
-					foreach($arfNumber as $val){
-						HeaderRequest::where('reference_number',$val->reference_number)
-						->update([
-							'to_mo' => 1
-						]);
+
+					//Get all item master
+					$arraySearch = DB::table('assets')->select('*')->get()->toArray();
+				    //get digits code
+					$digits_code = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->get();
+
+					$BodyValue = [];
+					foreach($digits_code as $bodyfKey => $bodyVal){
+						$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
+						if($i !== false){
+							$bodyVal['item_master'] = $arraySearch[$i];
+							$BodyValue[] = $bodyVal;
+						}else{
+							$bodyVal['item_master'] = "";
+							$BodyValue[] = $bodyVal;
+						}
 					}
+
+					//get the asset code in another array
+					$finalBodyValue = [];
+					foreach($BodyValue as $finalBodyKey => $finalBodyVal){
+						$i = array_search($finalBodyVal['id'], array_column($array_assetcode,'reserve_id'));
+						if($i !== false){
+							$finalBodyVal['asset_code'] = $array_assetcode[$i];
+							$finalBodyValue[] = $finalBodyVal;
+						}else{
+							$finalBodyVal['asset_code'] = "";
+							$finalBodyValue[] = $finalBodyVal;
+						}
+					}
+
+					dd($finalBodyValue	);
+					//Process the data
+					foreach($finalBodyValue as $fKey => $fVal){
+						if($fVal->item_master->fulfillment_type === "DELIVERY-DIRECT"){
+
+						}else{
+
+						}
+
+					}
+				
+					// AssetsInventoryReserved::where(['id' => $tag_id[$t]])
+					//    ->update([
+					// 		   'reserved' => 1,
+					// 		   'for_po'   => NULL
+					// 		   ]);
+					// $arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
+					// foreach($arfNumber as $val){
+					// 	HeaderRequest::where('reference_number',$val->reference_number)
+					// 	->update([
+					// 		'to_mo' => 1
+					// 	]);
+					// }
 				}
 				
 			}
@@ -790,21 +842,21 @@
 			$value             = $fields['value'];
 
 			//make base default value		
-			foreach($body_id as $key => $val){
-				AssetsInventoryBody::where(['id' => $body_id[$key]])
-				->update([
-				'statuses_id'           => 6,
-				'header_id'             => $id,
-				'serial_no'             => $serial_no[$key],
-				'value'                 => str_replace(',', '', $value[$key]),
-				'warranty_coverage'     => $warranty_coverage[$key],
-				'upc_code'              => $upc_code[$key],
-				'brand'                 => $brand[$key],
-				'specs'                 => $specs[$key],
-				'transaction_per_asset' => "Inventory"
-						]);
+			// foreach($body_id as $key => $val){
+			// 	AssetsInventoryBody::where(['id' => $body_id[$key]])
+			// 	->update([
+			// 	'statuses_id'           => 6,
+			// 	'header_id'             => $id,
+			// 	'serial_no'             => $serial_no[$key],
+			// 	'value'                 => str_replace(',', '', $value[$key]),
+			// 	'warranty_coverage'     => $warranty_coverage[$key],
+			// 	'upc_code'              => $upc_code[$key],
+			// 	'brand'                 => $brand[$key],
+			// 	'specs'                 => $specs[$key],
+			// 	'transaction_per_asset' => "Inventory"
+			// 			]);
 				   
-			}
+			// }
 			
 			$message = ['status'=>'success', 'message' => 'Received!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
