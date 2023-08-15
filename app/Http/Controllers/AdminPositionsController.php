@@ -1,9 +1,19 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	//use Request;
+	use Illuminate\Http\Request;
 	use DB;
 	use CRUDBooster;
+	use App\Models\PositionsModel;
+	use App\Imports\PositionsImport;
+	use App\Department;
+	use App\Models\CmsPrivileges;
+	use PhpOffice\PhpSpreadsheet\Spreadsheet;
+	use PhpOffice\PhpSpreadsheet\Reader\Exception;
+	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use Excel;
 
 	class AdminPositionsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -36,9 +46,10 @@
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			$this->col[] = ["label"=>"Department","name"=>"department_id", "join"=>"departments,department_name"];
+			$this->col[] = ["label"=>"Departments","name"=>"department_id"];
 			
 			$this->col[] = ["label"=>"Position Description","name"=>"position_description"];
+			$this->col[] = ["label"=>"Privilege","name"=>"privilege_id"];
 			$this->col[] = ["label"=>"Status","name"=>"status"];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
@@ -49,12 +60,11 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 
-			$this->form[] = ['label'=>'Department','name'=>'department_id','type'=>'select2','validation'=>'integer|min:0','width'=>'col-sm-5','datatable'=>'departments,department_name','datatable_where'=>"status = 'ACTIVE'"];
+			$this->form[] = ['label'=>'Department','name'=>'department_id','type'=>'select2-new','width'=>'col-sm-5','datatable'=>'departments,department_name','datatable_where'=>"status = 'ACTIVE'"];
 
 			$this->form[] = ['label'=>'Position Description','name'=>'position_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			
 
-
+			$this->form[] = ['label'=>'Privilege','name'=>'privilege_id','type'=>'select2','width'=>'col-sm-5','datatable'=>'cms_privileges,name'];
 			
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
@@ -140,7 +150,15 @@
 	        | 
 	        */
 	        $this->index_button = array();
-
+			if(CRUDBooster::isSuperadmin()){
+				$this->index_button[] = [
+					"title"=>"Import Position",
+					"label"=>"Import Position",
+					"icon"=>"fa fa-download",
+					"color"=>"success",
+					"url"=>CRUDBooster::mainpath('positions-upload')];
+			}
+			
 
 
 	        /* 
@@ -176,6 +194,23 @@
 	        $this->script_js = NULL;
 			$this->script_js = "
 			$(document).ready(function() {
+				$('#department_id').select2();
+				let x = $(location).attr('pathname').split('/');
+				let add_action = x.includes('add');
+				let edit_action = x.includes('edit');
+				if (edit_action){
+					var a  = 	department_id.split(',').length;
+					var b = 	department_id.split(',');
+					var selectedValues = new Array();
+	
+					for (let i = 0; i < a; i++) {
+					
+						selectedValues[i] = b[i];
+	
+						$('#department_id').val(selectedValues);
+					}
+				}
+				
 				$('#position_description').keyup(function() {
 					this.value = this.value.toLocaleUpperCase();
 				});
@@ -278,7 +313,22 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
+	    	if($column_index == 2){
+				$departmentLists = $this->departmentListing($column_value);
+				
+				foreach ($departmentLists as $value) {
+					$col_values .= '<span stye="display: block;" class="label label-info">'.$value.'</span><br>';
+				}
+				$column_value = $col_values;
+			}
+			if($column_index == 4){
+				$privilegeLists = $this->privilegeListing($column_value);
+				
+				foreach ($privilegeLists as $value) {
+					$col_values .= '<span stye="display: block;" class="label label-info">'.$value.'</span><br>';
+				}
+				$column_value = $col_values;
+			}
 	    }
 
 	    /*
@@ -289,7 +339,16 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
+	        $departmentIds = array();
+    		$department = json_encode($postdata['department_id'], true);
+    		$departmentArray1 = explode(",", $department);
+    
+    		foreach ($departmentArray1 as $key => $value) {
+    			$departmentIds[$key] = preg_replace("/[^0-9]/","",$value);
+    		}
+    
+    		$postdata['department_id'] = implode(",", $departmentIds);
+
 			$postdata['created_by']=CRUDBooster::myId();
 
 	    }
@@ -302,7 +361,7 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        //Your code here
+			
 
 	    }
 
@@ -315,7 +374,16 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
+			$departmentIds = array();
+    		$department = json_encode($postdata['department_id'], true);
+    		$departmentArray1 = explode(",", $department);
+    
+    		foreach ($departmentArray1 as $key => $value) {
+    			$departmentIds[$key] = preg_replace("/[^0-9]/","",$value);
+    		}
+
+    		$postdata['department_id'] = implode(",", $departmentIds);
+
 			$postdata['updated_by']=CRUDBooster::myId();
 	    }
 
@@ -355,9 +423,29 @@
 
 	    }
 
+        public function uploadPositionsView() {
+			// if(!CRUDBooster::isSuperadmin()) {    
+			// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			// }
+			$data['page_title']= 'Positions Upload';
+			return view('import.positions-import', $data)->render();
+		}
 
+		public function positionsUpload(Request $request) {
+			$path_excel = $request->file('import_file')->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+			Excel::import(new PositionsImport, $path);	
+			CRUDBooster::redirect(CRUDBooster::adminpath('positions'), trans("Upload Successfully!"), 'success');
+		}
 
-	    //By the way, you can still create your own method in here... :) 
+		public function departmentListing($ids) {
+    		$departmentIds = explode(",", $ids);
+    		return Department::whereIn('id', $departmentIds)->pluck('department_name');
+    	}
 
+		public function privilegeListing($ids) {
+    		$privilegeIds = explode(",", $ids);
+    		return CmsPrivileges::whereIn('id', $privilegeIds)->pluck('name');
+    	}
 
 	}
