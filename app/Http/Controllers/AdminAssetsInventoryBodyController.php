@@ -381,7 +381,7 @@
 			}else{
 				$postdata['statuses_id']      = 16;
 				$postdata['item_id']          = $item_id;
-				$postdata['location']         = $location;
+				//$postdata['location']         = $location;
 				$postdata['asset_code']       = $assetCode;
 				$postdata['digits_code']      = $digits_code;
 				$postdata['item_description'] = $item_description;
