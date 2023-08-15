@@ -176,7 +176,7 @@
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Export","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
-				if(CRUDBooster::myPrivilegeId() == 6 || CRUDBooster::isSuperadmin()){ 
+				if(in_array(CRUDBooster::myPrivilegeId(),[1,5,9])){ 
 				    $this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-inventory'),"color"=>"success"];
 				}
 			}
