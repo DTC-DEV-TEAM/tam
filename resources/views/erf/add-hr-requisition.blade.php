@@ -839,7 +839,7 @@
             // $(".application_others").prop('checked', false);
             // $("#application_others").removeAttr('required');
             var id_data = $(this).attr("data-id");
-            if($.inArray($("#class_type"+id_data).val().toLowerCase().replace(/\s/g, ''), ['laptop','desktop','macbook']) > -1){
+            if($.inArray($("#class_type"+id_data).val().toLowerCase().replace(/\s/g, ''), ['oeq-laptop','oeq-computermonitor','laptop','desktop','macbook']) > -1){
                 $("#application_div").hide();
                 $("#application_div").val("");
                 $(".application").prop('checked', false);
@@ -1211,7 +1211,7 @@
                     var sub_cat_value = $("input[name^='class_type']");
                     for(i=0;i<sub_cat;i++){
                         var val = sub_cat_value.eq(i).val() || '';
-                        if(app_count == 0 && $.inArray((sub_cat_value.eq(i).val() || '').toLowerCase().replace(/\s/g, ''),['laptop','desktop','macbook']) > -1){
+                        if(app_count == 0 && $.inArray((sub_cat_value.eq(i).val() || '').toLowerCase().replace(/\s/g, ''),['oeq-laptop','oeq-computermonitor','laptop','desktop','macbook']) > -1){
                             swal({  
                                     type: 'error',
                                     title: 'Please choose an Application!',
