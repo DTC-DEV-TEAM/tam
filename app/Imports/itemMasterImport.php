@@ -24,7 +24,6 @@ class ItemMasterImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows->toArray() as $row){
-            dd($row);
             DB::beginTransaction();
 			try {
                 Assets::updateOrcreate([
@@ -33,8 +32,6 @@ class ItemMasterImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
                 [
                     'digits_code'      => $row['digits_code'],
                     'fulfillment_type' => $row['fulfillment_type'],
-                    
-
                 ]);
             DB::commit();
             } catch (\Exception $e) {
