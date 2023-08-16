@@ -5,7 +5,7 @@ namespace App\Exports;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use App\AssetsInventoryBodyForApproval;
+use App\AssetsInventoryBody;
 
 class ExportHeaderInventory implements FromCollection, WithHeadings
 {
@@ -15,9 +15,9 @@ class ExportHeaderInventory implements FromCollection, WithHeadings
     */
     public function collection()
     {
-        return AssetsInventoryBodyForApproval::leftjoin('statuses', 'assets_inventory_body_for_approval.statuses_id','=','statuses.id')
-        ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body_for_approval.header_id','=','assets_inventory_header_for_approval.id')
-        ->leftjoin('cms_users', 'assets_inventory_body_for_approval.created_by', '=', 'cms_users.id')
+        return AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
+        ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id','=','assets_inventory_header_for_approval.id')
+        ->leftjoin('cms_users', 'assets_inventory_body.created_by', '=', 'cms_users.id')
         ->select(
           'statuses.status_description',
           'assets_inventory_header_for_approval.po_no',
@@ -25,21 +25,20 @@ class ExportHeaderInventory implements FromCollection, WithHeadings
           'assets_inventory_header_for_approval.invoice_no',
           'assets_inventory_header_for_approval.rr_date',
           'assets_inventory_header_for_approval.location',
-          'assets_inventory_body_for_approval.digits_code',
-          'assets_inventory_body_for_approval.serial_no',
-          'assets_inventory_body_for_approval.location as body_location',
-          'assets_inventory_body_for_approval.item_condition',
-          'assets_inventory_body_for_approval.item_description',
-          'assets_inventory_body_for_approval.value',
-          'assets_inventory_body_for_approval.quantity',
-          'assets_inventory_body_for_approval.warranty_coverage',
+          'assets_inventory_body.digits_code',
+          'assets_inventory_body.asset_code',
+          'assets_inventory_body.serial_no',
+          'assets_inventory_body.location as body_location',
+          'assets_inventory_body.item_condition',
+          'assets_inventory_body.item_description',
+          'assets_inventory_body.value',
+          'assets_inventory_body.quantity',
+          'assets_inventory_body.warranty_coverage',
           'cms_users.name',
           'assets_inventory_header_for_approval.created_at as header_date_created',
         ) 
-        ->get()
-        ->each(function ($model) {
-            $model->setAttribute('assets_inventory_body_for_approval.location', null);
-        });
+        ->whereNotNull('assets_inventory_body.header_id')
+        ->get();
     }
 
     public function headings(): array
@@ -52,6 +51,7 @@ class ExportHeaderInventory implements FromCollection, WithHeadings
                 "RR Date",
                 "Location",
                 "Digits Code",
+                "Asset Code",
                 "Serial No",
                 "Location",
                 "Item Condition",

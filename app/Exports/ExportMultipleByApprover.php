@@ -3,13 +3,13 @@
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class ExportApplicantMultipleSheet implements WithMultipleSheets
+class ExportMultipleByApprover implements WithMultipleSheets
 {
     use Exportable;
 
     protected $filter_column;
     public function __construct($fields){
-        $this->filter_column  = $fields['filter_column'];
+        $this->fields  = $fields;
  
     }
 
@@ -19,9 +19,8 @@ class ExportApplicantMultipleSheet implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
-        $sheets[] = new ApplicantExport($this->filter_column);
-        //$sheets[] = new ApplicantErf($this->filter_column);
-        $sheets[] = new ApplicantStatus();
+        $sheets[] = new ExportRequest($this->fields);
+        $sheets[] = new ExportReturnTransfer($this->fields);
         return $sheets;
     }
 }
