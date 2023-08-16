@@ -5,11 +5,11 @@
             table.dataTable td.dataTables_empty {
                 text-align: center;    
             }
-            .active{
+            /* .active{
                 font-weight: bold;
                 font-size: 13px;
                 color:#3c8dbc
-            }
+            } */
             .modal-content  {
                 -webkit-border-radius: 3px !important;
                 -moz-border-radius: 3px !important;

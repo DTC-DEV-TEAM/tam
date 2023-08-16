@@ -846,8 +846,6 @@
 						}
 					}
 
-				
-
 					//Process the data
 					$dataLines1 = [];
 					$SavedataLines1 = [];
@@ -1047,6 +1045,7 @@
 
 			$items = DB::table('assets_inventory_body')
 			    ->where('assets_inventory_body.asset_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
+				->orWhere('assets_inventory_body.digits_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
 				->orWhere('assets_inventory_body.item_description','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
 				->join('category', 'assets_inventory_body.item_category','=', 'category.id')
 				->select(	'assets_inventory_body.*',

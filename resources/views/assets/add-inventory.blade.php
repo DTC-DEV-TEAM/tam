@@ -265,7 +265,7 @@
              <div class="col-md-12">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> {{ trans('message.form-label.add_item') }}</label>
+                            <label class="control-label"><span style="color:red">*</span> Please indicate Asset Code, Digits Code or Item Description</label>
                             <input class="form-control auto finput" placeholder="Search Item..." id="search">
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
                                 <li>Loading...</li>
@@ -1232,8 +1232,13 @@
                                         arf_array = jQuery.grep(arf_array, function(value) {
                                           return value != removeItem;
                                         });
+
+                                        stack = jQuery.grep(stack, function(value) {
+                                         return value != e.id;
+                                        });
                         
                                         $(parentTR).remove();
+                                        
                                         $(".nr"+e.id).remove();
                                         $(".serial_qty"+e.id).val('');
                                         $("#dcqty"+e.id).remove();
@@ -1241,7 +1246,7 @@
                                         $(".delete_serial_row").remove();
                                         $('#rowid').load('#rowid');
                                         $("#quantity_total").val(calculateTotalQuantity());
-                                       
+                                      
                                     });
                                    
                                     $(".date").datetimepicker({
@@ -1298,24 +1303,19 @@
                                         // });
 
                                         //var temp_qty = $('#add_quantity'+ e.id).attr("data-id");
-
-                                        var q = parseInt($('#add_quantity' +e.id).val());
-                                        var r = parseInt($("#quantity" + e.id).val());
-
-                                        var price = calculatePrice(q, r); 
-
-                                        if(price == 0){
-                                            price = q * 1;
-                                       // }
-                                        
-
-                                        $("#total_quantity" + e.id).val(price);
+                                        // var q = parseInt($('#add_quantity' +e.id).val());
+                                        // var r = parseInt($("#quantity" + e.id).val());
+                                        // var price = calculatePrice(q, r); 
+                                        // if(price == 0){
+                                        //     price = q * 1;
+                                        // }
+                                        //$("#total_quantity" + e.id).val(price);
                                         
                                      
                                         $(this).val('');
                                         $('#val_item').html('');
                                         return false;
-                                    }
+                                        
 
                                 }
                                 
