@@ -1031,7 +1031,7 @@ class AdminCmsUsersController extends \crocodicstudio\crudbooster\controllers\CB
 	}
 
 	public function getExport(){
-		return Excel::download(new ExportUsersList, 'DAM-UsersList.xlsx');
+		return Excel::download(new ExportUsersList, 'TAM-UsersList.xlsx');
 	}
 	
 }
