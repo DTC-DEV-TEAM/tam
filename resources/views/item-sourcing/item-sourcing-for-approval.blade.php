@@ -167,8 +167,6 @@
                                                 @if(in_array($Header->request_type_id,[1,5,7])) 
                                                 <th width="12%" class="text-center">Category</th> 
                                                 <th width="12%" class="text-center">Sub Category</th>
-                                                <th width="12%" class="text-center">Class</th> 
-                                                <th width="12%" class="text-center">Sub Class</th> 
                                                 @endif
                                                 <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>   
                                                 <th width="7%" class="text-center">Brand</th> 
@@ -200,13 +198,7 @@
                                                                 {{$rowresult->category_description}}                               
                                                             </td>
                                                             <td style="text-align:center" height="10">
-                                                                {{$rowresult->sub_category_description}}                              
-                                                            </td>
-                                                            <td style="text-align:center" height="10">
-                                                                {{$rowresult->class_description}}                               
-                                                            </td>
-                                                            <td style="text-align:center" height="10">
-                                                                {{$rowresult->sub_class_description}}                               
+                                                                {{$rowresult->subcategory_description}}                              
                                                             </td>
                                                                                                 
                                                             <td style="text-align:center" height="10">                                                             
@@ -756,7 +748,7 @@
             }
         }
         document.getElementById("item-sourcing").innerHTML +=
-        "<tr style='text-align:center'><td colspan=11><strong>TOTAL</strong></td><td><strong>" +
+        "<tr style='text-align:center'><td colspan=7><strong>TOTAL</strong></td><td><strong>" +
         
                             sumqty +
         "</strong></td></tr>";
