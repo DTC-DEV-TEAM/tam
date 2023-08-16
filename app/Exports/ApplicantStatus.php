@@ -20,7 +20,7 @@ class ApplicantStatus implements FromCollection, WithHeadings, WithTitle
         return Statuses::select(
             'statuses.status_description'
           )
-          ->whereIn('id', [34,35,36,8])
+          ->whereIn('id', [42,34,35,36,8,5])
           ->get();
     }
 

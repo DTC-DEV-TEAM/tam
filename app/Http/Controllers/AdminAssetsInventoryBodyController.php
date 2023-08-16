@@ -9,7 +9,7 @@
 	use App\AssetsInventoryBody;
 	use App\CommentsGoodDefect;
 	use App\GoodDefectLists;
-	use App\WarehouseLocationModel;
+	use App\Statuses;
 	use App\Exports\ExportMultipleSheet;
 	use Maatwebsite\Excel\Facades\Excel;
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -18,6 +18,8 @@
 	use PhpOffice\PhpSpreadsheet\IOFactory;
 	use Carbon\Carbon;
 	use App\Imports\InventoryUpload;
+	use App\Imports\InventoryUploadNotAvailable;
+	use App\Imports\InventoryUploadUpdate;
 	
 	class AdminAssetsInventoryBodyController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private static $apiContext;
@@ -623,7 +625,10 @@
 			}
 		}
 
-		
+		public function getAssetListsExport() 
+		{
+			return Excel::download(new ExportMultipleSheet, 'asset_lists.xlsx');
+		}
 
 		public function getInventory(Request $request){
         $AssetsInventoryBody = AssetsInventoryBody::select('assets_inventory_body.*');

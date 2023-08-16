@@ -974,9 +974,9 @@
     $("#btnSubmit").attr('disabled', true);
 
     $("#add-Row").attr('disabled', true);
-
+    $("#lock").attr('disabled', true);
     $('#header_request_id').on('change', function() {
-
+        $("#lock").attr('disabled', false);
         selected_header = this.value;
 
         //var channel = $('#channels_id').val();

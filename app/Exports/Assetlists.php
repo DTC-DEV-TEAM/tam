@@ -20,6 +20,9 @@ class Assetlists implements FromCollection, WithHeadings, WithTitle
         ->leftjoin('assets_inventory_header', 'assets_inventory_body.header_id','=','assets_inventory_header.id')
         ->leftjoin('cms_users', 'assets_inventory_body.created_by', '=', 'cms_users.id')
         ->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
+        ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
+        ->leftjoin('tam_categories', 'assets.category_id', '=', 'tam_categories.id')
+        ->leftjoin('tam_subcategories', 'assets.class_id', '=', 'tam_subcategories.id')
         ->select(
           'assets_inventory_body.asset_code',
           'assets_inventory_body.digits_code',
@@ -32,6 +35,8 @@ class Assetlists implements FromCollection, WithHeadings, WithTitle
           'assets_inventory_body.item_description',
           'assets_inventory_body.value',
           'assets_inventory_body.quantity',
+          'tam_categories.category_description',
+          'tam_subcategories.subcategory_description',
           'assets_inventory_body.warranty_coverage',
           'cms_users.name',
           'assets_inventory_body.created_at as body_created',
@@ -56,6 +61,8 @@ class Assetlists implements FromCollection, WithHeadings, WithTitle
                 "Item Description",
                 "Value",
                 "Quantity",
+                "Category",
+                "Sub Category",
                 "Warranty Coverage",
                 "Created By",
                 "Created Date",

@@ -1035,6 +1035,11 @@
 			
 		}
 
+		public function getExport() 
+		{
+			return Excel::download(new ExportHeaderInventory, 'requested_inventory.xlsx');
+		}
+
 		public function assetSearch(Request $request) {
 			$data = array();
 			$fields = Request::all();
