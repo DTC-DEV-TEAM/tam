@@ -1,14 +1,14 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
-	use Request;
+	//use Request;
 	use DB;
 	use CRUDBooster;
 
 	use App\Assets;
 	use App\Statuses;
 	use Excel;
-	//use Illuminate\Http\Request;
+	use Illuminate\Http\Request;
 	use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -57,7 +57,7 @@
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"digits_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"tam_categories,category_description"];
-			$this->col[] = ["label"=>"Sub Category","name"=>"sub_category_id","join"=>"class,class_description"];
+			$this->col[] = ["label"=>"Sub Category","name"=>"class_id","join"=>"tam_subcategories,subcategory_description"];
 			$this->col[] = ["label"=>"Fulfillment Typle","name"=>"fulfillment_type"];
 			//$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];

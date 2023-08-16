@@ -426,10 +426,10 @@
                         confirmButtonColor: "#367fa9",
                     }); 
                     event.preventDefault(); // cancel default behavior
-                }else if ($('#mock_up').val() === "") {
+                }else if ($('#mark_up').val() === "") {
                     swal({
                         type: 'error',
-                        title: 'Mark Up required!',
+                        title: 'Mock Up required!',
                         icon: 'error',
                         confirmButtonColor: "#367fa9",
                     }); 
@@ -646,8 +646,8 @@
                     } 
 
                     //Installation
-                    var installation = $("input[name^='installation']").length;
-                    var installation_value = $("input[name^='installation']");
+                    var installation = $(".installation").length;
+                    var installation_value = $(".installation").find(":selected");;
                     for(i=0;i<installation;i++){
                         if(installation_value.eq(i).val() == 0 || installation_value.eq(i).val() == null){
                             swal({  
@@ -662,8 +662,8 @@
                     } 
 
                     //Dismantling
-                    var dismantling = $("input[name^='dismantling_body']").length;
-                    var dismantling_value = $("input[name^='dismantling_body']");
+                    var dismantling = $(".dismantling_body").length;
+                    var dismantling_value = $(".dismantling_body").find(":selected");;
                     for(i=0;i<dismantling;i++){
                         if(dismantling_value.eq(i).val() == 0 || dismantling_value.eq(i).val() == null){
                             swal({  
