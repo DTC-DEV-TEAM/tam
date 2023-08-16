@@ -313,6 +313,11 @@
                         return false;
                     }
                 });
+                $("#quantity_total").val(calculateTotalQuantity());
+            });
+            
+            $(document).on('keyup', '.quantity_item', function(ev) {
+                $("#quantity_total").val(calculateTotalQuantity());
             });
 
             //Category
