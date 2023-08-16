@@ -14,6 +14,7 @@
 	use Illuminate\Support\Facades\Redirect;
 	use Maatwebsite\Excel\HeadingRowImport;
 	use App\Imports\ItemMasterImport;
+	use App\Imports\ItemMasterEolImport;
 	use App\WarehouseLocationModel;
 	//use App\Imports\InventoryUpload;
 
@@ -57,6 +58,7 @@
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"tam_categories,category_description"];
 			$this->col[] = ["label"=>"Sub Category","name"=>"sub_category_id","join"=>"class,class_description"];
+			$this->col[] = ["label"=>"Fulfillment Typle","name"=>"fulfillment_type"];
 			//$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
 			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
@@ -174,12 +176,12 @@
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
 				if(CRUDBooster::isSuperadmin()){
-					// $this->index_button[] = [
-					// 	"title"=>"Upload Item Master",
-					// 	"label"=>"Upload Item Master",
-					// 	"icon"=>"fa fa-upload",
-					// 	"url"=>CRUDBooster::mainpath('item-master-upload')];
-					$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
+					$this->index_button[] = [
+						"title"=>"Upload Item Master",
+						"label"=>"Upload Item Master",
+						"icon"=>"fa fa-upload",
+						"url"=>CRUDBooster::mainpath('item-master-upload')];
+					//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 				}
 				// $this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
 			}
@@ -621,7 +623,11 @@
 		public function itemMasterUpload(Request $request) {
 			$path_excel = $request->file('import_file')->store('temp');
 			$path = storage_path('app').'/'.$path_excel;
-			Excel::import(new ItemMasterImport, $path);	
+			if($request->upload_type == "categories"){
+			    Excel::import(new ItemMasterImport, $path);	
+			}else{
+				Excel::import(new ItemMasterEolImport, $path);
+			}
 			CRUDBooster::redirect(CRUDBooster::adminpath('assets'), trans("Upload Successfully!"), 'success');
 		}
 

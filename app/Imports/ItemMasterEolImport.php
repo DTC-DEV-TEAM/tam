@@ -14,7 +14,7 @@ use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithConditionalSheets;
 use DB;
 use CRUDBooster;
-class ItemMasterImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
+class ItemMasterEolImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
 {
     /**
      * @param array $row
@@ -24,23 +24,22 @@ class ItemMasterImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows->toArray() as $row){
-            dd($row);
             DB::beginTransaction();
 			try {
-                Assets::updateOrcreate([
-                    'digits_code' => $row['digits_code'] 
-                ],
-                [
-                    'digits_code'      => $row['digits_code'],
-                    'fulfillment_type' => $row['fulfillment_type'],
-                    
-
-                ]);
+            Assets::where(['digits_code'=>$row['digits_code']])
+            ->update(
+                        [
+                        'category_id' => $row['category_id'],
+                        'class_id'    => $row['class_id'],
+                        'status'      => $row['status']         
+                        ]
+                    );
             DB::commit();
             } catch (\Exception $e) {
                 \Log::debug($e);
                 DB::rollback();
             }
+   
         }
     }
 }

@@ -85,7 +85,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Screen Date</label>
+                            <label class="control-label"> Screen Date</label>
                             <input class="form-control finput" type="text" placeholder="Select Date" name="screen_date" id="screen_date" value="{{$applicant->screen_date}}" readonly>
                         </div>
                     </div>  
@@ -94,13 +94,13 @@
                 <div class="row"> 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> First Name</label>
+                            <label class="control-label"> First Name</label>
                             <input type="text" class="form-control finput"  id="first_name" name="first_name"  value="{{$applicant->first_name}}" readonly>                                   
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Last Name</label>
+                            <label class="control-label"> Last Name</label>
                             <input type="text" class="form-control finput"  id="last_name" name="last_name"  value="{{$applicant->last_name}}" readonly>                                   
                         </div>
                     </div>
@@ -108,13 +108,19 @@
                 <div class="row"> 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Status</label>
+                            <label class="control-label"> Status</label>
                             <input type="text" class="form-control finput"  id="status" name="status"  value="{{$applicant->status_desc}}" readonly>                                   
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Remarks</label>
+                            <label class="control-label"> Remarks</label>
+                            <input type="text" class="form-control finput"  id="remarks" name="remarks"  value="{{$applicant->remarks}}" readonly>                                   
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"> Additional Notes</label>
                             <input type="text" class="form-control finput"  id="remarks" name="remarks"  value="{{$applicant->update_remarks}}" readonly>                                   
                         </div>
                     </div>

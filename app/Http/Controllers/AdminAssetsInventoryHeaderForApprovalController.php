@@ -769,88 +769,6 @@
 				}
 			}
 	         
-			//update reserved table
-			if($tag_id){
-				// //get asset code
-				// $array_assetcode = [];
-				// $array_cont      = [];
-				// foreach($asset_code as $aKey => $aVal){
-				// 	$array_cont['reserve_id'] = $tag_id[$aKey];
-				// 	$array_cont['asset_code'] = $aVal;
-				// 	$array_assetcode[] = $array_cont;
-				// }
-
-				// $count_header 		= MoveOrder::count();
-			    // $count_header1  	= $count_header + 1;
-				
-				for ($t = 0; $t < count($tag_id); $t++) {
-
-				// 	//Get all item master
-				// 	$arraySearch = DB::table('assets')->select('*')->get()->toArray();
-				//     //get digits code
-				// 	$digits_code = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->get();
-
-				// 	$BodyValue = [];
-				// 	foreach($digits_code as $bodyfKey => $bodyVal){
-				// 		$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
-				// 		if($i !== false){
-				// 			$bodyVal['item_master'] = $arraySearch[$i];
-				// 			$BodyValue[] = $bodyVal;
-				// 		}else{
-				// 			$bodyVal['item_master'] = "";
-				// 			$BodyValue[] = $bodyVal;
-				// 		}
-				// 	}
-
-				// 	//get the asset code in another array
-				// 	$finalBodyValue = [];
-				// 	foreach($BodyValue as $finalBodyKey => $finalBodyVal){
-				// 		$i = array_search($finalBodyVal['id'], array_column($array_assetcode,'reserve_id'));
-				// 		if($i !== false){
-				// 			$finalBodyVal['asset_code'] = $array_assetcode[$i];
-				// 			$finalBodyValue[] = $finalBodyVal;
-				// 		}else{
-				// 			$finalBodyVal['asset_code'] = "";
-				// 			$finalBodyValue[] = $finalBodyVal;
-				// 		}
-				// 	}
-
-				// 	dd($finalBodyValue);
-				// 	//Process the data
-				// 	foreach($finalBodyValue as $fKey => $fVal){
-				// 		if($fVal->item_master->fulfillment_type === "DELIVERY-DIRECT"){
-				// 			AssetsInventoryReserved::where(['id' => $fVal->id])
-				// 			->update([
-				// 					'reserved' => 1,
-				// 					'for_po'   => NULL
-				// 					]);
-
-				// 			//CREATE MO		
-				// 			$count_header++;
-				// 			$header_ref       = str_pad($count_header, 7, '0', STR_PAD_LEFT);			
-				// 			$reference_number = "MO-".$header_ref.$ref_inventory;
-							
-				// 		}else{
-
-				// 		}
-
-				// 	}
-				
-					AssetsInventoryReserved::where(['id' => $tag_id[$t]])
-					   ->update([
-							   'reserved' => 1,
-							   'for_po'   => NULL
-							   ]);
-					$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
-					foreach($arfNumber as $val){
-						HeaderRequest::where('reference_number',$val->reference_number)
-						->update([
-							'to_mo' => 1
-						]);
-					}
-				}
-				
-			}
 
 	        //Body details
 			$allData    = [];
@@ -880,6 +798,169 @@
 				'transaction_per_asset' => "Inventory"
 						]);
 				   
+			}
+
+			//update reserved table and process direct delivery
+			if($tag_id){
+				//get asset code
+				$array_assetcode = [];
+				$array_cont      = [];
+				foreach($asset_code as $aKey => $aVal){
+					$array_cont['reserve_id'] = $tag_id[$aKey];
+					$array_cont['asset_code'] = $aVal;
+					$array_assetcode[] = $array_cont;
+				}
+
+				$count_header 		= MoveOrder::count();
+				$count_header1  	= $count_header + 1;
+				
+				for ($t = 0; $t < count($tag_id); $t++) {
+
+					//Get all item master
+					$arraySearch = DB::table('assets')->select('*')->get()->toArray();
+					//get digits code
+					$digits_code = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->get();
+
+					$BodyValue = [];
+					foreach($digits_code as $bodyfKey => $bodyVal){
+						$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
+						if($i !== false){
+							$bodyVal['item_master'] = $arraySearch[$i];
+							$BodyValue[] = $bodyVal;
+						}else{
+							$bodyVal['item_master'] = "";
+							$BodyValue[] = $bodyVal;
+						}
+					}
+
+					//get the asset code in another array
+					$finalBodyValue = [];
+					foreach($BodyValue as $finalBodyKey => $finalBodyVal){
+						$i = array_search($finalBodyVal['id'], array_column($array_assetcode,'reserve_id'));
+						if($i !== false){
+							$finalBodyVal['asset_code'] = $array_assetcode[$i];
+							$finalBodyValue[] = $finalBodyVal;
+						}else{
+							$finalBodyVal['asset_code'] = "";
+							$finalBodyValue[] = $finalBodyVal;
+						}
+					}
+
+					//Process the data
+					$dataLines1 = [];
+					$SavedataLines1 = [];
+					foreach($finalBodyValue as $fKey => $fVal){
+						if($fVal->item_master->fulfillment_type === "DELIVERY-DIRECT"){
+
+							//CREATE MO		
+							$inventory_info        = DB::table('assets_inventory_body')->where('digits_code', $fVal->digits_code)->first();
+							$inventory_asset_info  = DB::table('assets_inventory_body')->where('asset_code', $fVal->asset_code['asset_code'])->first();
+							$ref_inventory         =  str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
+
+							$count_header++;
+							$header_ref            = str_pad($count_header, 7, '0', STR_PAD_LEFT);			
+							$reference_number      = "MO-".$header_ref.$ref_inventory;
+
+							$arf_header            = HeaderRequest::where(['reference_number' => $fVal->reference_number])->first();
+							$arf_body 	           = BodyRequest::where(['id' => $fVal->body_id])->first();
+
+							$dataLines1['status_id'] 			= 16;
+							$dataLines1['mo_reference_number'] 	= $reference_number;
+							$dataLines1['header_request_id'] 	= $arf_header->id;
+							$dataLines1['body_request_id'] 		= $fVal->body_id;
+							$dataLines1['item_id'] 				= $inventory_asset_info->item_id;
+							$dataLines1['inventory_id'] 		= $inventory_asset_info->id;
+							$dataLines1['digits_code'] 			= $fVal->digits_code;
+							$dataLines1['asset_code'] 			= $inventory_asset_info->asset_code;
+							$dataLines1['item_description'] 	= $fVal->item_master->item_description;
+							$dataLines1['category_id'] 			= $arf_body->category_id;
+							$dataLines1['sub_category_id'] 		= $arf_body->sub_category_id;
+							$dataLines1['serial_no'] 			= $inventory_asset_info->serial_no;
+							$dataLines1['quantity'] 			= $arf_body->quantity;
+							$dataLines1['unit_cost'] 			= $inventory_asset_info->value;
+							$dataLines1['total_unit_cost'] 		= $inventory_asset_info->value;
+							$dataLines1['location_id'] 			= $inventory_asset_info->location;
+							$dataLines1['created_by'] 			= CRUDBooster::myId();
+							$dataLines1['created_at'] 			= date('Y-m-d H:i:s');
+							$dataLines1['request_created_by']   = $arf_header->created_by;
+							$dataLines1['request_type_id_mo']   = $arf_header->request_type_id;
+							$SavedataLines1[] = $dataLines1;
+
+							MoveOrder::insert($dataLines1);
+
+							$HeaderID = MoveOrder::where('body_request_id', $fVal->body_id)->first();
+
+							//UPDATE REPLENISH/RE ORDER QTY
+							BodyRequest::where('id', $fVal->body_id)
+							->update(
+										[
+										'serve_qty'        => 1, 
+										'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
+										'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
+										'unserved_qty'     => DB::raw("unserved_qty - 1"),      
+										'dr_qty'           => 1,
+										'mo_so_num'        => $HeaderID->mo_reference_number,
+										'mo_plug'          => 1,
+										'location_id'      => $inventory_asset_info->location,
+										'to_mo'            => 0       
+										]
+									);
+
+							//UPDATE INVENTORY
+							$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
+
+							DB::table('assets_inventory_body')->where('id', $inventory_asset_info->id)
+							->update([
+								'statuses_id'=> 2,
+								'deployed_to'=> $employee_name->bill_to
+							]);
+
+							//DELETE IN RESERVE TABLE
+							DB::table('assets_inventory_reserved')->where('body_id', $fVal->body_id)->delete();
+
+							//CHECK IF REQUEST IS ALREADY MO
+							$body_request = BodyRequest::where(['header_request_id' => $arf_header->id])
+											->where(['to_mo' => 0])
+											->whereNull('deleted_at')
+											->count();
+
+							$mo_request   = MoveOrder::where(['header_request_id' => $arf_header->id])
+															->where('status_id', '!=', 8)
+															->count();
+
+							if($body_request == $mo_request){
+								HeaderRequest::where('id',$arf_header->id)
+								->update([
+									'status_id' => 16,
+									'mo_plug'   => 1,
+									'to_mo'     => 0
+								]);
+							}else{
+								HeaderRequest::where('id',$arf_header->id)
+								->update([
+									'to_mo'   => 1,
+									'mo_plug' => 0
+								]);
+							}
+
+						}else{
+							AssetsInventoryReserved::where(['id' => $tag_id[$t]])
+								->update([
+										'reserved' => 1,
+										'for_po'   => NULL
+										]);
+							$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
+							foreach($arfNumber as $val){
+								HeaderRequest::where('reference_number',$val->reference_number)
+								->update([
+									'to_mo' => 1
+								]);
+							}
+						}
+
+					}
+				}
+				
 			}
 			
 			$message = ['status'=>'success', 'message' => 'Received!','redirect_url'=>CRUDBooster::mainpath()];
@@ -964,6 +1045,7 @@
 
 			$items = DB::table('assets_inventory_body')
 			    ->where('assets_inventory_body.asset_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
+				->orWhere('assets_inventory_body.digits_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
 				->orWhere('assets_inventory_body.item_description','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
 				->join('category', 'assets_inventory_body.item_category','=', 'category.id')
 				->select(	'assets_inventory_body.*',
