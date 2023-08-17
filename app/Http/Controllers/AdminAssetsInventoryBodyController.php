@@ -572,8 +572,8 @@
 					'assets_inventory_body.id as aib_id',
 					'statuses.*',
 					'cms_users.*',
-					'assets.item_type as itemType',
-					'assets.image as itemImage',
+					//'assets.item_type as itemType',
+					//'assets.image as itemImage',
 					'assets_inventory_body.created_at as date_created',
 					'assets_inventory_body.updated_at as date_updated',
 					'assets_inventory_header.location as header_location',
@@ -678,7 +678,7 @@
 			$data['page_title'] = 'Add Asset';
 			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [6,4])->orderby('category_description', 'asc')->get();
 			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
-			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			//$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("masterfile.add-asset", $data);
 
 		}

@@ -69,9 +69,9 @@
 			$this->form = [];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 			$this->form[] = ['label'=>'Item Description','name'=>'item_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description','datatable_where'=>"category_status = 'ACTIVE' && id = 1 || id = 5"];
-			$this->form[] = ['label'=>'Class','name'=>'sub_category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'class,class_description','datatable_where'=>"class_status = 'ACTIVE'"];
-
+			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'tam_categories,category_description','datatable_where'=>"status = 'ACTIVE'"];
+			$this->form[] = ['label'=>'Sub Category','name'=>'class_id','type'=>'select','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'tam_subcategories,subcategory_description','datatable_where'=>"status = 'ACTIVE'"];
+			$this->form[] = ['label'=>'Fulfillment Type','name'=>'fulfillment_type','type'=>'text','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Cost','name'=>'item_cost','type'=>'text','validation'=>'required','width'=>'col-sm-5'];
 			
 			//$this->form[] = ['label'=>'Status','name'=>'status_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'statuses,status_description','datatable_where'=>"status_type = 'ASSETS'"];

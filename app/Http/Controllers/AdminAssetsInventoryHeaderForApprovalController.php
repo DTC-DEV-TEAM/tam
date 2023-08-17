@@ -1098,7 +1098,7 @@
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
 			$data['items'] =  DB::table('assets_inventory_reserved')->where('digits_code',$search)->whereNotNull('for_po')->count();
-			
+			//dd($search,$data['items']);
 			echo json_encode($data);
 			exit;  
 		}
