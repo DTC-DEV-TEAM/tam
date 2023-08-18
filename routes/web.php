@@ -293,6 +293,9 @@ Route::group(['middleware' => ['web']], function() {
      Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-it-search','AdminHeaderRequestController@itemITSearch')->name('item.it.search');
      Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-fa-search','AdminHeaderRequestController@itemFASearch')->name('item.fa.search');
 
+     //Direct Delivery
+     Route::post(config('crudbooster.ADMIN_PATH').'/selectedHeaderDr','AdminDirectDeliveryController@selectedHeaderDr')->name('order.selected.header');
+
      Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

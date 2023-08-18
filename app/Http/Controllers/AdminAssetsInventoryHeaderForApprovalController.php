@@ -293,7 +293,7 @@
 	        */
 	        $this->load_css = array();
 	        $this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	    }
 
 
@@ -551,7 +551,8 @@
 			  )
 			  ->where('assets_header_images.header_id', $id)
 			  ->get();
-
+			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
+			
 			return $this->view("assets.add-inventory", $data);
 
 		}
@@ -713,13 +714,14 @@
 			// $lock->block(5);
 
 			$fields = Request::all();
-		    //dd($fields);
+		  
 			$files = $fields['si_dr'];
 			//$id = $fields['id'];
 			$remarks = $fields['remarks'];
 
 			//parse data in form
 			parse_str($fields['form_data'], $fields);
+
 			$po_no        = $fields['po_no'];
 			$location     = $fields['location'];
 			$invoice_date = $fields['invoice_date'];
@@ -733,236 +735,155 @@
 			$brand        = $fields['brand'];
 			$specs        = $fields['specs'];
 
+			$count_header = DB::table('assets_inventory_header_for_approval')->count();
+			$header_ref   = str_pad($count_header + 1, 7, '0', STR_PAD_LEFT);			
+			$inv_ref_no	  = "INV#-".$header_ref;
+
 			$getLastId = AssetsInventoryHeaderForApproval::Create(
 				[
-					'po_no'                  => $po_no, 
-					'invoice_date'           => $invoice_date,
-					'invoice_no'             => $invoice_no,
-					'rr_date'                => $rr_date,
-					'location'               => $location,
-					'header_approval_status' => 22,
-					'created_by'             => CRUDBooster::myId(),
-					'created_at'             => date('Y-m-d H:i:s'),
-					'updated_by'             => CRUDBooster::myId(), 
-					'date_updated'           => date('Y-m-d H:i:s')
+					'inv_reference_number' => $inv_ref_no, 
 				]
 			);     
 			
 			$id = $getLastId->id;
-	
-			$images = [];
-			if (isset($files)) {
-				$counter = 0;
-				foreach($files as $file){
-					$counter++;
-					$name = time().rand(1,50) . '.' . $file->getClientOriginalExtension();
-					$filename = $name;
-					$file->move('vendor/crudbooster/inventory_header',$filename);
-					$images[]= $filename;
-
-					$header_images = new AssetsHeaderImages;
-					$header_images->header_id 		        = $id;
-					$header_images->file_name 		        = $filename;
-					$header_images->ext 		            = $file->getClientOriginalExtension();
-					$header_images->created_by 		        = CRUDBooster::myId();
-					$header_images->save();
-				}
-			}
 	         
-
-	        //Body details
+			//Body details
 			$allData    = [];
 			$container  = [];
-			$body_id           = $fields['body_id'];
-			$asset_code        = $fields['asset_code'];
+			$item_id           = $fields['item_id'];
+			$digits_code       = $fields['digits_code'];
+			$item_desc         = $fields['item_description'];
+			$value             = $fields['value'];
 			$serial_no         = $fields['serial_no'];
+			$quantity          = $fields['add_quantity'];
+			$item_category     = $fields['item_category'];
+			$category_id       = $fields['category_id'];
+			$sub_category_id   = $fields['sub_category_id'];
+			$rr_date           = $fields['rr_date'];
+			$location          = $fields['location'];
 			$warranty_coverage = $fields['warranty_coverage'];
 			$upc_code          = $fields['upc_code'];
 			$brand             = $fields['brand'];
 			$specs             = $fields['specs'];
-			$value             = $fields['value'];
 
 			//make base default value		
-			foreach($body_id as $key => $val){
-				AssetsInventoryBody::where(['id' => $body_id[$key]])
-				->update([
-				'statuses_id'           => 6,
-				'header_id'             => $id,
-				'serial_no'             => $serial_no[$key],
-				'location'              => $location,
-				'value'                 => str_replace(',', '', $value[$key]),
-				'warranty_coverage'     => $warranty_coverage[$key],
-				'upc_code'              => $upc_code[$key],
-				'brand'                 => $brand[$key],
-				'specs'                 => $specs[$key],
-				'transaction_per_asset' => "Inventory"
-						]);
-				   
-			}
-
-			//update reserved table and process direct delivery
-			if($tag_id){
-				//get asset code
-				$array_assetcode = [];
-				$array_cont      = [];
-				foreach($asset_code as $aKey => $aVal){
-					$array_cont['reserve_id'] = $tag_id[$aKey];
-					$array_cont['asset_code'] = $aVal;
-					$array_assetcode[] = $array_cont;
-				}
-
-				$count_header 		= MoveOrder::count();
-				$count_header1  	= $count_header + 1;
-				
-				for ($t = 0; $t < count($tag_id); $t++) {
-
-					//Get all item master
-					$arraySearch = DB::table('assets')->select('*')->get()->toArray();
-					//get digits code
-					$digits_code = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->get();
-
-					$BodyValue = [];
-					foreach($digits_code as $bodyfKey => $bodyVal){
-						$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
-						if($i !== false){
-							$bodyVal['item_master'] = $arraySearch[$i];
-							$BodyValue[] = $bodyVal;
-						}else{
-							$bodyVal['item_master'] = "";
-							$BodyValue[] = $bodyVal;
-						}
-					}
-
-					//get the asset code in another array
-					$finalBodyValue = [];
-					foreach($BodyValue as $finalBodyKey => $finalBodyVal){
-						$i = array_search($finalBodyVal['id'], array_column($array_assetcode,'reserve_id'));
-						if($i !== false){
-							$finalBodyVal['asset_code'] = $array_assetcode[$i];
-							$finalBodyValue[] = $finalBodyVal;
-						}else{
-							$finalBodyVal['asset_code'] = "";
-							$finalBodyValue[] = $finalBodyVal;
-						}
-					}
-
-					//Process the data
-					$dataLines1 = [];
-					$SavedataLines1 = [];
-					foreach($finalBodyValue as $fKey => $fVal){
-						if($fVal->item_master->fulfillment_type === "DELIVERY-DIRECT"){
-
-							//CREATE MO		
-							$inventory_info        = DB::table('assets_inventory_body')->where('digits_code', $fVal->digits_code)->first();
-							$inventory_asset_info  = DB::table('assets_inventory_body')->where('asset_code', $fVal->asset_code['asset_code'])->first();
-							$ref_inventory         =  str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
-
-							$count_header++;
-							$header_ref            = str_pad($count_header, 7, '0', STR_PAD_LEFT);			
-							$reference_number      = "MO-".$header_ref.$ref_inventory;
-
-							$arf_header            = HeaderRequest::where(['reference_number' => $fVal->reference_number])->first();
-							$arf_body 	           = BodyRequest::where(['id' => $fVal->body_id])->first();
-
-							$dataLines1['status_id'] 			= 16;
-							$dataLines1['mo_reference_number'] 	= $reference_number;
-							$dataLines1['header_request_id'] 	= $arf_header->id;
-							$dataLines1['body_request_id'] 		= $fVal->body_id;
-							$dataLines1['item_id'] 				= $inventory_asset_info->item_id;
-							$dataLines1['inventory_id'] 		= $inventory_asset_info->id;
-							$dataLines1['digits_code'] 			= $fVal->digits_code;
-							$dataLines1['asset_code'] 			= $inventory_asset_info->asset_code;
-							$dataLines1['item_description'] 	= $fVal->item_master->item_description;
-							$dataLines1['category_id'] 			= $arf_body->category_id;
-							$dataLines1['sub_category_id'] 		= $arf_body->sub_category_id;
-							$dataLines1['serial_no'] 			= $inventory_asset_info->serial_no;
-							$dataLines1['quantity'] 			= $arf_body->quantity;
-							$dataLines1['unit_cost'] 			= $inventory_asset_info->value;
-							$dataLines1['total_unit_cost'] 		= $inventory_asset_info->value;
-							$dataLines1['location_id'] 			= $inventory_asset_info->location;
-							$dataLines1['created_by'] 			= CRUDBooster::myId();
-							$dataLines1['created_at'] 			= date('Y-m-d H:i:s');
-							$dataLines1['request_created_by']   = $arf_header->created_by;
-							$dataLines1['request_type_id_mo']   = $arf_header->request_type_id;
-							$SavedataLines1[] = $dataLines1;
-
-							MoveOrder::insert($dataLines1);
-
-							$HeaderID = MoveOrder::where('body_request_id', $fVal->body_id)->first();
-
-							//UPDATE REPLENISH/RE ORDER QTY
-							BodyRequest::where('id', $fVal->body_id)
-							->update(
-										[
-										'serve_qty'        => 1, 
-										'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
-										'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
-										'unserved_qty'     => DB::raw("unserved_qty - 1"),      
-										'dr_qty'           => 1,
-										'mo_so_num'        => $HeaderID->mo_reference_number,
-										'mo_plug'          => 1,
-										'location_id'      => $inventory_asset_info->location,
-										'to_mo'            => 0       
-										]
-									);
-
-							//UPDATE INVENTORY
-							$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
-
-							DB::table('assets_inventory_body')->where('id', $inventory_asset_info->id)
-							->update([
-								'statuses_id'=> 2,
-								'deployed_to'=> $employee_name->bill_to
-							]);
-
-							//DELETE IN RESERVE TABLE
-							DB::table('assets_inventory_reserved')->where('body_id', $fVal->body_id)->delete();
-
-							//CHECK IF REQUEST IS ALREADY MO
-							$body_request = BodyRequest::where(['header_request_id' => $arf_header->id])
-											->where(['to_mo' => 0])
-											->whereNull('deleted_at')
-											->count();
-
-							$mo_request   = MoveOrder::where(['header_request_id' => $arf_header->id])
-															->where('status_id', '!=', 8)
-															->count();
-
-							if($body_request == $mo_request){
-								HeaderRequest::where('id',$arf_header->id)
-								->update([
-									'status_id' => 16,
-									'mo_plug'   => 1,
-									'to_mo'     => 0
-								]);
-							}else{
-								HeaderRequest::where('id',$arf_header->id)
-								->update([
-									'to_mo'   => 1,
-									'mo_plug' => 0
-								]);
-							}
-
-						}else{
-							AssetsInventoryReserved::where(['id' => $tag_id[$t]])
-								->update([
-										'reserved' => 1,
-										'for_po'   => NULL
-										]);
-							$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
-							foreach($arfNumber as $val){
-								HeaderRequest::where('reference_number',$val->reference_number)
-								->update([
-									'to_mo' => 1
-								]);
-							}
-						}
-
-					}
-				}
-				
-			}
+			foreach($digits_code as $key => $val){
+				$container['item_id']               = $item_id[$key];
+				$container['header_id']             = $id;
+				$container['serial_no']             = $serial_no[$key];
+				$container['digits_code']           = $val;
+				$container['item_description']      = $item_desc[$key];
+				$container['value']                 = $value[$key];
+				$container['quantity']              = $quantity[$key];
+				$container['warranty_coverage']     = $warranty_coverage[$key];
+				$container['item_category']         = $item_category[$key];
+				$container['category_id']           = $category_id[$key];
+				$container['sub_category_id']       = $sub_category_id[$key];
+				$container['created_by']            = CRUDBooster::myId();
+				$container['upc_code']              = $upc_code[$key];
+				$container['brand']                 = $brand[$key];
+				$container['specs']                 = $specs[$key];
+				$container['transaction_per_asset'] = "Inventory";
+				$container['item_condition']        = "Good";
+				$allData[] = $container;
 			
+			}
+
+			/* process to generate chronological sequential numbers asset code */
+			
+			//segregate COOKING AND EQUIPMENT to get category id
+			$cooking_and_equipment_array = [];
+			$cooking_and_equipment = DB::table('class')->find(1);
+			foreach ($allData as $key => $value) {
+				if ($fvalue['sub_category_id'] == $cooking_and_equipment->id) {
+					$cooking_and_equipment_array[] = $value;
+					unset($allData[$key]);
+				}
+			}
+
+			//put asset code per based on  item category COOKING AND EQUIPMENT
+			$finalCEAssetsArr = [];
+			$DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
+			foreach((array)$cooking_and_equipment_array as $finalfakey => $finalfavalue) {
+					$finalfavalue['asset_code'] = $cooking_and_equipment->from_code + $DatabaseCounterCE;
+					$DatabaseCounterCE++; // or any rule you want.	
+					$finalCEAssetsArr[] = $finalfavalue;
+			}
+
+			//segregate REFRIGERATION AND FREEZER to get category id
+			$refrigeration_and_freezer_array = [];
+			$refrigeration_and_freezer = DB::table('class')->find(4);
+			foreach ($allData as $key => $value) {
+				if ($fvalue['sub_category_id'] == $refrigeration_and_freezer->id) {
+					$refrigeration_and_freezer_array[] = $value;
+					unset($allData[$key]);
+				}
+			}
+
+			//put asset code per based on  item category REFRIGERATION AND FREEZER
+			$finalRAFAssetsArr = [];
+			$DatabaseCounterRAF = DB::table('assets_inventory_body')->where('sub_category_id',$refrigeration_and_freezer->id)->count();
+			foreach((array)$refrigeration_and_freezer_array as $finalfakey => $finalfavalue) {
+					$finalfavalue['asset_code'] = $refrigeration_and_freezer->from_code + $DatabaseCounterRAF;
+					$DatabaseCounterRAF++; // or any rule you want.	
+					$finalRAFAssetsArr[] = $finalfavalue;
+			}
+
+			//segregate COMPUTER SOFTWARE/PROGRAM to get category id
+			$computer_software_program_array = [];
+			$computer_software_program = DB::table('class')->find(19);
+			foreach ($allData as $fkey => $fvalue) {
+				if ($fvalue['sub_category_id'] == $computer_software_program->id) {
+					$computer_software_program_array[] = $fvalue;
+					unset($allData[$fkey]);
+				}
+			}
+			//put asset code per based on  item category COMPUTER SOFTWARE/PROGRAM
+			$finalCSPAssetsArr = [];
+			$DatabaseCounterCSP = DB::table('assets_inventory_body')->where('sub_category_id',$computer_software_program->id)->count();
+			foreach((array)$computer_software_program_array as $finalItkey => $finalItvalue) {
+					$finalItvalue['asset_code'] = $computer_software_program->from_code + $DatabaseCounterCSP;
+					$DatabaseCounterCSP++; // 
+					$finalCSPAssetsArr[] = $finalItvalue;	
+			}
+
+			$finalDataofSplittingArray = array_merge($finalCSPAssetsArr, $finalRAFAssetsArr, $finalCEAssetsArr);
+
+            dd($finalDataofSplittingArray);
+			//make base default value		
+			$saveData = [];
+			$saveContainerData = [];
+			foreach($finalDataofSplittingArray as $akey => $aVal){
+				
+				$saveContainerData['header_id']             = $aVal['header_id'];
+				$saveContainerData['item_id']               = $aVal['item_id'];
+				$saveContainerData['statuses_id']           = 6;
+				$saveContainerData['location']              = $aVal['location'];
+				$saveContainerData['digits_code']           = $aVal['digits_code'];
+				$saveContainerData['item_description']      = $aVal['item_description'];
+				$saveContainerData['value']                 = str_replace(',', '', $aVal['value']);
+				$saveContainerData['quantity']              = 1;	
+				$saveContainerData['serial_no']             = $aVal['serial_no'];
+				$saveContainerData['warranty_coverage']     = $aVal['warranty_coverage'];
+				$saveContainerData['asset_code']            = $aVal['asset_code'];
+				$saveContainerData['barcode']               = $aVal['digits_code'].''.$aVal['asset_code'];
+				$saveContainerData['item_condition']        = $aVal['item_condition'];
+				$saveContainerData['item_category']         = $aVal['item_category'];
+				$saveContainerData['sub_category_id']       = $aVal['sub_category_id'];
+				$saveContainerData['transaction_per_asset'] = $aVal['transaction_per_asset'];
+				$saveContainerData['upc_code']              = $aVal['upc_code'];
+				$saveContainerData['brand']                 = $aVal['brand'];
+				$saveContainerData['specs']                 = $aVal['specs'];
+				$saveContainerData['created_by']            = $aVal['created_by'];
+				$saveContainerData['created_at']            = Carbon::parse($aVal['created_at'])->toDateTimeString();
+			
+				$saveData[] = $saveContainerData;				   
+			}
+
+			//dd($saveData);
+
+			AssetsInventoryBody::insert($saveData);
+
 			$message = ['status'=>'success', 'message' => 'Received!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 			
@@ -1048,15 +969,14 @@
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
 
-			$items = DB::table('assets_inventory_body')
-			    ->where('assets_inventory_body.asset_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
-				->orWhere('assets_inventory_body.digits_code','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
-				->orWhere('assets_inventory_body.item_description','LIKE','%'.$search.'%')->where('assets_inventory_body.statuses_id','=',16)
-				->join('category', 'assets_inventory_body.item_category','=', 'category.id')
-				->select(	'assets_inventory_body.*',
-				            'category.id as cat_id',
-							'assets_inventory_body.id as assetID',
-							'category.category_description as category_description'
+			$items = DB::table('assets')
+				->orWhere('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->join('tam_categories', 'assets.category_id','=', 'tam_categories.id')
+				->select(	'assets.*',
+				            'tam_categories.id as cat_id',
+							'assets.id as assetID',
+							'tam_categories.category_description as category_description'
 						)
 				->take(10)->get();
 			
@@ -1070,15 +990,10 @@
 
 					$return_data[$i]['id']                   = $value->assetID;
 					$return_data[$i]['cat_id']               = $value->cat_id;
-					$return_data[$i]['asset_code']           = $value->asset_code;
 					$return_data[$i]['digits_code']          = $value->digits_code;
-					$return_data[$i]['serial_no']            = $value->serial_no;
 					$return_data[$i]['item_description']     = $value->item_description;
 					$return_data[$i]['category_description'] = $value->category_description;
-					$return_data[$i]['item_cost']            = $value->value;
-					$return_data[$i]['item_type']            = $value->item_type;
-					$return_data[$i]['quantity']             = $value->quantity;
-
+					$return_data[$i]['item_cost']            = $value->item_cost;
 					$i++;
 
 				}
