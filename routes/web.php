@@ -43,7 +43,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-approvedProcess','AdminAssetsInventoryHeaderForApprovalController@getapprovedProcess')->name('assets.get.approvedProcess');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-closeProcess','AdminAssetsInventoryHeaderForApprovalController@getCloseProcess')->name('assets.get.closeProcess');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/check-digits-code','AdminAssetsInventoryHeaderForApprovalController@checkDigitsCode')->name('check-reserve-digits-code');//new 72723
-    
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-forPoProcess','AdminAssetsInventoryHeaderForApprovalController@forPoProcess')->name('assets.get.forPoProcess');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-forReceivingProcess','AdminAssetsInventoryHeaderForApprovalController@forReceivingProcess')->name('assets.get.forReceivingProcess');
+
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-history','AdminHeaderRequestController@getHistory')->name('assets.get.history');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-comments','AdminHeaderRequestController@getComments')->name('assets.get.comments');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-checkData','AdminHeaderRequestController@getcheckData')->name('assets.get.checkData');

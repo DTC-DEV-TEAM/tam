@@ -160,7 +160,7 @@
 	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-				$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
+				//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 			    $this->index_button[] = ["label"=>"Export Data","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('asset-lists-export'),"color"=>"primary"];
 				if(CRUDBooster::isSuperadmin()){
 				// $this->index_button[] = [
@@ -299,7 +299,7 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$query->whereNull('assets_inventory_body.archived')->orderBy('assets_inventory_body.id', 'DESC');    
+			$query->whereNotNull('assets_inventory_body.received')->orderBy('assets_inventory_body.id', 'DESC');    
 	            
 	    }
 

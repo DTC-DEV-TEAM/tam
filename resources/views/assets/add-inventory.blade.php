@@ -290,13 +290,13 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="box-header text-center">
-                        <h3 class="box-title"><b>Asset Details</b></h3>
+                        <h3 class="box-title"><b>Item Details</b></h3>
                     </div>
                     <div class="box-body no-padding">
                         <div class="table-responsive">
                             <div class="pic-container">
                                 <div class="pic-row">
-                                    <table id="asset-items" style="width: 130%">
+                                    <table id="asset-items">
                                         <tbody id="bodyTable">
                                             <tr class="tbl_header_color dynamicRows">
                                                 <th width="7%" class="text-center">{{ trans('message.table.digits_code') }}</th>
@@ -304,12 +304,12 @@
                                                 <th width="8%" class="text-center">Category</th>
                                                 <th width="7%" class="text-center">Sub Category Code</th>
                                                 <th width="2%" class="text-center">{{ trans('message.table.quantity_text') }}</th>
-                                                <th width="5%" class="text-center">Value</th>
+                                                {{-- <th width="5%" class="text-center">Value</th>
                                                 <th width="7%" class="text-center"> Serial No <span style="font-style: italic; font-size:11px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
                                                 <th width="5%" class="text-center"> Warranty Month Expiration <span style="font-style: italic; font-size:11px; color:red"> <br>(Note: 1 is equivalent of 1 month)</span></th>                                                     
                                                 <th width="5%" class="text-center">UPC Code</th>     
                                                 <th width="6%" class="text-center" >Brand</th>
-                                                <th width="7%" class="text-center" >Specs <span style="font-style: italic; font-size:11px; color:red"><br>(Ex: ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD)</span></th>    
+                                                <th width="7%" class="text-center" >Specs <span style="font-style: italic; font-size:11px; color:red"><br>(Ex: ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD)</span></th>     --}}
                                                 <th width="3%" class="text-center">Action</th>
                                             </tr>
                                     
@@ -345,7 +345,7 @@
 
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainPath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i>  Save</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-check=circle" ></i>  Save</button>
         </div>
 
     </form>
@@ -435,6 +435,223 @@
             });
 
         });
+
+        var tableRow = 1;
+        var stack = [];
+        var token = $("#token").val();
+        var arf_array = [];
+        $("#btnSubmit").attr("disabled", true);
+        $(document).ready(function(){
+            //selectRefresh();
+            $(function(){
+                $("#search").autocomplete({
+                   
+                    source: function (request, response) {
+                        $("#btnSubmit").attr("disabled", false);
+                    $.ajax({
+                        url: "{{ route('search-assets') }}",
+                        dataType: "json",
+                        type: "POST",
+                        data: {
+                            "_token": token,
+                            "search": request.term
+                        },
+                        success: function (data) {
+                            //console.log(data.items);
+                            if(data.items === null){
+                                swal({
+                                type: 'error',
+                                title: 'Item not Found!',
+                                icon: 'error',
+                                confirmButtonColor: "#367fa9",
+                               });
+                            }else{                              
+                            var rowCount = $('#asset-items tr').length;
+                            //myStr = data.sample;   
+                            if (data.status_no == 1) {
+
+                                $("#val_item").html();
+                                var data = data.items;
+                                $('#ui-id-2').css('display', 'none');
+
+                                response($.map(data, function (item) {
+                                    return {
+                                        id:                         item.id,
+                                        asset_code:                 item.asset_code,
+                                        digits_code:                item.digits_code,
+                                        asset_tag:                  item.asset_tag,
+                                        serial_no:                  item.serial_no,
+                                        value:                      item.item_description,
+                                        category_description:       item.category_description,
+                                        category_id:                item.cat_id,
+                                        item_cost:                  item.item_cost,
+                                        item_type:                  item.item_type,
+                                        image:                      item.image,
+                                        quantity:                   item.quantity,
+                                        total_quantity:             item.total_quantity,
+                                     
+                                    }
+
+                                }));
+
+                            } else {
+
+                                $('.ui-menu-item').remove();
+                                $('.addedLi').remove();
+                                $("#ui-id-2").append($("<li class='addedLi'>").text(data.message));
+                                var searchVal = $("#search").val();
+                                if (searchVal.length > 0) {
+                                    $("#ui-id-2").css('display', 'block');
+                                } else {
+                                    $("#ui-id-2").css('display', 'none');
+                                }
+                            }
+                        }
+                        }
+                    })
+                    
+                },
+                select: function (event, ui) {
+                        var e = ui.item;  
+                      
+                        tableRow++;
+                        if (e.id) {   
+                           // if (!in_array(e.id, stack)) {
+                                if (!stack.includes(e.id)) {            
+                                    //stack.push(e.id);                                                                                
+                                                           
+                                    var new_row = '<tr class="nr" id="rowid' + e.id + '" rows>' +
+                                        '<input class="form-control text-center ginput" type="hidden" name="body_id[]" readonly value="' + e.id + '">' +
+                                        '<td><input class="form-control text-center ginput" type="text" id="dc" name="digits_code[]" readonly value="' + e.digits_code + '"></td>' +
+                                        '<td><input class="form-control text-center ginput" type="text" name="item_description[]" readonly value="' + e.value + '"></td>' +
+                                        '<td><input class="form-control text-center ginput amount" placeholder="Value" type="text" readonly value="' + e.category_description + '"></td>' +
+                                        '<td>' +
+                                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + e.id  + '" id="sub_category_id' + e.id  + '" required style="width:100%">' +
+                                                '<option value=""></option>' + 
+                                                '@foreach($sub_categories as $subData)' +
+                                                    '<option value="{{$subData->id}}">{{$subData->class_description}} | {{ $subData->category_code }}</option>' +
+                                                '@endforeach' +
+                                            '</select>' +
+                                        '</td>' +
+                                        '<td><input class="form-control text-center ginput text-center add_quantity" placeholder="Quantity" type="text" value="1" readonly name="add_quantity[]" id="add_quantity' + e.id  + '" data-id="' + e.id  + '"  min="0" max="9999999999" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validity.valid||(value=1);"></td>' +               
+                                        // '<td><input class="form-control ginput text-center finput" placeholder="' + e.item_cost + '" type="text" name="value[]" id="value" required min="1" min="0" max="9999999999"></td>' +                                           
+                                        // '<td><input class="form-control finput serial_no" type="text" placeholder="Serial No." name="serial_no[]" value="" data-index="1"></td>' + 
+                                        // '<td><input class="form-control finput text-center" type="text" placeholder="(Month)" name="warranty_coverage[]" id="warranty_coverage" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57" value="0"></td>' +                                                                                                                                       
+                                        // '<td><input class="form-control upc_code finput" type="text" placeholder="UPC Code" name="upc_code[]" style="width:100%" data-index="1"></td>' + 
+                                        // '<td><input class="form-control brand finput" type="text" placeholder="Brand" name="brand[]" style="width:100%" data-index="1"></td>' +
+                                        // '<td><input class="form-control specs finput" type="text" placeholder="ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD" name="specs[]" style="width:100%" data-index="1"></td>' +  
+                                        '<td style="text-align:center"><a id="delete_item' +e.id + '" class="btn btn-sm btn-danger delete_item btn-lg"><i class="fa fa-trash"></i></a></td>' +
+                                        '<input type="hidden" name="item_id[]" readonly value="' +e.id + '">' +
+                                        '<input type="hidden" id="checkImage" value="' + e.image + '" readonly>' +
+                                        '<input type="hidden" name="item_category[]" id="item_cat" value="' + e.category_description + '">' +
+                                        '<input type="hidden" name="category_id[]" id="catid" value="' + e.category_id + '">' +
+                                        '</tr>';
+                                        //alert($reserved_assets);
+                                        //}
+                                    
+                                    //$(new_row).insertAfter($('table tr.dynamicRows:last'));
+                                  
+
+                                    $("table tbody").append(new_row);
+                                    $('.sub_category_id').select2({allowClear:true});  
+                                    $(".text-muted").css({
+                                        background: "#41B314",
+                                        color: "white",
+                                        padding: "2px 8px",
+                                        borderRadius: "8px",
+                                    });                          
+                                    $(document).on('click', '#delete_item' + e.id, function () {
+                                        var parentTR = $(this).parents('tr');  
+
+                                        // stack = jQuery.grep(stack, function(value) {
+                                        //  return value != e.id;
+                                        // });
+                        
+                                        $(parentTR).remove();
+                                        $(".nr"+e.id).remove();
+                                        $(".serial_qty"+e.id).val('');
+                                        $("#dcqty"+e.id).remove();
+                                        $("#dcqty"+e.id).val('');
+                                        $(".delete_serial_row").remove();
+                                        $('#rowid').load('#rowid');
+                                        $("#quantity_total").val(calculateTotalQuantity());
+                                      
+                                    });
+                                   
+                                    $(".date").datetimepicker({
+                                            viewMode: "days",
+                                            format: "YYYY-MM-DD",
+                                            dayViewHeaderFormat: "MMMM YYYY",
+                                    });
+                              
+                                    $(document).on("keyup","#quantity, #amount, #value", function (e) {
+                                        if (e.which >= 37 && e.which <= 40) return;
+                                        if (this.value.charAt(0) == ".") {
+                                            this.value = this.value.replace(
+                                            /\.(.*?)(\.+)/,
+                                            function (match, g1, g2) {
+                                                return "." + g1;
+                                            }
+                                            );
+                                        }
+                                        if (e.key == "." && this.value.split(".").length > 2) {
+                                            this.value =
+                                            this.value.replace(/([\d,]+)([\.]+.+)/, "$1") +
+                                            "." +
+                                            this.value.replace(/([\d,]+)([\.]+.+)/, "$2").replace(/\./g, "");
+                                            return;
+                                        }
+                                        $(this).val(function (index, value) {
+                                            value = value.replace(/[^-0-9.]+/g, "");
+                                            let parts = value.toString().split(".");
+                                            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+                                            return parts.join(".");
+                                        });
+                                     });
+                                     $("#quantity_total").val(calculateTotalQuantity());
+                                   
+                                 
+                                    //blank++;
+                                    
+
+                                    $(this).val('');
+                                    $('#val_item').html('');
+
+                                    return false;
+                                  
+                                }else{
+
+                                        $('#add_quantity' + e.id).val(function (i, oldval) {
+                                            return ++oldval;
+                                        });
+
+                                        var temp_qty = $('#add_quantity'+ e.id).attr("data-id");
+                                        var q = parseInt($('#add_quantity' +e.id).val());
+                                        var r = parseInt($("#quantity" + e.id).val());
+
+                                        var price = calculatePrice(q, r); 
+
+                                        if(price == 0){
+                                            price = q * 1;           
+                                                $("#total_quantity" + e.id).val(price);                                    
+                                                $(this).val('');
+                                                $('#val_item').html('');
+                                                return false;    
+                                        }
+                                
+                                }
+                             
+                        }
+                    
+                },
+                        
+                minLength: 1,
+                autoFocus: true
+                
+                });
+            });
+
+        }); 
        
   
         //VERSION 2 SUBMIT
@@ -443,6 +660,7 @@
             var fired_button = $(this).val();
             var id = $('#header_id').val();
             var remarks = $('#remarks').val();
+            var countRow = $('#asset-items tfoot tr').length;
             // if($('#po_no').val() === ""){
             //     swal({
             //         type: 'error',
@@ -611,44 +829,44 @@
                         
                         }
 
-                        //not allowed duplicate
-                        var finalDuplicateData = checkRowForNa;
-                        var dupArrData = finalDuplicateData.sort(); 
+                        // //not allowed duplicate
+                        // var finalDuplicateData = checkRowForNa;
+                        // var dupArrData = finalDuplicateData.sort(); 
 
-                        if(dupArrData.length !== 0){
-                            if($('.serial_no').val() != ""){
-                                for (var i = 0; i < dupArrData.length - 1; i++) {
-                                if (dupArrData[i + 1] == dupArrData[i]) {
-                                    swal({
-                                            type: 'error',
-                                            title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na)',
-                                            icon: 'error',
-                                            confirmButtonColor: "#367fa9"
-                                        }); 
-                                        event.preventDefault();
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
+                        // if(dupArrData.length !== 0){
+                        //     if($('.serial_no').val() != ""){
+                        //         for (var i = 0; i < dupArrData.length - 1; i++) {
+                        //         if (dupArrData[i + 1] == dupArrData[i]) {
+                        //             swal({
+                        //                     type: 'error',
+                        //                     title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na)',
+                        //                     icon: 'error',
+                        //                     confirmButtonColor: "#367fa9"
+                        //                 }); 
+                        //                 event.preventDefault();
+                        //                 return false;
+                        //             }
+                        //         }
+                        //     }
+                        // }
                         
 
-                        //each value validation
-                        var v = $("input[name^='serial_no']").length;
-                        var value = $("input[name^='serial_no']");
-                        for(i=0;i<v;i++){
-                            if(value.eq(i).val() == 0){
-                                swal({  
-                                        type: 'error',
-                                        title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
-                                        icon: 'error',
-                                        confirmButtonColor: "#367fa9"
-                                    });
-                                    event.preventDefault();
-                                    return false;
-                            }
+                        // //each value validation
+                        // var v = $("input[name^='serial_no']").length;
+                        // var value = $("input[name^='serial_no']");
+                        // for(i=0;i<v;i++){
+                        //     if(value.eq(i).val() == 0){
+                        //         swal({  
+                        //                 type: 'error',
+                        //                 title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
+                        //                 icon: 'error',
+                        //                 confirmButtonColor: "#367fa9"
+                        //             });
+                        //             event.preventDefault();
+                        //             return false;
+                        //     }
                     
-                        }
+                        // }
         
                         //upc code each value validation
                         var u = $("input[name^='upc_code']").length;
@@ -706,17 +924,17 @@
 
                     
                         //check existing
-                        $.each(checkRowFinal, function(index, item) {
-                            if($.inArray(item, data.items) != -1){
-                                swal({
-                                        type: 'error',
-                                        title: 'Digits Code and Serial Already Exist! (' + item + ')',
-                                        icon: 'error',
-                                        confirmButtonColor: "#367fa9",
-                                    }); 
-                                    event.preventDefault();
-                                    return false;
-                            }else{
+                        // $.each(checkRowFinal, function(index, item) {
+                        //     if($.inArray(item, data.items) != -1){
+                        //         swal({
+                        //                 type: 'error',
+                        //                 title: 'Digits Code and Serial Already Exist! (' + item + ')',
+                        //                 icon: 'error',
+                        //                 confirmButtonColor: "#367fa9",
+                        //             }); 
+                        //             event.preventDefault();
+                        //             return false;
+                        //     }else{
                                 $('.arf_tag').attr('disabled',false);
                                 swal({
                                     title: "Are you sure?",
@@ -762,242 +980,29 @@
                                                     type: data.status,
                                                     title: data.message,
                                                 });
-                                                //window.location.replace(data.redirect_url);
-                                                setTimeout(function(){
-                                                    window.location.replace(document.referrer);
-                                                }, 1000); 
+                                                window.location.replace(data.redirect_url);
+                                                // setTimeout(function(){
+                                                //     window.location.replace(document.referrer);
+                                                // }, 1000); 
                                                 } else if (data.status == "error") {
                                                 swal({
                                                     type: data.status,
                                                     title: data.message,
+                                                    confirmButtonColor: "#367fa9",
                                                 });
                                             }
                                         }
                                     })
                                 });
-                            }
+                        //     }
                                         
-                        });
+                        // });
                     }    
                 });
             //}
         });
 
-        var tableRow = 1;
-        var stack = [];
-        var token = $("#token").val();
-        var arf_array = [];
-        $(document).ready(function(){
-            //selectRefresh();
-            $(function(){
-                $("#search").autocomplete({
-
-                    source: function (request, response) {
-                    $.ajax({
-                        url: "{{ route('search-assets') }}",
-                        dataType: "json",
-                        type: "POST",
-                        data: {
-                            "_token": token,
-                            "search": request.term
-                        },
-                        success: function (data) {
-                            //console.log(data.items);
-                            if(data.items === null){
-                                swal({
-                                type: 'error',
-                                title: 'Item not Found!',
-                                icon: 'error',
-                                confirmButtonColor: "#367fa9",
-                               });
-                            }else{                              
-                            var rowCount = $('#asset-items tr').length;
-                            //myStr = data.sample;   
-                            if (data.status_no == 1) {
-
-                                $("#val_item").html();
-                                var data = data.items;
-                                $('#ui-id-2').css('display', 'none');
-
-                                response($.map(data, function (item) {
-                                    return {
-                                        id:                         item.id,
-                                        asset_code:                 item.asset_code,
-                                        digits_code:                item.digits_code,
-                                        asset_tag:                  item.asset_tag,
-                                        serial_no:                  item.serial_no,
-                                        value:                      item.item_description,
-                                        category_description:       item.category_description,
-                                        category_id:                item.cat_id,
-                                        item_cost:                  item.item_cost,
-                                        item_type:                  item.item_type,
-                                        image:                      item.image,
-                                        quantity:                   item.quantity,
-                                        total_quantity:             item.total_quantity,
-                                     
-                                    }
-
-                                }));
-
-                            } else {
-
-                                $('.ui-menu-item').remove();
-                                $('.addedLi').remove();
-                                $("#ui-id-2").append($("<li class='addedLi'>").text(data.message));
-                                var searchVal = $("#search").val();
-                                if (searchVal.length > 0) {
-                                    $("#ui-id-2").css('display', 'block');
-                                } else {
-                                    $("#ui-id-2").css('display', 'none');
-                                }
-                            }
-                        }
-                        }
-                    })
-                    
-                },
-                select: function (event, ui) {
-                        var e = ui.item;  
-                      
-                        tableRow++;
-                        if (e.id) {   
-                           // if (!in_array(e.id, stack)) {
-                                if (!stack.includes(e.id)) {            
-                                    //stack.push(e.id);                                                                                
-                                                           
-                                    var new_row = '<tr class="nr" id="rowid' + e.id + '" rows>' +
-                                        '<input class="form-control text-center ginput" type="hidden" name="body_id[]" readonly value="' + e.id + '">' +
-                                        '<td><input class="form-control text-center ginput" type="text" id="dc" name="digits_code[]" readonly value="' + e.digits_code + '"></td>' +
-                                        '<td><input class="form-control text-center ginput" type="text" name="item_description[]" readonly value="' + e.value + '"></td>' +
-                                        '<td><input class="form-control text-center ginput amount" placeholder="Value" type="text" readonly value="' + e.category_description + '"></td>' +
-                                        '<td>' +
-                                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + e.id  + '" id="sub_category_id' + e.id  + '" required style="width:100%">' +
-                                                '<option value=""></option>' + 
-                                                '@foreach($sub_categories as $subData)' +
-                                                    '<option value="{{$subData->id}}">{{$subData->class_description}} | {{ $subData->category_code }}</option>' +
-                                                '@endforeach' +
-                                            '</select>' +
-                                        '</td>' +
-                                        '<td><input class="form-control text-center ginput text-center add_quantity" placeholder="Quantity" type="text" value="1" readonly name="add_quantity[]" id="add_quantity' + e.id  + '" data-id="' + e.id  + '"  min="0" max="9999999999" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validity.valid||(value=1);"></td>' +               
-                                        '<td><input class="form-control ginput text-center finput" placeholder="' + e.item_cost + '" type="text" name="value[]" id="value" required min="1" min="0" max="9999999999"></td>' +                                           
-                                        '<td><input class="form-control finput serial_no" type="text" placeholder="Serial No." name="serial_no[]" value="" data-index="1"></td>' + 
-                                        '<td><input class="form-control finput text-center" type="text" placeholder="(Month)" name="warranty_coverage[]" id="warranty_coverage" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57" value="0"></td>' +                                                                                                                                       
-                                        '<td><input class="form-control upc_code finput" type="text" placeholder="UPC Code" name="upc_code[]" style="width:100%" data-index="1"></td>' + 
-                                        '<td><input class="form-control brand finput" type="text" placeholder="Brand" name="brand[]" style="width:100%" data-index="1"></td>' +
-                                        '<td><input class="form-control specs finput" type="text" placeholder="ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD" name="specs[]" style="width:100%" data-index="1"></td>' +  
-                                        '<td style="text-align:center"><a id="delete_item' +e.id + '" class="btn btn-sm btn-danger delete_item btn-lg"><i class="fa fa-trash"></i></a></td>' +
-                                        '<input type="hidden" name="item_id[]" readonly value="' +e.id + '">' +
-                                        '<input type="hidden" id="checkImage" value="' + e.image + '" readonly>' +
-                                        '<input type="hidden" name="item_category[]" id="item_cat" value="' + e.category_description + '">' +
-                                        '<input type="hidden" name="category_id[]" id="catid" value="' + e.category_id + '">' +
-                                        '</tr>';
-                                        //alert($reserved_assets);
-                                        //}
-                                    
-                                    //$(new_row).insertAfter($('table tr.dynamicRows:last'));
-                                  
-
-                                    $("table tbody").append(new_row);
-                                    $('.sub_category_id').select2({allowClear:true});  
-                                    $(".text-muted").css({
-                                        background: "#41B314",
-                                        color: "white",
-                                        padding: "2px 8px",
-                                        borderRadius: "8px",
-                                    });                          
-                                    $(document).on('click', '#delete_item' + e.id, function () {
-                                        var parentTR = $(this).parents('tr');  
-
-                                        // stack = jQuery.grep(stack, function(value) {
-                                        //  return value != e.id;
-                                        // });
-                        
-                                        $(parentTR).remove();
-                                        $(".nr"+e.id).remove();
-                                        $(".serial_qty"+e.id).val('');
-                                        $("#dcqty"+e.id).remove();
-                                        $("#dcqty"+e.id).val('');
-                                        $(".delete_serial_row").remove();
-                                        $('#rowid').load('#rowid');
-                                        $("#quantity_total").val(calculateTotalQuantity());
-                                      
-                                    });
-                                   
-                                    $(".date").datetimepicker({
-                                            viewMode: "days",
-                                            format: "YYYY-MM-DD",
-                                            dayViewHeaderFormat: "MMMM YYYY",
-                                    });
-                              
-                                    $(document).on("keyup","#quantity, #amount, #value", function (e) {
-                                        if (e.which >= 37 && e.which <= 40) return;
-                                        if (this.value.charAt(0) == ".") {
-                                            this.value = this.value.replace(
-                                            /\.(.*?)(\.+)/,
-                                            function (match, g1, g2) {
-                                                return "." + g1;
-                                            }
-                                            );
-                                        }
-                                        if (e.key == "." && this.value.split(".").length > 2) {
-                                            this.value =
-                                            this.value.replace(/([\d,]+)([\.]+.+)/, "$1") +
-                                            "." +
-                                            this.value.replace(/([\d,]+)([\.]+.+)/, "$2").replace(/\./g, "");
-                                            return;
-                                        }
-                                        $(this).val(function (index, value) {
-                                            value = value.replace(/[^-0-9.]+/g, "");
-                                            let parts = value.toString().split(".");
-                                            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-                                            return parts.join(".");
-                                        });
-                                     });
-                                     $("#quantity_total").val(calculateTotalQuantity());
-                                   
-                                 
-                                    //blank++;
-                                    
-
-                                    $(this).val('');
-                                    $('#val_item').html('');
-
-                                    return false;
-                                  
-                                }else{
-
-                                        $('#add_quantity' + e.id).val(function (i, oldval) {
-                                            return ++oldval;
-                                        });
-
-                                        var temp_qty = $('#add_quantity'+ e.id).attr("data-id");
-                                        var q = parseInt($('#add_quantity' +e.id).val());
-                                        var r = parseInt($("#quantity" + e.id).val());
-
-                                        var price = calculatePrice(q, r); 
-
-                                        if(price == 0){
-                                            price = q * 1;           
-                                                $("#total_quantity" + e.id).val(price);                                    
-                                                $(this).val('');
-                                                $('#val_item').html('');
-                                                return false;    
-                                        }
-                                
-                                }
-                             
-                        }
-                    
-                },
-                        
-                minLength: 1,
-                autoFocus: true
-                
-                });
-            });
-
-        }); 
-
+      
         $(document).on('keyup', '.add_quantity', function(ev) {
             $("#quantity_total").val(calculateTotalQuantity());
         });

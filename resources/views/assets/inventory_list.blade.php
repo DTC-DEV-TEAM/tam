@@ -99,6 +99,16 @@
             </div>
         </div>
         <div class="row">                           
+            <label class="control-label col-md-2">Received/Cancelled By:</label>
+            <div class="col-md-4">
+             <p>{{ $Header->approver }}</p>
+            </div>
+            <label class="control-label col-md-2">Received Date/Cancelled:</label>
+           <div class="col-md-4">
+             <p>{{ $Header->date_updated }}</p>
+           </div>
+        </div>
+        <div class="row">                           
             <label class="control-label col-md-2">SI/DR</label>
             <div class="col-md-4">
              @foreach($header_images as $res_header_images)                                    
