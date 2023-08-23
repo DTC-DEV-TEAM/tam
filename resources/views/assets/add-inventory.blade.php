@@ -274,7 +274,7 @@
                 <div class="col-md-12">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label class="control-label"><span style="color:red">*</span> Please indicate Asset Code, Digits Code or Item Description</label>
+                                <label class="control-label"><span style="color:red">*</span> Please indicate Digits Code or Item Description</label>
                                 <input class="form-control auto finput" placeholder="Search Item..." id="search">
                                 <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
                                     <li>Loading...</li>

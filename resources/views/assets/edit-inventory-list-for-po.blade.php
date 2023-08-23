@@ -91,7 +91,7 @@
              <div class="col-md-12">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label"><span style="color:red">*</span> Reference No</label>
+                        <label class="control-label"> Reference No</label>
                         <input class="form-control" type="text" value="{{$Header->inv_reference_number}}" readonly>
                     </div>
                 </div>

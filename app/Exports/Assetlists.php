@@ -41,6 +41,7 @@ class Assetlists implements FromCollection, WithHeadings, WithTitle
           'cms_users.name',
           'assets_inventory_body.created_at as body_created',
         ) 
+        ->whereNotNull('assets_inventory_body.received')
         ->get()
         ->each(function ($model) {
             $model->setAttribute('assets_inventory_body.location', null);

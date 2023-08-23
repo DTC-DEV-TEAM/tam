@@ -128,7 +128,7 @@
 			$closed       = DB::table('statuses')->where('id', 13)->value('id');
 			$for_po       = DB::table('statuses')->where('id', 47)->value('id');
 			if(CRUDBooster::myPrivilegeId() == 6){
-				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval && [location] == 1"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved"];
 				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval && [location] == 2"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval "];
 				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
@@ -165,7 +165,7 @@
 	        */
 	        $this->alert        = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-			  $this->alert[] = ['message'=>"Cancelling PO's will not deduct inventory!",'type'=>'danger'];
+			  //$this->alert[] = ['message'=>"Cancelling PO's will not deduct inventory!",'type'=>'danger'];
 			}
 	        
 	        /* 
@@ -217,23 +217,23 @@
 	        $this->script_js = NULL;
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				if(CRUDBooster::myPrivilegeId() == 6){ 
-					$this->script_js = "
-					$(document).ready(function() {
-					$('h1').contents().filter(function(){
-						return this.nodeType != 1;
-						}).remove()
-					});
+					// $this->script_js = "
+					// $(document).ready(function() {
+					// $('h1').contents().filter(function(){
+					// 	return this.nodeType != 1;
+					// 	}).remove()
+					// });
 				
-					newPageTitle = 'Add PO';
-					var parent = document.querySelector('h1');
-					parent.firstElementChild.textContent = newPageTitle;
-					parent.firstElementChild.style.marginRight = \"20px\";
+					// newPageTitle = 'Add PO';
+					// var parent = document.querySelector('h1');
+					// parent.firstElementChild.textContent = newPageTitle;
+					// parent.firstElementChild.style.marginRight = \"20px\";
 				
-					var tag = document.getElementsByTagName('a');
-					for (var i = 0; i < tag.length; i++) {
-						tag[i].style.marginRight = \"5px\";
-					}
-					";
+					// var tag = document.getElementsByTagName('a');
+					// for (var i = 0; i < tag.length; i++) {
+					// 	tag[i].style.marginRight = \"5px\";
+					// }
+					// ";
 					
 				}
 		    }
@@ -650,8 +650,13 @@
 				)
 				->where('assets_inventory_body.header_id', $id)
 				->get();
+			$arrayDigitsCode = [];
+            foreach($data['Body'] as $codes) {
+				$digits_code['digits_code'] = $codes['digits_code'];
+				array_push($arrayDigitsCode, $codes['digits_code']);
+			}
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
-			$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->get();
+			$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->whereIn('digits_code', $arrayDigitsCode)->get();
 			return $this->view("assets.edit-inventory-list-for-receiving", $data);
 		}
 
@@ -1437,9 +1442,9 @@
 				$saveData = [];
 				$saveContainerData = [];
 				foreach($finalDataofSplittingArray as $akey => $aVal){
-					$saveContainerData['header_id']             = $aVal['header_id'];
-					$saveContainerData['item_id']               = $id;
-					$saveContainerData['statuses_id']           = 6;
+					$saveContainerData['header_id']             = $id;
+					$saveContainerData['item_id']               = $aVal['item_id'];
+					$saveContainerData['statuses_id']           = 47;
 					$saveContainerData['location']              = $aVal['location'];
 					$saveContainerData['digits_code']           = $aVal['digits_code'];
 					$saveContainerData['item_description']      = $aVal['item_description'];
@@ -1490,6 +1495,11 @@
 				'header_approval_status' => 20, 
 				'po_no'                  => $po_no
 			]);
+
+			AssetsInventoryBody::where(['header_id' => $id])
+			->update([
+					'statuses_id'  => 20
+					]);
 
 			$message = ['status'=>'success', 'message' => 'Success!'];
 			echo json_encode($message);
@@ -1557,6 +1567,7 @@
 			for ($x = 0; $x < count($body_id); $x++) {
 				AssetsInventoryBody::where(['id' => $body_id[$x]])
 				   ->update([
+					       'statuses_id'       => 6,
 						   'value'             => str_replace(',', '', $value[$x]),
 						   'location'          => $location,
 						   'serial_no'         => $serial_no[$x],

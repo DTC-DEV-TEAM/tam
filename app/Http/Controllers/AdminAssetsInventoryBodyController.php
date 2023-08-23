@@ -120,7 +120,7 @@
 	        | 
 	        */
 	        $this->addaction = array(
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('generate-barcode-single/[id]'),'icon'=>'fa fa-barcode','color'=>'default']
+				//$this->addaction[] = ['url'=>CRUDBooster::mainpath('generate-barcode-single/[id]'),'icon'=>'fa fa-barcode','color'=>'default']
 			);
 
 
@@ -273,7 +273,7 @@
 	        $this->load_css = array();
 			$this->load_css[] = asset("sweetalert2/sweetalert2.css");
 			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	    }
 
 
@@ -561,22 +561,22 @@
 			$data['page_title'] = 'View Item Lists';
 
 			$data['Body'] = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
-					->leftjoin('assets_inventory_header', 'assets_inventory_body.header_id','=','assets_inventory_header.id')
+					->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id','=','assets_inventory_header_for_approval.id')
 					->leftjoin('cms_users', 'assets_inventory_body.created_by', '=', 'cms_users.id')
 					->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
 					->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
 					->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
+					->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
 					->select(
-					'assets_inventory_header.*',
+					'assets_inventory_header_for_approval.*',
 					'assets_inventory_body.*',
 					'assets_inventory_body.id as aib_id',
 					'statuses.*',
 					'cms_users.*',
-					//'assets.item_type as itemType',
-					//'assets.image as itemImage',
+					'approver.name as approver',
 					'assets_inventory_body.created_at as date_created',
 					'assets_inventory_body.updated_at as date_updated',
-					'assets_inventory_header.location as header_location',
+					'assets_inventory_header_for_approval.location as header_location',
 					'warehouse_location_model.location as body_location',
 					'cms_users_updated_by.name as updated_by'
 					)->where('assets_inventory_body.id', $id)

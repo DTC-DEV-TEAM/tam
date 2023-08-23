@@ -48,6 +48,23 @@
     z-index: 1000;
     position: relative;
     }
+    ::-webkit-scrollbar-track
+    {
+        /* -webkit-box-shadow: inset 0 0 6px rgba(32, 83, 178, 0.3); */
+        background-color: #F5F5F5;
+    }
+
+    ::-webkit-scrollbar
+    {
+        width: 10px;
+        background-color: #F5F5F5;
+    }
+
+    ::-webkit-scrollbar-thumb
+    {
+        background-color: #00a65a;
+        /* border: px solid #367fa9; */
+    }
 </style>
 @endpush
 @section('content')
@@ -95,6 +112,16 @@
             </div>
         </div>
         <div class="row">                           
+            <label class="control-label col-md-2">Received/Cancelled By:</label>
+            <div class="col-md-4">
+             <p>{{ $Body->approver }}</p>
+            </div>
+            <label class="control-label col-md-2">Received Date/Cancelled:</label>
+           <div class="col-md-4">
+             <p>{{ $Body->date_updated }}</p>
+           </div>
+        </div>
+        <div class="row">                           
         <label class="control-label col-md-2">SI/DR</label>
             <div class="col-md-4">
                 @foreach($header_images as $res_header_images)                                                                         
@@ -131,7 +158,7 @@
                                     <table id='table_dashboard' class="table table-hover table-striped table-bordered" style="height:150px">
                                         <thead>
                                             <tr class="active">
-                                                <th>Action</th>
+                                                {{-- <th>Action</th> --}}
                                                 <th>Asset Code</th>   
                                                 <th>Digits Code</th>   
                                                 <th>Serial No</th> 
@@ -143,16 +170,15 @@
                                                 <th>Value</th>                                           
                                                 <th>Quantity</th>     
                                                 <th>Warranty Coverage Year</th>                                        
-                                                <th>Item Photo</th>      
                                                 <th>Updated By</th>   
                                                 <th>Date Updated</th>                                                              
                                             </tr>
                                         </thead>
                                         <tbody>
                                                 <tr>
-                                                <td style="text-align:center">        
+                                                {{-- <td style="text-align:center">        
                                                     <a class='btn btn-success btn-xs' href='{{CRUDBooster::mainpath("generate-barcode-single/".$Body->aib_id)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-barcode'></i></a>
-                                                </td>  
+                                                </td>   --}}
                                                 <td>{{$Body->asset_code}}</td> 
                                                 <td>{{$Body->digits_code}}</td>
                                                 <td>{{$Body->serial_no}}</td>  
@@ -163,15 +189,7 @@
                                                 <td>{{$Body->item_description}}</td>   
                                                 <td>{{$Body->value}}</td>        
                                                 <td>{{$Body->quantity}}</td>       
-                                                <td>{{$Body->warranty_coverage}}</td>                                            
-                                                <td>
-                                                    @if ($Body->itemImage)
-                                                      <img width="60px"; height="50px"; src="{{URL::to($Body->itemImage)}}" alt="" data-action="zoom">
-                                                    @else
-                                                      <img width="60px"; height="50px"; src="{{URL::to('vendor/crudbooster/no_image_available/No_Image_Available.jpg')}}" alt="" data-action="zoom">
-                                                    @endif 
-                                                    
-                                                </td>   
+                                                <td>{{$Body->warranty_coverage}}</td>                                             
                                                 <td>{{$Body->updated_by}}</td>    
                                                 <td>{{$Body->date_updated}}</td>                                                                       
                                                </tr>

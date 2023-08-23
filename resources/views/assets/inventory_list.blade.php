@@ -52,6 +52,28 @@
     table-layout: fixed;
     word-wrap: break-word;
     }
+    
+    #asset-items th, td {
+        border: 1px solid rgba(000, 0, 0, .5);
+        padding: 8px;
+    }
+    ::-webkit-scrollbar-track
+    {
+        /* -webkit-box-shadow: inset 0 0 6px rgba(32, 83, 178, 0.3); */
+        background-color: #F5F5F5;
+    }
+
+    ::-webkit-scrollbar
+    {
+        width: 10px;
+        background-color: #F5F5F5;
+    }
+
+    ::-webkit-scrollbar-thumb
+    {
+        background-color: #00a65a;
+        /* border: px solid #367fa9; */
+    }
 </style>
 @endpush
 @section('content')
@@ -132,113 +154,51 @@
         </div>
 
         <div class="box-body">
-            <div class="table-responsive">
-               
-                    <div class="hack1" style="display: table;
-                    table-layout: ;
-                    width: 140%;">
-                        <div class="hack2" style="  display: table-cell;
+            <div class="table-responsive">                      
+                    <table id="asset-items" style="width: 130%">
+                        <thead>
+                            <tr>
+                                <th>Asset Code</th>   
+                                <th>Digits Code</th>   
+                                <th>Serial No</th> 
+                                <th>Location</th> 
+                                <th>Status</th>     
+                                <th>Deployed To</th>       
+                                <th>Item Condition</th>                                               
+                                <th>Item Description</th> 
+                                <th>Value</th>                                         
+                                <th>Quantity</th>    
+                                <th>Warranty Coverage Year</th>                                             
+                                <th>Updated By</th>                                            
+                                <th>Date Updated</th>  
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($Body as $res)
+                                <tr>
+                                <!-- <td style="text-align:center">        
+                                <a id="getHistory" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#demoModal" data-id="{{ $res->aib_id }}"><i class='fa fa-history'></i> </a>
+                                <a class='btn btn-success btn-xs' href='{{CRUDBooster::mainpath("generate-barcode-single/".$res->aib_id)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-barcode'></i></a>                                      
+                                </td>   -->
+                                <td>{{$res->asset_code}}</td> 
+                                <td>{{$res->digits_code}}</td>
+                                <td>{{$res->serial_no}}</td>  
+                                <td>{{$res->body_location}}</td>  
+                                <td>{{$res->status_description}}</td>
+                                <td>{{$res->deployed_to}}</td>
+                                <td>{{$res->item_condition}}</td> 
+                                <td>{{$res->item_description}}</td>   
+                                <td>{{$res->value}}</td>
+                                <td>{{$res->quantity}}</td>     
+                                <td>{{$res->warranty_coverage}}</td>                                                                                                                         
+                                <td>{{$res->updated_by}}</td>    
+                                <td>{{$res->date_updated}}</td>    
+                                </tr>
+                            @endforeach
+                        </tbody>
                         
-                        width: ;"> 
-                          
-                                    <table id='table_dashboard' class="table table-hover table-striped table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <!-- <th>Action</th> -->
-                                                <th>Asset Code</th>   
-                                                <th>Digits Code</th>   
-                                                <th>Serial No</th> 
-                                                <th>Location</th> 
-                                                <th>Status</th>     
-                                                <th>Deployed To</th>       
-                                                <th>Item Condition</th>                                               
-                                                <th>Item Description</th> 
-                                                <th>Value</th>                                         
-                                                <th>Quantity</th>    
-                                                <th>Warranty Coverage Year</th>                                           
-                                                <th>Item Photo</th>     
-                                                <th>Updated By</th>                                            
-                                                <th>Date Updated</th>  
-                                              
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($Body as $res)
-                                                <tr>
-                                                <!-- <td style="text-align:center">        
-                                                <a id="getHistory" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#demoModal" data-id="{{ $res->aib_id }}"><i class='fa fa-history'></i> </a>
-                                             <a class='btn btn-success btn-xs' href='{{CRUDBooster::mainpath("generate-barcode-single/".$res->aib_id)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-barcode'></i></a>                                      
-                                                </td>   -->
-                                                <td>{{$res->asset_code}}</td> 
-                                                <td>{{$res->digits_code}}</td>
-                                                <td>{{$res->serial_no}}</td>  
-                                                <td>{{$res->body_location}}</td>  
-                                                <td>{{$res->status_description}}</td>
-                                                <td>{{$res->deployed_to}}</td>
-                                                <td>{{$res->item_condition}}</td> 
-                                                <td>{{$res->item_description}}</td>   
-                                                <td>{{$res->value}}</td>
-                                                <td>{{$res->quantity}}</td>     
-                                                <td>{{$res->warranty_coverage}}</td>                                                      
-                                                <td>
-                                                   @if ($res->itemImage)
-                                                      <img width="80px"; height="50px"; src="{{URL::to($res->itemImage)}}" alt="" data-action="zoom">
-                                                    @else
-                                                      <img width="60px"; height="50px"; src="{{URL::to('vendor/crudbooster/no_image_available/No_Image_Available.jpg')}}" alt="" data-action="zoom">
-                                                    @endif    
-                                                </td>                                                                      
-                                                <td>{{$res->updated_by}}</td>    
-                                                <td>{{$res->date_updated}}</td>    
-                                               </tr>
-                                            @endforeach
-                                        </tbody>
-                                        
-                                    </table> 
-                 
-                                 <!-- Modal Example Start-->
-                                <div class="modal fade" id="demoModal" tabindex="-1" role="dialog" aria- 
-                                    labelledby="demoModalLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg" role="document">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                   <button type="button" class="close" data-dismiss="modal" aria- 
-                                                    label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                    <h3 class="modal-title text-center" id="demoModalLabel">Assets Movement History</h3>
-                                            </div>
-                                            <div class="modal-body">
-                                                    <table id='table_dashboard' class="table table-hover table-striped table-bordered historyTbl">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Asset Code</th>   
-                                                                <th>Digits Code</th>   
-                                                                <th>Serial No</th> 
-                                                                <th>Time Update</th> 
-                                                                <th>Update By</th>
-                                                                <!-- <th>Deployed To</th>    -->
-                                                                <th>Location</th>   
-                                                                <th style="width:30%">Remarks</th>  
-                                                               
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            
-                                                        </tbody>
-                                                        
-                                                    </table> 
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Modal Example End-->
-                            
-                        </div>
-                    </div>
-                
+                    </table>  
             </div>
         </div>
 

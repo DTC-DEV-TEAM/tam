@@ -161,13 +161,13 @@
                 <div class="col-md-12">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Reference No</label>
+                            <label class="control-label"> Reference No</label>
                             <input class="form-control" type="text" value="{{$Header->inv_reference_number}}" readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> PO NO</label>
+                            <label class="control-label"> PO NO</label>
                             <input class="form-control" type="text" value="{{$Header->po_no}}" placeholder="PO NO" name="po_no" id="po_no" readonly>
                         </div>
                     </div>
@@ -263,7 +263,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        <?php   $tableRow = 1; ?>
                         @foreach($Body as $res)
+                        <?php   $tableRow++; ?>
                             <tr>
                             <td style="display:none">
                                 <input class="form-control" type="text"name="body_id[]" value="{{$res->for_approval_body_id}}">
@@ -292,10 +294,10 @@
                                 <input class="form-control text-center finput" name="specs[]" id="warranty_coverage" type="text">
                             </td>        
                             <td>
-                                <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="" id="arf_tag" required style="width:100%">
+                                <select selected data-placeholder="Select ARF" class="form-control arf_tag{{$tableRow}}" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
                                     <option value=""></option>
                                            @foreach($reserved_assets as $reserve)
-                                               <option value="{{$reserve->served_id}}" data-code="{{$reserve->digits_code}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
+                                               <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
                                            @endforeach
                                 </select>
                                 </td>                                                                                                
@@ -325,26 +327,27 @@
             null;
         };
         setTimeout("preventBack()", 0);
-    //preview image before save
-    $(function() {
-    // Multiple images preview in browser
-    var imagesPreview = function(input, placeToInsertImagePreview) {
+        
+       //preview image before save
+        $(function() {
+        // Multiple images preview in browser
+        var imagesPreview = function(input, placeToInsertImagePreview) {
 
-        if (input.files) {
-            var filesAmount = input.files.length;
+            if (input.files) {
+                var filesAmount = input.files.length;
 
-            for (i = 0; i < filesAmount; i++) {
-                var reader = new FileReader();
+                for (i = 0; i < filesAmount; i++) {
+                    var reader = new FileReader();
 
-                reader.onload = function(event) {
-                    $($.parseHTML('<img height="120px" class="header_images" width="180px;" hspace="10" data-action="zoom">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                    reader.onload = function(event) {
+                        $($.parseHTML('<img height="120px" class="header_images" width="180px;" hspace="10" data-action="zoom">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
+                    }
+
+                    reader.readAsDataURL(input.files[i]);
                 }
-
-                reader.readAsDataURL(input.files[i]);
             }
-        }
 
-    };
+        };
 
         $('#si_dr').on('change', function() {
             imagesPreview(this, 'div.gallery');
@@ -360,8 +363,41 @@
         $("#removeImageHeader").toggle(); // hide remove link.
     });
 
-    $('.arf_tag').select2({placeholder_text_single : "-- Select --"})
-    $('#location').select2({placeholder_text_single : "-- Select --"})
+    var searchcount = <?php echo json_encode($tableRow); ?>;
+    let countrow = 1;
+    $(function(){
+        for (let i = 0; i < searchcount; i++) {
+                countrow++;
+                $('.arf_tag'+countrow).select2({})
+        }
+    });
+
+    $(document).ready(function () {
+        var $selects = $('select');
+        $selects.select2();
+        $('.arf_tag').change(function () {
+            $('option:hidden', $selects).each(function () {
+                var self = this,
+                    toShow = true;
+                $selects.not($(this).parent()).each(function () {
+                    if (self.value == this.value) toShow = false;
+                })
+                if (toShow) {
+                    $(this).removeAttr('disabled');
+                    $(this).parent().select2();
+                }
+            });
+            if (this.value != "") {
+                //$selects.not(this).children('option[value=' + this.value + ']').attr('disabled', 'disabled');
+                $selects.not(this).children('option[value=' + this.value + ']').remove();
+                $selects.select2();
+            }
+   
+        });
+    })
+    
+   
+    $('#location').select2({})
     $(".date").datetimepicker({
         viewMode: "days",
         format: "YYYY-MM-DD",
@@ -607,7 +643,7 @@
                                     event.preventDefault();
                                     return false;
                             }else{
-                                $('.arf_tag').attr('disabled',false);
+                                //$('.arf_tag').attr('disabled',false);
                                 swal({
                                     title: "Are you sure?",
                                     type: "warning",
