@@ -8,6 +8,7 @@ class AssetsInventoryHeaderForApproval extends Model
 {
     protected $table = 'assets_inventory_header_for_approval';
     protected $fillable = [
+        'inv_reference_number',
         'po_no',
         'invoice_date',
         'rr_date',
