@@ -643,6 +643,7 @@
 				  'assets_inventory_body.*',
 				  'assets_inventory_body.id as for_approval_body_id',
 				  'statuses.*',
+				  'assets.item_cost as item_cost',
 				  'assets_inventory_header_for_approval.location as location',
 				  'assets_inventory_body.location as body_location',
 				  'assets_inventory_body.updated_at as date_updated',
@@ -655,7 +656,14 @@
 				$digits_code['digits_code'] = $codes['digits_code'];
 				array_push($arrayDigitsCode, $codes['digits_code']);
 			}
-			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){
+				$data['warehouse_location'] = WarehouseLocationModel::where('id','=',3)->get();
+			}else if(CRUDBooster::myPrivilegeId() == 9){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[2])->get();
+			}else{
+				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			}
+	
 			$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->whereIn('digits_code', $arrayDigitsCode)->get();
 			return $this->view("assets.edit-inventory-list-for-receiving", $data);
 		}
@@ -1598,7 +1606,7 @@
 				
 			}
 
-			$message = ['status'=>'success', 'message' => 'Success!'];
+			$message = ['status'=>'success', 'message' => 'Received!'];
 			echo json_encode($message);
 		}
 

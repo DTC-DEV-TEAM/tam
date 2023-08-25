@@ -276,13 +276,13 @@
                             <td class="text-center">{{$res->item_description}}</td>   
                             <td class="qty" style="text-align:center">{{$res->quantity}}</td> 
                             <td>
-                                <input class="form-control text-center finput" name="value[]" id="value" type="text">
+                                <input class="form-control text-center finput" name="value[]" id="value" type="text" placeholder="{{$res->item_cost}}">
                             </td> 
                             <td>
                                 <input class="form-control text-center finput" name="serial_no[]" id="serial_no" type="text">
                             </td>  
                             <td>
-                                <input class="form-control text-center finput" name="warranty_coverage[]" id="warranty_coverage" type="text">
+                                <input class="form-control text-center finput" name="warranty_coverage[]" id="warranty_coverage" type="text" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57" value="0">
                             </td>    
                             <td>
                                 <input class="form-control text-center finput" name="upc_code[]" id="upc_code" type="text">
@@ -294,7 +294,7 @@
                                 <input class="form-control text-center finput" name="specs[]" id="warranty_coverage" type="text">
                             </td>        
                             <td>
-                                <select selected data-placeholder="Select ARF" class="form-control arf_tag{{$tableRow}}" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
+                                <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
                                     <option value=""></option>
                                            @foreach($reserved_assets as $reserve)
                                                <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
@@ -327,7 +327,7 @@
             null;
         };
         setTimeout("preventBack()", 0);
-        
+        $('#location').select2({})
        //preview image before save
         $(function() {
         // Multiple images preview in browser
@@ -335,25 +335,22 @@
 
             if (input.files) {
                 var filesAmount = input.files.length;
-
                 for (i = 0; i < filesAmount; i++) {
                     var reader = new FileReader();
-
                     reader.onload = function(event) {
                         $($.parseHTML('<img height="120px" class="header_images" width="180px;" hspace="10" data-action="zoom">')).attr('src', event.target.result).appendTo(placeToInsertImagePreview);
                     }
-
                     reader.readAsDataURL(input.files[i]);
                 }
             }
 
         };
 
-        $('#si_dr').on('change', function() {
-            imagesPreview(this, 'div.gallery');
-            $("#removeImageHeader").toggle(); 
+            $('#si_dr').on('change', function() {
+                imagesPreview(this, 'div.gallery');
+                $("#removeImageHeader").toggle(); 
+            });
         });
-    });
      //remove image header from preview
      $("#removeImageHeader").click(function(e) {
         e.preventDefault(); // prevent default action of link
@@ -368,12 +365,12 @@
     $(function(){
         for (let i = 0; i < searchcount; i++) {
                 countrow++;
-                $('.arf_tag'+countrow).select2({})
+                $('#arf_tag'+countrow).select2({})
         }
     });
 
     $(document).ready(function () {
-        var $selects = $('select');
+        var $selects = $('.arf_tag');
         $selects.select2();
         $('.arf_tag').change(function () {
             $('option:hidden', $selects).each(function () {
@@ -397,7 +394,7 @@
     })
     
    
-    $('#location').select2({})
+
     $(".date").datetimepicker({
         viewMode: "days",
         format: "YYYY-MM-DD",
