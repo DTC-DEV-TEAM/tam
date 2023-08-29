@@ -163,19 +163,9 @@
 				//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 			    $this->index_button[] = ["label"=>"Export Data","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('asset-lists-export'),"color"=>"primary"];
 				if(CRUDBooster::isSuperadmin()){
-				// $this->index_button[] = [
-				// 	"title"=>"Upload Inventory",
-				// 	"label"=>"Upload Inventory",
-				// 	"icon"=>"fa fa-download",
-				// 	"url"=>CRUDBooster::mainpath('inventory-upload')];
+					$this->index_button[] = ["title"=>"Upload Inventory","label"=>"Upload Inventory","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('inventory-upload')];
 				}
-				// 	$this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::adminPath('assets_inventory_header/add-inventory'),"color"=>"success"];
-			// 	//$this->index_button[] = ["label"=>"Return Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-return'),"color"=>"success"];
 
-			// 	//$this->index_button[] = ["label"=>"Transfer Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-transfer'),"color"=>"success"];
-
-			// 	//$this->index_button[] = ["label"=>"Disposal Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-disposal'),"color"=>"success"];
-			
 			}
 
 
@@ -630,6 +620,27 @@
 			return Excel::download(new ExportMultipleSheet, 'asset_lists.xlsx');
 		}
 
+		public function uploadInventoryTemplate() {
+			$filename = "inventory-import-template"."-".date("Ymd").".csv";
+		
+				header("Content-Disposition: attachment; filename=\"$filename\"");
+				header("Content-Type: text/csv; charset=UTF-16LE");
+		
+				$out = fopen("php://output", 'w');
+				$flag = false;
+	
+				if(!$flag) {
+					// display field/column names as first row
+					fputcsv($out, array('EMAIL', 'DIGITS CODE', 'ITEM DESCRIPTION', 'SUB CATEGORY CODE', 'SERIAL NUMBER', 'QTY', 'STATUS', 'LOCATION', 'WARRANTY COVERAGE'));
+					$flag = true;
+				}
+				
+				fputcsv($out, array('johndoe@digits.ph', '40000769', 'ASUS X415J LAPTOP', 'COMPUTER SOFTWARE/PROGRAM', 'XSER12', '1', 'WORKING', 'IT WAREHOUSE' , '1'));
+				fclose($out);
+				
+				exit;
+		}
+
 		public function getInventory(Request $request){
         $AssetsInventoryBody = AssetsInventoryBody::select('assets_inventory_body.*');
         $per_page = $request->input('per_page');
@@ -639,7 +650,7 @@
 
 		public function uploadInventory() {
 			$data['page_title']= 'Inventory Upload';
-			return view('imports.inventory-import', $data)->render();
+			return view('import.inventory-import', $data)->render();
 		}
 
 		public function inventoryUpload(Request $request) {

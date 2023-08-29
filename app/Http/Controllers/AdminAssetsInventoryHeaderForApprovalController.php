@@ -216,7 +216,7 @@
 	        */
 	        $this->script_js = NULL;
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-				if(CRUDBooster::myPrivilegeId() == 6){ 
+				//if(CRUDBooster::myPrivilegeId() == 6){ 
 					// $this->script_js = "
 					// $(document).ready(function() {
 					// $('h1').contents().filter(function(){
@@ -235,7 +235,7 @@
 					// }
 					// ";
 					
-				}
+				//}
 		    }
             /*
 	        | ---------------------------------------------------------------------- 
@@ -1516,9 +1516,9 @@
 		public function forReceivingProcess(Request $request){
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {  
-				if(!CRUDBooster::myPrivilegeId() == 6) {    
-					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-				}
+				// if(!CRUDBooster::myPrivilegeId() == 6) {    
+				// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				// }
 			}
 
 			$fields = Request::all();
@@ -1613,9 +1613,9 @@
 		public function getCloseProcess(Request $request){
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {  
-				if(!CRUDBooster::myPrivilegeId() == 6) {    
-					CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-				}
+				// if(!CRUDBooster::myPrivilegeId() == 6) {    
+				// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+				// }
 			}
 			$fields = Request::all();
 			

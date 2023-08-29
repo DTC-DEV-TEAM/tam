@@ -155,9 +155,10 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
     Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
 
-    //inventory upload
-    Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
-    Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
+     //inventory upload
+     Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
+     Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
+     Route::get('/admin/assets_inventory_body/upload-inventory-template','AdminAssetsInventoryBodyController@uploadInventoryTemplate'); 
     
      //Deployed Assets
      Route::get('/admin/deployed_asset/Detail/{id}','AdminDeployedAssetsController@Detail')->name('deployed-asset');
