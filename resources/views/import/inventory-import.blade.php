@@ -19,7 +19,7 @@
 
             <label class='col-sm-2 control-label'>Import Template File: </label>
             <div class='col-sm-4'>
-                <a href='{{ CRUDBooster::mainpath() }}/upload-user-account-template' class="btn btn-primary" role="button">Download Template</a>
+                <a href='{{ CRUDBooster::mainpath() }}/upload-inventory-template' class="btn btn-primary" role="button">Download Template</a>
             </div>
             <br/>
             <br/>

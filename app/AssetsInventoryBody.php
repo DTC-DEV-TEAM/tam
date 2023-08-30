@@ -29,6 +29,8 @@ class AssetsInventoryBody extends Model
         'location',
         'request_type_id_inventory',
         'item_category',
+        'sub_category_id',
+        'received',
         'item_id'
     ];
 

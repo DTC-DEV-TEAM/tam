@@ -155,10 +155,20 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
     Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
 
-    //inventory upload
-    Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
-    Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
-    
+     //inventory upload
+     Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
+     Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
+     Route::get('/admin/assets_inventory_body/upload-inventory-template','AdminAssetsInventoryBodyController@uploadInventoryTemplate'); 
+     
+     //inventory upload Not Available
+     Route::get('/admin/assets_inventory_body/upload-inventory-not-available','AdminAssetsInventoryBodyController@uploadInventoryNotAvailable');
+     Route::post('/admin/assets_inventory_body/inventory-upload-not-available','AdminAssetsInventoryBodyController@inventoryUploadNotAvailable')->name('upload-inventory-not-available');
+ 
+     //inventory update
+     Route::get('/admin/assets_inventory_body/upload-inventory-update','AdminAssetsInventoryBodyController@uploadInventoryUpdate');
+     Route::post('/admin/assets_inventory_body/inventory-upload-update','AdminAssetsInventoryBodyController@inventoryUploadUpdate')->name('upload-inventory-update');
+     Route::get('/admin/assets_inventory_body/update-digits-code-template','AdminAssetsInventoryBodyController@updateDigitsCodeTemplate');
+ 
      //Deployed Assets
      Route::get('/admin/deployed_asset/Detail/{id}','AdminDeployedAssetsController@Detail')->name('deployed-asset');
      Route::get('/admin/deployed_asset/DetailMoOnly/{id}','AdminDeployedAssetsController@DetailMoOnly')->name('deployed-asset');
