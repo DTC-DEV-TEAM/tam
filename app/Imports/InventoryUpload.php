@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Storage;
 use App\MoveOrder;
 use App\Assets;
 use App\Users;
+use App\Models\AssetCodeModel;
 class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, WithValidation
 {
     public function __construct() {
@@ -21,8 +22,10 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
     }
 
     /**
-    * @param Collection $collection
-    */
+     * @param array $row
+     *
+     * @return Users|null
+     */
     public function collection(Collection $rows){
         $cooking_and_equipment = DB::table('class')->find(1);
         $DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
@@ -100,114 +103,285 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $cooking_and_equipment->to_code){
+                    DB::table('class')->where('id',$cooking_and_equipment->id)
+                    ->update([
+                        'limit_code'   => 1
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$cooking_and_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 2){
                 $asset_code                = $refrigeration_equipment->from_code + $DatabaseCounterRE;
                 $DatabaseCounterRE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $refrigeration_equipment->to_code){
+                    DB::table('class')->where('id',$refrigeration_equipment->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$refrigeration_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 3){
                 $asset_code                = $commercial_ovens->from_code + $DatabaseCounterCO;
                 $DatabaseCounterCO++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $commercial_ovens->to_code){
+                    DB::table('class')->where('id',$commercial_ovens->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$commercial_ovens->class_description." : ".($key+2),"danger");
+                }
+                
             }else if($sub_cat_code == 4){
                 $asset_code                = $refrigeration_and_freezer->from_code + $DatabaseCounterRAF;
                 $DatabaseCounterRAF++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $refrigeration_and_freezer->to_code){
+                    DB::table('class')->where('id',$refrigeration_and_freezer->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$refrigeration_and_freezer->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 5){
                 $asset_code                = $commercial_sinks->from_code + $DatabaseCounterCS;
                 $DatabaseCounterCS++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $commercial_sinks->to_code){
+                    DB::table('class')->where('id',$commercial_sinks->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$commercial_sinks->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 6){
                 $asset_code                = $work_table_stations->from_code + $DatabaseCounterWTS;
                 $DatabaseCounterWTS++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $work_table_stations->to_code){
+                    DB::table('class')->where('id',$work_table_stations->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$work_table_stations->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 7){
                 $asset_code                = $food_preparation_equipmen->from_code + $DatabaseCounterFPE;
                 $DatabaseCounterFPE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $food_preparation_equipmen->to_code){
+                    DB::table('class')->where('id',$food_preparation_equipmen->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$food_preparation_equipmen->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 8){
                 $asset_code                = $faucet_and_plumbing->from_code + $DatabaseCounterFAP;
                 $DatabaseCounterFAP++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $faucet_and_plumbing->to_code){
+                    DB::table('class')->where('id',$faucet_and_plumbing->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$faucet_and_plumbing->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 9){
                 $asset_code                = $food_holding_warming_equip->from_code + $DatabaseCounterFHWE;
                 $DatabaseCounterFHWE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $food_holding_warming_equip->to_code){
+                    DB::table('class')->where('id',$food_holding_warming_equip->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$food_holding_warming_equip->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 10){
                 $asset_code                = $other_restaurant_equipment->from_code + $DatabaseCounterORE;
                 $DatabaseCounterORE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $other_restaurant_equipment->to_code){
+                    DB::table('class')->where('id',$other_restaurant_equipment->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$other_restaurant_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 11){
                 $asset_code                = $other_vehicle->from_code + $DatabaseCounterOV;
                 $DatabaseCounterOV++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $other_vehicle->to_code){
+                    DB::table('class')->where('id',$other_vehicle->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$other_vehicle->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 12){
                 $asset_code                = $other_fixed_asset->from_code + $DatabaseCounterOFA;
                 $DatabaseCounterOFA++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $other_fixed_asset->to_code){
+                    DB::table('class')->where('id',$other_fixed_asset->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$other_fixed_asset->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 13){
                 $asset_code                = $communication_equipment->from_code + $DatabaseCounterCOMME;
                 $DatabaseCounterCOMME++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $communication_equipment->to_code){
+                    DB::table('class')->where('id',$communication_equipment->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$communication_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 14){
                 $asset_code                = $furnitures_fixtures->from_code + $DatabaseCounterFF;
                 $DatabaseCounterFF++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $furnitures_fixtures->to_code){
+                    DB::table('class')->where('id',$furnitures_fixtures->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$furnitures_fixtures->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 15){
                 $asset_code                = $facilities_equipment->from_code + $DatabaseCounterFE;
                 $DatabaseCounterFE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $facilities_equipment->to_code){
+                    DB::table('class')->where('id',$facilities_equipment->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$facilities_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 16){
                 $asset_code                = $leasehold_equipment->from_code + $DatabaseCounterLE;
                 $DatabaseCounterLE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $leasehold_equipment->to_code){
+                    DB::table('class')->where('id',$leasehold_equipment->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$leasehold_equipment->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 17){
                 $asset_code                = $machinery_equipmen->from_code + $DatabaseCounterME;
                 $DatabaseCounterME++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $machinery_equipmen->to_code){
+                    DB::table('class')->where('id',$machinery_equipmen->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$machinery_equipmen->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 18){
                 $asset_code                = $vehicle->from_code + $DatabaseCounterV;
                 $DatabaseCounterV++; 
                 $request_type_id_inventory = 5;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $vehicle->to_code){
+                    DB::table('class')->where('id',$vehicle->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$vehicle->class_description." : ".($key+2),"danger");
+                }
+
             }else if($sub_cat_code == 19){
                 $asset_code                = $computer_software_program->from_code + $DatabaseCounterCSP;
                 $DatabaseCounterCSP++; 
                 $request_type_id_inventory = 1;
                 $item_category             = $itemCat->category_description;
                 $sub_cat_id                = $sub_cat_code;
+
+                if($asset_code > $computer_software_program->to_code){
+                    DB::table('class')->where('id',$computer_software_program->id)
+                    ->update([
+                        'limit_code'   => "Code exceed in Asset Lists",
+                    ]);	
+                    return CRUDBooster::redirect(CRUDBooster::mainpath(),"Asset Code Exceed in Asset Lists! ".$computer_software_program->class_description." : ".($key+2),"danger");
+                }
+
             }
 
             if(!empty($row['serial_number'])){

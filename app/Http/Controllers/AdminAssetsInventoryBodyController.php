@@ -164,6 +164,8 @@
 			    $this->index_button[] = ["label"=>"Export Data","icon"=>"fa fa-upload","url"=>CRUDBooster::mainpath('asset-lists-export'),"color"=>"primary"];
 				if(CRUDBooster::isSuperadmin()){
 					$this->index_button[] = ["title"=>"Upload Inventory","label"=>"Upload Inventory","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('inventory-upload')];
+					$this->index_button[] = ["title"=>"Upload Not Available Inventory","label"=>"Upload Not Available Inventory","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-inventory-not-available'), "color"=>"warning"];
+					$this->index_button[] = ["title"=>"Update Inventory","label"=>"Update Inventory","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('upload-inventory-update'), "color"=>"success"];
 				}
 
 			}
@@ -679,63 +681,149 @@
 			CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), $errors[0], 'danger');
 		}
 
-		public function getAddAsset() {
-
-			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
-				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
-			}
-
-			$this->cbLoader();
-			$data['page_title'] = 'Add Asset';
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [6,4])->orderby('category_description', 'asc')->get();
-			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
-			//$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
-			return $this->view("masterfile.add-asset", $data);
-
+		//Inventory Not Available Upload
+		public function uploadInventoryNotAvailable() {
+			$data['page_title']= 'Inventory Upload Not Available';
+			return view('import.inventory-not-available-import', $data)->render();
 		}
 
-		public function digitsCodeSearch(Request $request) {
+		public function inventoryUploadNotAvailable(Request $request) {
+			$data = Request::all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
 
-			$request = Request::all();
-			$search 		= $request['search'];
-			$data = array();
-
-			$data['status_no'] = 0;
-			$data['message']   ='No Item Found!';
-			$data['items'] = array();
-
-			$items = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
-			->join('tam_categories', 'assets.category_id','=', 'tam_categories.id')
-			->select(	'assets.*',
-						'assets.id as assetID',
-						'tam_categories.category_description as category_description'
-					)->take(10)->get();
-    
-			if($items){
-				$data['status'] = 1;
-				$data['problem']  = 1;
-				$data['status_no'] = 1;
-				$data['message']   ='Item Found';
-				$i = 0;
-				foreach ($items as $key => $value) {
-
-					$return_data[$i]['id']                   = 	$value->assetID;
-					$return_data[$i]['digits_code']          = 	$value->digits_code;
-					$return_data[$i]['item_description']     = 	$value->item_description;
-					$return_data[$i]['category_description'] = 	$value->category_description;
-					$return_data[$i]['item_cost']            = 	$value->item_cost;
+			try {
+				Excel::import(new InventoryUploadNotAvailable, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), trans("Update Not Available Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
 				
-					$i++;
-
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
 				}
-				$data['items'] = $return_data;
+				
+				$errors = collect($error)->unique()->toArray();
+		
 			}
-
-			echo json_encode($data);
-			exit;  
+			CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), $errors[0], 'danger');
 		}
+
+		//Temporay Update Inventory
+		public function uploadInventoryUpdate() {
+			$data['page_title']= 'Inventory Update Info';
+			return view('import.inventory-update-import', $data)->render();
+		}
+
+		public function inventoryUploadUpdate(Request $request) {
+			$data = Request::all();	
+			$file = $data['import_file'];
+			$path_excel = $file->store('temp');
+			$path = storage_path('app').'/'.$path_excel;
+
+			try {
+				Excel::import(new InventoryUploadUpdate, $path);	
+			    CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), trans("Update Successfully!"), 'success');
+			} catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+				$failures = $e->failures();
+				
+				$error = [];
+				foreach ($failures as $failure) {
+					$line = $failure->row();
+					foreach ($failure->errors() as $err) {
+						$error[] = $err . " on line: " . $line; 
+					}
+				}
+				
+				$errors = collect($error)->unique()->toArray();
+		
+			}
+			CRUDBooster::redirect(CRUDBooster::adminpath('assets_inventory_body'), $errors[0], 'danger');
+		}
+
+		public function updateDigitsCodeTemplate() {
+
+			$filename = "update-digits-code-template"."-".date("Ymd").".csv";
+		
+				header("Content-Disposition: attachment; filename=\"$filename\"");
+				header("Content-Type: text/csv; charset=UTF-16LE");
+		
+				$out = fopen("php://output", 'w');
+				$flag = false;
+	
+				if(!$flag) {
+					// display field/column names as first row
+					fputcsv($out, array('asset_code', 'digits_code'));
+					$flag = true;
+				}
+				
+				fputcsv($out, array('A1000001', '40000769'));
+				fclose($out);
+				
+				exit;
+		}
+
+		// public function getAddAsset() {
+
+		// 	if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+		// 		CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+		// 	}
+
+		// 	$this->cbLoader();
+		// 	$data['page_title'] = 'Add Asset';
+		// 	$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [6,4])->orderby('category_description', 'asc')->get();
+		// 	$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
+		// 	//$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+		// 	return $this->view("masterfile.add-asset", $data);
+
+		// }
+
+		// public function digitsCodeSearch(Request $request) {
+
+		// 	$request = Request::all();
+		// 	$search 		= $request['search'];
+		// 	$data = array();
+
+		// 	$data['status_no'] = 0;
+		// 	$data['message']   ='No Item Found!';
+		// 	$data['items'] = array();
+
+		// 	$items = DB::table('assets')
+		// 	->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
+		// 	->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
+		// 	->join('tam_categories', 'assets.category_id','=', 'tam_categories.id')
+		// 	->select(	'assets.*',
+		// 				'assets.id as assetID',
+		// 				'tam_categories.category_description as category_description'
+		// 			)->take(10)->get();
+    
+		// 	if($items){
+		// 		$data['status'] = 1;
+		// 		$data['problem']  = 1;
+		// 		$data['status_no'] = 1;
+		// 		$data['message']   ='Item Found';
+		// 		$i = 0;
+		// 		foreach ($items as $key => $value) {
+
+		// 			$return_data[$i]['id']                   = 	$value->assetID;
+		// 			$return_data[$i]['digits_code']          = 	$value->digits_code;
+		// 			$return_data[$i]['item_description']     = 	$value->item_description;
+		// 			$return_data[$i]['category_description'] = 	$value->category_description;
+		// 			$return_data[$i]['item_cost']            = 	$value->item_cost;
+				
+		// 			$i++;
+
+		// 		}
+		// 		$data['items'] = $return_data;
+		// 	}
+
+		// 	echo json_encode($data);
+		// 	exit;  
+		// }
 
 		
 
