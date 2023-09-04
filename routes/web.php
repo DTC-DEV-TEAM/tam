@@ -55,6 +55,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/searchAssets','AdminAssetsInventoryHeaderForApprovalController@assetSearch')->name('search-assets');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/search-digits-code','AdminAssetsInventoryBodyController@digitsCodeSearch')->name('search-digits-code');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/selection-digits-code','AdminAssetsInventoryHeaderForApprovalController@selectionDigitsCode')->name('selection-digits-code'); // new 72723
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/sub-categories-code','AdminAssetsInventoryHeaderForApprovalController@subCatCode')->name('sub-categories-code'); // new 72723
 
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
