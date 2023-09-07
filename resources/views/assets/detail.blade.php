@@ -534,7 +534,13 @@
         <div class='panel-footer'>
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.back') }}</a>
-
+            @if(CRUDBooster::isSuperadmin())
+              @if(in_array($Header->request_type_id, [1,5]))
+                @if(in_array($Header->status_id, [1,14]))
+                    <button class="btn btn-danger pull-right" value="cancelRequest" type="button" id="btnCancelRequest"><i class="fa fa-times-circle" ></i> Cancel</button>
+                @endif
+              @endif
+            @endif
         </div>
 
     </form>
@@ -626,168 +632,191 @@
             });
     });
 
-        function calculateTotalQuantity(...body_qty) {
-            var totalQuantity = 0;  
-            $('.quantity_item').each(function() {
-             totalQuantity = parseInt($("#quantity_total").val()) - parseInt(body_qty);
-            });
-            return totalQuantity;
-    
-        }
-    
-        // if($('#request_type_id').val() == 1 || $('#request_type_id').val() == 5){
-        //     var tds = document
-        //     .getElementById("asset-items1")
-        //     .getElementsByTagName("td");
-        //     var sumqty       = 0;
-        //     var rep_qty      = 0;
-        //     var ro_qty       = 0;
-        //     var served_qty   = 0;
-        //     var unserved_qty = 0;
-        //     var dr_qty       = 0;
-        //     var po_qty       = 0;
-        //     for (var i = 0; i < tds.length; i++) {
-        //         if(tds[i].className == "qty") {
-        //             sumqty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "rep_qty"){
-        //             rep_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "ro_qty"){
-        //             ro_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "served_qty"){
-        //             served_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "unserved_qty"){
-        //             unserved_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "dr_qty"){
-        //             dr_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }else if(tds[i].className == "po_qty"){
-        //             po_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        //         }
-        //     }
-        //     document.getElementById("asset-items1").innerHTML +=
-        //     "<tr>"+
-        //         "<td colspan='4' style='text-align:right;border:none'>"+
-        //                 "<strong>TOTAL</strong>"+
-        //             "</td>"+
-                    
-        //             "<td style='text-align:center;border:none'>"+
-        //                 "<strong>" +
-        //                 sumqty +
-        //                 "</strong>"+
-        //             "</td>"+
-                    
-        //     "</tr>";
-        // }else{
-            var tds = document.getElementById("asset-items1").getElementsByTagName("td");
-            var sumqty       = 0;
-            var rep_qty      = 0;
-            var ro_qty       = 0;
-            var served_qty   = 0;
-            var unserved_qty = 0;
-            var dr_qty       = 0;
-            var po_qty       = 0;
-            for (var i = 0; i < tds.length; i++) {
-                if(tds[i].className == "qty") {
-                    sumqty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "rep_qty"){
-                    rep_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "ro_qty"){
-                    ro_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "served_qty"){
-                    served_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "unserved_qty"){
-                    unserved_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "dr_qty"){
-                    dr_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-                }else if(tds[i].className == "po_qty"){
-                    po_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+    //CANCEL REQUEST
+    $("#btnCancelRequest").click(function(event) {
+        event.preventDefault();
+        var id = $('#headerID').val();
+        console.log(id);
+        swal({
+            title: "Reason to cancel",
+            type: "input",
+            confirmButtonText: 'Proceed',
+            confirmButtonColor: "#41B314",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            animation: "slide-from-top",
+            inputPlaceholder: "Reason to cancel"
+            },
+            function(inputValue){
+                var remarks = inputValue;
+                if (inputValue === "") {
+                    swal.showInputError("Reason to cancel required for this process!");
+                    return false
+                }else{
+                    swal({
+                        title: "Are you sure?",
+                        type: "warning",
+                        text: "You won't be able to revert this!",
+                        showCancelButton: true,
+                        confirmButtonColor: "#41B314",
+                        cancelButtonColor: "#F9354C",
+                        confirmButtonText: "Yes, cancel it!",
+                        width: 450,
+                        height: 200
+                        }, function () {
+                            $.ajaxSetup({
+                                headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    }
+                            });
+                            $.ajax({
+                                url: "{{ route('cancel-arf-request') }}",
+                                type: "POST",
+                                dataType: 'json',
+                                data: {
+                                    "id": id,
+                                    "remarks": remarks
+                                },
+                                success: function (data) {
+                                    if (data.status == "success") {
+                                        swal({
+                                            type: data.status,
+                                            title: data.message,
+                                        });
+                                        window.location.replace(data.redirect_url);
+                                        } else if (data.status == "error") {
+                                        swal({
+                                            type: data.status,
+                                            title: data.message,
+                                        });
+                                    }
+                                }
+                            });                    
+                    });
                 }
-            }
-            document.getElementById("asset-items1").innerHTML +=
-            "<tr>"+
-                "<td colspan='4' style='text-align:right'>"+
-                        "<strong>TOTAL</strong>"+
-                    "</td>"+
-                    
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                        sumqty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                        rep_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                        ro_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                        served_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                        unserved_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                            dr_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                        "<strong>" +
-                            po_qty +
-                        "</strong>"+
-                    "</td>"+
-                    "<td style='text-align:center'>"+
-                    "</td>"+
-                    "<td colspan='4' style='text-align:center'>"+
-                    "</td>"+
-                   
-            "</tr>";
-        //}
+      
+        });
+    });
 
-        var tds = document.getElementById("asset-items").getElementsByTagName("td");
-        var moQty        = 0;
-        var moUnitCost   = 0;
-        var moTotalCost  = 0;
+    function calculateTotalQuantity(...body_qty) {
+        var totalQuantity = 0;  
+        $('.quantity_item').each(function() {
+            totalQuantity = parseInt($("#quantity_total").val()) - parseInt(body_qty);
+        });
+        return totalQuantity;
 
-        for (var i = 0; i < tds.length; i++) {
-            if(tds[i].className == "mo_qty") {
-                moQty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-            }else if(tds[i].className == "mo_unit_cost"){
-                moUnitCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-            }else if(tds[i].className == "mo_total_cost"){
-                moTotalCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-            }
+    }
+    
+    var tds = document.getElementById("asset-items1").getElementsByTagName("td");
+    var sumqty       = 0;
+    var rep_qty      = 0;
+    var ro_qty       = 0;
+    var served_qty   = 0;
+    var unserved_qty = 0;
+    var dr_qty       = 0;
+    var po_qty       = 0;
+    for (var i = 0; i < tds.length; i++) {
+        if(tds[i].className == "qty") {
+            sumqty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "rep_qty"){
+            rep_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "ro_qty"){
+            ro_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "served_qty"){
+            served_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "unserved_qty"){
+            unserved_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "dr_qty"){
+            dr_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "po_qty"){
+            po_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
         }
-        document.getElementById("asset-items").innerHTML +=
-        "<tr>"+
-            "<td colspan='6' style='text-align:right'>"+
-                    "<strong>TOTAL</strong>"+
-                "</td>"+
-                
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moQty +
-                    "</strong>"+
-                "</td>"+
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moUnitCost +
-                    "</strong>"+
-                "</td>"+
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moTotalCost +
-                    "</strong>"+
-                "</td>"+       
-        "</tr>";
-       
+    }
+    document.getElementById("asset-items1").innerHTML +=
+    "<tr>"+
+        "<td colspan='4' style='text-align:right'>"+
+                "<strong>TOTAL</strong>"+
+            "</td>"+
+            
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                sumqty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                rep_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                ro_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                served_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                unserved_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                    dr_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                    po_qty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+            "</td>"+
+            "<td colspan='4' style='text-align:center'>"+
+            "</td>"+
+            
+    "</tr>";
+    
+    var tds = document.getElementById("asset-items").getElementsByTagName("td");
+    var moQty        = 0;
+    var moUnitCost   = 0;
+    var moTotalCost  = 0;
+
+    for (var i = 0; i < tds.length; i++) {
+        if(tds[i].className == "mo_qty") {
+            moQty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "mo_unit_cost"){
+            moUnitCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }else if(tds[i].className == "mo_total_cost"){
+            moTotalCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+        }
+    }
+    document.getElementById("asset-items").innerHTML +=
+    "<tr>"+
+        "<td colspan='6' style='text-align:right'>"+
+                "<strong>TOTAL</strong>"+
+            "</td>"+
+            
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                    moQty +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                    moUnitCost +
+                "</strong>"+
+            "</td>"+
+            "<td style='text-align:center'>"+
+                "<strong>" +
+                    moTotalCost +
+                "</strong>"+
+            "</td>"+       
+    "</tr>";
+      
         
 </script>
 @endpush

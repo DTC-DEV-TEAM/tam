@@ -87,22 +87,33 @@
     <section id="loading">
         <div id="loading-content"></div>
     </section>
-    <div class="row">
-             <div class="col-md-12">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label"> Reference No</label>
-                        <input class="form-control" type="text" value="{{$Header->inv_reference_number}}" readonly>
-                    </div>
+        <div class="row">
+            <div class="col-md-12">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label"> Reference No</label>
+                    <input class="form-control" type="text" value="{{$Header->inv_reference_number}}" readonly>
                 </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Location</label>
+                    <input class="form-control" type="text"  value="{{$Header->warehouse_location}}" readonly>
+                </div>
+            </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label"><span style="color:red">*</span> PO NO</label>
                         <input class="form-control finput" type="text"  placeholder="PO NO" name="po_no" id="po_no">
                     </div>
                 </div>
-             </div>
             </div>
+        </div>
+            
         <hr>
 
         <!-- Body Area -->
@@ -119,8 +130,9 @@
                         <tr>
                             <th width="10%" class="text-center">Asset Code</th>
                             <th width="10%" class="text-center">Digits Code</th>   
-                            <th width="30%" class="text-center">Item Condition</th>                                           
-                            <th width="5%" class="text-center">Quantity</th>                         
+                            <th width="30%" class="text-center">Item Condition</th>      
+                            <th width="5%" class="text-center">Location</th>                                         
+                            <th width="5%" class="text-center">Quantity</th>                   
                         </tr>
                     </thead>
                     <tbody>
@@ -133,7 +145,8 @@
                             <td class="text-center">{{$res->asset_code}}</td>
                             <td class="text-center">{{$res->digits_code}}</td>
                             <td>{{$res->item_description}}</td>   
-                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>                                                                                                           
+                            <td class="qty" style="text-align:center">{{$res->warehouse_location}}</td>  
+                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>                                                                                                       
                             </tr>
                         @endforeach
                     </tbody>
@@ -254,7 +267,8 @@
                                     title: data.message,
                                 });
                                 setTimeout(function(){
-                                    window.location.replace(document.referrer);
+                                    //window.location.replace(document.referrer);
+                                    window.location.replace(data.redirect_url);
                                 }, 1000); 
                                 } else if (data.status == "error") {
                                 swal({
@@ -287,7 +301,7 @@
     }
     document.getElementById("asset-items").innerHTML +=
     "<tr>"+
-        "<td colspan='3' style='text-align:center'>"+
+        "<td colspan='4' style='text-align:center'>"+
                 "<strong>TOTAL</strong>"+
             "</td>"+
             

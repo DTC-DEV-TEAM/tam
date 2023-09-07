@@ -178,12 +178,14 @@
                 <div class="col-md-12">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Location</label>
+                            <label class="control-label">Location</label>
+                            <input class="form-control" type="text"  value="{{$Header->warehouse_location}}" readonly>
+                            {{-- <label class="control-label"><span style="color:red">*</span> Location</label>
                             <select  id="location" name="location" class="form-select select2" id="location" style="width:100%;">
                             @foreach($warehouse_location as $res)
                                 <option value="{{ $res->id }}">{{ $res->location }}</option>
                             @endforeach
-                            </select>
+                            </select> --}}
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -282,7 +284,7 @@
                                 <input class="form-control text-center finput" name="serial_no[]" id="serial_no" type="text">
                             </td>  
                             <td>
-                                <input class="form-control text-center finput" name="warranty_coverage[]" id="warranty_coverage" type="text" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57" value="0">
+                                <input class="form-control text-center finput" name="warranty_coverage[]" id="warranty_coverage" type="text" min="1" max="9999999999" step="1" onkeypress="return event.charCode <= 57">
                             </td>    
                             <td>
                                 <input class="form-control text-center finput" name="upc_code[]" id="upc_code" type="text">
@@ -564,6 +566,23 @@
                                 swal({  
                                         type: 'error',
                                         title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
+                                        icon: 'error',
+                                        confirmButtonColor: "#367fa9"
+                                    });
+                                    event.preventDefault();
+                                    return false;
+                            }
+                    
+                        }
+
+                        //warranty
+                        var u = $("input[name^='warranty_coverage']").length;
+                        var upcValue = $("input[name^='warranty_coverage']");
+                        for(i=0;i<u;i++){
+                            if(upcValue.eq(i).val() == 0){
+                                swal({  
+                                        type: 'error',
+                                        title: 'Warranty coverage required! put zero if dont have warranty',
                                         icon: 'error',
                                         confirmButtonColor: "#367fa9"
                                     });

@@ -284,6 +284,17 @@
                                 <span class="test"></span>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label"><span style="color:red">*</span> Location</label>
+                                <select selected data-placeholder="- Select location -" id="location" name="location" class="form-select select2" id="location" style="width:100%;">
+                                @foreach($warehouse_location as $res)
+                                    <option value=""></option>
+                                    <option value="{{ $res->id }}">{{ $res->location }}</option>
+                                @endforeach
+                                </select>
+                            </div>
+                        </div>
                 </div>
             </div>
 
@@ -516,6 +527,14 @@
                       
                         tableRow++;
                         if (e.id) {   
+                            if($('#location').val() === ""){
+                                swal({
+                                    type: 'info',
+                                    title: 'Please select location!',
+                                    icon: 'info',
+                                });
+                            }
+                            
                            // if (!in_array(e.id, stack)) {
                                 if (!stack.includes(e.id)) {            
                                     //stack.push(e.id);                                                                                
@@ -527,10 +546,10 @@
                                         '<td><input class="form-control text-center ginput amount" placeholder="Value" type="text" readonly value="' + e.category_description + '"></td>' +
                                         '<td>' +
                                             '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + e.id  + '" id="sub_category_id' + e.id  + '" required style="width:100%">' +
-                                                '<option value=""></option>' + 
-                                                '@foreach($sub_categories as $subData)' +
-                                                    '<option value="{{$subData->id}}">{{$subData->class_description}} | {{ $subData->category_code }}</option>' +
-                                                '@endforeach' +
+                                                // '<option value=""></option>' + 
+                                                // '@foreach($sub_categories as $subData)' +
+                                                //     '<option value="{{$subData->id}}">{{$subData->class_description}} | {{ $subData->category_code }}</option>' +
+                                                // '@endforeach' +
                                             '</select>' +
                                         '</td>' +
                                         '<td><input class="form-control text-center ginput text-center add_quantity" placeholder="Quantity" type="text" value="1" readonly name="add_quantity[]" id="add_quantity' + e.id  + '" data-id="' + e.id  + '"  min="0" max="9999999999" step="1" onkeypress="return event.charCode >= 48 && event.charCode <= 57" oninput="validity.valid||(value=1);"></td>' +               
@@ -577,7 +596,7 @@
                                         $("#quantity_total").val(calculateTotalQuantity());
                                       
                                     });
-                                   
+                                    $('#location').trigger('change');
                                     $(".date").datetimepicker({
                                             viewMode: "days",
                                             format: "YYYY-MM-DD",
@@ -653,6 +672,30 @@
 
         }); 
        
+         //Class
+         $('#location').change(function(){
+            var id =  this.value;
+            $.ajax({ 
+                type: 'POST',
+                url: "{{ route('sub-categories-code') }}",
+                data: {
+                    "id": id
+                },
+                success: function(result) {
+                    var i;
+                    var showData = [];
+                    showData[0] = "<option value=''>Choose Sub Class</option>";
+                    for (i = 0; i < result.length; ++i) {
+                        var j = i + 1;
+                        showData[j] = "<option value='"+result[i].id+"'>"+result[i].class_description+" | "+result[i].category_code+"</option>";
+                    }
+                    $('#sub_class').attr('disabled', false);
+                    jQuery('.sub_category_id').html(showData);   
+                    $('#sub_class').val('').trigger('change');       
+                }
+            });
+
+        });
   
         //VERSION 2 SUBMIT
         $('#btnSubmit').on('click', function (event) {

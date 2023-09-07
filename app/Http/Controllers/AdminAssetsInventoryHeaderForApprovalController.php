@@ -560,7 +560,7 @@
 			  ->where('assets_header_images.header_id', $id)
 			  ->get();
 			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
-			
+			$data['warehouse_location'] = WarehouseLocationModel::whereNotIn('id',[1,4])->get();
 			return $this->view("assets.add-inventory", $data);
 
 		}
@@ -578,10 +578,12 @@
 			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
 				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
 				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_header_for_approval.location', '=', 'warehouse_location_model.id')
 				->select(
 					'assets_inventory_header_for_approval.*',
 					'assets_inventory_header_for_approval.id as header_id',
 					'cms_users.*',
+					'warehouse_location_model.location as warehouse_location',
 					'approver.name as approver',
 					'assets_inventory_header_for_approval.created_at as date_created'
 					)
@@ -593,10 +595,12 @@
 			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id', '=', 'assets_inventory_header_for_approval.id')
 			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
 				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
 				->select(
 				  'assets_inventory_body.*',
 				  'assets_inventory_body.id as for_approval_body_id',
 				  'statuses.*',
+				  'warehouse_location_model.location as warehouse_location',
 				  'assets_inventory_header_for_approval.location as location',
 				  'assets_inventory_body.location as body_location',
 				  'assets_inventory_body.updated_at as date_updated',
@@ -620,10 +624,12 @@
 			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
 				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
 				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_header_for_approval.location', '=', 'warehouse_location_model.id')
 				->select(
 					'assets_inventory_header_for_approval.*',
 					'assets_inventory_header_for_approval.id as header_id',
 					'cms_users.*',
+					'warehouse_location_model.location as warehouse_location',
 					'approver.name as approver',
 					'assets_inventory_header_for_approval.created_at as date_created'
 					)
@@ -640,12 +646,14 @@
 			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id', '=', 'assets_inventory_header_for_approval.id')
 			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
 				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
 				->select(
 				  'assets_inventory_body.*',
 				  'assets_inventory_body.id as for_approval_body_id',
 				  'statuses.*',
 				  'assets.item_cost as item_cost',
 				  'assets_inventory_header_for_approval.location as location',
+				  'warehouse_location_model.location as warehouse_location',
 				  'assets_inventory_body.location as body_location',
 				  'assets_inventory_body.updated_at as date_updated',
 				  'cms_users_updated_by.name as updated_by'
@@ -825,6 +833,7 @@
 				$container['item_id']               = $item_id[$key];
 				$container['serial_no']             = $serial_no[$key];
 				$container['digits_code']           = $val;
+				$container['location']              = $location;
 				$container['item_description']      = $item_desc[$key];
 				$container['quantity']              = $quantity[$key];
 				$container['warranty_coverage']     = $warranty_coverage[$key];
@@ -1438,7 +1447,8 @@
 
 				$getLastId = AssetsInventoryHeaderForApproval::Create(
 					[
-						'inv_reference_number'   => $inv_ref_no, 
+						'inv_reference_number'   => $inv_ref_no,
+						'location'               => $location, 
 						'header_approval_status' => 47, 
 						'created_by'             => CRUDBooster::myId(), 
 						'created_at'             => date('Y-m-d H:i:s')
@@ -1510,7 +1520,7 @@
 					'statuses_id'  => 20
 					]);
 
-			$message = ['status'=>'success', 'message' => 'Success!'];
+			$message = ['status'=>'success', 'message' => 'Success!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 		}
 
@@ -1528,8 +1538,6 @@
 			//parse data in form
 		
 			parse_str($fields['form_data'], $fields);
-
-			$location          = $fields['location'];
 			$invoice_date      = $fields['invoice_date'];
 			$invoice_no        = $fields['invoice_no'];
 			$rr_date           = $fields['rr_date'];
@@ -1565,7 +1573,6 @@
 			AssetsInventoryHeaderForApproval::where('id', $id)
 			->update([
 				'header_approval_status' => 22, 
-				'location'               => $location,
 				'invoice_date'           => $invoice_date,
 				'invoice_no'             => $invoice_no,
 				'rr_date'                => $rr_date,
@@ -1578,7 +1585,6 @@
 				   ->update([
 					       'statuses_id'       => 6,
 						   'value'             => str_replace(',', '', $value[$x]),
-						   'location'          => $location,
 						   'serial_no'         => $serial_no[$x],
 						   'warranty_coverage' => $warranty_coverage[$x],
 						   'upc_code'          => $upc_code[$x],
@@ -1743,6 +1749,17 @@
 							->get();
 	
 			return($selectdititscode);
+		}
+
+		public function subCatCode(Request $request){
+			$data = Request::all();	
+			$id = $data['id'];
+	
+			$subcategories = DB::table('class')
+							->select('class.*')
+							->where('location', $id)
+							->get();
+			return($subcategories);
 		}
 
 	}

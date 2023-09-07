@@ -55,6 +55,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/searchAssets','AdminAssetsInventoryHeaderForApprovalController@assetSearch')->name('search-assets');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/search-digits-code','AdminAssetsInventoryBodyController@digitsCodeSearch')->name('search-digits-code');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/selection-digits-code','AdminAssetsInventoryHeaderForApprovalController@selectionDigitsCode')->name('selection-digits-code'); // new 72723
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/sub-categories-code','AdminAssetsInventoryHeaderForApprovalController@subCatCode')->name('sub-categories-code'); // new 72723
 
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
@@ -65,6 +66,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-fa', 'AdminHeaderRequestController@getAddRequisitionFA')->name('assets.add.requisition.fa'); 
     Route::get('admin/header_request/subcategories/{id}','AdminHeaderRequestController@SubCategories');
     Route::get('admin/header_request/RemoveItem','AdminHeaderRequestController@RemoveItem');
+    //Cancel Request
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-request','AdminHeaderRequestController@cancelArfRequest')->name('cancel-arf-request');
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-mo-perline-request','AdminHeaderRequestController@cancelArfMoPerLineRequest')->name('cancel-arf-mo-perline-request');
 
 
     Route::get('admin/header_request/getRequestCancel/{id}','AdminHeaderRequestController@getRequestCancel')->name('getRequestCancel');
