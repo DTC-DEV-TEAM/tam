@@ -223,6 +223,7 @@
 				if(in_array(CRUDBooster::myPrivilegeId(), [1,6,20])){
 					$this->index_button[] = ["label"=>"Consolidation","icon"=>"fa fa-download",'url'=>"javascript:showConsoExport()"];
 					$this->index_button[] = ["label"=>"Upload PO","icon"=>"fa fa-upload","url"=>CRUDBooster::adminpath('for_purchasing/po-upload'),'color'=>'success'];
+					$this->index_button[] = ["label"=>"Cancellation","icon"=>"fa fa-upload","url"=>CRUDBooster::adminpath('for_purchasing/cancellation-upload'),'color'=>'warning'];
 				}
 				if(in_array(CRUDBooster::myPrivilegeId(), [1,5,9,17])){
 					$this->index_button[] = ["label"=>"MO Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-mo'),"color"=>"success"];
@@ -666,15 +667,11 @@
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
 		
-
 			$fields = Request::all();
 			//dd($fields);
 			$cont = (new static)->apiContext;
-
 			$dataLines1 = array();
-
 			$locationArray = array();
-
 			$Header_id 							= $fields['header_request_id'];
 			$digits_code 						= $fields['add_digits_code'];
 			//$asset_code 						= $fields['add_asset_code'];
@@ -694,7 +691,6 @@
 			}
 			//$postdata['quantity_total']		 	= $quantity_total;
 			//$postdata['total']		 			= $total;
-
 			$arf_header 		= HeaderRequest::where(['id' => $Header_id])->first();
 			// if(in_array($arf_header->request_type_id, [1, 5])){
 			//     $inventory_id 						= $fields['inventory_id'];
@@ -704,11 +700,8 @@
 			// 	$item_id 							= $fields['inventory_id'];
 			// }
 			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])->count();
-
 			$count_header 		= MoveOrder::count();
-
 			$count_header1  	= $count_header + 1;
-
 			//dd(count((array)$digits_code));
 			if(in_array($arf_header->request_type_id, [5, 6, 7])){
 			//if($arf_header->request_type_id == 5){
@@ -721,23 +714,15 @@
 												->value('status_id');
 			}
 
-		
             //dd($body_request_id, $body_request_id);
 			for($x=0; $x < count((array)$item_description); $x++) {
-
-
 				$inventory_info = 	DB::table('assets_inventory_body')->where('digits_code', $digits_code[$x])->where('statuses_id',6)->first();
-
 				$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);	
-
 					if(count((array)$digits_code) != $body_request){
-
 						if($body_request_id[$x] == "" || $body_request_id[$x] == null){
-
 							$count_header++;
 							$header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
 							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
-
 						}else{
 							$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
 							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
@@ -751,19 +736,12 @@
 					}else{
 						$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
 						$reference_number	= 	"MO-".$header_ref.$ref_inventory;
-
 						//$reference_number	= 	"MO-".$header_ref;
 					}
-
-				
 					// $items = 				DB::table('assets')->where('assets.id', $item_id[$x])->first();
-
 					// $category_id = 			DB::table('category')->where('id',	$items->category_id)->value('category_description');
-
 					// $sub_category_id = 		DB::table('class')->where('id',	$items->class_id)->value('class_description');
 
-
-	
 				$dataLines1[$x]['status_id'] 			= $for_printing;
 				$dataLines1[$x]['mo_reference_number'] 	= $reference_number;
 				$dataLines1[$x]['header_request_id'] 	= $arf_header->id;
@@ -776,15 +754,12 @@
 				$dataLines1[$x]['category_id'] 			= $category_id[$x];
 				$dataLines1[$x]['sub_category_id'] 		= $sub_category_id[$x];
 
-				
-
 				$array_location = [1,2];
 				if(in_array($arf_header->request_type_id, [1, 5])){
 					$location 						= $inventory_info->location;
 				}else{
 					$location 						= implode(",",$array_location);
 				}
-
 				//$dataLines1[$x]['serial_no'] 			= $serial_no[$x];
 				$dataLines1[$x]['quantity'] 			= $quantity[$x];
 				$dataLines1[$x]['unit_cost'] 			= $unit_cost[$x];
@@ -814,7 +789,6 @@
 
 			
 			DB::beginTransaction();
-	
 			try {
 				MoveOrder::insert($dataLines1);
 				DB::commit();
@@ -825,7 +799,6 @@
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_database_error",['database_error'=>$e]), 'danger');
 			}
 
-
 			if(in_array($arf_header->request_type_id, [1, 5])){
 				$headLocation 						= implode(",", $locationArray);
 			}else{
@@ -833,14 +806,13 @@
 			}
 
 			if($arf_header->print_by == null){	
-				
 				HeaderRequest::where('id',$Header_id)
 				->update([
 					'mo_by'          => CRUDBooster::myId(),
 					'mo_at'          => date('Y-m-d H:i:s'),
 					'purchased2_by'	 => CRUDBooster::myId(),
 				    'purchased2_at'  => date('Y-m-d H:i:s'),
-					'status_id'      => $for_printing,
+					//'status_id'      => $for_printing,
 					'quantity_total' => $quantity_total,
 					'total'          => $total,
 					'location_id'    => $headLocation,
@@ -874,40 +846,25 @@
 			}
 
 			$cancelled  = 		DB::table('statuses')->where('id', 8)->value('id');
-
-
-			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])
-											   ->where(['to_mo' => 0])
-											   ->whereNull('deleted_at')
-											   ->count();
-
-			$mo_request 		= MoveOrder::where(['header_request_id' => $Header_id])
-											 ->where('status_id', '!=', $cancelled)
-											 //->where('category_id', '!=', "FREEBIES")
-											 //->orwhere('category_id', '!=', "FREEBIES")
-											 //->where(['header_request_id' => $Header_id])
-								             ->count();
+			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])->whereNull('deleted_at')->count();
+			$mo_request 		= MoveOrder::where(['header_request_id' => $Header_id])->where('status_id', '!=', $cancelled)->count();
 
 			if($body_request == $mo_request){
-
 					HeaderRequest::where('id',$Header_id)
 					->update([
-						'mo_plug'=> 1
+						'status_id' => $for_printing,
+						'mo_plug'   => 1
 					]);
 
 			}else{
-				
 				HeaderRequest::where('id',$Header_id)
 				->update([
 					'to_mo'   => 1,
 					'mo_plug' => 0
 				]);
 			}
-
 			//$postdata['mo_print']		 	= 1;
-
 			//unset($postData['id']);
-
 	    }
 
 	    /* 
@@ -1138,7 +1095,6 @@
 
 		public function getAddMO(){
 			
-
 			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
 				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 			}
@@ -1340,21 +1296,15 @@
 
 		public function getRequestPrintPickList($id){
 
-		
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}  
 
-
 			$data = array();
-
 			$data['page_title'] = 'Print Picklist';
-
 			$HeaderID = MoveOrder::where('id', $id)->first();
-
 			$location = substr($HeaderID->mo_reference_number,11);
-
 			$data['Location'] = DB::table('warehouse_location_model')->where('id', $location)->first();
 
 			$data['Header'] = HeaderRequest::
@@ -1489,12 +1439,9 @@
 		public function PickListUpdate(){
 
 			$data = 			Request::all();	
-			
 			$cont = (new static)->apiContext;
-
 			$requestid = 			$data['requestid']; 
 			$mo_id = 				$data['mo_id']; 
-
 			$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 
 			//$for_picking =  		DB::table('statuses')->where('id', 15)->value('id');
@@ -1509,11 +1456,9 @@
 										->value('status_id');
 			}
 
-
 			//$mo_request = 			MoveOrder::where(['header_request_id' => $requestid])->get();
 
 			for($x=0; $x < count((array)$mo_id); $x++) {
-
 				MoveOrder::where('id', $mo_id[$x])
 				->update([
 					'status_id'=> 		$for_picking,
@@ -1524,19 +1469,25 @@
 			}
 
 			if($arf_header->print_by == null){
-
 				HeaderRequest::where('id',$requestid)
 					->update([
-						'status_id'=> 		$for_picking,
 						'print_by'=> 		CRUDBooster::myId(),
 						'print_at'=> 		date('Y-m-d H:i:s')
 					]);	
 
 			}
 
+			$body_request = BodyRequest::where(['header_request_id' => $requestid])->whereNull('deleted_at')->count();
+			$mo_request   = MoveOrder::where(['header_request_id' => $requestid])->where('status_id', '!=', 8)->count();
 
+			if($body_request == $mo_request){
+					HeaderRequest::where('id',$requestid)
+					->update([
+						'status_id'=> 		$for_picking,
+					]);
+
+			}
 			//CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.arf_print_success",['reference_number'=>$arf_header->reference_number]), 'info');
-
 		}
 
 		public function selectedHeader(Request $request) {
@@ -1587,6 +1538,7 @@
 			$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
 								->select(
 								  'body_request.*',
+								  'body_request.id as body_id',
 								  'assets_inventory_reserved.reserved as reserved'
 								)
 								->where('body_request.header_request_id', $search)
@@ -1676,22 +1628,23 @@
 			$tableRow = 1;
 
 			$total = 0;
-
+		
 			foreach($data['Body'] as $rowresult){
 
 				$tableRow++;
-
 				$total++;
 
 				$data['ARFBody'] .='
-
 					<tr style="background-color: #d4edda; color:#155724">
 						<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
 						<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
 						<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
-					
 				';
+				
 			    if($rowresult->reserved != null || $rowresult->reserved != ""){ 
+					if(CRUDBooster::isSuperadmin()){
+						$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+					}
 					$data['ARFBody'] .='
 					   <td style="text-align:center" height="10">
 					        <input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
@@ -1732,10 +1685,14 @@
 						'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
 						</td>
 						<td style="text-align:center"><i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i></td>
+						</tr>
 					';
 				}else{
+					$data['ARFBody'] .='<tr>';
+					if(CRUDBooster::isSuperadmin()){
+						$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+					}
 					$data['ARFBody'] .='
-					<tr >
 					   <td style="text-align:center" height="10">
 							'.$rowresult->digits_code.'                                                                            
 						</td>
@@ -1793,6 +1750,10 @@
 
 			}
 
+			if(CRUDBooster::isSuperadmin()){
+				$data['checkBoxHeader'] .= '<th width="3%" class="text-center">Cancel</th>';
+			}
+
 			$data['ARFBodyTable'] .= '
 				<hr/>
 				<div class="col-md-12">
@@ -1806,6 +1767,7 @@
 								<table id="asset-items1">
 									<tbody id="bodyTable">
 										<tr class="tbl_header_color dynamicRows">
+										    '.$data['checkBoxHeader'].'
 											<th width="9%" class="text-center">Digits Code</th>
 											<th width="20%" class="text-center">Item Description</th>
 											<th width="9%" class="text-center">Category</th>                                                         
@@ -1829,7 +1791,7 @@
 											// }
 											
 
-		$data['ARFBodyTable'] .= '	
+			$data['ARFBodyTable'] .= '	
 										<tr id="tr-table">	
 											<tr>
 												'.$data['ARFBody'].'
@@ -1898,21 +1860,15 @@
 
 		public function getRequestPrintADF($id){
 			
-		
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}  
 
 			$for_printing_adf = DB::table('statuses')->where('id', 18)->value('id');
-
-
 			$data = array();
-
 			$data['page_title'] = 'Print Request';
-
 			$HeaderID = MoveOrder::where('id', $id)->first();
-
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
@@ -1961,7 +1917,6 @@
 		}
 
 		public function ADFUpdate(){
-
 				$email_infos = array();
 				$mo_reference_number = array();
 				$asset_code = array();
@@ -1969,21 +1924,13 @@
 				$item_description = array();
 				$item_category = array();
 				$serial_no = array();
-	
 				$data = 			Request::all();	
-	
 				$itemID = array();
-	
 				$cont = (new static)->apiContext;
-	
 				$requestid = 			$data['requestid']; 
-	
 				$mo_id = 				$data['mo_id']; 
-	
 				$inventory_id = 		$data['inventory_id'];
-
 				$item_id = 		        $data['item_id'];
-	
 				$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 				
 				if(in_array($arf_header->request_type_id, [5, 6, 7])){
@@ -2000,12 +1947,10 @@
 				$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
 
 				for($x=0; $x < count((array)$mo_id); $x++){
-
 					MoveOrder::where('id', $mo_id[$x])
 					->update([
 						'status_id'=> 		$for_receiving
 					]);	
-
 
 					/*DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
 					->update([
@@ -2014,12 +1959,9 @@
 						'deployed_by'=> 			CRUDBooster::myId(),
 						'deployed_at'=> 			date('Y-m-d H:i:s')
 					]);
-
 					DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity');
 					*/
-
 					array_push($itemID, $mo_id[$x]);
-                    
 					if(in_array($arf_header->request_type_id, [1, 5])){
 						$email_info = 	DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->first();
 						//$mo_info = 		MoveOrder::where('inventory_id', $email_info->id)->whereNull('return_flag')->first();
@@ -2046,8 +1988,6 @@
 										;
 					
 						array_push($email_infos, $full_date);*/
-
-
 						/*$data = [	
 									'assign_to'=>	$employee_name->bill_to,
 									'asset_tag'=>	$item_Value->asset_code,
@@ -2060,14 +2000,25 @@
 								]; */
 
 				}
-				
-				HeaderRequest::where('id',$requestid)
-				->update([
-					'status_id'      => $for_receiving,
-					'print_by_form'  => CRUDBooster::myId(),
-					'print_at_form'  => date('Y-m-d H:i:s')
-				]);	
 
+				if($arf_header->print_by_form == null){
+					HeaderRequest::where('id',$requestid)
+					->update([
+						'print_by_form'  => CRUDBooster::myId(),
+						'print_at_form'  => date('Y-m-d H:i:s')
+					]);	
+				}
+
+				$body_request = BodyRequest::where(['header_request_id' => $requestid])->whereNull('deleted_at')->count();
+				$mo_request   = MoveOrder::where(['header_request_id' => $requestid])->where('status_id', '!=', 8)->count();
+	
+				if($body_request == $mo_request){
+					HeaderRequest::where('id',$requestid)
+					->update([
+						'status_id'      => $for_receiving,
+					]);	
+				}
+				
 				MoveOrder::where('header_request_id', $arf_header->id)
 				->update([
 					'to_print'=> 	0
@@ -2076,11 +2027,11 @@
 				$infos['assign_to'] = $employee_name->bill_to;
 				$infos['reference_number'] = $arf_header->reference_number;
 				//if(app()->environment('production')) {
-					//$infos['systemlink'] = "<a href='https://dam.digitstrading.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+					//$infos['systemlink'] = "<a href='https://tam.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
 				//}else if(app()->environment('staging')){
-					//$infos['systemlink'] = "<a href='https://dam-test.digitstrading.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+					//$infos['systemlink'] = "<a href='https://tam-test.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
 				//}else{
-					$infos['systemlink'] = "<a href='https://localhost/dam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+					$infos['systemlink'] = "<a href='https://localhost/tam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
 				//}
 			
 				$infos['mo_reference_number'] = '<p>'. implode("<br>", $mo_reference_number) .'</p>';
@@ -2092,7 +2043,7 @@
 				
 				//CRUDBooster::sendEmail(['to'=>$employee_name->email,'data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
 				CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
-				
+
 				$item_string = implode(",",$itemID);
 				$itemList = array_map('intval',explode(",",$item_string));
 				$items = MoveOrder::wherein('id',$id)->get();

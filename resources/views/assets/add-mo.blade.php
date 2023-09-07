@@ -223,8 +223,11 @@
         <div class='panel-footer'>
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit" style="margin-left: 5px;"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            @if(CRUDBooster::isSuperadmin())
+                <button class="btn btn-danger pull-right" value="cancelLineRequest" type="button" id="btnCancelLineRequest" style="margin-left: 5px;"><i class="fa fa-times-circle" ></i> Cancel Line</button>
+            @endif
+           
 
         </div>
 
@@ -284,63 +287,44 @@
     $( "#quote_date, #po_date" ).datepicker( { format: 'yyyy-mm-dd', endDate: new Date() } );
 
     $(".btnsearch").click(function(event) {
-         
         var searchID = $(this).attr("data-id");
-      
        //alert($("#item_description"+searchID).val());
- 
        $("#item_search").text($("#item_description"+searchID).val());
-
        $("#add_item_id").val($("#add_item_id"+searchID).val());
-
        $("#button_count").val(searchID);
- 
        $("#button_remove").val($("#remove_btn"+searchID).val());
 
     });
 
     $(document).on('keyup', '.quantity_item', function(ev) {
-
         var id = $(this).attr("data-id");
         var rate = parseInt($(this).val());
-
         var qty = parseFloat($("#unit_cost" + id).val());
-
         var price = calculatePrice(qty, rate); // this is for total Value in row
-
         if(price == 0){
             price = rate * 1;
         }
-
         $("#total_unit_cost" + id).val(price.toFixed(2));
-
         $("#total").val(calculateTotalValue2());
         $("#quantity_total").val(calculateTotalQuantity());
 
     });
 
     $(document).on('keyup', '.cost_item', function(ev) {
-
         var id = $(this).attr("data-id");
         var rate = parseFloat($(this).val());
-        
         var qty = parseInt($("#quantity" + id).val());
-
         var price = calculatePrice(qty, rate); // this is for total Value in row
-
         if(price == 0){
             price = rate * 1;
         }
-
         $("#total_unit_cost" + id).val(price.toFixed(2));
-
         $("#total").val(calculateTotalValue2());
         $("#quantity_total").val(calculateTotalQuantity());
 
     });
 
     function calculatePrice(qty, rate) {
-
         if (qty != 0) {
             var price = (qty * rate);
             return price;
@@ -370,62 +354,89 @@
             return totalQuantity;
     }
 
+     //CANCEL REQUEST
+     $("#btnCancelLineRequest").click(function(event) {
+        event.preventDefault();
+        var header_id = $('#header_request_id').val();
+        var Ids = [];
+        $.each($("input[name='body_id_to_cancel[]']:checked"), function(){
+            Ids.push($(this).val());
+        });
+        console.log(Ids);
+        if(Ids == ""){
+            swal({
+                type: 'error',
+                title: 'Please select item to cancel!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault();
+            return false;
+        }
+
+        swal({
+            title: "Reason to cancel",
+            type: "input",
+            confirmButtonText: 'Proceed',
+            confirmButtonColor: "#41B314",
+            showCancelButton: true,
+            closeOnConfirm: false,
+            animation: "slide-from-top",
+            inputPlaceholder: "Reason to cancel"
+            },
+            function(inputValue){
+                var remarks = inputValue;
+                if (inputValue === "") {
+                    swal.showInputError("Reason to cancel required for this process!");
+                    return false
+                }else{
+                    swal({
+                        title: "Are you sure?",
+                        type: "warning",
+                        text: "You won't be able to revert this!",
+                        showCancelButton: true,
+                        confirmButtonColor: "#41B314",
+                        cancelButtonColor: "#F9354C",
+                        confirmButtonText: "Yes, cancel it!",
+                        width: 450,
+                        height: 200
+                        }, function () {
+                            $.ajaxSetup({
+                                headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    }
+                            });
+                            $.ajax({
+                                url: "{{ route('cancel-arf-mo-perline-request') }}",
+                                type: "POST",
+                                dataType: 'json',
+                                data: {
+                                    'id' : header_id,
+                                    'Ids' : Ids,
+                                    'remarks': remarks
+                                },
+                                success: function (data) {
+                                    if (data.status == "success") {
+                                        swal({
+                                            type: data.status,
+                                            title: data.message,
+                                        });
+                                        window.location.replace(data.redirect_url);
+                                        } else if (data.status == "error") {
+                                        swal({
+                                            type: data.status,
+                                            title: data.message,
+                                        });
+                                    }
+                                }
+                            });                    
+                    });
+                }
+      
+        });
+    });
+
     $("#btnSubmit").click(function(event) {
-        // var countRow = $('#asset-items tbody tr').length;
-        // var error = 0;
-        // var strconfirm = confirm("Are you sure you want to move this request?");
-        // if (strconfirm == true) {
-        //     if (countRow == 2) {
-        //         alert("Please add an item!");
-        //         event.preventDefault(); // cancel default behavior
-        //     }else{
-        //         $('.itemDcode').each(function() {
-        //             description = $(this).val();
-        //             if (description == null) {
-        //                 error++;
-        //                 alert("Digits Code cannot be empty!");
-        //                 event.preventDefault(); // cancel default behavior
-        //             } else if (description == "") {
-        //                 error++;
-        //                 alert("Digits Code cannot be empty!");
-        //                 event.preventDefault(); // cancel default behavior
-        //             }
-        //         });
-        //         $('.itemDesc').each(function() {
-        //             description = $(this).val();
-        //             if (description == null) {
-        //                 error++;
-        //                 alert("Item Description cannot be empty!");
-        //                 event.preventDefault(); // cancel default behavior
-        //             } else if (description == "") {
-        //                 error++;
-        //                 alert("Item Description cannot be empty!");
-        //                 event.preventDefault(); // cancel default behavior
-        //             }
-        //         });
-        //         if($("#category").val() == 1 || $("#category").val() == 5){
-        //             $('.cost_item').each(function() {
-        //                 description = $(this).val();
-        //                 if (description == null) {
-        //                     error++;
-        //                     alert("Item Cost cannot be empty!");
-        //                     event.preventDefault(); // cancel default behavior
-        //                 } else if (description == "") {
-        //                     error++;
-        //                     alert("Item Cost cannot be empty!");
-        //                     event.preventDefault(); // cancel default behavior
-        //                 }
-        //             });
-        //         }
-        //         if(error == 0){
-        //             $(this).attr('disabled','disabled');
-        //             $('#AssetRequest').submit(); 
-        //         }
-        //     }
-        // }else{
-        //     return false;
-        //     window.stop();
-        // }
         var countRow = $('#asset-items tbody tr').length;
         var error = 0;
         event.preventDefault();
@@ -456,46 +467,28 @@
 
 
     $(document).on('click', '.delete_item', function() {
-       
         var RowID = $(this).attr("data-id");
-
         var disabled = $('#remove_disable'+RowID).val();
-
         $("#searchrow"+disabled).attr('disabled', false);
-
         $("#freebies_val").val("0");
-
        // alert(stack.indexOf(RowID));
-
         if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
-
             stack.splice(stack.indexOf(parseInt(RowID)), 1);
-   
             $(this).closest('tr').remove();
-
             $("#total").val(calculateTotalValue2());
             $("#quantity_total").val(calculateTotalQuantity());
-
             var countRow = $('#asset-items tbody tr').length;
-
             if (countRow == 2) {
                 $("#btnUpdate").attr('disabled', false);
             }
-
-
-
             return false;
         }
-
     });
 
     //for IT and FA Request
     $(document).ready(function(){
-            
             $(function(){
-
                 $("#search").autocomplete({
-                  
                     source: function (request, response) {
                     $.ajax({
                         url: "{{ route('asset.item.tagging') }}",
@@ -505,7 +498,6 @@
                             "_token": token,
                             "search": request.term
                         },
-                        
                         success: function (data) {
                             var rowCount = $('#asset-items tr').length;
                             //myStr = data.sample; 
@@ -730,11 +722,8 @@
 
     //for SUPPLIES and MARKETING Request
     $(document).ready(function(){
-            
             $(function(){
-
                 $("#searchItemMaster").autocomplete({
-                  
                     source: function (request, response) {
                     $.ajax({
                         url: "{{ route('asset.item.supplies.marketing.tagging') }}",
@@ -972,17 +961,12 @@
     });
 
     $("#btnSubmit").attr('disabled', true);
-
     $("#add-Row").attr('disabled', true);
-    $("#lock").attr('disabled', true);
     $('#header_request_id').on('change', function() {
-        $("#lock").attr('disabled', false);
         selected_header = this.value;
-
         //var channel = $('#channels_id').val();
         //$("#template_checker").val(selected_template);
         //$(".nr-item").remove();
-
         $.ajax({
                 type: 'POST',
                 url: ADMIN_PATH + "/selectedHeader",
@@ -1008,19 +992,14 @@
     });
 
     $('#lock').change(function() {
-
         var id = $(this).attr("data-id");
-
         var ischecked= $(this).is(':checked');
-
         if(ischecked == false){
-
             $("#btnSubmit").attr('disabled', true);
             $(".btnsearch").attr('disabled', true);
             $("#header_request_id").attr('disabled', false);
                 
         }else{
-
             $("#btnSubmit").attr('disabled', false);
             $(".btnsearch").attr('disabled', false);
             $("#header_request_id").attr('disabled', true);

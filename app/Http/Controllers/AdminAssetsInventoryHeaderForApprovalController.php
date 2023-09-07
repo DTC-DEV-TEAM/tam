@@ -1520,7 +1520,7 @@
 					'statuses_id'  => 20
 					]);
 
-			$message = ['status'=>'success', 'message' => 'Success!'];
+			$message = ['status'=>'success', 'message' => 'Success!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 		}
 

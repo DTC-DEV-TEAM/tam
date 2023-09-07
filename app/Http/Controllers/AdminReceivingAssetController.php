@@ -493,70 +493,30 @@
 				}	
 		    
 			
-			//if($arf_header->received_by == null){
-				if(in_array($arf_header->request_type_id, [1, 5])){
-					HeaderRequest::where('id', $arf_header->id)
-					->update([
-						'status_id'=> 	 	$for_closing,
-						'received_by'=> 	CRUDBooster::myId(),
-						'received_at'=> 	date('Y-m-d H:i:s')
-					]);	
-			    }else{
-					HeaderRequest::where('id', $arf_header->id)
-					->update([
-						    'status_id'=> 	 	$for_closing,
-							'received_by'=> 	CRUDBooster::myId(),
-							'received_at'=> 	date('Y-m-d H:i:s'),
-							'closing_plug'=> 1,
-							'closed_by'=> CRUDBooster::myId(),
-							'closed_at'=> date('Y-m-d H:i:s')
-						
-					]);	
-				}
-			//}
-            //save in IN assets
-			// $inAssets 	= MoveOrder::whereIn('id',$item_id)->get();
-	
-			// $mo_reference = [];
-			// $request_type_id_mo = [];
-			// $digits_code = [];
-            // $asset_code = [];
-            // $item_description = [];
-			// $serial_no = [];
-			// $quantity = [];
-			// $unit_cost = [];
-			// foreach($inAssets as $invData){
-			// 	array_push($mo_reference, $invData['mo_reference_number']);
-			// 	array_push($request_type_id_mo, $invData['request_type_id_mo']);
-			// 	array_push($digits_code, $invData['digits_code']);
-            //     array_push($asset_code, $invData['asset_code']);
-            //     array_push($item_description, $invData['item_description']);
-			// 	array_push($serial_no, $invData['serial_no']);
-			// 	array_push($quantity, $invData['quantity']);
-			// 	array_push($unit_cost, $invData['unit_cost']);
-			// }
+			if($arf_header->received_by == null){
+				HeaderRequest::where('id', $arf_header->id)
+				->update([
+					'received_by'=> 	CRUDBooster::myId(),
+					'received_at'=> 	date('Y-m-d H:i:s')
+				]);	
+			}
 
-			// //put in in assets deployed
-			// for($x=0; $x < count((array)$item_id); $x++) {
-			// 	InAssets::create([
-			// 		'arf_number'          => $arf_header->reference_number,
-			// 		'mo_ref_number'       => $mo_reference[$x],
-			// 		'requestor_id'        => $arf_header->employee_name,
-			// 		'requestor_name'      => $employee_name->bill_to,
-			// 		'transfer_to'         => NULL,
-			// 		'transaction_type'    => $request_type_id_mo[$x],
-			// 		'request_type'        => "REQUEST",
-			// 		'asset_code'          => $asset_code[$x],
-			// 		'digits_code'         => $digits_code[$x],
-			// 		'item_description'    => $item_description[$x],
-			// 		'serial_no'           => $serial_no[$x],
-			// 		'quantity'            => $quantity[$x],
-			// 		'amount'              => $unit_cost[$x],
-			// 		'date_received'       => date('Y-m-d H:i:s'),
-			// 	]);
-		    // }
+			$body_request = BodyRequest::where(['header_request_id' => $arf_header->id])->whereNull('deleted_at')->count();
+			$mo_request   = MoveOrder::where(['header_request_id' => $arf_header->id])->where('status_id', '!=', 8)->count();
 
-			
+			if($body_request == $mo_request){
+				HeaderRequest::where('id', $arf_header->id)
+				->update([
+					'status_id'    => $for_closing,
+					'received_by'  => CRUDBooster::myId(),
+					'received_at'  => date('Y-m-d H:i:s'),
+					'closing_plug' => 1,
+					'closed_by'    => CRUDBooster::myId(),
+					'closed_at'    => date('Y-m-d H:i:s')
+				
+				]);		
+			}
+  		
 			/*$arf_header = 		HeaderRequest::where(['id' => $id])->first();
 
 			if($arf_header->request_type_id == 5){
@@ -715,15 +675,10 @@
 		}
 
 		public function getADFStatus($id){
-
 			//dd($id);
-
 			$data = array();
-
 			$for_receiving =  	DB::table('statuses')->where('id', 16)->value('id');
-
 			$arf_header 				= HeaderRequest::where(['id' => $id])->first();
-
 			if($arf_header->request_type_id == 5){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
@@ -743,9 +698,7 @@
 			}
 			
 			$MO_infos =  	MoveOrder::where('mo_body_request.header_request_id', $id)->where('mo_body_request.status_id', $for_receiving)->get();
-
 			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
-
 			foreach( $MO_infos as $request_value ){
 				if(in_array($arf_header->request_type_id, [1, 5])){
 					DB::table('assets_inventory_body')->where('id', $request_value->inventory_id)
@@ -770,40 +723,33 @@
 				}
 			}
 
-			
-				if(in_array($arf_header->request_type_id, [1, 5])){
-					//if($arf_header->received_by == null){
-						HeaderRequest::where('id', $arf_header->id)
-						->update([
-							'status_id'=> 	 	$for_closing,
-							'received_by'=> 	$arf_header->created_by,
-							'received_at'=> 	date('Y-m-d H:i:s')
-						]);	
-			    	//}
-			    }else{
-					if($arf_header->received_by == null){
-						HeaderRequest::where('id',$arf_header->id)
-						->update([
-								'received_by'=> 	$arf_header->created_by,
-								'received_at'=> 	date('Y-m-d H:i:s'),
-								'closing_plug'=> 1,
-								'status_id'=> 	 	$for_closing,
-								'closed_by'=> $arf_header->created_by,
-								'closed_at'=> date('Y-m-d H:i:s')
-							
-						]);	
-				    }
-				}
-			
-			
+			if($arf_header->received_by == null){
+				HeaderRequest::where('id', $arf_header->id)
+				->update([
+					'received_by'=> 	$arf_header->created_by,
+					'received_at'=> 	date('Y-m-d H:i:s')
+				]);	
+			}
 
+			$body_request = BodyRequest::where(['header_request_id' => $arf_header->id])->whereNull('deleted_at')->count();
+			$mo_request   = MoveOrder::where(['header_request_id' => $arf_header->id])->where('status_id', '!=', 8)->count();
+
+			if($body_request == $mo_request){
+				HeaderRequest::where('id',$arf_header->id)
+				->update([
+					    'status_id'     => $for_closing,
+						'received_by'   => $arf_header->created_by,
+						'received_at'   => date('Y-m-d H:i:s'),
+						'closing_plug'  => 1,
+						'closed_by'     => $arf_header->created_by,
+						'closed_at'     => date('Y-m-d H:i:s')
+					
+				]);		
+			}
+		
 			$data['alertmessage'] = 1;
-
 			return view('crudbooster::login', $data);
-			
-	
 			//CRUDBooster::redirect(CRUDBooster::mainpath(), "Assets has been received successfully!", 'success');
-
 			//return $data;
 		}
 	}

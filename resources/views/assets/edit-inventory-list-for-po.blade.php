@@ -267,7 +267,8 @@
                                     title: data.message,
                                 });
                                 setTimeout(function(){
-                                    window.location.replace(document.referrer);
+                                    //window.location.replace(document.referrer);
+                                    window.location.replace(data.redirect_url);
                                 }, 1000); 
                                 } else if (data.status == "error") {
                                 swal({

@@ -1779,4 +1779,87 @@
 			echo json_encode($data);
 			exit;  
 		}
+
+		public function cancelArfRequest(Request $request){
+			$data = Request::all();	
+			$id   = $data['id'];
+			$remarks = $data['remarks'];
+			
+			HeaderRequest::where('id', $id)
+			->update([
+				'status_id'=> 8,
+				'to_mo'    => 0
+			]);	
+
+			BodyRequest::where('header_request_id', $id)
+			->update([
+				'unserved_rep_qty' => 0, 
+				'unserved_ro_qty'  => 0,
+				'serve_qty'        => 0,
+				'unserved_qty'     => 0, 
+				'cancelled_qty'    => 1, 
+				'reason_to_cancel' => $remarks,
+				'deleted_at'       => date('Y-m-d H:i:s'),
+				'deleted_by'       => CRUDBooster::myId()
+			]);	
+
+			$arf_number = HeaderRequest::where('id',$id)->first();
+
+			DB::table('assets_inventory_reserved')->where('reference_number', $arf_number->reference_number)->delete();
+
+			$message = ['status'=>'success', 'message' => 'Cancelled Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+			echo json_encode($message);
+			
+		}
+
+		public function cancelArfMoPerLineRequest(Request $request){
+			$data     = Request::all();	
+			$id       = $data['id'];
+			$body_ids = $data['Ids'];
+			$remarks  = $data['remarks'];
+			
+			for($x=0; $x < count((array)$body_ids); $x++) {
+				BodyRequest::where('id', $body_ids[$x])
+				->update([
+					'unserved_rep_qty' => 0, 
+					'unserved_ro_qty'  => 0,
+					'serve_qty'        => 0,
+					'unserved_qty'     => 0, 
+					'cancelled_qty'    => 1, 
+					'reason_to_cancel' => $remarks,
+					'deleted_at'       => date('Y-m-d H:i:s'),
+					'deleted_by'       => CRUDBooster::myId()
+				]);	
+
+				DB::table('assets_inventory_reserved')->where('body_id', $body_ids[$x])->delete();
+			}
+
+			$header           = DB::table('header_request')->where('id',$id)->first();
+			$bodyCountAll     = DB::table('body_request')->where('header_request_id',$id)->count();
+			$bodyCountDeleted = DB::table('body_request')->where('header_request_id',$id)->whereNotNull('deleted_at')->count();
+			$bodyCountMo      = DB::table('mo_body_request')->where('header_request_id',$id)->where('status_id', '!=', 8)->count();
+			$getStatus        = DB::table('mo_body_request')->where('header_request_id',$id)->where('status_id', '!=', 8)->first();
+
+			if($bodyCountMo == 0){
+				if($bodyCountAll ==  $bodyCountDeleted){
+					HeaderRequest::where('id', $id)
+					->update([
+						'status_id' => 8,
+						'to_mo'     => 0
+					]);	
+				}
+			}else{
+				if($bodyCountAll ==  ($bodyCountDeleted + $bodyCountMo)){
+					HeaderRequest::where('id', $id)
+					->update([
+						'status_id' => $getStatus->status_id,
+						'to_mo'    => 0
+					]);	
+				}
+			}
+
+			$message = ['status'=>'success', 'message' => 'Cancelled Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+			echo json_encode($message);
+			
+		}
 	}

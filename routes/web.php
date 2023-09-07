@@ -66,6 +66,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-fa', 'AdminHeaderRequestController@getAddRequisitionFA')->name('assets.add.requisition.fa'); 
     Route::get('admin/header_request/subcategories/{id}','AdminHeaderRequestController@SubCategories');
     Route::get('admin/header_request/RemoveItem','AdminHeaderRequestController@RemoveItem');
+    //Cancel Request
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-request','AdminHeaderRequestController@cancelArfRequest')->name('cancel-arf-request');
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-mo-perline-request','AdminHeaderRequestController@cancelArfMoPerLineRequest')->name('cancel-arf-mo-perline-request');
 
 
     Route::get('admin/header_request/getRequestCancel/{id}','AdminHeaderRequestController@getRequestCancel')->name('getRequestCancel');
