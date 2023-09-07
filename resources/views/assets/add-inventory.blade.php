@@ -545,7 +545,7 @@
                                         '<td><input class="form-control text-center ginput" type="text" name="item_description[]" readonly value="' + e.value + '"></td>' +
                                         '<td><input class="form-control text-center ginput amount" placeholder="Value" type="text" readonly value="' + e.category_description + '"></td>' +
                                         '<td>' +
-                                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + e.id  + '" id="sub_category_id' + e.id  + '" required style="width:100%">' +
+                                            '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + e.id  + '" id="sub_category_id' + tableRow  + '" required style="width:100%">' +
                                                 // '<option value=""></option>' + 
                                                 // '@foreach($sub_categories as $subData)' +
                                                 //     '<option value="{{$subData->id}}">{{$subData->class_description}} | {{ $subData->category_code }}</option>' +
@@ -602,7 +602,8 @@
                                             format: "YYYY-MM-DD",
                                             dayViewHeaderFormat: "MMMM YYYY",
                                     });
-                              
+
+                                                           
                                     $(document).on("keyup","#quantity, #amount, #value", function (e) {
                                         if (e.which >= 37 && e.which <= 40) return;
                                         if (this.value.charAt(0) == ".") {
@@ -672,30 +673,30 @@
 
         }); 
        
-         //Class
-         $('#location').change(function(){
-            var id =  this.value;
-            $.ajax({ 
-                type: 'POST',
-                url: "{{ route('sub-categories-code') }}",
-                data: {
-                    "id": id
-                },
-                success: function(result) {
-                    var i;
-                    var showData = [];
-                    showData[0] = "<option value=''>Choose Sub Class</option>";
-                    for (i = 0; i < result.length; ++i) {
-                        var j = i + 1;
-                        showData[j] = "<option value='"+result[i].id+"'>"+result[i].class_description+" | "+result[i].category_code+"</option>";
+           //Class
+           $('#location').change(function(){
+                var id =  this.value;
+                $.ajax({ 
+                    type: 'POST',
+                    url: "{{ route('sub-categories-code') }}",
+                    data: {
+                        "id": id
+                    },
+                    success: function(result) {
+                        var i;
+                        var showData = [];
+                        showData[0] = "<option value=''>Choose Sub Class</option>";
+                        for (i = 0; i < result.length; ++i) {
+                            var j = i + 1;
+                            showData[j] = "<option value='"+result[i].id+"'>"+result[i].class_description+" | "+result[i].category_code+"</option>";
+                        }
+                        $('#sub_class').attr('disabled', false);
+                        jQuery('#sub_category_id'+tableRow).html(showData);   
+                        $('#sub_class').val('').trigger('change');       
                     }
-                    $('#sub_class').attr('disabled', false);
-                    jQuery('.sub_category_id').html(showData);   
-                    $('#sub_class').val('').trigger('change');       
-                }
+                });
             });
-
-        });
+        
   
         //VERSION 2 SUBMIT
         $('#btnSubmit').on('click', function (event) {
