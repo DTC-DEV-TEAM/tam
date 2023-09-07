@@ -327,17 +327,17 @@
 			$it_warehouse  =    DB::table('warehouse_location_model')->where('id', 3)->value('id');
 			$admin_threef  =    DB::table('warehouse_location_model')->where('id', 1)->value('id');
 			$admin_gf  =  		DB::table('warehouse_location_model')->where('id', 2)->value('id');
-			// if(CRUDBooster::myPrivilegeId() == 5){ 
-			// 	$query->where('assets_inventory_header_for_approval.location', $it_warehouse)
-			// 		  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+			if(CRUDBooster::myPrivilegeId() == 5){ 
+				$query->where('assets_inventory_header_for_approval.location', $it_warehouse)
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
-			// }else if(CRUDBooster::myPrivilegeId() == 9){ 
-			// 	$query->whereIn('assets_inventory_header_for_approval.location', [$admin_threef, $admin_gf])
-			// 		  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+			}else if(CRUDBooster::myPrivilegeId() == 9){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$admin_threef, $admin_gf])
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
-			// }else{
-			// 	$query->whereNull('assets_inventory_header_for_approval.archived')->orderBy('assets_inventory_header_for_approval.id', 'DESC');  
-			// }
+			}else{
+				$query->whereNull('assets_inventory_header_for_approval.archived')->orderBy('assets_inventory_header_for_approval.id', 'DESC');  
+			}
 			$query->whereNull('assets_inventory_header_for_approval.archived')->orderBy('assets_inventory_header_for_approval.id', 'DESC');    
 	    }
 
