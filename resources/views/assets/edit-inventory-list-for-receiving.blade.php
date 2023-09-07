@@ -562,7 +562,7 @@
                         var v = $("input[name^='serial_no']").length;
                         var value = $("input[name^='serial_no']");
                         for(i=0;i<v;i++){
-                            if(value.eq(i).val() == 0){
+                            if(value.eq(i).val() == ""){
                                 swal({  
                                         type: 'error',
                                         title: 'Put N/A in Serial No if not available/Put N/A(not NA, na)',
