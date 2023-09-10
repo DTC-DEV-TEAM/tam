@@ -692,7 +692,7 @@
                         }
                         $('#sub_class').attr('disabled', false);
                         jQuery('#sub_category_id'+tableRow).html(showData);   
-                        $('#sub_class').val('').trigger('change');       
+                        $('.sub_category_id').val('').trigger('change');       
                     }
                 });
             });
@@ -713,7 +713,8 @@
             //             confirmButtonColor: "#367fa9",
             //     });
             //             event.preventDefault();
-            // }else if($('#location').val() === ""){
+            // }
+            //else if($('#location').val() === ""){
             //     swal({
             //         type: 'error',
             //         title: 'Please select location!',
@@ -759,6 +760,16 @@
             //     });
             //     event.preventDefault();
             // }else{
+                if($('#location').val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Location required!',
+                        icon: 'error',
+                            confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+                }
                 $.ajax({
                     url: "{{ route('assets.check.row') }}",
                     dataType: "json",
