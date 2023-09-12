@@ -312,6 +312,8 @@ Route::group(['middleware' => ['web']], function() {
      //Direct Delivery
      Route::post(config('crudbooster.ADMIN_PATH').'/selectedHeaderDr','AdminDirectDeliveryController@selectedHeaderDr')->name('order.selected.header');
 
+     Route::get('/admin/db-truncate','TruncateController@dbtruncate');
+     
      Route::get('/admin/clear-view', function() {
         Artisan::call('view:clear');
         return "View cache is cleared!";

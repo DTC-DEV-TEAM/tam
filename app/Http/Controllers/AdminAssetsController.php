@@ -4,7 +4,6 @@
 	//use Request;
 	use DB;
 	use CRUDBooster;
-
 	use App\Assets;
 	use App\Statuses;
 	use Excel;
@@ -16,6 +15,7 @@
 	use App\Imports\ItemMasterImport;
 	use App\Imports\ItemMasterEolImport;
 	use App\WarehouseLocationModel;
+
 	//use App\Imports\InventoryUpload;
 
 	class AdminAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
@@ -56,9 +56,10 @@
 
 			$this->col[] = ["label"=>"Tasteless Code","name"=>"digits_code"];
 			$this->col[] = ["label"=>"Item Description","name"=>"item_description"];
-			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"tam_categories,category_description"];
-			$this->col[] = ["label"=>"Sub Category","name"=>"class_id","join"=>"tam_subcategories,subcategory_description"];
-			$this->col[] = ["label"=>"Fulfillment Typle","name"=>"fulfillment_type"];
+			$this->col[] = ["label"=>"Tam Category","name"=>"tam_category_id","join"=>"tam_categories,category_description"];
+			$this->col[] = ["label"=>"Tam Sub Category","name"=>"tam_sub_category_id","join"=>"tam_subcategories,subcategory_description"];
+			$this->col[] = ["label"=>"Dam Category","name"=>"dam_category_id","join"=>"category,category_description"];
+			$this->col[] = ["label"=>"Dam Sub Category","name"=>"dam_class_id","join"=>"sub_category,class_description"];
 			//$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
 			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
@@ -127,28 +128,7 @@
 	        $this->button_selected = array();
 			/*if(CRUDBooster::isUpdate())
 	        {
-				if(CRUDBooster::isSuperadmin()){
-
-					$this->button_selected[] = ['label'=>'Pending',
-												'icon'=>'fa fa-check',
-												'name'=>'set_pending'];
-
-					$this->button_selected[] = ['label'=>'Ready to Deploy',
-												'icon'=>'fa fa-check',
-												'name'=>'set_ready_to_deploy'];			
-												
-												
-					$this->button_selected[] = ['label'=>'Deployed',
-												'icon'=>'fa fa-check',
-												'name'=>'set_deployed'];	
-												
-				}else if(CRUDBooster::myPrivilegeName() == "Employee"){
-
-					$this->button_selected[] = ['label'=>'Receive',
-												'icon'=>'fa fa-check',
-												'name'=>'set_deployed'];	
-				}
-											
+									
 	        }*/
 
 	                
@@ -162,8 +142,6 @@
 	        */
 	        $this->alert        = array();
 	                
-
-	        
 	        /* 
 	        | ---------------------------------------------------------------------- 
 	        | Add more button to header button 
@@ -183,7 +161,7 @@
 						"url"=>CRUDBooster::mainpath('item-master-upload')];
 					//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 				}
-				// $this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
+				$this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
 			}
 
 
@@ -244,7 +222,11 @@
 					});
 				});
 
-				setInterval(getItemMasterData, 60*60*1000);
+				// setInterval(getItemMasterData, 5000);
+				$('#sync-data').click(function(event){
+					event.preventDefault();
+                    getItemMasterData();
+				});
 				function getItemMasterData(){
 					$.ajax({
 						type: 'POST',
@@ -318,8 +300,6 @@
 	        */
 	        $this->pre_index_html = null;
 	        
-	        
-	        
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Include HTML Code after index table 
@@ -329,8 +309,6 @@
 	        |
 	        */
 	        $this->post_index_html = null;
-	        
-	        
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -342,8 +320,6 @@
 	        */
 	        $this->load_js = array();
 	        
-	        
-	        
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Add css style at body 
@@ -353,9 +329,7 @@
 	        |
 	        */
 	        $this->style_css = NULL;
-	        
-	        
-	        
+	         
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Include css File 
@@ -379,70 +353,7 @@
 	    |
 	    */
 	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here
-			if($button_name == 'set_pending') {
-
-				$checker = Assets::whereIn('id', $id_selected)->get();
-
-				foreach($checker as $check){
-
-							Assets::where('id',	$check->id)->update([
-										'status_id'=> 6, 
-										'updated_at' => date('Y-m-d H:i:s'), 
-										'updated_by' => CRUDBooster::myId()]);
-
-				}
-
-			}else if($button_name == 'set_ready_to_deploy') {
-
-				$checker = Assets::whereIn('id', $id_selected)->get();
-
-				foreach($checker as $check){
-
-							$assign = DB::table("cms_users")->where('id', $check->assign_to)->first();
-
-							$category = DB::table("category")->where('id', $check->category_id)->first();
-
-
-							$assign_by = DB::table("cms_users")->where('id', $check->assign_by)->first();
-
-							Assets::where('id',	$check->id)->update([
-										'status_id'=> 2, 
-										'updated_at' => date('Y-m-d H:i:s'), 
-										'updated_by' => CRUDBooster::myId()]);
-
-
-							$data = [	'assign_to'=>$assign->name,
-										'asset_tag'=>$check->asset_tag,
-										'digits_code'=>$check->digits_code,
-										'serial_no'=>$check->serial_no,
-										'item_description'=>$check->item_description,
-										'category_id'=>$category->category_description,
-										'assign_date'=>$check->assign_date,
-										'assign_by'=>$assign_by->name
-									]; 
-		    
-							CRUDBooster::sendEmail(['to'=>'rickyalnin201995@gmail.com','data'=>$data,'template'=>'assets_confirmation','attachments'=>$files]);
-
-				}
-
-
-			}else if($button_name == 'set_deployed') {
-
-
-				$checker = Assets::whereIn('id', $id_selected)->get();
-
-				foreach($checker as $check){
-
-							Assets::where('id',	$check->id)->update([
-										'status_id'=> 3, 
-										'updated_at' => date('Y-m-d H:i:s'), 
-										'updated_by' => CRUDBooster::myId()]);
-
-				}
-
-			}
-	            
+	             
 	    }
 
 
@@ -454,17 +365,6 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        //Your code here
-
-			// if(CRUDBooster::myPrivilegeName() == "Employee"){
-
-			// 	$query->where('assets.assign_to', CRUDBooster::myId());
-
-			// }else{
-
-			// 	$query->whereNull('assets.image')->whereNull('assets.deleted_at');
-			// }
-
 	            
 	    }
 
@@ -479,7 +379,6 @@
 			$active = Statuses::where('id','9')->value('status_description');
 			$inactive = Statuses::where('id','10')->value('status_description');
 	
-
 			if($column_index == 2){
 				if($column_value == $active) {
 					$column_value = '<span class="label label-info">'.$active.'</span>';
@@ -564,31 +463,6 @@
 	    public function hook_after_edit($id) {
 	        //Your code here 
 
-			$check = Assets::where('id', $id)->first();
-
-			if($check->assign_to != null || $check->assign_to != ""){
-
-					
-
-					$assign = DB::table("cms_users")->where('id', $check->assign_to)->first();
-
-					$category = DB::table("category")->where('id', $check->category_id)->first();
-
-					$assign_by = DB::table("cms_users")->where('id', $check->assign_by)->first();
-
-					$data = [	'assign_to'=>$assign->name,
-								'asset_tag'=>$check->asset_tag,
-								'digits_code'=>$check->digits_code,
-								'serial_no'=>$check->serial_no,
-								'item_description'=>$check->item_description,
-								'category_id'=>$category->category_description,
-								'assign_date'=>$check->assign_date,
-								'assign_by'=>$assign_by->name
-							]; 
-
-					CRUDBooster::sendEmail(['to'=>'rickyalnin201995@gmail.com','data'=>$data,'template'=>'assets_confirmation','attachments'=>$files]);
-			}
-
 	    }
 
 	    /* 
@@ -644,6 +518,96 @@
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("masterfile.add-asset", $data);
 
+		}
+
+		// DAM ITEM MASTER
+		public function getItemMasterDataApi(Request $request) {
+			$token = $this->getToken();
+			//$token = 'k3SwpRtByEPOgFi8';
+			$headers = array(
+				'Accept: application/json',
+				'Authorization: Bearer ' . $token
+			);
+			$error_msg = "";
+			$url = 'http://127.0.0.1:8000/api/item_master';
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+	
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close($ch);
+
+			$cURLresponse = json_decode($cURLresponse, true);
+
+            $data = [];
+            $count = 0;
+            if(!empty($cURLresponse["data"])) {
+				foreach ($cURLresponse["data"] as $key => $value) {
+				
+					$count++;
+						DB::beginTransaction();
+						try {
+							Assets::updateOrcreate([
+								'digits_code'         => $value['digits_code'] 
+							],
+							[
+								'digits_code'         => $value['digits_code'],
+								'item_description'    => $value['item_description'],
+								'tam_category_id'     => NULL,
+								'tam_sub_category_id' => NULL,
+								'dam_category_id'     => $value['category_id'],
+								'dam_sub_category_id' => $value['sub_category_id'],
+								'dam_class_id'        => $value['class_id'],
+								'dam_sub_class_id'    => $value['sub_class_id'],
+								'status'              => 'ACTIVE',
+								'from_dam'            => 1,
+								'created_by'          => CRUDBooster::myId(),
+								'created_at'          => date('Y-m-d H:i:s')
+							]);
+							DB::commit();
+						} catch (\Exception $e) {
+							\Log::debug($e);
+							DB::rollback();
+						}
+					
+				}
+            }
+            \Log::info('Item Create: executed! items');
+			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
+			echo json_encode($message);
+		}
+
+		public function getToken(){
+			$secretKey = "df65ed91ecf26bffb9f511df132e822b"; 
+			$url = 'http://127.0.0.1:8000/api/get-token?secret='.$secretKey;
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_POST, true);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close ($ch);
+
+			$cURLresponse = json_decode($cURLresponse);
+			if ($error_msg != "" || $cURLresponse->access_token == null || $cURLresponse->access_token == "") {
+			} else {
+				$token = $cURLresponse->data->access_token;
+			}
+	
+			return $cURLresponse->data->access_token;
 		}
 
 

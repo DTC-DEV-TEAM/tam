@@ -2026,13 +2026,16 @@
 
 				$infos['assign_to'] = $employee_name->bill_to;
 				$infos['reference_number'] = $arf_header->reference_number;
-				//if(app()->environment('production')) {
-					//$infos['systemlink'] = "<a href='https://tam.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
-				//}else if(app()->environment('staging')){
-					//$infos['systemlink'] = "<a href='https://tam-test.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
-				//}else{
-					$infos['systemlink'] = "<a href='https://localhost/tam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
-				//}
+
+				// if(app()->environment('production')) {
+				// 	$infos['systemlink'] = "<a href='https://tam.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				// }else if(app()->environment('staging')){
+				// 	$infos['systemlink'] = "<a href='https://tam-test.tasteless.com.ph/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				// }else{
+				// 	$infos['systemlink'] = "<a href='https://localhost/tam/public/admin/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
+				// }
+
+				$infos['systemlink'] = "<a href='".CRUDBooster::adminPath()."/receiving_asset/getADFStatus/$arf_header->id'>I have read and agree to the terms of use, and have received this item.</a>";
 			
 				$infos['mo_reference_number'] = '<p>'. implode("<br>", $mo_reference_number) .'</p>';
 				$infos['asset_code'] = '<p>'. implode("<br>", $asset_code) .'</p>';
@@ -2041,9 +2044,14 @@
 				$infos['item_category'] = '<p>'. implode("<br>", $item_category) .'</p>';
 				$infos['serial_no'] = '<p>'. implode("<br>", $serial_no) .'</p>';
 				
-				//CRUDBooster::sendEmail(['to'=>$employee_name->email,'data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
-				CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
-
+				if(app()->environment('production')) {
+					CRUDBooster::sendEmail(['to'=>$employee_name->email,'data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
+				}else if(app()->environment('staging')){
+					CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
+				}else{
+					CRUDBooster::sendEmail(['to'=>'marvinmosico@digits.ph','data'=>$infos,'template'=>'assets_confirmation','attachments'=>$files]);
+				}
+				
 				$item_string = implode(",",$itemID);
 				$itemList = array_map('intval',explode(",",$item_string));
 				$items = MoveOrder::wherein('id',$id)->get();
