@@ -17,7 +17,9 @@
 	use App\BodyRequest;
 	use App\Statuses;
 	use App\Models\Applicant;
+	use App\Mail\EmailErfClose;
 	use Illuminate\Support\Facades\Hash;
+	use Mail;
 
 	class AdminErfEditStatusController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $cancelled;  
@@ -135,8 +137,9 @@
 				$this->addaction[] = ['title'=>'Close Request','url'=>CRUDBooster::mainpath('getErfCloseRequest/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $onboarded && [locking_close] == null || [locking_close] == $id"];
 				$this->addaction[] = ['title'=>'Locking Close Request','url'=>CRUDBooster::mainpath('getLockingErfCloseRequest/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $onboarded && [locking_close] != null && [locking_close] != $id"];
 				
-				
 				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailErf/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[status_id] != $for_verification && [status_id] != $for_onboarding && [status_id] != $onboarded"];
+
+				$this->addaction[] = ['title'=>'Print PDF','url'=>CRUDBooster::mainpath('getDetailPrintErf/[id]'),'icon'=>'fa fa-print'];
 				
 			}
 
@@ -394,7 +397,7 @@
 	        */
 	        $this->load_js = array();
 			$this->load_js[] = asset("datetimepicker/bootstrap-datetimepicker.min.js");
-	        
+	        $this->load_js[] = asset("js/spinner.js");
 	        
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -419,6 +422,7 @@
 	        $this->load_css = array();
 			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
 	        $this->load_css[] = asset("css/font-family.css");
+			$this->load_js[] = asset("html2pdf/dist/html2pdf.bundle.min.js");
 	    }
 
 
@@ -917,7 +921,6 @@
 		}
 
 		public function getDetailErf($id){
-			
 			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -993,6 +996,85 @@
 			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
 			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
 			return $this->view("erf.erf_details", $data);
+		}
+
+		public function getDetailPrintErf($id){
+			
+			$this->cbLoader();
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+			$data = array();
+
+			$data['page_title'] = 'ERF Print Preview';
+
+			$data['Header'] = ErfHeaderRequest::
+				leftjoin('companies', 'erf_header_request.company', '=', 'companies.id')
+				->leftjoin('departments', 'erf_header_request.department', '=', 'departments.id')
+				->leftjoin('cms_users as approver', 'erf_header_request.approved_immediate_head_by', '=', 'approver.id')
+				->leftjoin('cms_users as verifier', 'erf_header_request.approved_hr_by', '=', 'verifier.id')
+				->leftJoin('applicant_table', function($join) 
+				{
+					$join->on('erf_header_request.reference_number', '=', 'applicant_table.erf_number')
+					->where('applicant_table.status',$this->jo_done);
+				})
+				->select(
+						'erf_header_request.*',
+						'erf_header_request.id as requestid',
+						'approver.name as approved_head_by',
+						'verifier.name as verified_by',
+						'departments.department_name as department',
+						'applicant_table.*'
+						)
+				->where('erf_header_request.id', $id)->first();
+		
+			$res_req = explode(",",$data['Header']->required_exams);
+			$interact_with = explode(",",$data['Header']->employee_interaction);
+			$asset_usage = explode(",",$data['Header']->asset_usage);
+			$application = explode(",",$data['Header']->application);
+			$required_system = explode(",",$data['Header']->required_system);
+			$data['res_req'] = array_map('trim', $res_req);
+			$data['interaction'] = array_map('trim', $interact_with);
+			$data['asset_usage_array'] = array_map('trim', $asset_usage);
+			$data['application'] = $application;
+			$data['required_system_array'] = array_map('trim', $required_system);
+			$data['Body'] = ErfBodyRequest::
+				select(
+				  'erf_body_request.*'
+				)
+				->where('erf_body_request.header_request_id', $id)
+				->get();
+			$data['erf_header_documents'] = ErfHeaderDocuments::select(
+					'erf_header_documents.*',
+				  )
+				  ->where('erf_header_documents.header_id', $id)
+				  ->get();
+			$data['statuses'] = Statuses::select(
+					'statuses.*'
+				  )
+				  ->whereIn('id', [29,30,31,32])
+				  ->get();
+
+			$data['applicants'] = Applicant::leftjoin('statuses', 'applicant_table.status', '=', 'statuses.id')
+				  ->select(
+				  'applicant_table.*',
+				  'statuses.status_description',
+				  'statuses.id as status_id',
+				  )
+				  ->where('applicant_table.erf_number', $data['Header']->reference_number)
+				  ->get();
+			$data['schedule'] = DB::table('sub_masterfile_schedule')->where('status', 'ACTIVE')->get();
+			$data['allow_wfh'] = DB::table('sub_masterfile_allow_wfh')->where('status', 'ACTIVE')->get();
+			$data['manpower'] = DB::table('sub_masterfile_manpower')->where('status', 'ACTIVE')->get();
+			$data['manpower_type'] = DB::table('sub_masterfile_manpower_type')->where('status', 'ACTIVE')->get();
+			$data['required_exams'] = DB::table('sub_masterfile_required_exams')->where('status', 'ACTIVE')->get();
+			$data['asset_usage'] = DB::table('sub_masterfile_asset_usage')->where('status', 'ACTIVE')->get();
+			$data['shared_files'] = DB::table('sub_masterfile_shared_files')->where('status', 'ACTIVE')->get();
+			$data['interact_with'] = DB::table('sub_masterfile_interact_with')->where('status', 'ACTIVE')->get();
+			$data['email_domain'] = DB::table('sub_masterfile_email_domain')->where('status', 'ACTIVE')->get();
+			$data['required_system'] = DB::table('sub_masterfile_required_system')->where('status', 'ACTIVE')->get();
+			return $this->view("erf.erf_details_print", $data);
 		}
 
 		public function getErfCreateAccount($id){
@@ -1414,6 +1496,19 @@
 							'regular_date'  => $fields['date'],
 							'locking_close' => NULL,
 							]);
+
+			$header = erfHeaderRequest::where('id', $fields['id'])->first();
+			//$hr_email = "HR@digits.ph";
+			$hr_email = "marvinmosico@digits.ph";
+
+			$infos['subject'] = " Has been close!";
+			$infos['reference_number'] = $header->reference_number;
+			$infos['data'] = $header;
+			$infos['email'] = $hr_email;
+			
+			Mail::to($hr_email)
+			->send(new EmailErfClose($infos));
+			
 			$message = ['status'=>'success', 'message' => 'Closed Successfully!'];
 			echo json_encode($message);
 		}

@@ -60,6 +60,7 @@
                               <input type="checkbox" name="mo_id[]" id="mo_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$res->mo_id}}"/>
                               <input type="hidden" name="request_type_id[]" id="request_type_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$res->request_type_id}}"/>
                               <input type="hidden" name="location_id[]" id="location_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$stores->id}}"/>
+                              <input type="hidden" name="asset_location_id[]" id="asset_location_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$res->warehouse_location_id}}"/>
                             </td>
                             <td>{{$res->reference_number}}</td>
                             <td>{{$res->mo_reference_number}}</td>
@@ -109,13 +110,15 @@ var table;
         pageLength:100,
     });
     $("#btnSubmit").click(function(event) {
-        var Ids = [];
-        var request_type_id = [];
-        var location_id = [];
+        var Ids               = [];
+        var request_type_id   = [];
+        var location_id       = [];
+        var asset_location_id = [];
         $.each($("input[name='mo_id[]']:checked"), function(){
             Ids.push($(this).val());
             request_type_id.push($("#request_type_id"+$(this).attr("data-id")).val());
             location_id.push($("#location_id"+$(this).attr("data-id")).val());
+            asset_location_id.push($("#asset_location_id"+$(this).attr("data-id")).val());
         });
     
         var check = $('input:checkbox:checked').length;
@@ -148,7 +151,8 @@ var table;
                             //"_token": token,
                             "Ids": Ids,
                             "request_type_id": request_type_id,
-                            "location_id": location_id
+                            "location_id": location_id,
+                            "asset_location_id": asset_location_id
                         },
                         success: function (data) {
                             if (data.status == "success") {

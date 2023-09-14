@@ -176,7 +176,7 @@
 					$this->index_button[] = ["label"=>"Upload PO","icon"=>"fa fa-upload","url"=>CRUDBooster::adminpath('for_purchasing/po-upload'),'color'=>'success'];
 					$this->index_button[] = ["label"=>"Cancellation","icon"=>"fa fa-upload","url"=>CRUDBooster::adminpath('for_purchasing/cancellation-upload'),'color'=>'warning'];
 				}
-				if(in_array(CRUDBooster::myPrivilegeId(), [1,5,9,17])){
+				if(in_array(CRUDBooster::myPrivilegeId(), [1,5,6,9,17])){
 					$this->index_button[] = ["label"=>"MO Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-mo'),"color"=>"success"];
 					$this->index_button[] = ["title"=>"Export","label"=>"Export","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('GetExtractMO').'?'.urldecode(http_build_query(@$_GET))];
 				}
@@ -480,7 +480,7 @@
 			$MOList = array_map('intval',explode(",",$list_string));
 			if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){
 			    $query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 1);
-			}else if(in_array(CRUDBooster::myPrivilegeId(),[9])){
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9])){
 				$query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 5);
 			}else{
 				$query->whereIn('mo_body_request.id', $MOList);
@@ -1080,7 +1080,7 @@
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 				->get();
-			}else if(in_array(CRUDBooster::myPrivilegeId(),[9])){
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9])){
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)

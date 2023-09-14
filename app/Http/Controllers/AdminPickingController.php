@@ -841,7 +841,7 @@
 			//   ->get();
 			
 			$data['good_defect_lists'] = GoodDefectLists::all();
-			if(in_array(CRUDBooster::myPrivilegeId(),[5,17,20])){
+			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20])){
 			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->get();
 			}else{
 				$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();

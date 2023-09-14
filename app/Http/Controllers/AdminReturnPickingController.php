@@ -275,16 +275,16 @@
 	        //Your code here
 	        if(CRUDBooster::myPrivilegeId() == 5 || CRUDBooster::myPrivilegeId() == 17){ 
 
-				$forturnover =  	DB::table('statuses')->where('id', 24)->value('id');
+				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 
 				$query->where('return_transfer_assets_header.status', $forturnover)
 					  ->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
 					  ->whereNull('return_transfer_assets_header.transfer_to')
 					  ->orderBy('return_transfer_assets_header.id', 'ASC');
 
-			}else if(CRUDBooster::myPrivilegeId() == 9){ 
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9])){ 
 
-				$forturnover =  	DB::table('statuses')->where('id', 24)->value('id');
+				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 				$query->where('return_transfer_assets_header.status', $forturnover)
 				      ->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
 					//   ->whereNull('return_transfer_assets_header.location_to_pick')
@@ -292,7 +292,7 @@
 					  ->orderBy('return_transfer_assets_header.id', 'ASC');
 
 			}else{
-				$forturnover =  	DB::table('statuses')->where('id', 24)->value('id');
+				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 				$query->where('return_transfer_assets_header.status', $forturnover)
 				      ->orderBy('return_transfer_assets_header.id', 'ASC');
 
@@ -393,6 +393,7 @@
 				array_push($finalinventory_id, $invData['inventory_id']);
 			}
 
+			$location_to_drop = DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->first();
 
 			for($x=0; $x < count((array)$selectedItemlist); $x++) {
 
@@ -430,7 +431,7 @@
 							'item_condition'=> 			"Defective",
 							'deployed_to'=> 			NULL,
 							'deployed_to_id'=> 			NULL,
-							'location'=> 				3
+							'location'=> 				$location_to_drop->location_to_pick
 						]);
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
 					}else{
@@ -440,7 +441,7 @@
 							'item_condition'=> 			"Defective",
 							'deployed_to'=> 			NULL,
 							'deployed_to_id'=> 			NULL,
-							'location'=> 				2
+							'location'=> 				$location_to_drop->location_to_pick
 						]);
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
 					}
@@ -478,7 +479,7 @@
 							'statuses_id'=> 			6,
 							'deployed_to'=> 			NULL,
 							'deployed_to_id'=> 			NULL,
-							'location'=> 				3
+							'location'=> 				$location_to_drop->location_to_pick
 						]);
 						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
 			    	}else{
@@ -487,7 +488,7 @@
 							'statuses_id'=> 			6,
 							'deployed_to'=> 			NULL,
 							'deployed_to_id'=> 			NULL,
-							'location'=> 				2	
+							'location'=> 				$location_to_drop->location_to_pick	
 						]);
 						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
 					}

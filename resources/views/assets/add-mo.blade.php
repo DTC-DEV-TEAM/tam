@@ -71,7 +71,7 @@
                 padding: 8px;
             }
             .finput {
-                border:none;
+                background-color: #f5f5f5;
                 /* border-bottom: 1px solid rgba(18, 17, 17, 0.5); */
             }
             /* input.finput:read-only {
