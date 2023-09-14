@@ -172,18 +172,14 @@
 	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-
 				if(CRUDBooster::isSuperadmin()){
 					$this->index_button[] = ["label"=>"Export Lists","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
 				}
-
 				$this->index_button[] = ["label"=>"IT Asset Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"FA Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-fa'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Supplies Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-supplies'),"color"=>"success"];
+				//$this->index_button[] = ["label"=>"Supplies Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-supplies'),"color"=>"success"];
 				//$this->index_button[] = ["label"=>"Return Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-return'),"color"=>"success"];
-
 				//$this->index_button[] = ["label"=>"Transfer Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-transfer'),"color"=>"success"];
-
 				//$this->index_button[] = ["label"=>"Disposal Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-disposal'),"color"=>"success"];
 			
 			}
@@ -358,29 +354,18 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
-
 			if(CRUDBooster::isSuperadmin()){
-
 				$released  = 		DB::table('statuses')->where('id', 12)->value('id');
-
 				$query->whereNull('header_request.deleted_at')
 					  ->orderBy('header_request.status_id', 'ASC')
 					  ->orderBy('header_request.id', 'DESC');
-
 			}else{
-
 				$user = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
 				$query->where(function($sub_query){
-
-					$user = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
-					$released  = 		DB::table('statuses')->where('id', 12)->value('id');
-
-					$sub_query->where('header_request.created_by', CRUDBooster::myId())
-	
-							  ->whereNull('header_request.deleted_at'); 
-
+				$user = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+				$released  = 		DB::table('statuses')->where('id', 12)->value('id');
+				$sub_query->where('header_request.created_by', CRUDBooster::myId())
+							->whereNull('header_request.deleted_at'); 
 				});
 
 				$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
@@ -1218,8 +1203,6 @@
 		{
 
 			$data = 				Request::all();	
-			
-
 			$headerID = 			$data['headerID'];
 			$bodyID = 				$data['bodyID'];
 			$quantity_total = 		$data['quantity_total']; 
@@ -1228,7 +1211,6 @@
 			->update([
 				'quantity_total'=> 		$quantity_total
 			]);	
-
 
 			BodyRequest::where('id', $bodyID)
 			->update([
@@ -1254,7 +1236,6 @@
 
 		//Get Assets Hitory tru modal
 		public function getHistory(Request $request) {
-
 			$data = array();
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
@@ -1528,6 +1509,7 @@
 						'sub_category.class_description as dam_sub_category_description'
 					)
 			->take(10)
+			->whereNotNull('assets.from_dam')
 			->get();
 
 			$arraySearch = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as wh_qty'))->where('statuses_id',6)->groupBy('digits_code')->get()->toArray();
@@ -1618,15 +1600,19 @@
 			$item = DB::table('assets')
 			->where('assets.digits_code','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
 			->orWhere('assets.item_description','LIKE','%'.$search.'%')->where('assets.status','!=','INACTIVE')
-			->leftjoin('category', 'assets.category_id','=', 'category.id')
-			->leftjoin('tam_categories', 'assets.sub_category_id','=', 'tam_categories.id')
-			->leftjoin('tam_subcategories','assets.class_id','tam_subcategories.id')
+			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
+			// ->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
+			// ->leftjoin('sub_category', 'assets.dam_class_id','=', 'sub_category.id')
 			->select(	'assets.*',
 						'assets.id as assetID',
-						'tam_categories.category_description as category_description',
-						'tam_subcategories.subcategory_description as subcategory_description'
+						'tam_categories.category_description as tam_category_description',
+						'tam_subcategories.subcategory_description as tam_sub_category_description',
+						// 'category.category_description as dam_category_description',
+						// 'sub_category.class_description as dam_sub_category_description'
 					)
 			->take(10)
+			->whereNull('assets.from_dam')
 			->get();
 					
 			$arraySearch = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as wh_qty'))->where('statuses_id',6)->groupBy('digits_code')->get()->toArray();
@@ -1689,9 +1675,9 @@
 					$return_data[$i]['asset_tag']                = 	$value->asset_tag;
 					$return_data[$i]['serial_no']                = 	$value->serial_no;
 					$return_data[$i]['item_description']         = 	$value->item_description;
-					$return_data[$i]['category_description']     = 	$value->category_description;
+					$return_data[$i]['category_description']     = 	$value->tam_category_description;
+					$return_data[$i]['sub_category_description'] =  $value->tam_sub_category_description;
 					$return_data[$i]['item_cost']                = 	$value->item_cost;
-					$return_data[$i]['sub_category_description'] =  $value->subcategory_description;
 					$return_data[$i]['quantity']                 = 	$value->quantity;
 					$return_data[$i]['total_quantity']           = 	$value->total_quantity;
 					$return_data[$i]['wh_qty']                   =  $value->wh_qty  ? $value->wh_qty : 0;

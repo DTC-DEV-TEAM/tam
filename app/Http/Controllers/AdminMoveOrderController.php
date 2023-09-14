@@ -19,6 +19,7 @@
 	use PhpOffice\PhpSpreadsheet\Reader\Exception;
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use PhpOffice\PhpSpreadsheet\IOFactory;
+	use App\WarehouseLocationModel;
 
 	class AdminMoveOrderController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -79,56 +80,6 @@
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
 			# END FORM DO NOT REMOVE THIS LINE
-
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Reference Number","name"=>"reference_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Status Id","name"=>"status_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"status,id"];
-			//$this->form[] = ["label"=>"Employee Name","name"=>"employee_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Company Name","name"=>"company_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Position","name"=>"position","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Department","name"=>"department","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Store Branch","name"=>"store_branch","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Purpose","name"=>"purpose","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Conditions","name"=>"conditions","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Quantity Total","name"=>"quantity_total","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Cost Total","name"=>"cost_total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Total","name"=>"total","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved At","name"=>"approved_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Rejected At","name"=>"rejected_at","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Requestor Comments","name"=>"requestor_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"request_type,id"];
-			//$this->form[] = ["label"=>"Privilege Id","name"=>"privilege_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"privilege,id"];
-			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"To Reco","name"=>"to_reco","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"It Comments","name"=>"it_comments","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Recommended By","name"=>"recommended_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Recommended At","name"=>"recommended_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Cancelled By","name"=>"cancelled_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Cancelled At","name"=>"cancelled_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Purchased1 By","name"=>"purchased1_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Purchased1 At","name"=>"purchased1_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Purchased2 By","name"=>"purchased2_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Purchased2 At","name"=>"purchased2_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Purchased3 By","name"=>"purchased3_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Purchased3 At","name"=>"purchased3_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Quote Date","name"=>"quote_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
-			//$this->form[] = ["label"=>"Po Date","name"=>"po_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
-			//$this->form[] = ["label"=>"Po Number","name"=>"po_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Employee Dr Date","name"=>"employee_dr_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
-			//$this->form[] = ["label"=>"Dr Number","name"=>"dr_number","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Received By","name"=>"received_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Received At","name"=>"received_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Picked By","name"=>"picked_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Picked At","name"=>"picked_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Closed By","name"=>"closed_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Closed At","name"=>"closed_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Application","name"=>"application","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Application Others","name"=>"application_others","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -666,9 +617,8 @@
 	    */
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
-		
 			$fields = Request::all();
-			//dd($fields);
+		
 			$cont = (new static)->apiContext;
 			$dataLines1 = array();
 			$locationArray = array();
@@ -685,6 +635,7 @@
 			$sub_category_id 					= $fields['sub_category_id'];
 			$quantity_total 					= $fields['quantity_total'];
 			$total 								= $fields['total'];
+			$setLocationToPick                  = $fields['location'];
 
 			if(!$digits_code || !$item_description){
 				return CRUDBooster::redirect(CRUDBooster::mainpath(),"No Reserved Item","danger");
@@ -717,7 +668,8 @@
             //dd($body_request_id, $body_request_id);
 			for($x=0; $x < count((array)$item_description); $x++) {
 				$inventory_info = 	DB::table('assets_inventory_body')->where('digits_code', $digits_code[$x])->where('statuses_id',6)->first();
-				$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);	
+				//$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
+				$ref_inventory   =  		str_pad($setLocationToPick[$x], 2, '0', STR_PAD_LEFT);	
 					if(count((array)$digits_code) != $body_request){
 						if($body_request_id[$x] == "" || $body_request_id[$x] == null){
 							$count_header++;
@@ -755,17 +707,22 @@
 				$dataLines1[$x]['sub_category_id'] 		= $sub_category_id[$x];
 
 				$array_location = [1,2];
-				if(in_array($arf_header->request_type_id, [1, 5])){
-					$location 						= $inventory_info->location;
-				}else{
-					$location 						= implode(",",$array_location);
-				}
+				// if(in_array($arf_header->request_type_id, [1, 5])){
+				// 	$location 						= $inventory_info->location;
+				// }else{
+				// 	$location 						= implode(",",$array_location);
+				// }
+				// if(!empty($setLocationToPick)){
+				// 	$location = $setLocationToPick;
+				// }else{
+				// 	$location = $inventory_info->location;
+				// }
 				//$dataLines1[$x]['serial_no'] 			= $serial_no[$x];
 				$dataLines1[$x]['quantity'] 			= $quantity[$x];
 				$dataLines1[$x]['unit_cost'] 			= $unit_cost[$x];
 				$dataLines1[$x]['total_unit_cost'] 		= $total_unit_cost[$x];
 				//$dataLines1[$x]['to_reco'] 				= $arf_header->to_reco;
-				$dataLines1[$x]['location_id'] 			= $location;
+				$dataLines1[$x]['location_id'] 			= $setLocationToPick[$x];
 				$dataLines1[$x]['created_by'] 			= CRUDBooster::myId();
 				$dataLines1[$x]['created_at'] 			= date('Y-m-d H:i:s');
 				$dataLines1[$x]['request_created_by']   = $arf_header->created_by;
@@ -1207,6 +1164,7 @@
 				->get();				
 
 			$data['recommendations'] = DB::table('recommendations')->where('status', 'ACTIVE')->get();
+			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,4])->get();
 
 			return $this->view("assets.add-mo", $data);
 		}
@@ -1548,7 +1506,8 @@
 								->where('body_request.header_request_id', $search)
 								->get();
 
-
+			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,4])->get();
+		
 			$data['ARFHeader'] .= '
 				<hr/>
 				<div class="row">                           
@@ -1585,9 +1544,20 @@
 					<div class="col-md-4">
 							<p>'. $data['Header']->position .'</p>
 					</div>
-            	</div>
+            	</div>	
 				';
-
+				// foreach($data['location'] as $res){
+				// 	$data['ARFHeader'] .='
+				//        <option value='.$res->id.'>'. $res->location .'</option>;
+				// 	';
+				// }
+				// $data['ARFHeader'] .='
+				// 		</select>
+				// 	   </td>
+				// 	 </div>
+				// 	</div>
+			    //     ';
+	
 				if($data['Header']->store_branch != null || $data['Header']->store_branch != ""){ 
 					$data['ARFHeader'] .= ' <div class="row">                           
 											<label class="control-label col-md-2">Store/Branch:</label>
@@ -1635,12 +1605,16 @@
 				$total++;
 
 				$data['ARFBody'] .='
-					<tr style="background-color: #d4edda; color:#155724">
+					<tr id="setColor'.$tableRow.'">
 						<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
 						<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
 						<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
 				';
-				
+				// if($rowresult->reserved != null || $rowresult->reserved != ""){ 
+				// 	$data['icon'] = '<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>';
+				// }else{
+				// 	$data['icon'] = '<i data-toggle="tooltip" data-placement="right" title="Unserved" class="fa fa-times-circle text-danger"></i>';
+				// }
 			    if($rowresult->reserved != null || $rowresult->reserved != ""){ 
 					if(CRUDBooster::isSuperadmin()){
 						$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
@@ -1648,7 +1622,7 @@
 					$data['ARFBody'] .='
 					   <td style="text-align:center" height="10">
 					        <input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
-							<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" required max="99999999" readonly>                                                                              
+							<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
 						</td>
 						<td style="text-align:center" height="10">
 						    <input type="text"  class="form-control text-center finput"  name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
@@ -1684,9 +1658,26 @@
 						<td style="text-align:center" class="total_cost">
 						'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
 						</td>
-						<td style="text-align:center"><i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i></td>
-						</tr>
+						<td style="text-align:center">
+							<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
+						</td>
+						<td>
+						<select selected data-placeholder="Select Location" class="form-control location" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" required style="width:100%">
+						<option value=""></option>
 					';
+					foreach($data['locations'] as $location){
+						$data['ARFBody'] .='
+						<option value='.$location->id.'>'. $location->location .'</option>;
+						';
+					}
+					$data['ARFBody'] .='
+								</select>
+								<input type="hidden" name="stock[]" id="stock'.$tableRow.'"  required readonly>
+								<div id="display_error'.$tableRow.'" style="text-align:left"></div>
+							</td>
+						</tr>
+						';
+				
 				}else{
 					$data['ARFBody'] .='<tr>';
 					if(CRUDBooster::isSuperadmin()){
@@ -1769,7 +1760,7 @@
 										<tr class="tbl_header_color dynamicRows">
 										    '.$data['checkBoxHeader'].'
 											<th width="9%" class="text-center">Digits Code</th>
-											<th width="20%" class="text-center">Item Description</th>
+											<th width="15%" class="text-center">Item Description</th>
 											<th width="9%" class="text-center">Category</th>                                                         
 											<th width="9%" class="text-center">Sub Category</th> 
 											<th width="3%" class="text-center">Request Qty</th>
@@ -1779,7 +1770,8 @@
                                             <th width="3%" class="text-center">UnServed Qty</th> 
                                             <th width="5%" class="text-center">Item Cost</th> 
                                             <th width="5%" class="text-center">Total Cost</th>
-											<th width="3%" class="text-center">Reserved</th>
+											<th width="2%" class="text-center">Reserved</th>
+											<th width="10%" class="text-center">Location to Pick</th>
 											'; 
 
 											// if($data['Header']->recommendedby != null || $data['Header']->recommendedby != ""){ 
@@ -1815,6 +1807,45 @@
 					var modal = document.getElementById("myModal");
 					var modal2 = document.getElementById("myModal2");
 
+					$(".location").select2();
+
+					//Location Value
+					$(".location").change(function(){
+						var data_id     = $(this).attr("data-id");
+						var value_id    = $("#location" + data_id).val();
+						var digits_code = $("#add_digits_code" + data_id).val();
+						var value_text  = $("#location" +data_id+ " :selected").text();
+			
+	                    $.ajax({
+							type: "POST",
+							url: "'.route('get-available-digits-code').'",
+							dataType: "json",
+							data: {
+								"_token": $("#token").val(),
+								"id": value_id,
+								"digits_code": digits_code
+							},
+							success: function(response) {
+								if(response > 0){
+									$("#setColor"+ data_id).attr("style", "background-color: #d4edda; color:#155724");
+									$("#setColor"+ data_id).find("input").css("background-color", "#d4edda", "color","#155724");
+									$("#display_error" + data_id).html("");
+									$("#stock" + data_id).val(1);
+								}else{
+									$("#setColor"+ data_id).attr("style", "background-color: #red; color:#155724");
+									$("#setColor"+ data_id).find("input").css("background-color", "", "color","");
+									$("#display_error" + data_id).html(`<span id="notif" class="label label-danger"> No Stock in ${value_text}</span>`);
+									$("#stock" + data_id).val(0);
+								}
+								console.log(response);
+							},
+							error: function(e) {
+								console.log(e);
+							}
+						});
+					
+					});
+
 					$(".btnsearch").click(function() {
 						if($("#category").val() == 1 || $("#category").val() == 5){
 							document.querySelector("body").style.overflow = "hidden";
@@ -1835,17 +1866,11 @@
 					});
 
 					$(".btnsearch").click(function(event) {
-       
 						var searchID = $(this).attr("data-id");
-						
 						//alert($("#item_description"+searchID).val());
-				 
 						$("#item_search").text($("#item_description"+searchID).val());
-				 
 						$("#add_item_id").val($("#add_item_id"+searchID).val());
-				 
 						$("#button_count").val(searchID);
-				  
 						$("#button_remove").val($("#remove_btn"+searchID).val());
 				 
 					 });
@@ -1869,6 +1894,8 @@
 			$data = array();
 			$data['page_title'] = 'Print Request';
 			$HeaderID = MoveOrder::where('id', $id)->first();
+			$location = substr($HeaderID->mo_reference_number,11);
+			$data['Location'] = DB::table('warehouse_location_model')->where('id', $location)->first();
 			$data['Header'] = HeaderRequest::
 				  leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
 				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
@@ -2059,7 +2086,6 @@
 				
 		}
 
-
 		public function GetExtractMO(Request $request) {
 			    
 			$filter_column = \Request::get('filter_column');
@@ -2210,7 +2236,7 @@
 			 
 			}
 
-			//Export Conso
+		//Export Conso
 		public function ExportConso(Request $request){
 			$data = Request::all();
 			return Excel::download(new ExportConso($data), 'Consolidation-'.date('Y-m-d H:i:s') .'.xlsx');
@@ -2220,5 +2246,13 @@
 		public function UploadPo() {
 			$data['page_title']= 'PO Upload';
 			return view('import.po-upload', $data)->render();
+		}
+
+		public function getAvailableDigitsCode(Request $request){
+			$data = Request::all();
+            $id = $data['id'];
+			$digits_code = $data['digits_code'];
+			$res = DB::table('assets_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			return json_encode($res);
 		}
 	}

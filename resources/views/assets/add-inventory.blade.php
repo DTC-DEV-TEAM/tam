@@ -692,7 +692,7 @@
                         }
                         $('#sub_class').attr('disabled', false);
                         jQuery('#sub_category_id'+tableRow).html(showData);   
-                        $('.sub_category_id').val('').trigger('change');       
+                        //$('.sub_category_id').val('').trigger('change');       
                     }
                 });
             });

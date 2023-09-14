@@ -135,7 +135,7 @@
 				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_po"];
 			}
-			else if(CRUDBooster::myPrivilegeId() == 5 || CRUDBooster::myPrivilegeId() == 9 || CRUDBooster::isSuperadmin()){
+			else if(in_array(CRUDBooster::myPrivilegeId(),[1,5,9,20])){
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
@@ -327,12 +327,17 @@
 			$it_warehouse  =    DB::table('warehouse_location_model')->where('id', 3)->value('id');
 			$admin_threef  =    DB::table('warehouse_location_model')->where('id', 1)->value('id');
 			$admin_gf  =  		DB::table('warehouse_location_model')->where('id', 2)->value('id');
+			$cavite  =  		DB::table('warehouse_location_model')->where('id', 5)->value('id');
 			if(CRUDBooster::myPrivilegeId() == 5){ 
 				$query->where('assets_inventory_header_for_approval.location', $it_warehouse)
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else if(CRUDBooster::myPrivilegeId() == 9){ 
 				$query->whereIn('assets_inventory_header_for_approval.location', [$admin_threef, $admin_gf])
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 20){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$cavite])
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else{
@@ -549,6 +554,9 @@
 			}else if(CRUDBooster::myPrivilegeId() == 9){
 				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[2])->get();
 				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
+			}else if(CRUDBooster::myPrivilegeId() == 20){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[5])->get();
+				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
 			}else{
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->get();
@@ -669,6 +677,8 @@
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','=',3)->get();
 			}else if(CRUDBooster::myPrivilegeId() == 9){
 				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[2])->get();
+			}else if(CRUDBooster::myPrivilegeId() == 20){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[5])->get();
 			}else{
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			}
@@ -1759,7 +1769,7 @@
 	
 			$subcategories = DB::table('class')
 							->select('class.*')
-							->where('location', $id)
+							->where('location_id','LIKE', '%'.$id.'%')
 							->get();
 			return($subcategories);
 		}

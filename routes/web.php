@@ -103,8 +103,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/move_order/add-mo', 'AdminMoveOrderController@getAddMO')->name('assets.add.mo'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/selectedHeader','AdminMoveOrderController@selectedHeader')->name('order.selected.header');
     Route::get('admin/move_order/ADFUpdate','AdminMoveOrderController@ADFUpdate');
-
     Route::get('/admin/move_order/GetExtractMO','AdminMoveOrderController@GetExtractMO')->name('GetExtractMO'); 
+    Route::post(config('crudbooster.ADMIN_PATH').'/get-available-digits-code','AdminMoveOrderController@getAvailableDigitsCode')->name('get-available-digits-code');
     
     //PickingRequest
     Route::get('/admin/picking/getRequestPicking/{id}','AdminPickingController@getRequestPicking')->name('picking-request');
@@ -128,9 +128,13 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/assets/item-master-upload','AdminAssetsController@UploadItemMaster');
     Route::post('/admin/assets/upload-item-master','AdminAssetsController@itemMasterUpload')->name('upload-item-master');
     Route::get('/admin/db-truncate','TruncateController@dbtruncate');
+    
+    //TIMFS API
     Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-data','AdminAssetsController@getItemMasterDataApi')->name('get-item-master-data');
     Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-updated-data','AdminAssetsController@getItemMasterUpdatedDataApi')->name('get-item-master-updated-data');
 
+    //DAM API
+    Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-data-dam','AdminAssetsItController@getItemMasterDataDamApi')->name('get-item-master-data');
     //truncate table
     Route::get('/admin/db-truncate','TruncateController@dbtruncate');
 
