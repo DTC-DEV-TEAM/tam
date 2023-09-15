@@ -319,7 +319,7 @@
 
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>    
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-circle-o" ></i> {{ trans('message.form.pick') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-circle-o" ></i> {{ trans('message.form.pick') }}</button>
         </div>
     </form>
 </div>
@@ -524,7 +524,7 @@
                     type: 'error',
                     title: 'Asset Code Tagging Required',
                     icon: 'error',
-                    confirmButtonColor: "#367fa9",
+                    confirmButtonColor: "#5cb85c",
                 }); 
                 event.preventDefault(); // cancel default behavior
             } else if (asset_code == "") {
@@ -532,7 +532,7 @@
                     type: 'error',
                     title: 'Asset Code Tagging Required',
                     icon: 'error',
-                    confirmButtonColor: "#367fa9",
+                    confirmButtonColor: "#5cb85c",
                 }); 
                 event.preventDefault(); // cancel default behavior
             }else{

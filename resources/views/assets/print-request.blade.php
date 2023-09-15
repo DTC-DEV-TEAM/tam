@@ -274,7 +274,7 @@
 
                     <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
                     
-                    <button class="btn btn-primary pull-right" type="submit" id="printARF" onclick="printDivision('printableArea')"> <i class="fa fa-print" ></i> Print as PDF</button>
+                    <button class="btn btn-success pull-right" type="submit" id="printARF" onclick="printDivision('printableArea')"> <i class="fa fa-print" ></i> Print as PDF</button>
                     
                     <!-- @if( $Header->status_id == 15 )
                     

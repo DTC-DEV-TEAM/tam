@@ -244,7 +244,7 @@
         <div class='panel-footer'>
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit" style="margin-left: 5px;"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit" style="margin-left: 5px;"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
             @if(CRUDBooster::isSuperadmin())
                 <button class="btn btn-danger pull-right" value="cancelLineRequest" type="button" id="btnCancelLineRequest" style="margin-left: 5px;"><i class="fa fa-times-circle" ></i> Cancel Line</button>
             @endif
@@ -264,6 +264,7 @@
 <script type="text/javascript">
     $(function(){
         $('body').addClass("sidebar-collapse");
+        $("#lock").attr('disabled', true);
     });
     $("#Tag").hide();
 
@@ -392,7 +393,7 @@
                 type: 'error',
                 title: 'Please select item to cancel!',
                 icon: 'error',
-                confirmButtonColor: "#367fa9",
+                confirmButtonColor: "#5cb85c",
             }); 
             event.preventDefault();
             return false;
@@ -469,7 +470,7 @@
                 type: 'error',
                 title: 'Please add an item!',
                 icon: 'error',
-                confirmButtonColor: "#367fa9",
+                confirmButtonColor: "#5cb85c",
             }); 
             event.preventDefault(); // cancel default behavior
         }
@@ -485,7 +486,7 @@
                             type: 'error',
                             title: 'Please choose location to pick!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         event.preventDefault();
                         return false;
@@ -501,7 +502,7 @@
                         type: 'error',
                         title: 'Must have stock in selected location',
                         icon: 'error',
-                        confirmButtonColor: "#367fa9",
+                        confirmButtonColor: "#5cb85c",
                     });
                     event.preventDefault();
                     return false;
@@ -1023,6 +1024,7 @@
     $("#btnSubmit").attr('disabled', true);
     $("#add-Row").attr('disabled', true);
     $('#header_request_id').on('change', function() {
+        $("#lock").attr('disabled', false);
         selected_header = this.value;
         //var channel = $('#channels_id').val();
         //$("#template_checker").val(selected_template);
