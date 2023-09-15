@@ -282,11 +282,12 @@
 					  ->whereNull('return_transfer_assets_header.transfer_to')
 					  ->orderBy('return_transfer_assets_header.id', 'ASC');
 
-			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9])){ 
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9,20])){ 
 
 				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 				$query->where('return_transfer_assets_header.status', $forturnover)
-				      ->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
+					  ->where('return_transfer_assets_header.request_type_id', 5)
+				      //->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
 					//   ->whereNull('return_transfer_assets_header.location_to_pick')
 					  ->whereNull('return_transfer_assets_header.transfer_to')
 					  ->orderBy('return_transfer_assets_header.id', 'ASC');

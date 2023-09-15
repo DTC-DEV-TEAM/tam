@@ -97,6 +97,7 @@
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
         <input type="hidden" name="freebies_val" id="freebies_val" value="0">
+        <input type="hidden" name="admin" id="admin" value="{{CRUDBooster::myPrivilegeId()}}">
 
         <!-- Modal 1-->
         <div id="myModal" class="modal" style="padding: auto">
@@ -308,34 +309,6 @@
 
     $( "#quote_date, #po_date" ).datepicker( { format: 'yyyy-mm-dd', endDate: new Date() } );
 
-    //Location Value
-    $('.location').change(function(){
-        console.log('test');
-        var data_id = $(this).attr("data-id");
-        var value_id = $("#location" + id).val();
-     
-        // $.ajax({
-        //         type: 'POST',
-        //         url: ADMIN_PATH + "/selectedHeader",
-        //         data: {
-        //             "_token": token,
-        //             "header_request_id": selected_header,
-        //         },
-        //         success: function(data) {
-        //             $('.ARFHeader').empty().append(data.ARFHeader);
-        //             $('.ARFBodyTable').empty().append(data.ARFBodyTable);
-        //             $("#Tag").show();
-        //             //$('.tab').append(data.upc_nav);
-        //             //$('.add').append(data.upc_div);
-        //             //$('.hidden_div').append(data.hidden_fields);
-        //             //$('#div_count').val(data.count_items);
-        //         },
-        //         error: function(e) {
-        //             alert(e);
-        //             console.log(e);
-        //         }
-        // });
-    });
 
     $(".btnsearch").click(function(event) {
         var searchID = $(this).attr("data-id");
@@ -501,10 +474,29 @@
             event.preventDefault(); // cancel default behavior
         }
 
-        var cost = $("input[name^='stock[]']").length;
-        var stockCost = $("input[name^='stock[]']");
-        for(i=0;i<cost;i++){
-            if(stockCost.eq(i).val() == 0){
+        var privilege = $('#admin').val();
+
+        if(privilege == 6){
+            var location = $(".location").length;
+            var location_value = $(".location").find(":selected");;
+            for(i=0;i<location;i++){
+                if(location_value.eq(i).val() == 0 || location_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please choose location to pick!',
+                            icon: 'error',
+                            confirmButtonColor: "#367fa9",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+            } 
+        }
+        
+        var id = $("input[name^='stock[]']").length;
+        var stockId = $("input[name^='stock[]']");
+        for(i=0;i<id;i++){
+            if(stockId.eq(i).val() == 0){
                 swal({
                         type: 'error',
                         title: 'Must have stock in selected location',

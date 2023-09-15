@@ -241,7 +241,7 @@
 	        |
 	        */
 	        $this->style_css = NULL;
-			$this->load_css[] = asset("css/font-family.css");
+			
 	        
 	        
 	        /*
@@ -253,7 +253,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 

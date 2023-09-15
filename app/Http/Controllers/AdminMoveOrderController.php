@@ -480,7 +480,7 @@
 			$MOList = array_map('intval',explode(",",$list_string));
 			if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){
 			    $query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 1);
-			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9])){
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9,20])){
 				$query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 5);
 			}else{
 				$query->whereIn('mo_body_request.id', $MOList);
@@ -1170,8 +1170,6 @@
 		}
 
 		public function getRequestOrdering($id){
-			
-
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -1253,7 +1251,6 @@
 
 
 		public function getRequestPrintPickList($id){
-
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -1313,7 +1310,6 @@
 
 
 		public function getDetailOrdering($id){
-
 			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -1596,149 +1592,239 @@
 				';
 
 			$tableRow = 1;
-
 			$total = 0;
+
+			$itUserLocation = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$itAssetLocation = DB::table('warehouse_location_model')->where('id', $itUserLocation->location_to_pick)->first();
 		
 			foreach($data['Body'] as $rowresult){
 
 				$tableRow++;
 				$total++;
-
-				$data['ARFBody'] .='
-					<tr id="setColor'.$tableRow.'">
-						<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
-						<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
-						<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
-				';
+                if(in_array(CRUDBooster::myPrivilegeId(), [5,17])){
+					$data['ARFBody'] .='
+						<tr style="background-color: #d4edda; color:#155724">
+							<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
+					';
+				}else{
+					$data['ARFBody'] .='
+						<tr id="setColor'.$tableRow.'">
+							<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
+					';
+				}
+				
 				// if($rowresult->reserved != null || $rowresult->reserved != ""){ 
 				// 	$data['icon'] = '<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>';
 				// }else{
 				// 	$data['icon'] = '<i data-toggle="tooltip" data-placement="right" title="Unserved" class="fa fa-times-circle text-danger"></i>';
 				// }
-			    if($rowresult->reserved != null || $rowresult->reserved != ""){ 
-					if(CRUDBooster::isSuperadmin()){
-						$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
-					}
-					$data['ARFBody'] .='
-					   <td style="text-align:center" height="10">
-					        <input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
-							<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
-						</td>
-						<td style="text-align:center" height="10">
-						    <input type="text"  class="form-control text-center finput"  name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
-						</td>
-
-						<td style="text-align:center" height="10">
-							<input type="text"  class="form-control text-center finput"  name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
-                        </td>
-
-						<td style="text-align:center" height="10">
-						   <input type="text"  class="form-control text-center finput"  name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
-                        </td>
-
-						<td style="text-align:center" height="10">
-						  <input type="text"  class="form-control text-center finput"  name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
-                        </td>	
-
-						<td style="text-align:center" class="rep_qty">
-						 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
-						</td>  
-						<td style="text-align:center" class="re_qty">
-						 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
-						</td>     
-						<td style="text-align:center" class="served_qty">
-						 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
-						 </td>                                                           
-						<td style="text-align:center" class="unserved_qty">
-						'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
-						</td>
-						<td style="text-align:center" class="unit_cost">
-						'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
-						</td>
-						<td style="text-align:center" class="total_cost">
-						'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
-						</td>
-						<td style="text-align:center">
-							<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
-						</td>
-						<td>
-						<select selected data-placeholder="Select Location" class="form-control location" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" required style="width:100%">
-						<option value=""></option>
-					';
-					foreach($data['locations'] as $location){
+				if(in_array(CRUDBooster::myPrivilegeId(), [5,17])){
+					if($rowresult->reserved != null || $rowresult->reserved != ""){ 
+						if(CRUDBooster::isSuperadmin()){
+							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+						}
 						$data['ARFBody'] .='
-						<option value='.$location->id.'>'. $location->location .'</option>;
-						';
-					}
-					$data['ARFBody'] .='
-								</select>
-								<input type="hidden" name="stock[]" id="stock'.$tableRow.'"  required readonly>
-								<div id="display_error'.$tableRow.'" style="text-align:left"></div>
+						   <td style="text-align:center" height="10">
+								<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+								<input class="form-control text-center itemDcode finput" style="background-color: #d4edda;color:#155724" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
 							</td>
-						</tr>
-						';
-				
-				}else{
-					$data['ARFBody'] .='<tr>';
-					if(CRUDBooster::isSuperadmin()){
-						$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+							<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+							   <input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+							  <input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+							</td>	
+	
+							<td style="text-align:center" class="rep_qty">
+							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+							</td>  
+							<td style="text-align:center" class="re_qty">
+							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+							</td>     
+							<td style="text-align:center" class="served_qty">
+							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+							 </td>                                                           
+							<td style="text-align:center" class="unserved_qty">
+							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+							</td>
+							<td style="text-align:center" class="unit_cost">
+							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+							</td>
+							<td style="text-align:center" class="total_cost">
+							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+							</td>
+							<td style="text-align:center">
+								<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
+							</td>
+							<td>
+								<input type="hidden" class="form-control finput location" style="background-color: #d4edda;color:#155724" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" value="'.$itAssetLocation->id.'">
+								<input type="text" class="form-control finput location" style="background-color: #d4edda;color:#155724"  data-id="'.$tableRow.'" value="'.$itAssetLocation->location.'">
+
+							</td>
+							</tr>
+						';	
+					}else{
+						$data['ARFBody'] .='<tr>';
+						if(CRUDBooster::isSuperadmin()){
+							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+						}
+						$data['ARFBody'] .='
+						   <td style="text-align:center" height="10">
+								'.$rowresult->digits_code.'                                                                            
+							</td>
+							<td style="text-align:center" height="10">
+								'.$rowresult->item_description.'
+							</td>
+							<td style="text-align:center" height="10">
+								'.$rowresult->category_id.'
+							</td>
+							<td style="text-align:center" height="10">
+							   '.$rowresult->sub_category_id.'
+							</td>
+							<td style="text-align:center" height="10">
+							  '.$rowresult->quantity.'
+							</td>	
+							<td style="text-align:center" class="rep_qty">
+							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+							</td>  
+							<td style="text-align:center" class="re_qty">
+							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+							</td>     
+							<td style="text-align:center" class="served_qty">
+							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+							 </td>                                                           
+							<td style="text-align:center" class="unserved_qty">
+							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+							</td>
+							<td style="text-align:center" class="unit_cost">
+							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+							</td>
+							<td style="text-align:center" class="total_cost">
+							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+							</td>
+							<td style="text-align:center"><i data-toggle="tooltip" data-placement="right" title="Unserved" class="fa fa-times-circle text-danger"></i></td>
+						</tr>';
 					}
-					$data['ARFBody'] .='
-					   <td style="text-align:center" height="10">
-							'.$rowresult->digits_code.'                                                                            
-						</td>
-						<td style="text-align:center" height="10">
-						    '.$rowresult->item_description.'
-						</td>
-						<td style="text-align:center" height="10">
-							'.$rowresult->category_id.'
-                        </td>
-						<td style="text-align:center" height="10">
-						   '.$rowresult->sub_category_id.'
-                        </td>
-						<td style="text-align:center" height="10">
-						  '.$rowresult->quantity.'
-                        </td>	
-						<td style="text-align:center" class="rep_qty">
-						 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
-						</td>  
-						<td style="text-align:center" class="re_qty">
-						 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
-						</td>     
-						<td style="text-align:center" class="served_qty">
-						 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
-						 </td>                                                           
-						<td style="text-align:center" class="unserved_qty">
-						'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
-						</td>
-						<td style="text-align:center" class="unit_cost">
-						'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
-						</td>
-						<td style="text-align:center" class="total_cost">
-						'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
-						</td>
-						<td style="text-align:center"><i data-toggle="tooltip" data-placement="right" title="Unserved" class="fa fa-times-circle text-danger"></i></td>
-					</tr>';
+				}else{
+					if($rowresult->reserved != null || $rowresult->reserved != ""){ 
+						if(CRUDBooster::isSuperadmin()){
+							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+						}
+						$data['ARFBody'] .='
+						   <td style="text-align:center" height="10">
+								<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+								<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
+							</td>
+							<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput"  name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput"  name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+							   <input type="text"  class="form-control text-center finput"  name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+							</td>
+	
+							<td style="text-align:center" height="10">
+							  <input type="text"  class="form-control text-center finput"  name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+							</td>	
+	
+							<td style="text-align:center" class="rep_qty">
+							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+							</td>  
+							<td style="text-align:center" class="re_qty">
+							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+							</td>     
+							<td style="text-align:center" class="served_qty">
+							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+							 </td>                                                           
+							<td style="text-align:center" class="unserved_qty">
+							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+							</td>
+							<td style="text-align:center" class="unit_cost">
+							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+							</td>
+							<td style="text-align:center" class="total_cost">
+							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+							</td>
+							<td style="text-align:center">
+								<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
+							</td>
+							<td>
+							<select selected data-placeholder="Select Location" class="form-control location" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" required style="width:100%">
+							<option value=""></option>
+						';
+						foreach($data['locations'] as $location){
+							$data['ARFBody'] .='
+							<option value='.$location->id.'>'. $location->location .'</option>;
+							';
+						}
+						$data['ARFBody'] .='
+									</select>
+									<input type="hidden" name="stock[]" id="stock'.$tableRow.'"  required readonly>
+									<div id="display_error'.$tableRow.'" style="text-align:left"></div>
+								</td>
+							</tr>
+							';
+					
+					}else{
+						$data['ARFBody'] .='<tr>';
+						if(CRUDBooster::isSuperadmin()){
+							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+						}
+						$data['ARFBody'] .='
+						   <td style="text-align:center" height="10">
+								'.$rowresult->digits_code.'                                                                            
+							</td>
+							<td style="text-align:center" height="10">
+								'.$rowresult->item_description.'
+							</td>
+							<td style="text-align:center" height="10">
+								'.$rowresult->category_id.'
+							</td>
+							<td style="text-align:center" height="10">
+							   '.$rowresult->sub_category_id.'
+							</td>
+							<td style="text-align:center" height="10">
+							  '.$rowresult->quantity.'
+							</td>	
+							<td style="text-align:center" class="rep_qty">
+							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+							</td>  
+							<td style="text-align:center" class="re_qty">
+							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+							</td>     
+							<td style="text-align:center" class="served_qty">
+							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+							 </td>                                                           
+							<td style="text-align:center" class="unserved_qty">
+							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+							</td>
+							<td style="text-align:center" class="unit_cost">
+							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+							</td>
+							<td style="text-align:center" class="total_cost">
+							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+							</td>
+							<td style="text-align:center"><i data-toggle="tooltip" data-placement="right" title="Unserved" class="fa fa-times-circle text-danger"></i></td>
+						</tr>';
+					}
 				}
-				// if($data['Header']->recommendedby != null || $data['Header']->recommendedby != ""){ 
-				// 	$data['ARFBody'] .='
-
-				// 			<td style="text-align:center" height="10">
-				// 				'.$rowresult->recommendation.'
-				// 			</td>
-
-				// 			<td style="text-align:center" height="10">
-				// 				'.$rowresult->reco_digits_code.'
-                //              </td>
-
-                //              <td style="text-align:center" height="10">
-				// 			 	'.$rowresult->reco_item_description.'
-                //              </td>
-
-				// 		</tr>
-				// 	';
-				// }
-
 			}
 
 			if(CRUDBooster::isSuperadmin()){

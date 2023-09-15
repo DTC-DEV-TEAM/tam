@@ -14,6 +14,7 @@
 	use App\Imports\ItemMasterImport;
 	use App\Imports\ItemMasterEolImport;
 	use App\WarehouseLocationModel;
+	use GuzzleHttp\Client;
 
 	class AdminAssetsItController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -448,7 +449,7 @@
 				'Authorization: Bearer ' . $token
 			);
 			$error_msg = "";
-			$url = 'http://127.0.0.1:8005/api/item_master';
+			$url = config('env-api.dam-get-created-items-url');
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -465,7 +466,6 @@
 			curl_close($ch);
 
 			$cURLresponse = json_decode($cURLresponse, true);
-      
 			$data = [];
 			$count = 0;
 			if(!empty($cURLresponse["data"])) {
@@ -506,28 +506,17 @@
 		}
 
 		public function getToken(){
-			$secretKey = "df65ed91ecf26bffb9f511df132e822b"; 
-			$url = 'http://127.0.0.1:8005/api/get-token?secret='.$secretKey;
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_FAILONERROR, true);
-			curl_setopt($ch, CURLOPT_POST, true);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			$cURLresponse = curl_exec($ch);
-			if (curl_errno($ch)) {
-				$error_msg = curl_error($ch);
-			}
-			curl_close ($ch);
+			$client = new Client();
+            $response = $client->post(config('env-api.dam-get-token-url'), [
+                'form_params' => [
+                    'secret' => config('env-api.dam-secret-key'),
+                ]
+            ]);
 
-			$cURLresponse = json_decode($cURLresponse);
-			if ($error_msg != "" || $cURLresponse->access_token == null || $cURLresponse->access_token == "") {
-			} else {
-				$token = $cURLresponse->data->access_token;
-			}
+            $responseBody = $response->getBody()->getContents();
+            $responseData = json_decode($responseBody, true);
 
-			return $cURLresponse->data->access_token;
+            return $responseData['data']['access_token'];
 		}
 
 

@@ -15,6 +15,7 @@
 	use App\Imports\ItemMasterImport;
 	use App\Imports\ItemMasterEolImport;
 	use App\WarehouseLocationModel;
+	use GuzzleHttp\Client;
 
 	//use App\Imports\InventoryUpload;
 
@@ -220,15 +221,15 @@
 					});
 				});
 
-				// setInterval(getItemMasterData, 5000);
+				// setInterval(getItemMasterTimfsData, 5000);
 				$('#sync-data').click(function(event){
 					event.preventDefault();
-                    getItemMasterData();
+                    getItemMasterTimfsData();
 				});
-				function getItemMasterData(){
+				function getItemMasterTimfsData(){
 					$.ajax({
 						type: 'POST',
-						url: '".route('get-item-master-data')."',
+						url: '".route('get-item-master-timfs-data')."',
 						dataType: 'json',
 						data: {
 							'_token': $(\"#token\").val(),
@@ -516,6 +517,91 @@
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("masterfile.add-asset", $data);
 
+		}
+
+		// TIMFS ITEM MASTER
+		public function getItemMasterTimfsData(Request $request) {
+			$token = $this->getToken();
+			$headers = array(
+				'Accept: application/json',
+				'Authorization: Bearer ' . $token
+			);
+		
+			$error_msg = "";
+			$url = config('env-api.get-created-items-url');
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close($ch);
+
+			$cURLresponse = json_decode($cURLresponse, true);
+
+			$data = [];
+			$count = 0;
+			if(!empty($cURLresponse["data"])) {
+				foreach ($cURLresponse["data"] as $key => $value) {
+					if($value['sku_statuses_id'] == 1){
+						$status = 'ACTIVE';
+					}else{
+						$status = 'INACTIVE';
+					}
+				
+					$count++;
+						DB::beginTransaction();
+						try {
+							Assets::updateOrcreate([
+								'digits_code'         => $value['tasteless_code'] 
+							],
+							[
+								'digits_code'         => $value['tasteless_code'],
+								'item_description'    => $value['full_item_description'],
+								'tam_category_id'     => $value['categories_id'],
+								'tam_sub_category_id' => $value['subcategories_id'],
+								'dam_category_id'     => NULL,
+								'dam_sub_category_id' => NULL,
+								'dam_class_id'        => NULL,
+								'dam_sub_class_id'    => NULL,
+								'item_cost'           => $value['ttp'],
+								'status'              => $status,
+								'created_by'          => CRUDBooster::myId(),
+								'created_at'          => date('Y-m-d H:i:s')
+							]);
+							DB::commit();
+						} catch (\Exception $e) {
+							\Log::debug($e);
+							DB::rollback();
+						}
+					
+				}
+			}
+			\Log::info('Item Create: executed! items');
+			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
+			echo json_encode($message);
+		}
+
+		public function getToken(){
+			$client = new Client();
+            $response = $client->post(config('env-api.get-token-url'), [
+                'form_params' => [
+                    'secret' => config('env-api.secret-key'),
+                ]
+            ]);
+
+            $responseBody = $response->getBody()->getContents();
+            $responseData = json_decode($responseBody, true);
+
+            return $responseData['data']['access_token'];
 		}
 
 
