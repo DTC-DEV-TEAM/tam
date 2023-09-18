@@ -71,13 +71,15 @@
                 padding: 8px;
             }
             .finput {
-                background-color: #f5f5f5;
+                background-color: #fff;
+                border: none;
                 /* border-bottom: 1px solid rgba(18, 17, 17, 0.5); */
             }
-            /* input.finput:read-only {
-                background-color: #d4edda; 
-                color:#155724
-            } */
+            input.finput:read-only {
+                background-color: #fff; 
+                border: none;
+                /* color:#155724 */
+            }
 
         </style>
     @endpush
@@ -500,7 +502,7 @@
             if(stockId.eq(i).val() == 0){
                 swal({
                         type: 'error',
-                        title: 'Must have stock in selected location',
+                        title: 'No stock in selected location',
                         icon: 'error',
                         confirmButtonColor: "#5cb85c",
                     });
@@ -1060,12 +1062,13 @@
             $("#btnSubmit").attr('disabled', true);
             $(".btnsearch").attr('disabled', true);
             $("#header_request_id").attr('disabled', false);
-                
+             
         }else{
             $("#btnSubmit").attr('disabled', false);
             $(".btnsearch").attr('disabled', false);
             $("#header_request_id").attr('disabled', true);
             $("#lock").attr('disabled', true);
+            $(".location").attr("disabled",false);
         }
 
     });

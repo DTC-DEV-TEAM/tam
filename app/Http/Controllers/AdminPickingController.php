@@ -367,7 +367,6 @@
 		
 
 			if($column_index == 2){
-
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $approved){
@@ -392,62 +391,33 @@
 
 			}
 
-
 			if($column_index == 4){
-
 				$request_type = 			DB::table('requests')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->request_name;
-
 				}
-
-
 			}
 
 			if($column_index == 5){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->bill_to;
-
 				}
-
-
 			}
-
 
 			if($column_index == 6){
-
 				$request_type = 			DB::table('departments')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->department_name;
-
 				}
-
-
 			}
-
 
 			if($column_index == 7){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->name;
-
 				}
-
-
 			}
-
-
 	    }
 
 	    /*
@@ -841,7 +811,7 @@
 			//   ->get();
 			
 			$data['good_defect_lists'] = GoodDefectLists::all();
-			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20])){
+			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
 			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->get();
 			}else{
 				$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
