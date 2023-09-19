@@ -480,6 +480,7 @@
 						'header_request.*',
 						'mo_body_request.*',
 						'mo_body_request.id as mo_id',
+						'mo_body_request.location_id as warehouse_location_id',
 						'header_request.id as requestid',
 						'header_request.created_at as created',
 						'request_type.*',
@@ -580,7 +581,8 @@
 			$rid = $request['request_type_id'];
 			$request_type_id = array_unique($rid);
 			$location = $request['location_id'];
-            
+			$asset_location_id = $request['asset_location_id'];
+   
 			$getData = MoveOrder::leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
 			->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
 			->select(
@@ -635,9 +637,9 @@
 					$conHeader['approved_date'] = date('Y-m-d H:i:s');
 				}
 				if($hData == 1){
-					$conHeader['location_to_pick'] = 3; 
+					$conHeader['location_to_pick'] = $asset_location_id[$hKey]; 
 				}else{
-					$conHeader['location_to_pick'] = 2; 
+					$conHeader['location_to_pick'] = $asset_location_id[$hKey];
 				}
 				$conHeader['store_branch'] = $location[$hKey];
 
@@ -691,10 +693,10 @@
 				$container['mo_id'] = $rData['mo_id'];
 				if($rData['request_type_id'] == 1){
 					$container['reference_no'] = $rData['reference_no'];
-					$container['location_to_pick'] = 3;
+					$container['location_to_pick'] = $rData['location_id'];
 				}else{
 					$container['reference_no'] = $rData['reference_no'];
-					$container['location_to_pick'] = 2;
+					$container['location_to_pick'] = $rData['location_id'];
 				}
 				$container['asset_code'] =  $rData['asset_code'];
 				$container['digits_code'] = $rData['digits_code'];
@@ -777,7 +779,7 @@
                     'requested_by' => CRUDBooster::myId(),
                     'requested_date' => date('Y-m-d H:i:s'),
 					'approved_date'  => $approved,
-                    'location_to_pick' => 5,
+                    'location_to_pick' => 0,
                     'store_branch' => $location,
                     'transfer_to' => $user_id,
                 ]
@@ -794,7 +796,7 @@
 				$container['return_header_id'] = $header_id;
 				$container['mo_id'] = $rData['mo_id'];
 				$container['reference_no'] = $ref_no->reference_no;
-				$container['location_to_pick'] = 5;
+				$container['location_to_pick'] = 0;
 				$container['asset_code'] =  $rData['asset_code'];
 				$container['digits_code'] = $rData['digits_code'];
 				$container['description'] = $rData['item_description'];

@@ -120,6 +120,16 @@
                 </div>
             @endif
 
+            @if($Header->requestor_comments != null || $Header->requestor_comments != "")
+                <hr/>
+                <div class="row">                           
+                    <label class="control-label col-md-2">{{ trans('message.table.requestor_comments') }}:</label>
+                    <div class="col-md-10">
+                            <p>{{$Header->requestor_comments}}</p>
+                    </div>
+                </div>
+            @endif  
+
             <hr/>
 
             <div class="row">                           

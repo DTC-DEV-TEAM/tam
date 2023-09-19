@@ -14,11 +14,16 @@ class Assets extends Model
         'item_description',
         'item_cost',
         'fulfillment_type' ,
-        'category_id',
-        'class_id',
+        'tam_category_id',
+        'tam_sub_category_id',
+        'dam_category_id',
+        'dam_sub_category_id',
+        'dam_class_id',
+        'dam_sub_class_id',
+        'status',
+        'from_dam',
         'created_by',
         'created_at',
-        'sub_category_id',
-        'sub_class_id',
+        
     ] ;
 }

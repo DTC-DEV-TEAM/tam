@@ -74,7 +74,7 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Asset Form
+        Fill up IT asset form
     </div>
 
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetRequest" enctype="multipart/form-data">
@@ -250,7 +250,7 @@
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
 
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
 
         </div>
 
@@ -336,7 +336,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -345,7 +345,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -361,7 +361,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -370,7 +370,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -495,7 +495,7 @@
                                             type: 'error',
                                             title: 'No Found Item',
                                             icon: 'error',
-                                            confirmButtonColor: "#367fa9",
+                                            confirmButtonColor: "#5cb85c",
                                         });
                                     }else{ 
                                     //var rowCount = $('#asset-items tr').length;
@@ -621,28 +621,32 @@
             
             //deleteRow
             $(document).on('click', '.removeRow', function() {
-               
                 var id_data = $(this).attr("data-id");
-
-                if($("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "laptop" || $("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "desktop"){
-
-                        $("#application_div").hide();
-                        $("#application_div").val("");
-                        $("#application_others_div").hide();
-                        $("#application_others").removeAttr('required');
-                        $(".application").prop('checked', false);
-                        $(".application_others").prop('checked', false);
-   
-                }
-
+                var laptopDesktop = [];
+                
                 if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
                     tableRow--;
-
                     $(this).closest('tr').remove();
-
                     $("#quantity_total").val(calculateTotalQuantity());
-                    return false;
+                   
                 }
+                $(".sub_category_id").each(function() {
+                    if($.inArray(this.value.toLowerCase().replace(/\s/g, ''), ['laptop','desktop','macbook']) > -1){
+                        laptopDesktop.push(this.value);
+                    }
+                });
+
+                //if($("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "laptop" || $("#sub_category_id"+id_data).val().toLowerCase().replace(/\s/g, '') == "desktop"){
+                if(laptopDesktop.length === 0){
+                    $("#application_div").hide();
+                    $("#application_div").val("");
+                    $("#application_others_div").hide();
+                    $("#application_others").removeAttr('required');
+                    $(".application").prop('checked', false);
+                    $(".application_others").prop('checked', false);
+                    $("#checkApplications").prop('checked', false);
+                }
+                return false;
             });
 
         });
@@ -725,7 +729,7 @@
                         type: 'error',
                         title: 'Please choose Purpose!',
                         icon: 'error',
-                        confirmButtonColor: "#367fa9",
+                        confirmButtonColor: "#5cb85c",
                     }); 
                     event.preventDefault(); // cancel default behavior
                     return false;
@@ -734,7 +738,7 @@
                         type: 'error',
                         title: 'Please add an item!',
                         icon: 'error',
-                        confirmButtonColor: "#367fa9",
+                        confirmButtonColor: "#5cb85c",
                     }); 
                     event.preventDefault(); // cancel default behavior
                 }else{
@@ -746,7 +750,7 @@
                                     type: 'error',
                                     title: 'Item Description cannot be empty!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -762,7 +766,7 @@
                                     type: 'error',
                                     title: 'Digits Code cannot be empty!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -778,7 +782,7 @@
                                     type: 'error',
                                     title: 'Please select Sub Category!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -795,7 +799,7 @@
                                         type: 'error',
                                         title: 'Quantity cannot be empty or zero!',
                                         icon: 'error',
-                                        confirmButtonColor: "#367fa9",
+                                        confirmButtonColor: "#5cb85c",
                                     });
                                     event.preventDefault();
                                     return false;
@@ -804,7 +808,7 @@
                                     type: 'error',
                                     title: 'Negative Value is not allowed!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 }); 
                                 event.preventDefault(); // cancel default behavior
                                 return false;
@@ -813,7 +817,7 @@
                                     type: 'error',
                                     title: 'Invalid Quantity Value!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 }); 
                                 event.preventDefault(); // cancel default behavior
                                 return false;     
@@ -828,7 +832,7 @@
                                 type: 'error',
                                 title: 'Please choose an Application!',
                                 icon: 'error',
-                                confirmButtonColor: "#367fa9",
+                                confirmButtonColor: "#5cb85c",
                                 
                             });
                             event.preventDefault();

@@ -29,11 +29,41 @@
 	use Illuminate\Contracts\Cache\LockTimeoutException;
 	use Carbon\Carbon;
 	class AdminAssetsInventoryHeaderForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
+		// LOCATION
+		private $admin_threef;
+		private $admin_gf;
+		private $it_warehouse;
+		private $cavite;
+		private $san_juan;
+		private $p_tuazon;
+		private $forItemCreation;
+		private $forArfCreation;
+		private $rejected;
+
+		//APPROVALS
+		private	$for_receiving;
+		private	$reject;
+		private	$recieved;
+		private	$closed;
+		private	$for_po;
+
 
 		public function __construct() {
-			// Register ENUM type
-			//$this->request = $request;
 			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
+			// LOCATION
+			$this->admin_threef =  1;    
+			$this->admin_gf     =  2;
+			$this->it_warehouse =  3;       
+			$this->cavite       =  5;
+			$this->san_juan     =  6;   
+			$this->p_tuazon     =  7;       
+
+			//APPROVALS
+			$this->for_receiving = 20;
+			$this->reject       = 21;
+			$this->recieved     = 22;
+			$this->closed       = 13;
+			$this->for_po       = 47;
 		}
 
 	    public function cbInit() {
@@ -79,22 +109,6 @@
 			$this->form[] = ['label'=>'Location','name'=>'location','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-10'];
 			# END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Po No","name"=>"po_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Invoice Date","name"=>"invoice_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
-			//$this->form[] = ["label"=>"Invoice No","name"=>"invoice_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rr Date","name"=>"rr_date","type"=>"date","required"=>TRUE,"validation"=>"required|date"];
-			//$this->form[] = ["label"=>"Expiration Date","name"=>"expiration_date","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Location","name"=>"location","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Wattage","name"=>"wattage","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Phase","name"=>"phase","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Date Updated","name"=>"date_updated","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Archived","name"=>"archived","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			# OLD END FORM
-
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -122,24 +136,21 @@
 	        | 
 	        */
 	        $this->addaction = array(); 
-			$for_approval = DB::table('statuses')->where('id', 20)->value('id');
-			$reject       = DB::table('statuses')->where('id', 21)->value('id');
-			$recieved     = DB::table('statuses')->where('id', 22)->value('id');
-			$closed       = DB::table('statuses')->where('id', 13)->value('id');
-			$for_po       = DB::table('statuses')->where('id', 47)->value('id');
 			if(CRUDBooster::myPrivilegeId() == 6){
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved"];
-				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval && [location] == 2"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval "];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->recieved"];
+				//$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_receiving && [location] == 2"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_receiving && [location] == 2"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_receiving && [location] != 2"];
 				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
-				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_po"];
+				// $this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_receiving"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_po"];
+			
 			}
-			else if(CRUDBooster::myPrivilegeId() == 5 || CRUDBooster::myPrivilegeId() == 9 || CRUDBooster::isSuperadmin()){
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $recieved"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_approval"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $reject"];
-				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $for_po"];
+			else if(in_array(CRUDBooster::myPrivilegeId(),[1,5,9,20,21,22])){
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->recieved"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_receiving"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->reject"];
+				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_po"];
 			}
 			
 			
@@ -324,15 +335,24 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-			$it_warehouse  =    DB::table('warehouse_location_model')->where('id', 3)->value('id');
-			$admin_threef  =    DB::table('warehouse_location_model')->where('id', 1)->value('id');
-			$admin_gf  =  		DB::table('warehouse_location_model')->where('id', 2)->value('id');
 			if(CRUDBooster::myPrivilegeId() == 5){ 
-				$query->where('assets_inventory_header_for_approval.location', $it_warehouse)
+				$query->where('assets_inventory_header_for_approval.location', $this->it_warehouse)
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
-			}else if(CRUDBooster::myPrivilegeId() == 9){ 
-				$query->whereIn('assets_inventory_header_for_approval.location', [$admin_threef, $admin_gf])
+			}else if(in_array(CRUDBooster::myPrivilegeId(),[9])){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->admin_threef, $this->admin_gf])
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 20){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->cavite])
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 21){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->san_juan])
+					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
+
+			}else if(CRUDBooster::myPrivilegeId() == 22){ 
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->p_tuazon])
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else{
@@ -347,12 +367,13 @@
 	    | ---------------------------------------------------------------------- 
 	    |
 	    */    
+	
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	$for_receiving = DB::table('statuses')->where('id', 20)->value('status_description');
-			$received      = DB::table('statuses')->where('id', 22)->value('status_description');
-			$reject        = DB::table('statuses')->where('id', 21)->value('status_description');
-			$closed        = DB::table('statuses')->where('id', 13)->value('status_description');
-			$for_po        = DB::table('statuses')->where('id', 47)->value('status_description');
+	    	$for_receiving = DB::table('statuses')->where('id', $this->for_receiving)->value('status_description');
+			$received      = DB::table('statuses')->where('id', $this->recieved)->value('status_description');
+			$reject        = DB::table('statuses')->where('id', $this->reject )->value('status_description');
+			$closed        = DB::table('statuses')->where('id', $this->closed)->value('status_description');
+			$for_po        = DB::table('statuses')->where('id', $this->for_po )->value('status_description');
 			if($column_index == 2){
 				if($column_value == $for_receiving){
 					$column_value = '<span class="label label-info">'.$for_receiving.'</span>';
@@ -549,6 +570,15 @@
 			}else if(CRUDBooster::myPrivilegeId() == 9){
 				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[2])->get();
 				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
+			}else if(CRUDBooster::myPrivilegeId() == 20){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[5])->get();
+				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
+			}else if(CRUDBooster::myPrivilegeId() == 21){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[6])->get();
+				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
+			}else if(CRUDBooster::myPrivilegeId() == 22){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[7])->get();
+				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->where('header_request.request_type_id',5)->get();
 			}else{
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 				$data['reserved_assets'] = AssetsInventoryReserved::leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')->whereNotNull('for_po')->get();
@@ -669,6 +699,12 @@
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','=',3)->get();
 			}else if(CRUDBooster::myPrivilegeId() == 9){
 				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[2])->get();
+			}else if(CRUDBooster::myPrivilegeId() == 20){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[5])->get();
+			}else if(CRUDBooster::myPrivilegeId() == 21){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[6])->get();
+			}else if(CRUDBooster::myPrivilegeId() == 22){
+				$data['warehouse_location'] = WarehouseLocationModel::whereIn('id',[7])->get();
 			}else{
 				$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			}
@@ -1683,21 +1719,45 @@
 		public function assetSearch(Request $request) {
 			$data = array();
 			$fields = Request::all();
+
 			$search 		   = $fields['search'];
+			$type 		       = $fields['location_id'];
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
-
-			$items = DB::table('assets')
+            if($type == "" || $type == NULL){
+				$items = [];
+			}else if($type == 3){
+				$items = DB::table('assets')
 				->orWhere('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
 				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
-				->join('tam_categories', 'assets.category_id','=', 'tam_categories.id')
+				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
 				->select(	'assets.*',
 				            'tam_categories.id as cat_id',
 							'assets.id as assetID',
-							'tam_categories.category_description as category_description'
+							'tam_categories.category_description as tam_category_description',
+							'category.category_description as dam_category_description'
 						)
-				->take(10)->get();
+				->take(10)
+				->whereNotNull('assets.from_dam')
+				->get();
+			}else{
+				$items = DB::table('assets')
+				->orWhere('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
+				->select(	'assets.*',
+				            'tam_categories.id as cat_id',
+							'assets.id as assetID',
+							'tam_categories.category_description as tam_category_description',
+							'category.category_description as dam_category_description'
+						)
+				->take(10)
+				->whereNull('assets.from_dam')
+				->get();
+			}
 			
 			if($items){
 				$data['status'] = 1;
@@ -1711,7 +1771,7 @@
 					$return_data[$i]['cat_id']               = $value->cat_id;
 					$return_data[$i]['digits_code']          = $value->digits_code;
 					$return_data[$i]['item_description']     = $value->item_description;
-					$return_data[$i]['category_description'] = $value->category_description;
+					$return_data[$i]['category_description'] = $value->tam_category_description ? $value->tam_category_description : $value->dam_category_description;
 					$return_data[$i]['item_cost']            = $value->item_cost;
 					$i++;
 
@@ -1757,7 +1817,7 @@
 	
 			$subcategories = DB::table('class')
 							->select('class.*')
-							->where('location', $id)
+							->where('location_id','LIKE', '%'.$id.'%')
 							->get();
 			return($subcategories);
 		}

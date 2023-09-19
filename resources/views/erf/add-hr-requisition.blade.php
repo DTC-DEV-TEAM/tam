@@ -82,7 +82,7 @@
                 /* border: 1px solid rgb(194, 193, 193); */
                 font-size: 35px;
                 color: white;
-                background-color: #3c8dbc;
+                background-color: #00a65a;
        
             }
             #bigplus{
@@ -109,6 +109,31 @@
                     transform: rotate(360deg);
                 }
             }
+
+            input[type=file]{
+                width: 100%;
+                border: 1px solid #a7a5a5ee;
+                padding: 5px;
+            }
+
+            input[type=file]::file-selector-button {
+                margin-right: 20px;
+                border: none;
+                background: #00a65a;
+                padding: 10px 20px;
+                border-radius: 5px;
+                color: #fff;
+                cursor: pointer;
+                transition: background .2s ease-in-out;
+            }
+
+            input[type=file]::file-selector-button:hover {
+                opacity: 0.7;
+            }
+            #asset-items th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
+            }
         </style>
     @endpush
 @section('content')
@@ -130,7 +155,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label require"> Company</label>
-                            <input type="text" class="form-control finput"  id="company" name="company" value="Digits Trading Corp."  required readonly>
+                            <input type="text" class="form-control finput"  id="company" name="company" value="Tasteless"  required readonly>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -343,21 +368,24 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Please attach the following documents:</label>
-                            <div class='callout callout-success'>
-                            <h4>*Job Description <br>
-                            *Specialty Test / Additional Tests with Answer Key (Optional)
-                            </h4> 
-                                Before uploading a file, please read below instructions : <br/>
-                                * File format should be : PDF, XLSX file format<br/>
-                            </div>
-                            <input type="file" class="form-control finput" style="" name="documents[]" id="documents" multiple accept=".xlsx, .pdf">
-                            <div class="gallery" style="margin-bottom:5px; margin-top:15px"></div>
-                            <a class="btn btn-xs btn-danger" style="display:none; margin-left:10px" id="removeImageHeader" href="#"><i class="fa fa-remove"></i></a>
+                    <div class="col-md-6">
+                        <div class='callout callout-success'>
+                        <h4>* Job Description <br>
+                        * Specialty Test / Additional Tests with Answer Key (Optional)
+                        </h4> 
+                            Before uploading a file, please read below instructions : <br/>
+                            * File format should be : PDF, XLSX file format<br/>
                         </div>
                     </div> 
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <br>
+                            <label class="control-label"><span style="color:red">*</span> Please attach the following documents:</label>
+                            <input type="file" class="finput" style="" name="documents[]" id="documents" multiple accept=".xlsx, .pdf">
+                            {{-- <div class="gallery" style="margin-bottom:5px; margin-top:15px"></div> --}}
+                            {{-- <a class="btn btn-xs btn-danger" style="display:none; margin-left:10px" id="removeImageHeader" href="#"><i class="fa fa-remove"></i></a> --}}
+                        </div> 
+                    </div>
                 </div>
             </div>
 
@@ -367,7 +395,7 @@
             <div class="card8">
                 <div class="row">
                     <div class="col-md-12">              
-                     <table class="table table-bordered" id="asset-items">
+                     <table id="asset-items">
                             <tbody id="bodyTable">
                                 <tr class="tbl_header_color dynamicRows">
                                     <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th> 
@@ -392,6 +420,7 @@
                                     <td align="left" colspan="1">
                                         <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
                                     </td>
+                                    <td></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -430,7 +459,7 @@
             </div>
             <div class='panel-footer'>
                 <a href="{{ CRUDBooster::mainpath() }}" id="btn-cancel" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-                <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+                <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
             </div>  
     </form>
    

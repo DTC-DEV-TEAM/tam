@@ -272,29 +272,29 @@
 
             <div class="row">
                 <div class="col-md-12">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="control-label"><span style="color:red">*</span> Please indicate Digits Code or Item Description</label>
-                                <input class="form-control auto finput" placeholder="Search Item..." id="search">
-                                <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
-                                    <li>Loading...</li>
-                                </ul>
-                            </div>
-                            <div id="display-error">
-                                <span class="test"></span>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"><span style="color:red">*</span> Location</label>
+                            <select selected data-placeholder="- Select location -" id="location" name="location" class="form-select select2" style="width:100%;">
+                            @foreach($warehouse_location as $res)
+                                <option value=""></option>
+                                <option value="{{ $res->id }}">{{ $res->location }}</option>
+                            @endforeach
+                            </select>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="control-label"><span style="color:red">*</span> Location</label>
-                                <select selected data-placeholder="- Select location -" id="location" name="location" class="form-select select2" id="location" style="width:100%;">
-                                @foreach($warehouse_location as $res)
-                                    <option value=""></option>
-                                    <option value="{{ $res->id }}">{{ $res->location }}</option>
-                                @endforeach
-                                </select>
-                            </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="control-label"><span style="color:red">*</span> Please indicate Digits Code or Item Description</label>
+                            <input class="form-control auto finput" placeholder="Search Item..." id="search">
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
+                                <li>Loading...</li>
+                            </ul>
                         </div>
+                        <div id="display-error">
+                            <span class="test"></span>
+                        </div>
+                    </div>   
                 </div>
             </div>
 
@@ -452,6 +452,7 @@
         var token = $("#token").val();
         var arf_array = [];
         $("#btnSubmit").attr("disabled", true);
+        
         $(document).ready(function(){
             //selectRefresh();
             $(function(){
@@ -465,14 +466,15 @@
                         type: "POST",
                         data: {
                             "_token": token,
-                            "search": request.term
+                            "search": request.term,
+                            "location_id": $('#location').val()
                         },
                         success: function (data) {
                             //console.log(data.items);
-                            if(data.items === null){
+                            if(data.items === null || data.items.length === 0){
                                 swal({
                                 type: 'error',
-                                title: 'Item not Found!',
+                                title: 'Item not found!',
                                 icon: 'error',
                                 confirmButtonColor: "#367fa9",
                                });
@@ -692,7 +694,7 @@
                         }
                         $('#sub_class').attr('disabled', false);
                         jQuery('#sub_category_id'+tableRow).html(showData);   
-                        $('#sub_class').val('').trigger('change');       
+                        //$('.sub_category_id').val('').trigger('change');       
                     }
                 });
             });
@@ -713,7 +715,8 @@
             //             confirmButtonColor: "#367fa9",
             //     });
             //             event.preventDefault();
-            // }else if($('#location').val() === ""){
+            // }
+            //else if($('#location').val() === ""){
             //     swal({
             //         type: 'error',
             //         title: 'Please select location!',
@@ -759,6 +762,16 @@
             //     });
             //     event.preventDefault();
             // }else{
+                if($('#location').val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Location required!',
+                        icon: 'error',
+                            confirmButtonColor: "#367fa9",
+                    });
+                    event.preventDefault();
+                    return false;
+                }
                 $.ajax({
                     url: "{{ route('assets.check.row') }}",
                     dataType: "json",

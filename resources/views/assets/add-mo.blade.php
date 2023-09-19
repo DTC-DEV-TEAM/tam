@@ -1,11 +1,25 @@
 @extends('crudbooster::admin_template')
     @push('head')
         <style type="text/css">   
+            .select2-selection__choice{
+                    font-size:14px !important;
+                    color:black !important;
+            }
 
             .select2-selection__choice{
                     font-size:14px !important;
                     color:black !important;
             }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
+
 
             /* The Modal (background) */
             .modal {
@@ -57,12 +71,14 @@
                 padding: 8px;
             }
             .finput {
-                border:none;
+                background-color: #fff;
+                border: none;
                 /* border-bottom: 1px solid rgba(18, 17, 17, 0.5); */
             }
             input.finput:read-only {
-                background-color: #d4edda; 
-                color:#155724
+                background-color: #fff; 
+                border: none;
+                /* color:#155724 */
             }
 
         </style>
@@ -83,6 +99,7 @@
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
         <input type="hidden" name="freebies_val" id="freebies_val" value="0">
+        <input type="hidden" name="admin" id="admin" value="{{CRUDBooster::myPrivilegeId()}}">
 
         <!-- Modal 1-->
         <div id="myModal" class="modal" style="padding: auto">
@@ -143,35 +160,41 @@
         <div class='panel-body'>
 
             <div class="row">
-
                 <div class="col-md-4">
                     <div class="form-group">
                         <label class="require control-label">*{{ trans('message.form-label.header_request_id') }}:</label>
                         <select class="js-example-basic-single" data-placeholder="** Please a Asset Request"  style="width: 100%;" name="header_request_id" id="header_request_id">
                             <option value=""></option>
                             @foreach($AssetRequest as $value)
-                               @if($value->if_from_erf !== NULL)
+                                @if($value->if_from_erf !== NULL)
                                 <option value="{{$value->id}}">{{$value->reference_number}} | {{$value->if_from_erf}}</option>
-                               @else
+                                @else
                                 <option value="{{$value->id}}">{{$value->reference_number}}</option>
-                               @endif
+                                @endif
                             @endforeach
                         </select>
                     </div>
                 </div>
-
-                <br/>
-                <input type="checkbox" name="lock" id="lock" style="height: 34px;" value="Lock"/>
+                <input type="checkbox" name="lock" id="lock" style="height: 34px; margin-top:25px" value="Lock"/>
+            
                 
- 
+                {{-- <div class="col-md-5">
+                    <div class="form-group">
+                        <label class="require control-label"> Location to Pick:</label>
+                        <select data-placeholder="** Please a location" id="location" name="location" class="form-select location" id="location" style="width:100%;">
+                            <option value=""></option>
+                            @foreach($locations as $location)
+                                <option value="{{$location->id}}">{{$location->location}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div> --}}
             </div>
 
             <div class="ARFHeader" id="ARFHeader">
-
             </div>
 
             <div class="ARFBodyTable" id="ARFBodyTable">
-
             </div>
 
             {{-- <div class="row" id="Tag">
@@ -223,7 +246,7 @@
         <div class='panel-footer'>
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit" style="margin-left: 5px;"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit" style="margin-left: 5px;"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
             @if(CRUDBooster::isSuperadmin())
                 <button class="btn btn-danger pull-right" value="cancelLineRequest" type="button" id="btnCancelLineRequest" style="margin-left: 5px;"><i class="fa fa-times-circle" ></i> Cancel Line</button>
             @endif
@@ -243,19 +266,22 @@
 <script type="text/javascript">
     $(function(){
         $('body').addClass("sidebar-collapse");
+        $("#lock").attr('disabled', true);
     });
     $("#Tag").hide();
 
     var stack = [];
     var token = $("#token").val();
 
+    $('.location').select2({allowClear: true});
+
     var modal = document.getElementById("myModal");
     var modal2 = document.getElementById("myModal2");
     $(document).keydown(function(event) { 
-    if (event.keyCode == 27) { 
-        modal.style.display = "none";
-        modal2.style.display = "none";
-    }
+        if (event.keyCode == 27) { 
+            modal.style.display = "none";
+            modal2.style.display = "none";
+        }
     });
     $('.btnsearch').click(function() {
         if($("#category").val() == 1 || $("#category").val() == 5){
@@ -285,6 +311,7 @@
     setTimeout("preventBack()", 0);
 
     $( "#quote_date, #po_date" ).datepicker( { format: 'yyyy-mm-dd', endDate: new Date() } );
+
 
     $(".btnsearch").click(function(event) {
         var searchID = $(this).attr("data-id");
@@ -368,7 +395,7 @@
                 type: 'error',
                 title: 'Please select item to cancel!',
                 icon: 'error',
-                confirmButtonColor: "#367fa9",
+                confirmButtonColor: "#5cb85c",
             }); 
             event.preventDefault();
             return false;
@@ -445,10 +472,47 @@
                 type: 'error',
                 title: 'Please add an item!',
                 icon: 'error',
-                confirmButtonColor: "#367fa9",
+                confirmButtonColor: "#5cb85c",
             }); 
             event.preventDefault(); // cancel default behavior
-        }else{
+        }
+
+        var privilege = $('#admin').val();
+
+        if(privilege == 6){
+            var location = $(".location").length;
+            var location_value = $(".location").find(":selected");;
+            for(i=0;i<location;i++){
+                if(location_value.eq(i).val() == 0 || location_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please choose location to pick!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+            } 
+        }
+        
+        var id = $("input[name^='stock[]']").length;
+        var stockId = $("input[name^='stock[]']");
+        for(i=0;i<id;i++){
+            if(stockId.eq(i).val() == 0){
+                swal({
+                        type: 'error',
+                        title: 'No stock in selected location',
+                        icon: 'error',
+                        confirmButtonColor: "#5cb85c",
+                    });
+                    event.preventDefault();
+                    return false;
+            }
+        
+        }
+
+        //else{
             swal({
                 title: "Are you sure?",
                 type: "warning",
@@ -461,10 +525,9 @@
                 }, function () {
                     $("#AssetRequest").submit();                                                   
             });
-        }
+        //}
 
     });
-
 
     $(document).on('click', '.delete_item', function() {
         var RowID = $(this).attr("data-id");
@@ -963,6 +1026,7 @@
     $("#btnSubmit").attr('disabled', true);
     $("#add-Row").attr('disabled', true);
     $('#header_request_id').on('change', function() {
+        $("#lock").attr('disabled', false);
         selected_header = this.value;
         //var channel = $('#channels_id').val();
         //$("#template_checker").val(selected_template);
@@ -998,12 +1062,13 @@
             $("#btnSubmit").attr('disabled', true);
             $(".btnsearch").attr('disabled', true);
             $("#header_request_id").attr('disabled', false);
-                
+             
         }else{
             $("#btnSubmit").attr('disabled', false);
             $(".btnsearch").attr('disabled', false);
             $("#header_request_id").attr('disabled', true);
             $("#lock").attr('disabled', true);
+            $(".location").attr("disabled",false);
         }
 
     });

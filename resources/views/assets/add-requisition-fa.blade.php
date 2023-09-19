@@ -64,7 +64,7 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Asset Form
+       Fill up FA asset form
     </div>
 
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetRequest" enctype="multipart/form-data">
@@ -208,7 +208,7 @@
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
 
-            <button class="btn btn-primary pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
 
         </div>
 
@@ -251,7 +251,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -261,7 +261,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -277,7 +277,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -286,7 +286,7 @@
                             type: 'error',
                             title: 'Please fill all Fields!',
                             icon: 'error',
-                            confirmButtonColor: "#367fa9",
+                            confirmButtonColor: "#5cb85c",
                         });
                         count_fail++;
 
@@ -408,7 +408,7 @@
                                         type: 'error',
                                         title: 'No Found Item',
                                         icon: 'error',
-                                        confirmButtonColor: "#367fa9",
+                                        confirmButtonColor: "#5cb85c",
                                     });
                                 }else{ 
                                 if (data.status_no == 1) {
@@ -665,7 +665,7 @@
                         type: 'error',
                         title: 'Please choose Purpose!',
                         icon: 'error',
-                        confirmButtonColor: "#367fa9",
+                        confirmButtonColor: "#5cb85c",
                     }); 
                     event.preventDefault(); // cancel default behavior
                     return false;
@@ -674,7 +674,7 @@
                         type: 'error',
                         title: 'Please add an item!',
                         icon: 'error',
-                        confirmButtonColor: "#367fa9",
+                        confirmButtonColor: "#5cb85c",
                     }); 
                     event.preventDefault(); // cancel default behavior
                     return false;
@@ -687,7 +687,7 @@
                                     type: 'error',
                                     title: 'Item Description cannot be empty!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -703,7 +703,7 @@
                                     type: 'error',
                                     title: 'Digits Code cannot be empty!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -719,7 +719,7 @@
                                     type: 'error',
                                     title: 'Please select Category!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;
@@ -735,7 +735,7 @@
                                     type: 'error',
                                     title: 'Please select Sub Category!',
                                     icon: 'error',
-                                    confirmButtonColor: "#367fa9",
+                                    confirmButtonColor: "#5cb85c",
                                 });
                                 event.preventDefault();
                                 return false;

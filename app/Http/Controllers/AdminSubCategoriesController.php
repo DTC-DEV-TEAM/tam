@@ -51,7 +51,7 @@
 			$this->form = [];
 			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description'];
 			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-
+			$this->form[] = ['label'=>'Location','name'=>'location_id','type'=>'select3-new','width'=>'col-sm-5','datatable'=>'warehouse_location_model,location'];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				
 				$this->form[] = ['label'=>'Status','name'=>'class_status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
@@ -184,8 +184,20 @@
 	        $this->script_js = NULL;
 			$this->script_js = "
 			$(document).ready(function() {
-
-				//$('#category_id').attr('disabled', 'true');
+				$('#location_id').select2();
+				let x = $(location).attr('pathname').split('/');
+				let add_action = x.includes('add');
+				let edit_action = x.includes('edit');
+				if (edit_action){
+					var a  = 	location_id.split(',').length;
+					var b = 	location_id.split(',');
+					var selectedValues = new Array();
+	
+					for (let i = 0; i < a; i++) {
+						selectedValues[i] = b[i];
+						$('#location_id').val(selectedValues);
+					}
+				}
 
 			});
 			";
@@ -319,6 +331,17 @@
 			}else if($FromtoCode != 0){
 				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_invalid_code_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
 			}else{
+
+				$locationIds = array();
+				$location = json_encode($postdata['location_id'], true);
+				$locationArray1 = explode(",", $location);
+		
+				foreach ($locationArray1 as $key => $value) {
+					$locationIds[$key] = preg_replace("/[^0-9]/","",$value);
+				}
+		
+				$postdata['location_id'] = implode(",", $locationIds);
+
 				$postdata['from_code']= $from_code;
 				$postdata['to_code']= $from_to;
 				$postdata['category_code']= $from_code . " - " . $from_to;
@@ -353,6 +376,15 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
 			//unset($postdata['category_id']);
+			$locationIds = array();
+			$location = json_encode($postdata['location_id'], true);
+			$locationArray1 = explode(",", $location);
+	
+			foreach ($locationArray1 as $key => $value) {
+				$locationIds[$key] = preg_replace("/[^0-9]/","",$value);
+			}
+	
+			$postdata['location_id'] = implode(",", $locationIds);
 
 			$postdata['updated_by']=CRUDBooster::myId();
 	    }

@@ -55,12 +55,16 @@
                             <td><p>{{$Header->position}}</p></td>
                         </tr>
                         <tr>
+                            <td width="20%"><label><strong>Date:<strong></label></td>
+                            <td><p>{{ date('Y-m-d') }}</p></td>
+                            <td width="10%"><label><strong>Location:<strong></label></td>
+                            <td><p style="margin-top: 6px;">{{$Location->location}}</p></td>
+                        </tr>
+                        <tr>
                             @if($Header->store_branch != null || $Header->store_branch != "")
                                 <td width="20%"><label><strong>Store/Branch:<strong></label></td>
                                 <td width="40%"><p>{{$Header->store_name}}</p></td>
                             @endif
-                            <td width="20%"><label><strong>Date:<strong></label></td>
-                            <td><p>{{ date('Y-m-d') }}</p></td>
                         </tr>
 
                         <tr>
@@ -270,7 +274,7 @@
 
                     <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
                     
-                    <button class="btn btn-primary pull-right" type="submit" id="printARF" onclick="printDivision('printableArea')"> <i class="fa fa-print" ></i> Print as PDF</button>
+                    <button class="btn btn-success pull-right" type="submit" id="printARF" onclick="printDivision('printableArea')"> <i class="fa fa-print" ></i> Print as PDF</button>
                     
                     <!-- @if( $Header->status_id == 15 )
                     
