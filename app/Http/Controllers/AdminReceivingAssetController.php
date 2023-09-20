@@ -634,7 +634,7 @@
 						'recommended.name as recommendedby',
 						'picked.name as pickedby',
 						'processed.name as processedby',
-						'mo.name as moby',
+						'mo.name as mo_by',
 						'header_request.created_at as created_at'
 						)
 				->where('header_request.id', $HeaderID->header_request_id)->first();
