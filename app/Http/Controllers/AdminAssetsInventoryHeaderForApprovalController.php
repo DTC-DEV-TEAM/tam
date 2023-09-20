@@ -830,7 +830,7 @@
 
 			//parse data in form
 			parse_str($fields['form_data'], $fields);
-
+  
 			$po_no        = $fields['po_no'];
 			$location     = $fields['location'];
 			$invoice_date = $fields['invoice_date'];
@@ -844,7 +844,6 @@
 			$brand        = $fields['brand'];
 			$specs        = $fields['specs'];
 
-		 
 			//Body details
 			$allData    = [];
 			$container  = [];

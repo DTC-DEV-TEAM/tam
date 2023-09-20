@@ -678,6 +678,11 @@
            //Class
            $('#location').change(function(){
                 var id =  this.value;
+                if(id == 3){
+                    $('#location').attr('disabled',true);
+                }else{
+                    $('#location').attr('disabled',false);
+                }
                 $.ajax({ 
                     type: 'POST',
                     url: "{{ route('sub-categories-code') }}",
@@ -992,7 +997,6 @@
                         //             event.preventDefault();
                         //             return false;
                         //     }else{
-                                $('.arf_tag').attr('disabled',false);
                                 swal({
                                     title: "Are you sure?",
                                     type: "warning",
@@ -1003,6 +1007,7 @@
                                     width: 450,
                                     height: 200
                                     }, function () {
+                                    $('#location').attr('disabled',false);
                                     //showLoading();   
                                     $.ajaxSetup({
                                         headers: {
