@@ -143,6 +143,7 @@
 					//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
 				}
 				$this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
+				$this->index_button[] = ["label"=>"Sync Data Updated","icon"=>"fa fa-refresh","color"=>"primary"];
 			}
 
 
@@ -237,8 +238,11 @@
 				}
                 
 				//updated item master data
-				setInterval(getItemMasterUpdatedData, 60*60*1000);
-				function getItemMasterUpdatedData(){
+				$('#sync-data-updated').click(function(event){
+					event.preventDefault();
+                    getItemMasterUpdatedDataDamApi();
+				});
+				function getItemMasterUpdatedDataDamApi(){
 					$.ajax({
 						type: 'POST',
 						url: '".route('get-item-master-updated-data')."',
@@ -501,6 +505,72 @@
 				}
 			}
 			\Log::info('Item Create: executed! items');
+			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
+			echo json_encode($message);
+		}
+
+		// DAM ITEM MASTER UPDATED
+		public function getItemMasterUpdatedDataDamApi(Request $request) {
+			$token = $this->getToken();
+			//$token = 'k3SwpRtByEPOgFi8';
+			$headers = array(
+				'Accept: application/json',
+				'Authorization: Bearer ' . $token
+			);
+			$error_msg = "";
+			$url = config('env-api.dam-get-updated-items-url');
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close($ch);
+
+			$cURLresponse = json_decode($cURLresponse, true);
+			dd($cURLresponse);
+			$data = [];
+			$count = 0;
+			if(!empty($cURLresponse["data"])) {
+				foreach ($cURLresponse["data"] as $key => $value) {
+				
+					$count++;
+						DB::beginTransaction();
+						try {
+							Assets::updateOrcreate([
+								'digits_code'         => $value['digits_code'] 
+							],
+							[
+								'digits_code'         => $value['digits_code'],
+								'item_description'    => $value['item_description'],
+								'tam_category_id'     => NULL,
+								'tam_sub_category_id' => NULL,
+								'dam_category_id'     => $value['category_id'],
+								'dam_sub_category_id' => $value['sub_category_id'],
+								'dam_class_id'        => $value['class_id'],
+								'dam_sub_class_id'    => $value['sub_class_id'],
+								'item_cost'           => $value['item_cost'],
+								'status'              => 'ACTIVE',
+								'from_dam'            => 1,
+								'updated_by'          => CRUDBooster::myId(),
+								'updated_at'          => date('Y-m-d H:i:s')
+							]);
+							DB::commit();
+						} catch (\Exception $e) {
+							\Log::debug($e);
+							DB::rollback();
+						}
+					
+				}
+			}
+			\Log::info('Item Update: executed! items');
 			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
 			echo json_encode($message);
 		}

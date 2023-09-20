@@ -398,13 +398,16 @@
                             '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="'+ tableRow +'" id="fixed_description'+ tableRow +'"  name="fixed_description[]"   maxlength="100" readonly>' +
                         '</td>' +
 
-                        '<td>'+
-                            '<select class="form-control category" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required required style="width:100%">' +
-                            //'  <option value="">- Select Category -</option>' +
-                            '        @foreach($categories as $data)'+
-                            '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
-                            '         @endforeach'+
-                            '</select>'+
+                        // '<td>'+
+                        //     '<select class="form-control category" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required required style="width:100%">' +
+                        //     //'  <option value="">- Select Category -</option>' +
+                        //     '        @foreach($categories as $data)'+
+                        //     '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
+                        //     '         @endforeach'+
+                        //     '</select>'+
+                        // '</td>' +
+                        '<td>' + 
+                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id sinput" data-id="'+ tableRow +'" id="category_id'+ tableRow +'"  name="category_id[]"   maxlength="100" readonly>' +
                         '</td>' +
 
                         '<td>' + 
@@ -436,9 +439,9 @@
 
                     //$('#sub_category_id'+tableRow).attr('disabled', true);
                    
-                    $('#category_id'+tableRow).select2({
-                    placeholder_text_single : "- Select Category -",
-                    minimumResultsForSearch: -1});
+                    // $('#category_id'+tableRow).select2({
+                    // placeholder_text_single : "- Select Category -",
+                    // minimumResultsForSearch: -1});
                     // $('.sub_category_id').select2({
                     // placeholder_text_single : "- Select Sub Category -"});
                     $('#app_id'+tableRow).change(function(){
@@ -546,6 +549,7 @@
                                 if (e.id) {
                                 
                                     $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
+                                    $('#category_id'+$(this).attr("data-id")).val(e.category_description);
                                     $('#sub_category_id'+$(this).attr("data-id")).val(e.sub_category_description);
                                     $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
                                     $('#itemDesc'+$(this).attr("data-id")).val(e.value);

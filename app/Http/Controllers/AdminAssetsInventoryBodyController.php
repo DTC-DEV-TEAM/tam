@@ -250,7 +250,11 @@
 	        | $this->style_css = ".style{....}";
 	        |
 	        */
-	        $this->style_css = NULL;
+	        $this->style_css = "
+			.change-color{
+				background-color:#343a40 !important;
+			}
+			";
 	        
 	        
 	        
@@ -302,20 +306,20 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	//Your code here
-			$for_approval   = DB::table('statuses')->where('id', 20)->value('status_description');
-			$available      = DB::table('statuses')->where('id', 6)->value('status_description');
-			$reserved       = DB::table('statuses')->where('id', 2)->value('status_description');
-			$deployed       = DB::table('statuses')->where('id', 3)->value('status_description');
-			$defective      = DB::table('statuses')->where('id', 23)->value('status_description');
-			$forReturn      = DB::table('statuses')->where('id', 26)->value('status_description');
-			$forTransfer    = DB::table('statuses')->where('id', 27)->value('status_description');
-			$notAvailabe    = DB::table('statuses')->where('id', 28)->value('status_description');
-			$for_receiving  = DB::table('statuses')->where('id', 16)->value('status_description');
-
+	    	$for_approval     = DB::table('statuses')->where('id', 20)->value('status_description');
+			$available        = DB::table('statuses')->where('id', 6)->value('status_description');
+			$reserved         = DB::table('statuses')->where('id', 2)->value('status_description');
+			$deployed         = DB::table('statuses')->where('id', 3)->value('status_description');
+			$defective        = DB::table('statuses')->where('id', 23)->value('status_description');
+			$forReturn        = DB::table('statuses')->where('id', 26)->value('status_description');
+			$forTransfer      = DB::table('statuses')->where('id', 27)->value('status_description');
+			$notAvailabe      = DB::table('statuses')->where('id', 28)->value('status_description');
+			$forInvestigation = DB::table('statuses')->where('id', 44)->value('status_description');
+			$forDisposal      = DB::table('statuses')->where('id', 45)->value('status_description');
+			$disposed         = DB::table('statuses')->where('id', 46)->value('status_description');
 			if($column_index == 4){
-				if($column_value == $for_receiving){
-					$column_value = '<span class="label label-warning">'.$for_receiving.'</span>';
+				if($column_value == $for_approval){
+					$column_value = '<span class="label label-success">'.$for_approval.'</span>';
 				}else if($column_value == $available){
 					$column_value = '<span class="label label-success">'.$available.'</span>';
 				}else if($column_value == $reserved){
@@ -329,15 +333,29 @@
 				}else if($column_value == $forTransfer){
 					$column_value = '<span class="label label-info">'.$forTransfer.'</span>';
 				}else if($column_value == $notAvailabe){
-					$column_value = '<span class="label label-danger">'.$notAvailabe.'</span>';
+					$column_value = '<span class="label label-warning change-color">'.$notAvailabe.'</span>';
+				}else if($column_value == $forInvestigation){
+					$column_value = '<span class="label label-warning change-color">'.$forInvestigation.'</span>';
+				}else if($column_value == $forDisposal){
+					$column_value = '<span class="label label-warning change-color">'.$forDisposal.'</span>';
+				}else if($column_value == $disposed){
+					$column_value = '<span class="label label-warning change-color">'.$disposed.'</span>';
 				}
 			}
-	
+
 			if($column_index == 7){
 				if($column_value == "Good"){
 					$column_value = '<span class="label label-success">GOOD</span>';
 				}else if($column_value == "Defective"){
 					$column_value = '<span class="label label-danger">DEFECTIVE</span>';
+				}else if($column_value == "Not Available"){
+					$column_value = '<span class="label label-danger change-color">NOT AVAILABLE</span>';
+				}else if($column_value == "For Investigation"){
+					$column_value = '<span class="label label-danger change-color">FOR INVESTIGATION</span>';
+				}else if($column_value == "For Disposal"){
+					$column_value = '<span class="label label-danger change-color">FOR DISPOSAL</span>';
+				}else if($column_value == "Disposed"){
+					$column_value = '<span class="label label-danger change-color">DISPOSED</span>';
 				}
 			}
 	    }
@@ -408,21 +426,32 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        $fields = Request::all();
+			$fields = Request::all();
 			$id =  $fields['request_type_id'];
 			$digits_code =  $fields['digits_code'];
 			$asset_code =  $fields['asset_code'];
 			$item_condition =  $fields['item_condition'];
 			$comments =  $fields['comments'];
 			$other_comment =  $fields['other_comment'];
-			$quantity =  $fields['quantity'];
 			$statuses_id =  $fields['statuses_id'];
-			if($item_condition === "Good" && $quantity != 0){
-               $status = 6;
-			}else if($quantity == 0){
-               $status = 28;
+			if($item_condition === "Good"){
+               $status    = 6;
+			   $quantity  =  1;
+			}else if($item_condition === "Not Available"){
+               $status    = 28;
+			   $quantity  =  0;
+			}else if($item_condition === "For Investigation"){
+				$status   = 44;
+				$quantity =  0;
+			}else if($item_condition === "For Disposal"){
+				$status   = 45;
+				$quantity =  0;
+			}else if($item_condition === "Disposed"){
+				$status   = 46;
+				$quantity =  0;
 			}else{
-				$status = 23;
+				$status   = 23;
+				$quantity =  0;
 			}
 	
 			DB::table('assets_inventory_body')->where('id', $id)
