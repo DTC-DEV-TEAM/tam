@@ -742,9 +742,10 @@
 			$data['page_title'] = 'Picking Request';
 
 			$HeaderID = MoveOrder::where('id', $id)->first();
-
+			$location = substr($HeaderID->mo_reference_number,11);
+			$data['Location'] = DB::table('warehouse_location_model')->where('id', $location)->first();
+			
 			$user_info = 		DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->get();
-
 
 			$approval_array = array();
 			foreach($user_info as $matrix){
@@ -809,10 +810,12 @@
 			//   ->where('comments_good_defect_tbl.digits_code', $digits_code['digits_code'])
 			//   ->where('comments_good_defect_tbl.asset_code', $asset_code['asset_code'])
 			//   ->get();
+
+			$users_location = DB::table('cms_users')->where('id',CRUDBooster::myId())->first();
 			
 			$data['good_defect_lists'] = GoodDefectLists::all();
 			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
-			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->get();
+			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
 			}else{
 				$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
 			}

@@ -79,6 +79,13 @@
                         <p>{{$Header->position}}</p>
                 </div>
             </div>
+            
+            <div class="row">
+                <label class="control-label col-md-2">Location:</label>
+                <div class="col-md-4">
+                        <p>{{$Location->location}}</p>
+                </div>
+            </div>
 
             @if($Header->store_branch != null || $Header->store_branch != "")
                 <div class="row">                           
