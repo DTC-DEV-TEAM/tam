@@ -211,7 +211,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -361,6 +361,7 @@
 				->leftjoin('cms_users as picked', 'header_request.picked_by','=', 'picked.id')
 				->leftjoin('cms_users as received', 'header_request.received_by','=', 'received.id')
 				->leftjoin('cms_users as closed', 'header_request.closed_by','=', 'closed.id')
+				->leftjoin('cms_users as mo', 'header_request.mo_by','=', 'mo.id')
 				->select(
 						'header_request.*',
 						'header_request.id as requestid',
@@ -378,7 +379,8 @@
 						'received.name as receivedby',
 						'processed.name as processedby',
 						'closed.name as closedby',
-						'header_request.created_at as created_at'
+						'header_request.created_at as created_at',
+						'mo.name as mo_by',
 						)
 				->where('header_request.id', $header_id->header_request_id)->first();
 				
