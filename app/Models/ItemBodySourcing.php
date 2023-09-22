@@ -33,14 +33,14 @@ class ItemBodySourcing extends Model{
 
      public function scopeBody($query,$id){
         return $query->leftjoin('category', 'item_sourcing_body.category_id', '=', 'category.id')
-        ->leftjoin('tam_subcategories', 'item_sourcing_body.sub_category_id', '=', 'tam_subcategories.id')
+        ->leftjoin('sub_category', 'item_sourcing_body.sub_category_id', '=', 'sub_category.id')
         //->leftjoin('class', 'item_sourcing_body.class_id', '=', 'class.id')
         //->leftjoin('new_sub_class', 'item_sourcing_body.sub_class_id', '=', 'new_sub_class.id')
         ->select(
           'item_sourcing_body.*',
           'item_sourcing_body.id as body_id',
           'category.*',
-          'tam_subcategories.*',
+          'sub_category.*',
           //'class.*',
           //'new_sub_class.*',
         )
@@ -51,7 +51,7 @@ class ItemBodySourcing extends Model{
      public function scopeBodyInfo($query,$id){
       return $query
       ->leftjoin('category', 'item_sourcing_body.category_id', '=', 'category.id')
-      ->leftjoin('tam_subcategories', 'item_sourcing_body.sub_category_id', '=', 'tam_subcategories.id')
+      ->leftjoin('sub_category', 'item_sourcing_body.sub_category_id', '=', 'sub_category.id')
       //->leftjoin('new_class', 'item_sourcing_body.class_id', '=', 'new_class.id')
       //->leftjoin('new_sub_class', 'item_sourcing_body.sub_class_id', '=', 'new_sub_class.id')
       ->where('item_sourcing_body.header_request_id',$id)->first();
