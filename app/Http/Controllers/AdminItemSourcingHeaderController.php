@@ -160,7 +160,7 @@
 				$this->index_button[] = ["label"=>"IT Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-it'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Fixed Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-fa'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Marketing","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-mkt'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Supplies","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-supplies'),"color"=>"success"];
+				//$this->index_button[] = ["label"=>"Supplies","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-supplies'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Services","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-services'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Subscription","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-subscription'),"color"=>"success"];
 
@@ -1024,11 +1024,11 @@
 			$id = $data['id'];
 			//$categories = DB::table('new_category')->where('category_description', $id)->first();
 
-			$subcategories = DB::table('tam_subcategories')
-							->select('tam_subcategories.*')
-							//->whereIn('categories_id', [273])
-							->where('status', "ACTIVE")
-							->orderby('subcategory_description', 'ASC')->get();
+			$subcategories = DB::table('sub_category')
+							->select('sub_category.*')
+							->where('category_id', $id)
+							->where('class_status', "ACTIVE")
+							->orderby('class_description', 'ASC')->get();
 	
 			return($subcategories);
 		}
