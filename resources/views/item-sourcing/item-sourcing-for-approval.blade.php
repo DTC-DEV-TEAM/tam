@@ -198,7 +198,7 @@
                                                                 {{$rowresult->category_description}}                               
                                                             </td>
                                                             <td style="text-align:center" height="10">
-                                                                {{$rowresult->subcategory_description}}                              
+                                                                {{$rowresult->class_description}}                              
                                                             </td>
                                                                                                 
                                                             <td style="text-align:center" height="10">                                                             
