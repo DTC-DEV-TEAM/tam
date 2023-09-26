@@ -356,7 +356,7 @@
 				'Authorization: Bearer ' . $token
 			);
 			$error_msg = "";
-			$url = config('env-api.dam-get-created-items-url');
+			$url = config('env-api.dam-get-created-classes-url');
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
@@ -416,7 +416,7 @@
 				'Authorization: Bearer ' . $token
 			);
 			$error_msg = "";
-			$url = config('env-api.dam-get-updated-items-url');
+			$url = config('env-api.dam-get-updated-classes-url');
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
