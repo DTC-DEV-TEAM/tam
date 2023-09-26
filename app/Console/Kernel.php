@@ -24,10 +24,22 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call('\App\Http\Controllers\AdminItemsController@getItemsUpdatedAPI')->hourly()->between('9:00', '21:00');
-        $schedule->call('\App\Http\Controllers\AdminItemsController@getItemsCreatedAPI')->hourly()->between('9:00', '21:00');
-        $schedule->call('\App\Http\Controllers\AdminOrderSchedulesController@deactivateSchedule')->dailyAt('04:00');
-        $schedule->call('\App\Http\Controllers\AdminPurchaseOrderController@closeHeaders')->everyMinute();
+        /** TIMFS **/
+        $schedule->call('\App\Http\Controllers\AdminAssetsController@getItemMasterTimfsData')->hourly()->between('9:00', '21:00');
+        $schedule->call('\App\Http\Controllers\AdminAssetsController@getItemMasterUpdatedTimfsData')->hourly()->between('9:00', '21:00');
+
+        /** DAM **/
+        $schedule->call('\App\Http\Controllers\AdminAssetsItController@getItemMasterDataDamApi')->hourly()->between('9:00', '21:00');
+        $schedule->call('\App\Http\Controllers\AdminAssetsItController@getItemMasterUpdatedDataDamApi')->hourly()->between('9:00', '21:00');
+
+        /** DAM Categories */
+        $schedule->call('\App\Http\Controllers\AdminCategoriesController@getCategoriesDataApi')->hourly()->between('9:00', '21:00');
+        $schedule->call('\App\Http\Controllers\AdminCategoriesController@getCategoriesUpdatedDataApi')->hourly()->between('9:00', '21:00');
+
+        /** DAM Class */
+        $schedule->call('\App\Http\Controllers\AdminClassesController@getClassCreatedDataApi')->hourly()->between('9:00', '21:00');
+        $schedule->call('\App\Http\Controllers\AdminClassesController@getClassUpdatedDataApi')->hourly()->between('9:00', '21:00');
+        
         $schedule->command('mysql:backup')->daily()->at('20:00');
     }
 
