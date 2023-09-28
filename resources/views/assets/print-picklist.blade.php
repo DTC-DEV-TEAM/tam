@@ -71,8 +71,8 @@
                                         <tr> -->
                                             <th style="text-align:center" height="10" width="10%">MO#</th>
                                             <th style="text-align:center" height="10" width="8%">Digits Code</th>
-                                            <th style="text-align:center" height="10" width="8%">Asset Tag</th>
-                                            <th style="text-align:center" height="10" width="11%">Serial#</th>
+                                            {{-- <th style="text-align:center" height="10" width="8%">Asset Tag</th>
+                                            <th style="text-align:center" height="10" width="11%">Serial#</th> --}}
                                             <th style="text-align:center" height="10" width="30%">DAM Description</th>          
                                             
                                             <th style="text-align:center" height="10" width="10%">Asset Category</th>
@@ -98,8 +98,8 @@
                                                         {{$rowresult->mo_reference_number}}
                                                     </td>
                                                     <td height="10">{{$rowresult->digits_code}}</td>
-                                                    <td height="10">{{$rowresult->asset_code}}</td>
-                                                    <td height="10">{{$rowresult->serial_no}}</td>
+                                                    {{-- <td height="10">{{$rowresult->asset_code}}</td>
+                                                    <td height="10">{{$rowresult->serial_no}}</td> --}}
                                                     <td height="10">{{$rowresult->item_description}}</td>
                                                     <td height="10">{{$rowresult->category_id}}</td>
                                                     <td height="10">{{$rowresult->sub_category_id}}</td>
@@ -114,7 +114,7 @@
                                     </tbody>
 
                                     <tr>
-                                        <td colspan="7" style="text-align:right">
+                                        <td colspan="5" style="text-align:right">
                                             <label>Total Qty:</label>
                                         </td>
 

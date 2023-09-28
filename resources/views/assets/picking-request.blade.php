@@ -1,6 +1,19 @@
 @extends('crudbooster::admin_template')
     @push('head')
         <style type="text/css">   
+            .select2-selection__choice{
+                    font-size:14px !important;
+                    color:black !important;
+            }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
             .comment_div {
                 box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
                 background: #f5f5f5;
@@ -143,9 +156,9 @@
                                             <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
                                             <!-- <th width="13%" class="text-center">{{ trans('message.table.status_id') }}</th> -->
                                             <th width="8%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                            <th width="8%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
+                                            {{-- <th width="8%" class="text-center">{{ trans('message.table.asset_tag') }}</th> --}}
                                             <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                            <th width="8%" class="text-center">{{ trans('message.table.serial_no') }}</th>
+                                            {{-- <th width="8%" class="text-center">{{ trans('message.table.serial_no') }}</th> --}}
                                             <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
                                             <!-- <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
                                             <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
@@ -192,17 +205,17 @@
                                                         {{$rowresult->digits_code}}
                                                     </td>
 
-                                                    <td style="text-align:center" height="10">
+                                                    {{-- <td style="text-align:center" height="10">
                                                         {{$rowresult->asset_code}}
-                                                    </td>
+                                                    </td> --}}
 
                                                     <td style="text-align:center" height="10">
                                                         {{$rowresult->item_description}}
                                                     </td>
 
-                                                    <td style="text-align:center" height="10">
+                                                    {{-- <td style="text-align:center" height="10">
                                                         {{$rowresult->serial_no}}
-                                                    </td>
+                                                    </td> --}}
 
                                                     <td style="text-align:center" height="10">
                                                         {{$rowresult->quantity}}

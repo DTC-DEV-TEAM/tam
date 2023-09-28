@@ -4,6 +4,8 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use App\Models\Classes;
+	use GuzzleHttp\Client;
 
 	class AdminClassesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -345,9 +347,139 @@
 
 	    }
 
+		// DAM CLASS
+		public function getClassCreatedDataApi(Request $request) {
+			$token = $this->getToken();
+			//$token = 'k3SwpRtByEPOgFi8';
+			$headers = array(
+				'Accept: application/json',
+				'Authorization: Bearer ' . $token
+			);
+			$error_msg = "";
+			$url = config('env-api.dam-get-created-classes-url');
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//curl_setopt($ch, CURLOPT_TIMEOUT, 0);
 
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close($ch);
 
-	    //By the way, you can still create your own method in here... :) 
+			$cURLresponse = json_decode($cURLresponse, true);
+			dd($cURLresponse);
+			$data = [];
+			$count = 0;
+			if(!empty($cURLresponse["data"])) {
+				foreach ($cURLresponse["data"] as $key => $value) {
+				
+					$count++;
+						DB::beginTransaction();
+						try {
+							Classes::updateOrcreate([
+								'id'                      => $value['id'] 
+							],
+							[
+								'id'                      => $value['id'],
+								'category_id'             => $value['category_id'],
+								'class_code'              => $value['class_code'],
+								'class_description'       => $value['class_description'],
+								'class_status'            => $value['class_status'],
+								'created_by'              => CRUDBooster::myId(),
+								'created_at'              => date('Y-m-d H:i:s')
+							]);
+							DB::commit();
+						} catch (\Exception $e) {
+							\Log::debug($e);
+							DB::rollback();
+						}
+					
+				}
+			}
+			\Log::info('Item Create: executed! items');
+			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
+			echo json_encode($message);
+		}
+
+		// DAM CLASS UPDATED
+		public function getClassUpdatedDataApi(Request $request) {
+			$token = $this->getToken();
+			//$token = 'k3SwpRtByEPOgFi8';
+			$headers = array(
+				'Accept: application/json',
+				'Authorization: Bearer ' . $token
+			);
+			$error_msg = "";
+			$url = config('env-api.dam-get-updated-classes-url');
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_FAILONERROR, true);
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			//curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+			$cURLresponse = curl_exec($ch);
+			if (curl_errno($ch)) {
+				$error_msg = curl_error($ch);
+			}
+			curl_close($ch);
+
+			$cURLresponse = json_decode($cURLresponse, true);
+	
+			$data = [];
+			$count = 0;
+			if(!empty($cURLresponse["data"])) {
+				foreach ($cURLresponse["data"] as $key => $value) {
+				
+					$count++;
+						DB::beginTransaction();
+						try {
+							Classes::updateOrcreate([
+								'id'                      => $value['id'] 
+							],
+							[
+								'id'                      => $value['id'],
+								'category_id'             => $value['category_id'],
+								'class_code'              => $value['class_code'],
+								'class_description'       => $value['class_description'],
+								'class_status'            => $value['class_status'],
+								'updated_by'              => CRUDBooster::myId(),
+								'updated_at'              => date('Y-m-d H:i:s')
+							]);
+							DB::commit();
+						} catch (\Exception $e) {
+							\Log::debug($e);
+							DB::rollback();
+						}
+					
+				}
+			}
+			\Log::info('Item Update: executed! items');
+			$message = ['status'=>'success', 'message' => 'Sync Successfully!'];
+			echo json_encode($message);
+		}
+
+		public function getToken(){
+			$client = new Client();
+            $response = $client->post(config('env-api.dam-get-token-url'), [
+                'form_params' => [
+                    'secret' => config('env-api.dam-secret-key'),
+                ]
+            ]);
+
+            $responseBody = $response->getBody()->getContents();
+            $responseData = json_decode($responseBody, true);
+
+            return $responseData['data']['access_token'];
+		}
 
 
 	}

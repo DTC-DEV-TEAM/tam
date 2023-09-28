@@ -30,8 +30,13 @@ class ItemMasterImport implements ToCollection, SkipsEmptyRows, WithHeadingRow
                     'digits_code' => $row['digits_code'] 
                 ],
                 [
-                    'digits_code'      => $row['digits_code'],
-                    'fulfillment_type' => $row['fulfillment_type'],
+                    'digits_code'          => $row['digits_code'],
+                    'item_description'     => $row['item_description'],
+                    'tam_category_id'      => $row['tam_category_id'],
+                    'tam_sub_category_id'  => $row['tam_sub_category_id'],
+                    'item_cost'            => $row['item_cost'],
+                    'status'               => $row['status'],
+                    'created_by'           => CRUDBooster::myId()
                 ]);
             DB::commit();
             } catch (\Exception $e) {

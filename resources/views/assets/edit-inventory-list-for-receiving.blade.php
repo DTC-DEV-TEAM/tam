@@ -546,7 +546,7 @@
                                 if (dupArrData[i + 1] == dupArrData[i]) {
                                     swal({
                                             type: 'error',
-                                            title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na)',
+                                            title: 'Not allowed duplicate Serial No. and Digits Code!/Put N/A(not NA, na, n/a)',
                                             icon: 'error',
                                             confirmButtonColor: "#367fa9"
                                         }); 
