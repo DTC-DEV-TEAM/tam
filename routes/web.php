@@ -261,6 +261,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/item-sourcing-header/selectedAlternativeOption','AdminItemSourcingHeaderController@selectedAlternativeOption');
     Route::get('admin/item-sourcing-header/getRequestCancelNis/{id}','AdminItemSourcingHeaderController@getRequestCancelNis')->name('getRequestCancelNis');
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/sub-categories','AdminItemSourcingHeaderController@SubCategories')->name('item.source.sub.categories');
+    Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/fa-sub-categories','AdminItemSourcingHeaderController@faSubCategories')->name('item.source.fa.sub.categories');
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/class','AdminItemSourcingHeaderController@Class')->name('item.source.class.categories');
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/subClass','AdminItemSourcingHeaderController@subClass')->name('item.source.sub.class.categories');
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/save-message','AdminItemSourcingHeaderController@saveMessage')->name('save-message');

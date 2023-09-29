@@ -173,7 +173,7 @@
                 $.ajax
                 ({ 
                     type: 'POST',
-                    url: "{{ route('item.source.sub.categories') }}",
+                    url: "{{ route('item.source.fa.sub.categories') }}",
                     data: {
                         "id": category
                     },
@@ -183,7 +183,7 @@
                         showData[0] = "<option value=''>Choose Sub Category</option>";
                         for (i = 0; i < result.length; ++i) {
                             var j = i + 1;
-                            showData[j] = "<option value='"+result[i].id+"'>"+result[i].class_description+"</option>";
+                            showData[j] = "<option value='"+result[i].id+"'>"+result[i].subcategory_description+"</option>";
                         }
                         $('#sub_category_id').attr('disabled', false);
                         jQuery('#sub_category_id').html(showData); 

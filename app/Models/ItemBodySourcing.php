@@ -34,14 +34,14 @@ class ItemBodySourcing extends Model{
      public function scopeBody($query,$id){
         return $query->leftjoin('category', 'item_sourcing_body.category_id', '=', 'category.id')
         ->leftjoin('sub_category', 'item_sourcing_body.sub_category_id', '=', 'sub_category.id')
-        //->leftjoin('class', 'item_sourcing_body.class_id', '=', 'class.id')
+        ->leftjoin('tam_subcategories', 'item_sourcing_body.sub_category_id', '=', 'tam_subcategories.id')
         //->leftjoin('new_sub_class', 'item_sourcing_body.sub_class_id', '=', 'new_sub_class.id')
         ->select(
           'item_sourcing_body.*',
           'item_sourcing_body.id as body_id',
           'category.*',
           'sub_category.*',
-          //'class.*',
+          'tam_subcategories.subcategory_description as tam_sub_category',
           //'new_sub_class.*',
         )
         ->where('item_sourcing_body.header_request_id', $id)
