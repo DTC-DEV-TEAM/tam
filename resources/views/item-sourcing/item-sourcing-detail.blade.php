@@ -265,9 +265,15 @@
                                                             <td style="text-align:center" height="10">
                                                                 {{$rowresult->category_description}}                               
                                                             </td>
+                                                         
                                                             <td style="text-align:center" height="10">
-                                                                {{$rowresult->class_description}}                              
+                                                                @if(in_array($Header->request_type_id,[1]))
+                                                                    {{$rowresult->class_description}}      
+                                                                @else
+                                                                    {{$rowresult->tam_sub_category}}  
+                                                                @endif                        
                                                             </td>
+                                                            
                                                             {{-- <td style="text-align:center" height="10">
                                                                 {{$rowresult->class_description}}                               
                                                             </td>

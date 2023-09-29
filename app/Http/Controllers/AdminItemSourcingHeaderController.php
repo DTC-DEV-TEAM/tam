@@ -1033,6 +1033,20 @@
 			return($subcategories);
 		}
 
+		public function faSubCategories(Request $request){
+			$data = Request::all();	
+			$id = $data['id'];
+			//$categories = DB::table('new_category')->where('category_description', $id)->first();
+
+			$subcategories = DB::table('tam_subcategories')
+							->select('tam_subcategories.*')
+							//->where('category_id', $id)
+							->where('status', "ACTIVE")
+							->orderby('subcategory_description', 'ASC')->get();
+	
+			return($subcategories);
+		}
+
 		public function Class(Request $request){
 			$data = Request::all();	
 			$id = $data['id'];
