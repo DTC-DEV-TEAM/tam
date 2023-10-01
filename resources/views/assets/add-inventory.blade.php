@@ -371,6 +371,7 @@
     <script type="text/javascript">
         $(function(){
             $('body').addClass("sidebar-collapse");
+          
         });
         //preview image before save
         $(function() {
@@ -476,7 +477,7 @@
                                 type: 'error',
                                 title: 'Item not found!',
                                 icon: 'error',
-                                confirmButtonColor: "#367fa9",
+                                confirmButtonColor: "#5cb85c",
                                });
                             }else{                              
                             var rowCount = $('#asset-items tr').length;
@@ -540,7 +541,7 @@
                            // if (!in_array(e.id, stack)) {
                                 if (!stack.includes(e.id)) {            
                                     //stack.push(e.id);                                                                                
-                                                           
+                                   
                                     var new_row = '<tr class="nr" id="rowid' + e.id + '" rows>' +
                                         '<input class="form-control text-center ginput" type="hidden" name="body_id[]" readonly value="' + e.id + '">' +
                                         '<td><input class="form-control text-center ginput" type="text" id="dc" name="digits_code[]" readonly value="' + e.digits_code + '"></td>' +
@@ -571,8 +572,7 @@
                                         //}
                                     
                                     //$(new_row).insertAfter($('table tr.dynamicRows:last'));
-                                  
-
+        
                                     $("table tbody").append(new_row);
                                     $('.sub_category_id').select2({allowClear:true});  
                                     $(".text-muted").css({
@@ -583,7 +583,7 @@
                                     });                          
                                     $(document).on('click', '#delete_item' + e.id, function () {
                                         var parentTR = $(this).parents('tr');  
-
+                          
                                         // stack = jQuery.grep(stack, function(value) {
                                         //  return value != e.id;
                                         // });
@@ -706,77 +706,32 @@
         
   
         //VERSION 2 SUBMIT
-        $('#btnSubmit').on('click', function (event) {
+        $('#btnSubmit').click(function(event) {
             event.preventDefault();
             var fired_button = $(this).val();
             var id = $('#header_id').val();
             var remarks = $('#remarks').val();
-            var countRow = $('#asset-items tfoot tr').length;
-            // if($('#po_no').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'PO No required!',
-            //         icon: 'error',
-            //             confirmButtonColor: "#367fa9",
-            //     });
-            //             event.preventDefault();
-            // }
-            //else if($('#location').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'Please select location!',
-            //         icon: 'error',
-            //         customClass: 'swal-wide',
-            //         confirmButtonColor: "#367fa9"
-            //     });
-            //     event.preventDefault();
-            // }else if($('#invoice_date').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'Invoice Date required!',
-            //         icon: 'error',
-            //         customClass: 'swal-wide',
-            //         confirmButtonColor: "#367fa9"
-            //     });
-            //     event.preventDefault();
-            // }else if($('#invoice_no').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'Invoice No required!',
-            //         icon: 'error',
-            //         customClass: 'swal-wide',
-            //         confirmButtonColor: "#367fa9"
-            //     });
-            //     event.preventDefault();
-            // }else if($('#rr_date').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'RR Date required!',
-            //         icon: 'error',
-            //         customClass: 'swal-wide',
-            //         confirmButtonColor: "#367fa9"
-            //     });
-            //     event.preventDefault();
-            // }else if($('#si_dr').val() === ""){
-            //     swal({
-            //         type: 'error',
-            //         title: 'Upload SR/DR required!',
-            //         icon: 'error',
-            //         customClass: 'swal-wide',
-            //         confirmButtonColor: "#367fa9"
-            //     });
-            //     event.preventDefault();
-            // }else{
-                if($('#location').val() === ""){
-                    swal({
-                        type: 'error',
-                        title: 'Location required!',
-                        icon: 'error',
-                            confirmButtonColor: "#367fa9",
-                    });
-                    event.preventDefault();
-                    return false;
-                }
+            var countRow = $('#asset-items tr').length - 4;
+
+            if($('#location').val() === ""){
+                swal({
+                    type: 'error',
+                    title: 'Location required!',
+                    icon: 'error',
+                        confirmButtonColor: "#5cb85c",
+                });
+                event.preventDefault();
+                return false;
+            }else if (countRow == 0) {
+                swal({
+                    type: 'error',
+                    title: 'Please add an item!',
+                    icon: 'error',
+                    confirmButtonColor: "#5cb85c",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }else{
                 $.ajax({
                     url: "{{ route('assets.check.row') }}",
                     dataType: "json",
@@ -867,7 +822,7 @@
                                         type: 'error',
                                         title: 'Sub Category cannot be empty!',
                                         icon: 'error',
-                                        confirmButtonColor: "#367fa9",
+                                        confirmButtonColor: "#5cb85c",
                                     });
                                     event.preventDefault();
                                     return false;
@@ -883,7 +838,7 @@
                                         type: 'error',
                                         title: 'Value required!',
                                         icon: 'error',
-                                        confirmButtonColor: "#367fa9",
+                                        confirmButtonColor: "#5cb85c",
                                     });
                                     event.preventDefault();
                                     return false;
@@ -940,7 +895,7 @@
                                         title: 'UPC Code Required!',
                                         icon: 'error',
                                         customClass: 'swal-wide',
-                                        confirmButtonColor: "#367fa9"
+                                        confirmButtonColor: "#5cb85c"
                                     });
                                     event.preventDefault();
                                     return false;
@@ -958,7 +913,7 @@
                                         title: 'Brand Required!',
                                         icon: 'error',
                                         customClass: 'swal-wide',
-                                        confirmButtonColor: "#367fa9"
+                                        confirmButtonColor: "#5cb85c"
                                     });
                                     event.preventDefault();
                                     return false;
@@ -976,7 +931,7 @@
                                         title: 'Specs Required!',
                                         icon: 'error',
                                         customClass: 'swal-wide',
-                                        confirmButtonColor: "#367fa9"
+                                        confirmButtonColor: "#5cb85c"
                                     });
                                     event.preventDefault();
                                     return false;
@@ -1003,7 +958,7 @@
                                     showCancelButton: true,
                                     confirmButtonColor: "#41B314",
                                     cancelButtonColor: "#F9354C",
-                                    confirmButtonText: "Yes, receive it!",
+                                    confirmButtonText: "Yes, create it!",
                                     width: 450,
                                     height: 200
                                     }, function () {
@@ -1061,6 +1016,8 @@
                         // });
                     }    
                 });
+            }
+                
             //}
         });
 

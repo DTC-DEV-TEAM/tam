@@ -273,10 +273,11 @@
 
 		 
 	        //Your code here
-	        if(CRUDBooster::myPrivilegeId() == 5 || CRUDBooster::myPrivilegeId() == 17){ 
+	        if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){ 
 
 				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 				$query->where('return_transfer_assets_header.status', $forturnover)
+					  ->where('return_transfer_assets_header.request_type_id', 1)
 					  ->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
 					  ->whereNull('return_transfer_assets_header.transfer_to')
 					  ->orderBy('return_transfer_assets_header.id', 'ASC');
