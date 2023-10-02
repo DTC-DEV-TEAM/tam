@@ -768,7 +768,7 @@
 					$return_data[$i]['item_description']     = $value->item_description;
 					$return_data[$i]['category_description'] = $value->dam_category_description;
 					$return_data[$i]['class_description']    = $value->dam_sub_category_description;
-					$return_data[$i]['class_type']           = $value->class_type;
+					$return_data[$i]['class_type']           = $value->dam_sub_category_description;
 					$return_data[$i]['item_cost']            = $value->item_cost;
 					$return_data[$i]['item_type']            = $value->item_type;
 					$return_data[$i]['image']                = $value->image;
