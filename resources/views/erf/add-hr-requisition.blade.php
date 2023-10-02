@@ -862,31 +862,44 @@
         
         //deleteRow
         $(document).on('click', '.removeRow', function() {
+            var laptopDesktop = [];
             // $("#application_div").hide();
             // $("#application_others_div").hide();
             // $(".application").prop('checked', false);
             // $(".application_others").prop('checked', false);
             // $("#application_others").removeAttr('required');
             var id_data = $(this).attr("data-id");
-            if($.inArray($("#class_type"+id_data).val().toLowerCase().replace(/\s/g, ''), ['oeq-laptop','oeq-computermonitor','laptop','desktop','macbook']) > -1){
+            if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
+                tableRow--;
+                $(this).closest('tr').remove();
+                $("#quantity_total").val(calculateTotalQuantity());
+              
+            }
+            // if($.inArray($("#class_type"+id_data).val().toLowerCase().replace(/\s/g, ''), ['oeq-laptop','oeq-computermonitor','laptop','desktop','macbook']) > -1){
+            //     $("#application_div").hide();
+            //     $("#application_div").val("");
+            //     $(".application").prop('checked', false);
+            //     $(".application_others").prop('checked', false);
+            //     $("#application_others_div").hide();
+            //     $("#application_others").removeAttr('required');
+
+            // }
+            $(".sub_category_id").each(function() {
+                if($.inArray(this.value.toLowerCase().replace(/\s/g, ''), ['oeq-laptop','oeq-computermonitor','laptop','desktop','macbook']) > -1){
+                    laptopDesktop.push(this.value);
+                }
+            });
+
+            if(laptopDesktop.length === 0){
                 $("#application_div").hide();
                 $("#application_div").val("");
                 $(".application").prop('checked', false);
                 $(".application_others").prop('checked', false);
                 $("#application_others_div").hide();
                 $("#application_others").removeAttr('required');
-
             }
-
-            if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
-                tableRow--;
-
-                $(this).closest('tr').remove();
-
-                $("#quantity_total").val(calculateTotalQuantity());
-
-                return false;
-            }
+            return false;
+            
         });
 
     });
