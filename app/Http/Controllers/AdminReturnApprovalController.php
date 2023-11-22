@@ -385,6 +385,13 @@
 				->update([
 					    'status' => $rejected
 				]);	
+
+				for ($i = 0; $i < count($mo_id); $i++) {
+					MoveOrder::where('id',$mo_id[$i])
+					->update([
+							'return_flag'=> NULL,
+					]);	
+				}
 			}
 
 	    }

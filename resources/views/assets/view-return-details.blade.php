@@ -89,6 +89,10 @@
                                 <td style="text-align:center">
                                 <label class="label label-warning" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
                                 </td>
+                            @elseif($rowresult['body_status'] == 5)
+                                <td style="text-align:center">
+                                <label class="label label-danger" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
+                                </td>
                             @elseif($rowresult['body_status'] == 8)
                                 <td style="text-align:center">
                                 <label class="label label-danger" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>

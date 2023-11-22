@@ -305,6 +305,7 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	$pending      =  	 DB::table('statuses')->where('id', 1)->value('status_description');
+			$rejected     =  	 DB::table('statuses')->where('id', 5)->value('status_description');
 			$cancelled    =  	 DB::table('statuses')->where('id', 8)->value('status_description');
 			$forturnover  =      DB::table('statuses')->where('id', 24)->value('status_description');
 			$toClose      =      DB::table('statuses')->where('id', 25)->value('status_description');
@@ -314,6 +315,8 @@
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $cancelled){
 					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
+				}else if($column_value == $rejected){
+					$column_value = '<span class="label label-danger">'.$rejected.'</span>';
 				}else if($column_value == $forturnover){
 					$column_value = '<span class="label label-info">'.$forturnover.'</span>';
 				}else if($column_value == $toClose){

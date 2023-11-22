@@ -134,6 +134,14 @@
                 border: 1px solid rgba(000, 0, 0, .5);
                 padding: 8px;
             }
+
+            .ui-state-focus {
+                background: none !important;
+                background-color: #00a65a !important;
+                border: 1px solid rgba(000, 0, 0, .5) !important;
+                color: #fff !important;
+            }
+
         </style>
     @endpush
 @section('content')
