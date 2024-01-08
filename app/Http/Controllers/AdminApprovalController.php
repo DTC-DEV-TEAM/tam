@@ -10,6 +10,7 @@
 	use App\StatusMatrix;
 	use App\Users;
 	use App\Models\AssetsSuppliesInventory;
+	use App\Models\AssetsNonTradeInventory;
 	use App\Models\AssetsInventoryReserved;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
@@ -363,7 +364,7 @@
 			$approval_action 		= $fields['approval_action'];
 			$approver_comments 		= $fields['approver_comments'];
 			$body_ids 		        = $fields['body_ids'];
-			if(in_array($arf_header->request_type_id, [7])){
+			if(in_array($arf_header->request_type_id, [7,9])){
 			    $wh_qty 		    = $fields['wh_qty'];
 			}else{
 				$wh_qty 		    = $fields['it_wh_qty'];
@@ -397,10 +398,10 @@
 					]);	
 		    	}
 
-				if(in_array($arf_header->request_type_id, [7])){
+				if(in_array($arf_header->request_type_id, [9])){
 					//Get the inventory value per digits code
-					$arraySearch = DB::table('assets_supplies_inventory')->select('*')->get()->toArray();
-				
+					$arraySearch = DB::table('assets_non_trade_inventory')->select('*')->get()->toArray();
+									
 					$finalBodyValue = [];
 					foreach($arf_body as $bodyfKey => $bodyVal){
 						$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
@@ -417,7 +418,7 @@
 					$containerData = [];
 					$finalContData = [];
 					foreach($finalBodyValue as $fBodyKey => $fBodyVal){
-                        if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
+						if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
 							//less quantity in inventory
 							BodyRequest::where('id', $fBodyVal['id'])
 							->update([
@@ -428,13 +429,12 @@
 								'unserved_rep_qty'   =>  $fBodyVal['quantity'],
 								'unserved_ro_qty'    =>  NULL
 							]);	
-							DB::table('assets_supplies_inventory')
+							DB::table('assets_no_trade_inventory')
 							->where('digits_code', $fBodyVal['digits_code'])
 							->decrement('quantity', $fBodyVal['quantity']);
 						}else{
 							$reorder = $fBodyVal['quantity'] - $fBodyVal['inv_value']->quantity;
 							$containerData['serve_qty']     = $fBodyVal['inv_value']->quantity;  
-							$containerData['unserve_qty']   = $containerData['reorder_qty'];
 							BodyRequest::where('id', $fBodyVal['id'])
 							->update([
 								'replenish_qty'      =>  $fBodyVal['inv_value']->quantity,
@@ -444,14 +444,13 @@
 								'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
 								'unserved_ro_qty'    =>  $reorder
 							]);	
-							AssetsSuppliesInventory::where('digits_code', $fBodyVal['digits_code'])
+							AssetsNonTradeInventory::where('digits_code', $fBodyVal['digits_code'])
 							->update([
 								'quantity'   =>  0,
 							]);	
-					    }
-						$finalContData[] = $containerData;
+						}
 					}
-			    }else{
+				}else{
 					//GET ASSETS INVENTORY AVAILABLE COUNT
 					$inventoryList = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
 					//GET RESERVED QTY 
@@ -672,11 +671,11 @@
 						'approved.name as approvedby'
 						)
 				->where('header_request.id', $id)->first();
-
-				$body = BodyRequest::leftjoin('assets_supplies_inventory', 'body_request.digits_code','=', 'assets_supplies_inventory.digits_code')
+				
+				$body = BodyRequest::leftjoin('assets_non_trade_inventory', 'body_request.digits_code','=', 'assets_non_trade_inventory.digits_code')
 				->select(
 				  'body_request.*',
-				  'assets_supplies_inventory.quantity as wh_qty'
+				  'assets_non_trade_inventory.quantity as wh_qty'
 				)
 				->where('body_request.header_request_id', $id)
 				->whereNull('deleted_at')

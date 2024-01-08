@@ -15,6 +15,7 @@
 	use App\AssetsInventoryBody;
 	use App\Exports\ExportTamReportList;
 	use App\Models\AssetsSuppliesInventory;
+	use App\Models\AssetsNonTradeInventory;
 	use App\Models\AssetsInventoryReserved;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -422,7 +423,6 @@
 	    public function hook_before_add(&$postdata) {        
 	        //Your code here
 			$fields = Request::all();
-
 			$cont = (new static)->apiContext;
 
 			$dataLines = array();
@@ -625,6 +625,58 @@
 									'unserved_ro_qty'    =>  $reorder
 								]);	
 								AssetsSuppliesInventory::where('digits_code', $fBodyVal['digits_code'])
+								->update([
+									'quantity'   =>  0,
+								]);	
+							}
+						}
+					}else if(in_array($request_type_id, [9])){
+						//Get the inventory value per digits code
+						$arraySearch = DB::table('assets_non_trade_inventory')->select('*')->get()->toArray();
+										
+						$finalBodyValue = [];
+						foreach($arf_body as $bodyfKey => $bodyVal){
+							$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
+							if($i !== false){
+								$bodyVal['inv_value'] = $arraySearch[$i];
+								$finalBodyValue[] = $bodyVal;
+							}else{
+								$bodyVal['inv_value'] = "";
+								$finalBodyValue[] = $bodyVal;
+							}
+						}
+
+						//Set data in each qty
+						$containerData = [];
+						$finalContData = [];
+						foreach($finalBodyValue as $fBodyKey => $fBodyVal){
+							if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
+								//less quantity in inventory
+								BodyRequest::where('id', $fBodyVal['id'])
+								->update([
+									'replenish_qty'      =>  $fBodyVal['quantity'],
+									'reorder_qty'        =>  NULL,
+									'serve_qty'          =>  NULL,
+									'unserved_qty'       =>  $fBodyVal['quantity'],
+									'unserved_rep_qty'   =>  $fBodyVal['quantity'],
+									'unserved_ro_qty'    =>  NULL
+								]);	
+								DB::table('assets_no_trade_inventory')
+								->where('digits_code', $fBodyVal['digits_code'])
+								->decrement('quantity', $fBodyVal['quantity']);
+							}else{
+								$reorder = $fBodyVal['quantity'] - $fBodyVal['inv_value']->quantity;
+								$containerData['serve_qty']     = $fBodyVal['inv_value']->quantity;  
+								BodyRequest::where('id', $fBodyVal['id'])
+								->update([
+									'replenish_qty'      =>  $fBodyVal['inv_value']->quantity,
+									'reorder_qty'        =>  $reorder,
+									'serve_qty'          =>  NULL,
+									'unserved_qty'       =>  $fBodyVal['quantity'],
+									'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
+									'unserved_ro_qty'    =>  $reorder
+								]);	
+								AssetsNonTradeInventory::where('digits_code', $fBodyVal['digits_code'])
 								->update([
 									'quantity'   =>  0,
 								]);	
@@ -912,7 +964,7 @@
 			if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
 				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-				return $this->view("assets.add-requisition-non-trade", $data);
+				return $this->view("non-trade.add-requisition-non-trade", $data);
 
 			}			
 		}
@@ -1604,12 +1656,78 @@
 			exit;  
 		}
 
-		public function itemSuppliesSearch(Request $request) {
-
+		public function itemNonTradeSearch(Request $request) {
 			$request = Request::all();
-
 			$search 		= $request['search'];
+			$data = array();
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$data['items'] = array();
 
+			$items = DB::table('assets')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
+			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
+			->leftjoin('assets_non_trade_inventory', 'assets.digits_code','=', 'assets_non_trade_inventory.digits_code')
+
+			->select(	'assets.*',
+						'assets.id as assetID',
+						'assets_non_trade_inventory.quantity as wh_qty',
+						'tam_categories.category_description as tam_category_description',
+						'tam_subcategories.subcategory_description as tam_sub_category_description',
+					)
+			->take(10)
+			->get();
+
+			$arraySearchUnservedQty = DB::table('body_request')->select('digits_code as digits_code',DB::raw('SUM(unserved_qty) as unserved_qty'))->where('body_request.created_by',CRUDBooster::myId())->groupBy('digits_code')->get()->toArray();
+			$finalItems = [];
+			foreach($items as $itemsKey => $itemsVal){
+				$i = array_search($itemsVal->digits_code, array_column($arraySearchUnservedQty,'digits_code'));
+				if($i !== false){
+					$itemsVal->unserved_qty = $arraySearchUnservedQty[$i];
+					$finalItems[] = $itemsVal;
+				}else{
+					$itemsVal->unserved_qty = "";
+					$finalItems[] = $itemsVal;
+				}
+			}
+			if($finalItems){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				$i = 0;
+				foreach ($finalItems as $key => $value) {
+
+					$return_data[$i]['id']                   = $value->assetID;
+					$return_data[$i]['asset_code']           = $value->asset_code;
+					$return_data[$i]['digits_code']          = $value->digits_code;
+					$return_data[$i]['asset_tag']            = $value->asset_tag;
+					$return_data[$i]['serial_no']            = $value->serial_no;
+					$return_data[$i]['item_description']     = $value->item_description;
+					$return_data[$i]['category_description'] = $value->tam_category_description;
+					$return_data[$i]['class_description']    = $value->tam_sub_category_description;
+					$return_data[$i]['item_cost']            = $value->item_cost;
+					$return_data[$i]['item_type']            = $value->item_type;
+					$return_data[$i]['image']                = $value->image;
+					$return_data[$i]['quantity']             = $value->quantity;
+					$return_data[$i]['total_quantity']       = $value->total_quantity;
+					$return_data[$i]['wh_qty']               = $value->wh_qty  ? $value->wh_qty : 0;
+					$return_data[$i]['unserved_qty']         = $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
+					$i++;
+
+				}
+				$data['items'] = $return_data;
+			}
+
+			echo json_encode($data);
+			exit;  
+		}
+
+		public function itemSuppliesSearch(Request $request) {
+			$request = Request::all();
+			$search 		= $request['search'];
 			$data = array();
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
