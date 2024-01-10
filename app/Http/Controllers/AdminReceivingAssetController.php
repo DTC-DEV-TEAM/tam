@@ -483,6 +483,21 @@
 							'location'=> 				4
 						]);
 						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->update(['quantity'=>0]);
+					}elseif(in_array($arf_header->request_type_id, [9])){
+						$quantity = MoveOrder::where(['id' => $item_id[$x]])->first()->quantity;
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'status_id'=> 	$for_closing
+						]);	
+						DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])
+						->update([
+							'statuses_id'=> 			3,
+							'deployed_to'=> 			$employee_name->bill_to,
+							'deployed_by'=> 			CRUDBooster::myId(),
+							'deployed_at'=> 			date('Y-m-d H:i:s'),
+							'location'=> 				4
+						]);
+						DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity', $quantity);
 					}else{
 						MoveOrder::where('id',$item_id[$x])
 						->update([

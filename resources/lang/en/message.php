@@ -150,6 +150,7 @@ return [
         'total_quantity'                 =>  'Total Qty',
         'asset_tag'                      =>  'Asset Code',
         'sub_category_id_text'           =>  'Sub Category', 
+        'sub_category_code'              =>  'Sub Category Code', 
         'mo_reference_number'            =>  'MO Reference Number',
         'status_id'                      =>  'Status',
         'pick'                           =>  'Pick',

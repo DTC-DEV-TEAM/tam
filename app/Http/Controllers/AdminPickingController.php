@@ -12,6 +12,7 @@
 	use App\MoveOrder;
 	use App\GoodDefectLists;
 	use App\AssetsInventoryBody;
+	use App\Models\AssetsNonTradeInventory;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -454,17 +455,9 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-
 			$fields = Request::all();
-
-			$cont = (new static)->apiContext;
-
 			$item_id 					= $fields['item_id'];
-
-			//$pick_value 				= $fields['pick_value'];
-
 			$good_text 					= $fields['good_text'];
-
 			$defective_text 			= $fields['defective_text'];
  
 			//good and defect value
@@ -482,7 +475,7 @@
 
 			$arf_header    = HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_receiving 				= StatusMatrix::where('current_step', 7)
 												->where('request_type', $arf_header->request_type_id)
@@ -554,42 +547,80 @@
 
 
 				// }else{
-					$inventoryDetails = AssetsInventoryBody::where('id',$asset_code_tag[$x])->first();
+					if(in_array($arf_header->request_type_id, [1,5])){
+						$inventoryDetails = AssetsInventoryBody::where('id',$asset_code_tag[$x])->first();
 
-					MoveOrder::where('id',$item_id[$x])
-					->update([
-						'item_id'         => $inventoryDetails->item_id,
-						'inventory_id'    => $inventoryDetails->id,
-						'asset_code'      => $inventoryDetails->asset_code,
-						'serial_no'       => $inventoryDetails->serial_no,
-						'unit_cost'       => $inventoryDetails->value,
-						'total_unit_cost' => $inventoryDetails->value,
-						'status_id'       => $for_receiving,
-						'to_pick'         => 1,
-						'good'            => $good_text[$x],
-						'defective'       => $defective_text[$x]
-					]);	
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'item_id'         => $inventoryDetails->item_id,
+							'inventory_id'    => $inventoryDetails->id,
+							'asset_code'      => $inventoryDetails->asset_code,
+							'serial_no'       => $inventoryDetails->serial_no,
+							'unit_cost'       => $inventoryDetails->value,
+							'total_unit_cost' => $inventoryDetails->value,
+							'status_id'       => $for_receiving,
+							'to_pick'         => 1,
+							'good'            => $good_text[$x],
+							'defective'       => $defective_text[$x]
+						]);	
 
-					BodyRequest::where('id', $body_id[$x])
-					->update(
-								[
-								'serve_qty'        => 1, 
-								'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
-								'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
-								'unserved_qty'     => DB::raw("unserved_qty - 1"),      
-								'dr_qty'           => 1,
-								'mo_so_num'        => $HeaderID->mo_reference_number       
-								]
-							);
+						BodyRequest::where('id', $body_id[$x])
+						->update(
+									[
+									'serve_qty'        => 1, 
+									'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
+									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
+									'unserved_qty'     => DB::raw("unserved_qty - 1"),      
+									'dr_qty'           => 1,
+									'mo_so_num'        => $HeaderID->mo_reference_number       
+									]
+								);
 
-					DB::table('assets_inventory_body')->where('id', $asset_code_tag[$x])
-					->update([
-						'statuses_id'=> 2,
-						'deployed_to'=> $employee_name->bill_to
-					]);
+						DB::table('assets_inventory_body')->where('id', $asset_code_tag[$x])
+						->update([
+							'statuses_id'=> 2,
+							'deployed_to'=> $employee_name->bill_to
+						]);
 
-					DB::table('assets_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+						DB::table('assets_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+					}else{
+						$quantity = BodyRequest::where(['id' => $body_id[$x]])->first()->quantity;
+						$inventoryDetails = AssetsNonTradeInventoryBody::where('id',$asset_code_tag[$x])->first();
 
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'item_id'         => $inventoryDetails->item_id,
+							'inventory_id'    => $inventoryDetails->id,
+							'asset_code'      => $inventoryDetails->asset_code,
+							'serial_no'       => $inventoryDetails->serial_no,
+							'unit_cost'       => $inventoryDetails->value,
+							'total_unit_cost' => $inventoryDetails->value,
+							'status_id'       => $for_receiving,
+							'to_pick'         => 1,
+							'good'            => $good_text[$x],
+							'defective'       => $defective_text[$x]
+						]);	
+
+						BodyRequest::where('id', $body_id[$x])
+						->update(
+									[
+									'serve_qty'        => $quantity, 
+									'unserved_rep_qty' => DB::raw("unserved_rep_qty - $quantity"), 
+									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - $quantity"), 
+									'unserved_qty'     => DB::raw("unserved_qty - $quantity"),      
+									'dr_qty'           => $quantity,
+									'mo_so_num'        => $HeaderID->mo_reference_number       
+									]
+								);
+
+						DB::table('assets_non_trade_inventory_body')->where('id', $asset_code_tag[$x])
+						->update([
+							'statuses_id'=> 2,
+							'deployed_to'=> $employee_name->bill_to
+						]);
+
+						DB::table('assets_non_trade_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+					}
 				//}
 				//}
 			}

@@ -585,7 +585,7 @@
 			$count_header 		= MoveOrder::count();
 			$count_header1  	= $count_header + 1;
 			//dd(count((array)$digits_code));
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
@@ -778,7 +778,7 @@
 			
 			$arf_header 		= HeaderRequest::where(['id' => $mo_request->header_request_id])->first();
 			
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
@@ -1007,7 +1007,7 @@
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)
-				->where('request_type_id' , 1)
+				->whereIn('request_type_id' , [1,9])
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 				->get();
@@ -1441,7 +1441,8 @@
 					<label class="control-label col-md-2">Reference Number:</label>
 					<div class="col-md-4">
 
-							<input type="hidden" value="'. $data['Header']->requestid .'" name="header_request_id" id="header_request_id">		
+							<input type="hidden" value="'. $data['Header']->requestid .'" name="header_request_id" id="header_request_id">	
+							<input type="hidden" value="'. $data['Header']->request_type_id .'" name="header_request_type_id" id="header_request_type_id">		
 							
 							<p>'. $data['Header']->reference_number .'</p>
 					</div>
@@ -1828,11 +1829,11 @@
 					$(".location").attr("disabled",true);
 					//Location Value
 					$(".location").change(function(){
-						var data_id     = $(this).attr("data-id");
-						var value_id    = $("#location" + data_id).val();
-						var digits_code = $("#add_digits_code" + data_id).val();
-						var value_text  = $("#location" +data_id+ " :selected").text();
-			
+						var data_id         = $(this).attr("data-id");
+						var value_id        = $("#location" + data_id).val();
+						var digits_code     = $("#add_digits_code" + data_id).val();
+						var value_text      = $("#location" +data_id+ " :selected").text();
+						var request_type_id = $("#header_request_type_id").val();
 	                    $.ajax({
 							type: "POST",
 							url: "'.route('get-available-digits-code').'",
@@ -1840,6 +1841,7 @@
 							data: {
 								"_token": $("#token").val(),
 								"id": value_id,
+								"request_type_id": request_type_id,
 								"digits_code": digits_code
 							},
 							success: function(response) {
@@ -2268,8 +2270,13 @@
 		public function getAvailableDigitsCode(Request $request){
 			$data = Request::all();
             $id = $data['id'];
+			$request_type_id = $data['request_type_id'];
 			$digits_code = $data['digits_code'];
-			$res = DB::table('assets_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			if($request_type_id == 9){
+				$res = DB::table('assets_non_trade_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			}else{
+				$res = DB::table('assets_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			}
 			return json_encode($res);
 		}
 	}

@@ -57,6 +57,10 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/selection-digits-code','AdminAssetsInventoryHeaderForApprovalController@selectionDigitsCode')->name('selection-digits-code'); // new 72723
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/sub-categories-code','AdminAssetsInventoryHeaderForApprovalController@subCatCode')->name('sub-categories-code'); // new 72723
 
+    //NON TRADE INVENTORY
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-approvedProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeApprovedProcess')->name('assets.non.trade.nonTradeApprovedProcess');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-forPoProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeForPoProcess')->name('assets.non.trade.get.nonTradeForPoProcess');
+    
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-search','AdminHeaderRequestController@itemSearch')->name('asset.item.search');

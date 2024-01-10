@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AssetsNonTradeInventory extends Model
+class AssetsNonTradeInventoryBody extends Model
 {
-    protected $table = 'assets_non_trade_inventory';
+    protected $table = 'assets_non_trade_inventory_body';
     protected $fillable = [
         'digits_code', 
         'description',
