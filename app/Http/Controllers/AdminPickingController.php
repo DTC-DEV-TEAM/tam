@@ -12,7 +12,7 @@
 	use App\MoveOrder;
 	use App\GoodDefectLists;
 	use App\AssetsInventoryBody;
-	use App\Models\AssetsNonTradeInventory;
+	use App\Models\AssetsNonTradeInventoryBody;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -612,13 +612,7 @@
 									'mo_so_num'        => $HeaderID->mo_reference_number       
 									]
 								);
-
-						DB::table('assets_non_trade_inventory_body')->where('id', $asset_code_tag[$x])
-						->update([
-							'statuses_id'=> 2,
-							'deployed_to'=> $employee_name->bill_to
-						]);
-
+						DB::table('assets_non_trade_inventory_body')->where('id', $inventoryDetails->id)->decrement('quantity', $quantity);
 						DB::table('assets_non_trade_inventory_reserved')->where('body_id', $body_id[$x])->delete();
 					}
 				//}
@@ -845,11 +839,16 @@
 			$users_location = DB::table('cms_users')->where('id',CRUDBooster::myId())->first();
 			
 			$data['good_defect_lists'] = GoodDefectLists::all();
-			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
-			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
+					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
+				}else{
+					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
+				}
 			}else{
-				$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
+				$data['assets_code'] = AssetsNonTradeInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->get();
 			}
+			
 			return $this->view("assets.picking-request", $data);
 		}
 

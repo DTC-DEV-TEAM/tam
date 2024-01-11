@@ -457,7 +457,7 @@
 			if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){
 			    $query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 1);
 			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9,20,21,22])){
-				$query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 5);
+				$query->whereIn('mo_body_request.id', $MOList)->whereIn('header_request.request_type_id', [5,9]);
 			}else{
 				$query->whereIn('mo_body_request.id', $MOList);
 			}
@@ -1007,7 +1007,7 @@
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)
-				->whereIn('request_type_id' , [1,9])
+				->whereIn('request_type_id' , [1])
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 				->get();
@@ -1015,7 +1015,7 @@
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)
-				->where('request_type_id' , 5)
+				->whereIn('request_type_id' , [5,9])
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 			
@@ -1330,7 +1330,7 @@
 			$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 
 			//$for_picking =  		DB::table('statuses')->where('id', 15)->value('id');
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_picking = 			StatusMatrix::where('current_step', 6)
 										->where('request_type', $arf_header->request_type_id)
@@ -1419,19 +1419,34 @@
 										'header_request.created_at as created_at'
 										)
 								->where('header_request.id', $search)->first();
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
+				->select(
+				  'body_request.*',
+				  'body_request.id as body_id',
+				  'assets_inventory_reserved.reserved as reserved'
+				)
+				->where('body_request.header_request_id', $search)
+				->where('body_request.mo_plug', 0)
+				->whereNull('deleted_at')
+				->orwhere('to_mo', 1)
+				->where('body_request.header_request_id', $search)
+				->get();
+			}else{
+				$data['Body'] = BodyRequest::leftjoin('assets_non_trade_inventory_reserved', 'body_request.id', '=', 'assets_non_trade_inventory_reserved.body_id')
+				->select(
+				  'body_request.*',
+				  'body_request.id as body_id',
+				  'assets_non_trade_inventory_reserved.reserved as reserved'
+				)
+				->where('body_request.header_request_id', $search)
+				->where('body_request.mo_plug', 0)
+				->whereNull('deleted_at')
+				->orwhere('to_mo', 1)
+				->where('body_request.header_request_id', $search)
+				->get();
+			}
 			
-			$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
-								->select(
-								  'body_request.*',
-								  'body_request.id as body_id',
-								  'assets_inventory_reserved.reserved as reserved'
-								)
-								->where('body_request.header_request_id', $search)
-								->where('body_request.mo_plug', 0)
-								->whereNull('deleted_at')
-								->orwhere('to_mo', 1)
-								->where('body_request.header_request_id', $search)
-								->get();
 
 			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,4])->get();
 		
@@ -1979,7 +1994,7 @@
 				$item_id = 		        $data['item_id'];
 				$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 				
-				if(in_array($arf_header->request_type_id, [5, 6, 7])){
+				if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 				//if($arf_header->request_type_id == 5){
 					$for_receiving = 		StatusMatrix::where('current_step', 8)
 											->where('request_type', $arf_header->request_type_id)
@@ -2013,8 +2028,8 @@
 						//$mo_info = 		MoveOrder::where('inventory_id', $email_info->id)->whereNull('return_flag')->first();
 						$mo_info = 		MoveOrder::where('id', $mo_id[$x])->whereNull('return_flag')->first();
 					}else{
-						$email_info = 	DB::table('assets')->where('id', $item_id[$x])->first();
-						$mo_info = 		MoveOrder::where('item_id', $email_info->id)->whereNull('return_flag')->first();
+						$email_info = 	DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])->first();
+						$mo_info = 		MoveOrder::where('id', $mo_id[$x])->whereNull('return_flag')->first();
 					}
 					$category_id = 			DB::table('category')->where('id',	$email_info->category_id)->value('category_description');
 

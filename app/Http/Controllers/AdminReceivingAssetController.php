@@ -449,14 +449,14 @@
 			$arf_header 				= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 
 		
-			if($arf_header->request_type_id == 5){
+			if(in_array($arf_header->request_type_id, [5, 9])){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
 												//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 												->value('status_id');
 			}else if(in_array($arf_header->request_type_id, [6, 7])){
 				//if($arf_header->request_type_id == 5){
-					$for_closing 				= StatusMatrix::where('current_step', 10)
+				$for_closing 				= StatusMatrix::where('current_step', 10)
 													->where('request_type', $arf_header->request_type_id)
 													//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 													->value('status_id');
@@ -489,15 +489,6 @@
 						->update([
 							'status_id'=> 	$for_closing
 						]);	
-						DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])
-						->update([
-							'statuses_id'=> 			3,
-							'deployed_to'=> 			$employee_name->bill_to,
-							'deployed_by'=> 			CRUDBooster::myId(),
-							'deployed_at'=> 			date('Y-m-d H:i:s'),
-							'location'=> 				4
-						]);
-						DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])->decrement('quantity', $quantity);
 					}else{
 						MoveOrder::where('id',$item_id[$x])
 						->update([

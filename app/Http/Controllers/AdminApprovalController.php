@@ -453,7 +453,7 @@
 					}
 				}else if(in_array($arf_header->request_type_id, [9])){
 					//GET ASSETS NON TRADE INVENTORY AVAILABLE COUNT
-					$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
+					$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
 					//GET RESERVED QTY 
 					$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
 					
@@ -488,10 +488,10 @@
 					}
                    
 					foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
-						$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('statuses_id',6)->where('digits_code',$fBodyItFaVal->digits_code)->first();
+						$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
                         $reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
 						$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
-			
+						//dd($reservedListCount);
 						if($available_quantity >= $fBodyItFaVal->quantity){
 							//add to reserved taable
 							AssetsNonTradeInventoryReserved::Create(
@@ -777,10 +777,10 @@
 						)
 				->where('header_request.id', $id)->first();
 				
-				$body = BodyRequest::leftjoin('assets_non_trade_inventory', 'body_request.digits_code','=', 'assets_non_trade_inventory.digits_code')
+				$body = BodyRequest::leftjoin('assets_non_trade_inventory_body', 'body_request.digits_code','=', 'assets_non_trade_inventory_body.digits_code')
 				->select(
 				  'body_request.*',
-				  'assets_non_trade_inventory.quantity as wh_qty'
+				  'assets_non_trade_inventory_body.quantity as wh_qty'
 				)
 				->where('body_request.header_request_id', $id)
 				->whereNull('deleted_at')

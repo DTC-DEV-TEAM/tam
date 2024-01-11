@@ -16,6 +16,7 @@
 	use App\Exports\ExportTamReportList;
 	use App\Models\AssetsSuppliesInventory;
 	use App\Models\AssetsNonTradeInventory;
+	use App\Models\AssetsNonTradeInventoryReserved;
 	use App\Models\AssetsInventoryReserved;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
@@ -631,57 +632,109 @@
 							}
 						}
 					}else if(in_array($request_type_id, [9])){
-						//Get the inventory value per digits code
-						$arraySearch = DB::table('assets_non_trade_inventory')->select('*')->get()->toArray();
-										
-						$finalBodyValue = [];
-						foreach($arf_body as $bodyfKey => $bodyVal){
-							$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
-							if($i !== false){
-								$bodyVal['inv_value'] = $arraySearch[$i];
-								$finalBodyValue[] = $bodyVal;
-							}else{
-								$bodyVal['inv_value'] = "";
-								$finalBodyValue[] = $bodyVal;
-							}
+						//GET ASSETS NON TRADE INVENTORY AVAILABLE COUNT
+					$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
+					//GET RESERVED QTY 
+					$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+					
+					$resultInventory = [];
+					foreach($inventoryList as $invKey => $invVal){
+						$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
+						if($i !== false){
+							$invVal->reserved_value = $reservedList[$i];
+							$resultInventory[] = $invVal;
+						}else{
+							$invVal->reserved_value = "";
+							$resultInventory[] = $invVal;
 						}
+					}
+					//get the final available qty
+					$finalInventory = [];
+					foreach($resultInventory as $fKey => $fVal){
+						$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
+						$finalInventory[] = $fVal;
+					}
 
-						//Set data in each qty
-						$containerData = [];
-						$finalContData = [];
-						foreach($finalBodyValue as $fBodyKey => $fBodyVal){
-							if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
-								//less quantity in inventory
-								BodyRequest::where('id', $fBodyVal['id'])
-								->update([
-									'replenish_qty'      =>  $fBodyVal['quantity'],
-									'reorder_qty'        =>  NULL,
-									'serve_qty'          =>  NULL,
-									'unserved_qty'       =>  $fBodyVal['quantity'],
-									'unserved_rep_qty'   =>  $fBodyVal['quantity'],
-									'unserved_ro_qty'    =>  NULL
-								]);	
-								DB::table('assets_no_trade_inventory')
-								->where('digits_code', $fBodyVal['digits_code'])
-								->decrement('quantity', $fBodyVal['quantity']);
-							}else{
-								$reorder = $fBodyVal['quantity'] - $fBodyVal['inv_value']->quantity;
-								$containerData['serve_qty']     = $fBodyVal['inv_value']->quantity;  
-								BodyRequest::where('id', $fBodyVal['id'])
-								->update([
-									'replenish_qty'      =>  $fBodyVal['inv_value']->quantity,
-									'reorder_qty'        =>  $reorder,
-									'serve_qty'          =>  NULL,
-									'unserved_qty'       =>  $fBodyVal['quantity'],
-									'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
-									'unserved_ro_qty'    =>  $reorder
-								]);	
-								AssetsNonTradeInventory::where('digits_code', $fBodyVal['digits_code'])
-								->update([
-									'quantity'   =>  0,
-								]);	
-							}
+					$finalItFaBodyValue = [];
+					foreach($arf_body as $bodyItFafKey => $bodyItFaVal){
+						$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
+						if($i !== false){
+							$bodyItFaVal->inv_qty = $finalInventory[$i];
+							$finalItFaBodyValue[] = $bodyItFaVal;
+						}else{
+							$bodyItFaVal->inv_qty = "";
+							$finalItFaBodyValue[] = $bodyItFaVal;
 						}
+					}
+                   
+					foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
+						$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+                        $reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+						$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
+			
+						if($available_quantity >= $fBodyItFaVal->quantity){
+							//add to reserved taable
+							AssetsNonTradeInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => $fBodyItFaVal->quantity,
+									'for_po'              => NULL,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							); 
+							
+							//update details in body table
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $fBodyItFaVal->quantity,
+								'reorder_qty'        =>  NULL,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
+								'unserved_ro_qty'    =>  NULL
+							]);	
+
+							HeaderRequest::where('id',$id)
+							->update([
+								'to_mo' => 1
+							]);
+							 
+						}else{
+							$reorder = $fBodyItFaVal->quantity - $available_quantity;
+							AssetsNonTradeInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => NULL,
+									'for_po'              => 1,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							);  
+
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $available_quantity,
+								'reorder_qty'        =>  $reorder,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $available_quantity,
+								'unserved_ro_qty'    =>  $reorder
+							]);	
+
+							
+					    }
+					}
 					}else{
 						//GET ASSETS INVENTORY AVAILABLE COUNT
 						$inventoryList = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
@@ -1669,11 +1722,11 @@
 			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
 			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
-			->leftjoin('assets_non_trade_inventory', 'assets.digits_code','=', 'assets_non_trade_inventory.digits_code')
+			->leftjoin('assets_non_trade_inventory_body', 'assets.digits_code','=', 'assets_non_trade_inventory_body.digits_code')
 
 			->select(	'assets.*',
 						'assets.id as assetID',
-						'assets_non_trade_inventory.quantity as wh_qty',
+						'assets_non_trade_inventory_body.quantity as wh_qty',
 						'tam_categories.category_description as tam_category_description',
 						'tam_subcategories.subcategory_description as tam_sub_category_description',
 					)
