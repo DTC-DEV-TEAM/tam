@@ -231,14 +231,22 @@
                                                     </td> --}}
 
                                                     <td>
-                                                        <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
-                                                            @foreach($assets_code as $asset_code)
-                                                                <option value=""></option>
-                                                                <option value="{{ $asset_code->id }}">{{ $asset_code->asset_code }} | {{ $asset_code->digits_code }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        </td>
-                                                    
+                                                        @if($Header->request_type_id == 9)
+                                                            <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
+                                                                @foreach($assets_code as $asset_code)
+                                                                    <option value=""></option>
+                                                                    <option value="{{ $asset_code->id }}">{{ $asset_code->digits_code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @else
+                                                            <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
+                                                                @foreach($assets_code as $asset_code)
+                                                                    <option value=""></option>
+                                                                    <option value="{{ $asset_code->id }}">{{ $asset_code->asset_code }} | {{ $asset_code->digits_code }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        @endif
+                                                    </td>
                                                 </tr>
 
                                                 <tr id="others{{$tableRow1}}" style="display:none">

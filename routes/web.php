@@ -60,7 +60,10 @@ Route::group(['middleware' => ['web']], function() {
     //NON TRADE INVENTORY
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-approvedProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeApprovedProcess')->name('assets.non.trade.nonTradeApprovedProcess');
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-forPoProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeForPoProcess')->name('assets.non.trade.get.nonTradeForPoProcess');
-    
+    Route::get(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-inventory-upload','AdminAssetsNonTradeInventoryBodyController@nonTradeUploadInventory');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-upload-inventory','AdminAssetsNonTradeInventoryBodyController@nonTradeInventoryUpload')->name('non-trade-upload-inventory');
+    Route::get(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-upload-inventory-template','AdminAssetsNonTradeInventoryBodyController@nonTradeUploadInventoryTemplate'); 
+
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-search','AdminHeaderRequestController@itemSearch')->name('asset.item.search');
@@ -111,7 +114,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/move_order/ADFUpdate','AdminMoveOrderController@ADFUpdate');
     Route::get('/admin/move_order/GetExtractMO','AdminMoveOrderController@GetExtractMO')->name('GetExtractMO'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/get-available-digits-code','AdminMoveOrderController@getAvailableDigitsCode')->name('get-available-digits-code');
-    
+    Route::post(config('crudbooster.ADMIN_PATH').'/reallocate-request','AdminMoveOrderController@reAllocateRequest')->name('reallocate-request');
     //PickingRequest
     Route::get('/admin/picking/getRequestPicking/{id}','AdminPickingController@getRequestPicking')->name('picking-request');
     //ReceivingRequest

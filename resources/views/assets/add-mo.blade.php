@@ -1073,5 +1073,11 @@
 
     });
 
+    //CANCEL REQUEST
+    $("#btnRefresh").click(function(event) {
+        event.preventDefault();
+    
+    });
+
 </script>
 @endpush

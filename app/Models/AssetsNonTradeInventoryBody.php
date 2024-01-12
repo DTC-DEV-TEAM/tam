@@ -8,14 +8,29 @@ class AssetsNonTradeInventoryBody extends Model
 {
     protected $table = 'assets_non_trade_inventory_body';
     protected $fillable = [
-        'digits_code', 
-        'description',
+        'header_id', 
+        'statuses_id', 
+        'po_no',
+        'warranty_coverage',
+        'digits_code',
+        'item_code',
+        'item_description',
+        'item_condition',
+        'value',
+        'item_type',
         'quantity',
-        'status',
+        'serial_no',
+        'item_photo',
+        'asset_code',
+        'deployed_to',
+        'barcode',
         'created_by',
-        'created_at	',
-        'updated_by',
-        'updated_at	',
-      
+        'deployed_to_id',
+        'location',
+        'request_type_id_inventory',
+        'item_category',
+        'sub_category_id',
+        'received',
+        'item_id'
     ];
 }
