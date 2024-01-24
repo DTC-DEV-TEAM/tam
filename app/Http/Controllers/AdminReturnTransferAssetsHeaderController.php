@@ -649,6 +649,9 @@
 				if($hData == 1){
 					$conHeader['reference_no'] = "1".str_pad($count_header + 1, 6, '0', STR_PAD_LEFT)."ITAR";
 					$count_header++;
+				}else if($hData == 9){
+					$conHeader['reference_no'] = "1".str_pad($count_header + 1, 6, '0', STR_PAD_LEFT)."NTAR";
+					$count_header++;
 				}else{
 					$conHeader['reference_no'] = "1".str_pad($count_header + 1, 6, '0', STR_PAD_LEFT)."FAR";
 					$count_header++;
@@ -659,6 +662,7 @@
 			ReturnTransferAssetsHeader::insert($conHeaderSave);
 			$itId = DB::table('return_transfer_assets_header')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',1)->first();
 			$faId = DB::table('return_transfer_assets_header')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',5)->first();
+			$ntId = DB::table('return_transfer_assets_header')->select('*')->where('id','>', $latestRequestId)->where('request_type_id',9)->first();
 	
 			$resultArrforIT = [];
 			foreach($getData as $item){
@@ -683,8 +687,20 @@
 					}
 				}
 			}
+
+			$resultArrforNTA = [];
+			foreach($getData as $itemNta){
+				if($itemNta['request_type_id'] == 9){
+					for($x = 0; $x < $itemNta['request_type_id']; $x++){
+						$nta = $itemNta;
+						$nta['return_header'] = $ntId->id;
+						$nta['reference_no'] = $ntId->reference_no;
+						$resultArrforNTA[] = $nta;
+					}
+				}
+			}
 	
-			$finalReturnData = array_merge($resultArrforIT, $resultArrforFA);
+			$finalReturnData = array_merge($resultArrforIT, $resultArrforFA, $resultArrforNTA);
 	
 			// Body Area
 			$container = [];

@@ -399,7 +399,7 @@ class NonTradeInventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadi
                 'statuses_id'                    => $statuses,
                 'deployed_to'                    => $deployed,
                 'location'                       => $location,
-                'asset_code'                     => "NT-".$asset_code,
+                'asset_code'                     => NULL,
                 'digits_code'                    => $row['digits_code'],
                 'item_description'               => $item_id->item_description,
                 'value'                          => $item_id->item_cost,
