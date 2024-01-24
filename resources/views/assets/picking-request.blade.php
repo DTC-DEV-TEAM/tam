@@ -154,7 +154,11 @@
                                             <th width="8%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                             <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
                                             <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
-                                            <th width="8%">Asset Code Tagging</th>
+                                            @if(in_array($Header->request_type_id, [1,5]))
+                                                <th width="8%" class="text-center">Asset Code Tagging</th>
+                                            @else
+                                                <th width="8%" class="text-center">Fulfill Qty</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                         
@@ -179,23 +183,29 @@
                                                     <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->item_description}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->quantity}}</td>
-                                                    <td>
-                                                        @if($Header->request_type_id == 9)
-                                                            <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
-                                                                @foreach($assets_code as $asset_code)
-                                                                    <option value=""></option>
-                                                                    <option value="{{ $asset_code->id }}">{{ $asset_code->digits_code }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        @else
-                                                            <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
-                                                                @foreach($assets_code as $asset_code)
-                                                                    <option value=""></option>
-                                                                    <option value="{{ $asset_code->id }}">{{ $asset_code->asset_code }} | {{ $asset_code->digits_code }}</option>
-                                                                @endforeach
-                                                            </select>
-                                                        @endif
-                                                    </td>
+                                                    @if(in_array($Header->request_type_id, [1,5]))
+                                                        <td>
+                                                            @if($Header->request_type_id == 9)
+                                                                <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
+                                                                    @foreach($assets_code as $asset_code)
+                                                                        <option value=""></option>
+                                                                        <option value="{{ $asset_code->id }}">{{ $asset_code->digits_code }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            @else
+                                                                <select required selected data-placeholder="Tag Asset Code" id="asset_code_tag{{$tableRow1}}" data-id="{{$tableRow1}}" name="asset_code_tag[]" class="form-select asset_code_tag" style="width:100%;">
+                                                                    @foreach($assets_code as $asset_code)
+                                                                        <option value=""></option>
+                                                                        <option value="{{ $asset_code->id }}">{{ $asset_code->asset_code }} | {{ $asset_code->digits_code }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            @endif
+                                                        </td>
+                                                    @else
+                                                        <td>
+                                                            <input type="text" class="form-control" name="nt_fulfill_qty[]" id="nt_fulfill_qty">
+                                                        </td>
+                                                    @endif
                                                 </tr>
 
                                                 <tr id="others{{$tableRow1}}" style="display:none">

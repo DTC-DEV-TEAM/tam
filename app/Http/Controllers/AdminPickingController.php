@@ -456,6 +456,7 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
 			$fields = Request::all();
+			//dd($fields);
 			$item_id 					= $fields['item_id'];
 			$good_text 					= $fields['good_text'];
 			$defective_text 			= $fields['defective_text'];
@@ -468,6 +469,7 @@
 			$other_comment  = $fields['other_comment'];
 			$asset_code_tag = $fields['asset_code_tag'];
 			$body_id        = $fields['body_id'];
+			$nt_full_qty    = $fields['nt_fulfill_qty'];
          
 			$HeaderID 					= MoveOrder::where('id', $id)->first();
 
@@ -584,9 +586,9 @@
 
 						DB::table('assets_inventory_reserved')->where('body_id', $body_id[$x])->delete();
 					}else{
-						$quantity = BodyRequest::where(['id' => $body_id[$x]])->first()->quantity;
-						$inventoryDetails = AssetsNonTradeInventoryBody::where('id',$asset_code_tag[$x])->first();
-
+						$bodeDetail = BodyRequest::where(['id' => $body_id[$x]])->first();
+						$inventoryDetails = AssetsNonTradeInventoryBody::where('digits_code',$bodeDetail->digits_code)->first();
+						$fulfillQty = intval(str_replace(',', '', $nt_full_qty[$key]));
 						MoveOrder::where('id',$item_id[$x])
 						->update([
 							'item_id'         => $inventoryDetails->item_id,
@@ -604,15 +606,15 @@
 						BodyRequest::where('id', $body_id[$x])
 						->update(
 									[
-									'serve_qty'        => $quantity, 
-									'unserved_rep_qty' => DB::raw("unserved_rep_qty - $quantity"), 
-									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - $quantity"), 
-									'unserved_qty'     => DB::raw("unserved_qty - $quantity"),      
-									'dr_qty'           => $quantity,
+									'serve_qty'        => $fulfillQty, 
+									'unserved_rep_qty' => DB::raw("unserved_rep_qty - $fulfillQty"), 
+									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - $fulfillQty"), 
+									'unserved_qty'     => DB::raw("unserved_qty - $fulfillQty"),      
+									'dr_qty'           => $fulfillQty,
 									'mo_so_num'        => $HeaderID->mo_reference_number       
 									]
 								);
-						DB::table('assets_non_trade_inventory_body')->where('id', $inventoryDetails->id)->decrement('quantity', $quantity);
+						DB::table('assets_non_trade_inventory_body')->where('id', $inventoryDetails->id)->decrement('quantity', $fulfillQty);
 						DB::table('assets_non_trade_inventory_reserved')->where('body_id', $body_id[$x])->delete();
 					}
 				//}
