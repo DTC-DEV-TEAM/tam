@@ -203,7 +203,7 @@
                                                         </td>
                                                     @else
                                                         <td>
-                                                            <input type="text" class="form-control" name="nt_fulfill_qty[]" id="nt_fulfill_qty">
+                                                            <input type="text" class="form-control nt_fulfill_qty" req-qty="{{$rowresult->quantity}}" name="nt_fulfill_qty[]" id="nt_fulfill_qty">
                                                         </td>
                                                     @endif
                                                 </tr>
@@ -263,9 +263,7 @@
         $('body').addClass("sidebar-collapse");
     });
 
-    $('.select2').select2({
-    placeholder_text_single : "-- Select --",
-    multiple: true});
+    $('.select2').select2({placeholder_text_single : "-- Select --",multiple: true});
 
     $('.asset_code_tag').select2({allowClear: true});
     var searchfield = $(this).find('.select2-search--inline');
@@ -334,7 +332,6 @@
         }
 
     });
-
 
     $('.defective').change(function() {
         // $('.good').not(this).prop('checked', false);    
@@ -445,11 +442,10 @@
 
         });
     });
+
     $('#btnSubmit').click(function(event) {
-    
         event.preventDefault();
         //each value validation
-       
         var asset_code = $(".asset_code_tag option").length;
         var asset_code_value = $('.asset_code_tag').find(":selected");
         for(i=0;i<asset_code;i++){
@@ -478,6 +474,34 @@
                 $('#myform').submit();                                                  
         });
     });
+
+    $('#nt_fulfill_qty').on('input',function(){
+        const currentVal = $(this).val();
+        const val = Number(currentVal.replace(/\D/g, ''));
+        $(this).val(currentVal ? val.toLocaleString() : '');
+        validateQty();
+    })
+    $('#btnSubmit').attr('disabled',true);
+    function validateQty(){
+        const inputs = $('.nt_fulfill_qty').get();
+        let isValid = true;
+        inputs.forEach(input =>{
+            const currentVal = $(input).val(); 
+            const value = Number(currentVal.replace(/\D/g, ''));
+            const maxValue = Number($(input).attr('req-qty'));
+            if (value > maxValue) {
+                $(input).css('border', '2px solid red');
+                isValid = false;
+            } else if(!currentVal || currentVal == 0){
+                isValid = false;
+                $(input).css('border', '2px solid red');
+            }else {
+                $(input).css('border', '');
+            }
+        });
+        isValid = isValid;
+        $('#btnSubmit').attr('disabled',!isValid);
+    }
 
 </script>
 @endpush

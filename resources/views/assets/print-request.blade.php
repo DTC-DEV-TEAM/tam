@@ -85,7 +85,7 @@
                                 <table border="1" width="100%" style="text-align:center;border-collapse: collapse; table-layout: fixed; font-size: 13px;">
                                     
                                     <thead>
-                                        <tr><th colspan="5"><h4 align="center" ><strong>Item Details</strong></h4></th></tr>
+                                        <tr><th colspan="4"><h4 align="center" ><strong>Item Details</strong></h4></th></tr>
                                         <tr>
                                             @if(in_array($Header->request_type_id,[1,5]))
                                                 <th style="text-align:center" height="10">Asset Code</th>
@@ -134,7 +134,7 @@
                                     </tbody>
 
                                     <tr>
-                                        <td colspan="5" style="text-align:right">
+                                        <td colspan="3" style="text-align:right">
                                             <label>Total:</label>
                                         </td>
 

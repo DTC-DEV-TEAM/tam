@@ -174,6 +174,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
     Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
 
+    //ASSET RETURN NON TRADE
+    Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/return-nontrade-assets', 'AdminReturnTransferAssetsHeaderController@getReturnNonTradeAssets')->name('assets.return.non.trade.assets'); 
+
      //inventory upload
      Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
      Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');

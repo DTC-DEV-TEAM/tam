@@ -278,8 +278,6 @@
 								array_push($list_array, $matrix->mo_reference_number);
 								array_push($id_array, $matrix->id);
 							}
-								
-			
 						}
 			
 				$list_string = implode(",",$id_array);
@@ -298,8 +296,6 @@
 								array_push($list_array, $matrix->mo_reference_number);
 								array_push($id_array, $matrix->id);
 							}
-								
-			
 						}
 			
 				$list_string = implode(",",$id_array);
@@ -352,57 +348,32 @@
 			}
 
 			if($column_index == 4){
-
 				$request_type = 			DB::table('requests')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->request_name;
-
 				}
-
-
 			}
 
 			if($column_index == 5){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->bill_to;
-
 				}
-
-
 			}
 
 			if($column_index == 6){
-
 				$request_type = 			DB::table('departments')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->department_name;
-
 				}
-
-
 			}
 
 			if($column_index == 7){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->name;
-
 				}
-
-
 			}
-			
 	    }
 
 	    /*
@@ -516,10 +487,7 @@
 					'status_id'    => $for_closing,
 					'received_by'  => CRUDBooster::myId(),
 					'received_at'  => date('Y-m-d H:i:s'),
-					'closing_plug' => 1,
-					'closed_by'    => CRUDBooster::myId(),
-					'closed_at'    => date('Y-m-d H:i:s')
-				
+					'closing_plug' => 1		
 				]);		
 			}
   		

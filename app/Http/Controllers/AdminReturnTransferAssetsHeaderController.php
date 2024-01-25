@@ -12,6 +12,9 @@
 	use App\Users;
 	class AdminReturnTransferAssetsHeaderController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private const Closed = 13;
+		private const ForClosing = 19;
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -135,6 +138,7 @@
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Return Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('return-assets'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Transfer Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('transfer-assets'),"color"=>"success"];
+				$this->index_button[] = ["label"=>"Return Non Trade Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('return-non-trade-assets'),"color"=>"success"];
 			}
 
 
@@ -276,22 +280,15 @@
 	    */
 	    public function hook_query_index(&$query) {
 			if(CRUDBooster::isSuperadmin()){
-
 				$query->whereNull('return_transfer_assets_header.archived')
 					  ->orderBy('return_transfer_assets_header.status', 'ASC')
 					  ->orderBy('return_transfer_assets_header.id', 'DESC');
-
 			}else{
-
 				$user = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
 				$query->where(function($sub_query){
-
 					$user = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
 					$sub_query->where('return_transfer_assets_header.requested_by', CRUDBooster::myId())
 							  ->whereNull('return_transfer_assets_header.archived'); 
-
 				});
 				$query->orderBy('return_transfer_assets_header.status', 'asc')->orderBy('return_transfer_assets_header.id', 'DESC');
 			}
@@ -450,6 +447,7 @@
 			return $this->view("assets.view-return-details", $data);
 		}
 
+		//RETURN IT/FA ASSETS
 		public function getReturnAssets(){
 			
 			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
@@ -462,49 +460,11 @@
 
 			$data['page_title'] = 'Return Request';
 
-			$closed =  	DB::table('statuses')->where('id', 13)->value('id');
-			$for_closing =  	DB::table('statuses')->where('id', 19)->value('id');
+			$closed      =  self::Closed;
+			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['mo_body'] = MoveOrder::leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
-				->leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
-				->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
-				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
-				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
-				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
-				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
-				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
-				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
-				->leftjoin('cms_users as tagged', 'header_request.purchased2_by','=', 'tagged.id')
-			
-				->select(
-						'header_request.*',
-						'mo_body_request.*',
-						'mo_body_request.id as mo_id',
-						'mo_body_request.location_id as warehouse_location_id',
-						'header_request.id as requestid',
-						'header_request.created_at as created',
-						'request_type.*',
-						'condition_type.*',
-						'requested.name as requestedby',
-						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
-						'departments.department_name as department',
-						'mo_body_request.category_id as asset_type',
-						'locations.store_name as store_branch',
-						'locations.id as location_id',
-						'approved.name as approvedby',
-						'recommended.name as recommendedby',
-						'tagged.name as taggedby',
-						'header_request.created_at as created_at',
-						DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
-						)
-				->where('mo_body_request.request_created_by', CRUDBooster::myId())
-				->whereIn('mo_body_request.status_id', [$closed, $for_closing])
-				->whereNull('mo_body_request.return_flag')
-				->get();
+			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -521,53 +481,15 @@
 			}
 
 			$this->cbLoader();
-
 			$data = array();
-
 			$data['page_title'] = 'Transfer Request';
 
-			$closed =  	DB::table('statuses')->where('id', 13)->value('id');
-			$for_closing =  	DB::table('statuses')->where('id', 19)->value('id');
+			$closed      =  self::Closed;
+			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['mo_body'] = MoveOrder::leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
-				->leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
-				->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
-				->leftjoin('condition_type', 'header_request.conditions', '=', 'condition_type.id')
-				->leftjoin('cms_users as employees', 'header_request.employee_name', '=', 'employees.id')
-				->leftjoin('companies', 'header_request.company_name', '=', 'companies.id')
-				->leftjoin('departments', 'header_request.department', '=', 'departments.id')
-				->leftjoin('positions', 'header_request.position', '=', 'positions.id')
-				->leftjoin('locations', 'header_request.store_branch', '=', 'locations.id')
-				->leftjoin('cms_users as requested', 'header_request.created_by','=', 'requested.id')
-				->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
-				->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
-				->leftjoin('cms_users as tagged', 'header_request.purchased2_by','=', 'tagged.id')
-			
-				->select(
-						'header_request.*',
-						'mo_body_request.*',
-						'mo_body_request.id as mo_id',
-						'header_request.id as requestid',
-						'header_request.created_at as created',
-						'request_type.*',
-						'condition_type.*',
-						'requested.name as requestedby',
-						'employees.bill_to as employee_name',
-						'employees.company_name_id as company_name',
-						'departments.department_name as department',
-						'mo_body_request.category_id as asset_type',
-						'locations.store_name as store_branch',
-						'locations.id as location_id',
-						'approved.name as approvedby',
-						'recommended.name as recommendedby',
-						'tagged.name as taggedby',
-						'header_request.created_at as created_at',
-						DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
-						)
-				->where('mo_body_request.request_created_by', CRUDBooster::myId())
-				->whereIn('mo_body_request.status_id', [$closed, $for_closing])
-				->whereNull('mo_body_request.return_flag')
-				->get();
+
+			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -577,6 +499,29 @@
 			$data['users'] = Users::where('id_cms_privileges','!=',1)->where('department_id',$data['user']->department_id)->get();
 	
 			return $this->view("assets.transfer-assets", $data);
+		}
+
+		//RETURN NON TRADE ASSETS
+		public function getReturnNonTradeAssets(){
+			
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
+
+			$this->cbLoader();
+			$data = array();
+			$data['page_title'] = 'Return Non Trade Request';
+			$closed      =  self::Closed;
+			$for_closing =  self::ForClosing;
+			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['mo_body'] = MoveOrder::moReturnNonTrade($closed, $for_closing, CRUDBooster::myId());
+
+			if(CRUDBooster::myPrivilegeId() == 8){ 
+				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+			}else{
+				$data['stores'] = NULL;
+			}	
+			return $this->view("non-trade.return-nontrade-assets", $data);
 		}
 
 		public function saveReturnAssets(Request $request){

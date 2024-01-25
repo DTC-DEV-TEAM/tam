@@ -281,70 +281,38 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-
-			$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			$user_info = 		DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->get();
-
-			$approval_array = array();
-			foreach($user_info as $matrix){
-				array_push($approval_array, $matrix->location_to_pick);
-			}
-			$approval_string = implode(",",$approval_array);
-			$locationList = array_map('intval',explode(",",$approval_string));
-
-
-			$List = MoveOrder::whereIn('mo_body_request.location_id', $locationList)->where('mo_body_request.status_id', $for_picking)->orderby('mo_body_request.id', 'asc')->get();
-
-			$list_array = array();
-
-			$id_array = array();
-
-			foreach($List as $matrix){
-
-				if(! in_array($matrix->mo_reference_number,$list_array)) {
-
-					array_push($list_array, $matrix->mo_reference_number);
-					array_push($id_array, $matrix->id);
-				}
-					
-
-			}
-
-			$list_string = implode(",",$id_array);
-
-			$MOList = array_map('intval',explode(",",$list_string));
-          
-	        //Your code here
-	        // if(CRUDBooster::myPrivilegeId() == 5){ 
-
-			// 	$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			// 	$query->where('mo_body_request.status_id', $for_picking)
-			// 		  ->where('mo_body_request.to_reco', 1)
-			// 		  ->where('mo_body_request.to_pick', 0)
-			// 		  ->orderBy('mo_body_request.id', 'ASC');
-
-			// }else if(CRUDBooster::myPrivilegeId() == 6){ 
-
-			// 	$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			// 	$query->where('mo_body_request.status_id', $for_picking)
-			// 		->where('mo_body_request.to_reco', 0)
-			// 		->where('mo_body_request.to_pick', 0)
-			// 		->orderBy('mo_body_request.id', 'ASC');
-
-			// }else{
-				
-				$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
+			$for_picking = DB::table('statuses')->where('id', 15)->value('id');
+			$user_info   = DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->get();
+			if(CRUDBooster::isSuperAdmin()){
 				$query->where('mo_body_request.status_id', $for_picking)
-					  ->where('mo_body_request.to_pick', 0)
-				      ->orderBy('mo_body_request.id', 'ASC');
+						->where('mo_body_request.to_pick', 0)
+						->orderBy('mo_body_request.id', 'ASC');
+			}else{
+				
+				$approval_array = array();
+				foreach($user_info as $matrix){
+					array_push($approval_array, $matrix->location_to_pick);
+				}
+				$approval_string = implode(",",$approval_array);
+				$locationList = array_map('intval',explode(",",$approval_string));
+				$List = MoveOrder::whereIn('mo_body_request.location_id', $locationList)->where('mo_body_request.status_id', $for_picking)->orderby('mo_body_request.id', 'asc')->get();
+				$list_array = array();
+				$id_array = array();
+				foreach($List as $matrix){
+					if(! in_array($matrix->mo_reference_number,$list_array)) {
+						array_push($list_array, $matrix->mo_reference_number);
+						array_push($id_array, $matrix->id);
+					}
+				}
 
-			//}
-
-			$query->whereIn('mo_body_request.id', $MOList);
+				$list_string = implode(",",$id_array);
+				$MOList = array_map('intval',explode(",",$list_string));
+				$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
+				$query->where('mo_body_request.status_id', $for_picking)
+						->where('mo_body_request.to_pick', 0)
+						->orderBy('mo_body_request.id', 'ASC');
+				$query->whereIn('mo_body_request.id', $MOList);
+			}
 	    }
 
 	    /*
@@ -456,7 +424,7 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
 			$fields = Request::all();
-			//dd($fields);
+			// dd($fields);
 			$item_id 					= $fields['item_id'];
 			$good_text 					= $fields['good_text'];
 			$defective_text 			= $fields['defective_text'];
@@ -588,7 +556,7 @@
 					}else{
 						$bodeDetail = BodyRequest::where(['id' => $body_id[$x]])->first();
 						$inventoryDetails = AssetsNonTradeInventoryBody::where('digits_code',$bodeDetail->digits_code)->first();
-						$fulfillQty = intval(str_replace(',', '', $nt_full_qty[$key]));
+						$fulfillQty = intval(str_replace(',', '', $nt_full_qty[$x]));
 						MoveOrder::where('id',$item_id[$x])
 						->update([
 							'item_id'         => $inventoryDetails->item_id,
