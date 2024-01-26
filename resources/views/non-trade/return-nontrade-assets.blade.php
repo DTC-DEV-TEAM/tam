@@ -27,7 +27,7 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Asset Form
+        Asset Non Trade Return Form
     </div>
 
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetReturnRequest" enctype="multipart/form-data">

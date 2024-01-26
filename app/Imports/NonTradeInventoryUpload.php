@@ -480,11 +480,11 @@ class NonTradeInventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadi
                     $onFailure('Employee Email not exist in Users List!');
                 }
             },
-            '*.sub_cat_code_exist' => function($attribute, $value, $onFailure) {
-                if ($value['check'] === false) {
-                    $onFailure('Sub Category Code not exist in Sub Master Asset Code!');
-                }
-            },
+            // '*.sub_cat_code_exist' => function($attribute, $value, $onFailure) {
+            //     if ($value['check'] === false) {
+            //         $onFailure('Sub Category Code not exist in Sub Master Asset Code!');
+            //     }
+            // },
             '*.digits_code_serial_exist' => function($attribute, $value, $onFailure) {
                 if ($value['check'] === true) {
                     $onFailure('Digits Code and Serial No Exist!');

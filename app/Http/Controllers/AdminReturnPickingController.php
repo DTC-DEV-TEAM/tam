@@ -10,9 +10,11 @@
 	use App\MoveOrder;
 	use App\CommentsGoodDefect;
 	use App\WarehouseLocationModel;
+	use App\Models\AssetsNonTradeInventoryBody;
 	use App\Models\OutAssets;
 	class AdminReturnPickingController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private const ToClosed = 25;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -285,7 +287,7 @@
 			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9,20,21,22])){ 
 				$forturnover =  DB::table('statuses')->where('id', 24)->value('id');
 				$query->where('return_transfer_assets_header.status', $forturnover)
-					  ->where('return_transfer_assets_header.request_type_id', 5)
+					  ->whereIn('return_transfer_assets_header.request_type_id', [5,9])
 				      //->whereIn('return_transfer_assets_header.location_to_pick', $locationList)
 					//   ->whereNull('return_transfer_assets_header.location_to_pick')
 					  ->whereNull('return_transfer_assets_header.transfer_to')
@@ -349,7 +351,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
-    
+			
 			$selectedItem       = $fields['item_to_receive_id'];
 			$selectedItem_array = array();
 			foreach($selectedItem as $select){
@@ -389,67 +391,115 @@
 			$inventory_id = MoveOrder::whereIn('id',$mo_id)->get();
 		
 			$finalinventory_id = [];
+			$moQty = [];
 			foreach($inventory_id as $invData){
 				array_push($finalinventory_id, $invData['inventory_id']);
+				array_push($moQty, $invData['quantity']);
 			}
-
+	
 			$location_to_drop = DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->first();
 
 			for($x=0; $x < count((array)$selectedItemlist); $x++) {
 
-				//if($item_id[$x] == 1){
-				if($defective_text[$x] == 1){
-					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
-					$mo_info 	= 		MoveOrder::where('id',$mo_id[$x])->first();
-
-					ReturnTransferAssets::where('id',$selectedItemlist[$x])
-					->update([
-							'status' => $to_close
-					]);	
-
-					$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
-					
-					ReturnTransferAssetsHeader::where('id', $id)
-					->update([
-						'transacted_by'   => CRUDBooster::myId(),
-						'transacted_date' => date('Y-m-d H:i:s')
-					]);	
-
-                    if($countItem == 0){
+				if(in_array($arf_header->request_type_id,[1,5])){
+					if($defective_text[$x] == 1){
+						$to_close  = self::ToClosed;
+						$mo_info   = MoveOrder::where('id',$mo_id[$x])->first();
+	
+						ReturnTransferAssets::where('id',$selectedItemlist[$x])
+						->update([
+								'status' => $to_close
+						]);	
+	
+						$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
+						
 						ReturnTransferAssetsHeader::where('id', $id)
 						->update([
-							'status'          => $to_close,
 							'transacted_by'   => CRUDBooster::myId(),
 							'transacted_date' => date('Y-m-d H:i:s')
 						]);	
-					}
-
-					if($arf_header->request_type_id == 1){
-						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
-						->update([
-							'statuses_id'=> 			23,
-							'item_condition'=> 			"Defective",
-							'deployed_to'=> 			NULL,
-							'deployed_to_id'=> 			NULL,
-							'location'=> 				$location_to_drop->location_to_pick
-						]);
-						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
+	
+						if($countItem == 0){
+							ReturnTransferAssetsHeader::where('id', $id)
+							->update([
+								'status'          => $to_close,
+								'transacted_by'   => CRUDBooster::myId(),
+								'transacted_date' => date('Y-m-d H:i:s')
+							]);	
+						}
+	
+						if($arf_header->request_type_id == 1){
+							DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
+							->update([
+								'statuses_id'=> 			23,
+								'item_condition'=> 			"Defective",
+								'deployed_to'=> 			NULL,
+								'deployed_to_id'=> 			NULL,
+								'location'=> 				$location_to_drop->location_to_pick
+							]);
+							DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
+						}else{
+							DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
+							->update([
+								'statuses_id'=> 			23,
+								'item_condition'=> 			"Defective",
+								'deployed_to'=> 			NULL,
+								'deployed_to_id'=> 			NULL,
+								'location'=> 				$location_to_drop->location_to_pick
+							]);
+							DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
+						}
+						
+	
 					}else{
-						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
+						$to_close  = self::ToClosed;
+	
+						ReturnTransferAssets::where('id',$selectedItemlist[$x])
 						->update([
-							'statuses_id'=> 			23,
-							'item_condition'=> 			"Defective",
-							'deployed_to'=> 			NULL,
-							'deployed_to_id'=> 			NULL,
-							'location'=> 				$location_to_drop->location_to_pick
-						]);
-						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
+								'status' => $to_close
+						]);	
+	
+						$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
+						
+						ReturnTransferAssetsHeader::where('id', $id)
+						->update([
+							'transacted_by'   => CRUDBooster::myId(),
+							'transacted_date' => date('Y-m-d H:i:s')
+						]);	
+	
+						if($countItem == 0){
+							ReturnTransferAssetsHeader::where('id', $id)
+							->update([
+								'status'          => $to_close,
+								'transacted_by'   => CRUDBooster::myId(),
+								'transacted_date' => date('Y-m-d H:i:s')
+							]);	
+						}
+						
+						
+						if($arf_header->request_type_id == 1){
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+							->update([
+								'statuses_id'=> 			6,
+								'deployed_to'=> 			NULL,
+								'deployed_to_id'=> 			NULL,
+								'location'=> 				$location_to_drop->location_to_pick
+							]);
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
+						}else{
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+							->update([
+								'statuses_id'=> 			6,
+								'deployed_to'=> 			NULL,
+								'deployed_to_id'=> 			NULL,
+								'location'=> 				$location_to_drop->location_to_pick	
+							]);
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
+						}
+	
 					}
-					
-
 				}else{
-					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
-
+					$to_close  = self::ToClosed;
 					ReturnTransferAssets::where('id',$selectedItemlist[$x])
 					->update([
 							'status' => $to_close
@@ -463,7 +513,7 @@
 						'transacted_date' => date('Y-m-d H:i:s')
 					]);	
 
-                    if($countItem == 0){
+					if($countItem == 0){
 						ReturnTransferAssetsHeader::where('id', $id)
 						->update([
 							'status'          => $to_close,
@@ -471,32 +521,9 @@
 							'transacted_date' => date('Y-m-d H:i:s')
 						]);	
 					}
-					
-					
-					if($arf_header->request_type_id == 1){
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			6,
-							'deployed_to'=> 			NULL,
-							'deployed_to_id'=> 			NULL,
-							'location'=> 				$location_to_drop->location_to_pick
-						]);
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
-			    	}else{
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			6,
-							'deployed_to'=> 			NULL,
-							'deployed_to_id'=> 			NULL,
-							'location'=> 				$location_to_drop->location_to_pick	
-						]);
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>1]);
-					}
-
+					DB::table('assets_non_trade_inventory_body')->where('digits_code', $digits_code[$x])->increment('quantity', $moQty[$x]);
 				}
-		
 			}
-
 
 			//save defect and good comments
 			$container = [];
@@ -542,9 +569,7 @@
 				$finalContainer['created_at'] = $val['created_at'];
 				$finalContainerSave[] = $finalContainer;
 			}
- 
 			CommentsGoodDefect::insert($finalContainerSave);
-
 	    }
 
 	    /* 
@@ -617,16 +642,18 @@
 		
 
 			$data['return_body'] = ReturnTransferAssets::
-			           leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			            leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+					    ->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
 				
-				->select(
-						'return_transfer_assets.*',
-						'return_transfer_assets.id as body_id',
-						'statuses.*',
-						)
-						->where('return_transfer_assets.return_header_id', $id)
-						->where('return_transfer_assets.status', 24)
-						->get();	
+					    ->select(
+								'return_transfer_assets.*',
+								'return_transfer_assets.id as body_id',
+								'statuses.*',
+								'mo_body_request.quantity'
+								)
+					    ->where('return_transfer_assets.return_header_id', $id)
+					    ->where('return_transfer_assets.status', 24)
+					    ->get();	
 			// dd($data['return_body']);
 			$data['good_defect_lists'] = GoodDefectLists::all();
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
