@@ -159,13 +159,13 @@
                                                 <table class="table table-bordered" id="asset-items">
                                                     <tbody id="bodyTable">
                                                         <tr class="tbl_header_color dynamicRows">
-                                                            <th width="35%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">Tasteless Code</th>
-                                                            <th width="20%" class="text-center">{{ trans('message.table.category_id_text') }}</th>      
-                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th>
-                                                            <th width="15%" class="text-center"> Wh Quantity</th>
-                                                            <th width="15%" class="text-center"> Unserved Quantity</th>  
-                                                            <th width="7%" class="text-center">*Request Qty</th> 
+                                                            <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
+                                                            <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                                            <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
+                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+                                                            <th width="15%" class="text-center">{{ trans('message.table.wh_qty') }}</th>
+                                                            <th width="15%" class="text-center">{{ trans('message.table.prev_balance_quantity') }}</th> 
+                                                            <th width="7%" class="text-center">{{ trans('message.table.request_qty') }}</th> 
                                                             <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
                                                         </tr>
                 

@@ -159,12 +159,10 @@
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"IT Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-it'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Fixed Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-fa'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Marketing","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-mkt'),"color"=>"success"];
+				//$this->index_button[] = ["label"=>"Marketing","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-mkt'),"color"=>"success"];
 				//$this->index_button[] = ["label"=>"Supplies","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-supplies'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Services","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-services'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Subscription","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-subscription'),"color"=>"success"];
-
-			
+				$this->index_button[] = ["label"=>"Non Trade","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-services'),"color"=>"success"];
+				// $this->index_button[] = ["label"=>"Subscription","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-item-sourcing-subscription'),"color"=>"success"];
 			}
 
 
@@ -733,7 +731,7 @@
 
 			$data['employeeinfos'] = Users::user($data['user']->id);
 
-			$data['categories'] = DB::table('category')->whereIn('id',[1,4,7,8])->where('category_status', 'ACTIVE')->orderby('category_description', 'asc')->get();
+			$data['categories'] = DB::table('tam_categories')->where('status', 'ACTIVE')->orderby('category_description', 'asc')->get();
 			$data['budget_range'] = DB::table('sub_masterfile_budget_range')->where('status', 'ACTIVE')->get();
 			$privilegesMatrix = DB::table('cms_privileges')->get();
 			$privileges_array = array();
@@ -826,7 +824,7 @@
 				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 			}
 			$this->cbLoader();
-			$data['page_title'] = 'Create Services Item Sourcing';
+			$data['page_title'] = 'Create Non Trade Item Sourcing';
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
 			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
@@ -1040,7 +1038,7 @@
 
 			$subcategories = DB::table('tam_subcategories')
 							->select('tam_subcategories.*')
-							//->where('category_id', $id)
+							->where('categories_id', $id)
 							->where('status', "ACTIVE")
 							->orderby('subcategory_description', 'ASC')->get();
 	

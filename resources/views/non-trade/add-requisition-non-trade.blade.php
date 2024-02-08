@@ -185,7 +185,7 @@
                                       <thead>
                                         <tr class="tbl_header_color dynamicRows">
                                             <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                            <th width="15%" class="text-center">{{ trans('message.table.tasteless_code') }}</th>
+                                            <th width="15%" class="text-center">{{ trans('message.table.item_code') }}</th>
                                             <th width="15%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
                                             <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                                             <th width="7%" class="text-center">{{ trans('message.table.wh_qty') }}</th>

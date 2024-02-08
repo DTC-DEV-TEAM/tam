@@ -412,7 +412,7 @@
                                             <tr class="tbl_header_color dynamicRows">
                                                 <th width="10%" class="text-center" height="10">{{ trans('message.table.mo_reference_number') }}</th>
                                                 <th width="13%" class="text-center" height="10">{{ trans('message.table.status_id') }}</th>
-                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.digits_code') }}</th>
+                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.item_code') }}</th>
                                                 @if(in_array($Header->request_type_id,[1,5]))
                                                     <th width="10%" class="text-center" height="10">{{ trans('message.table.asset_tag') }}</th>
                                                 @endif

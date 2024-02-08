@@ -55,7 +55,7 @@
     <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$HeaderID->id)}}'>
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="0" name="action" id="action">
-
+        <input type="hidden" id="request_type_id" value="{{$Header->request_type_id}}">
         <div class='panel-body'>
 
             <div class="row">                           
@@ -413,6 +413,39 @@
             }
    
         });
+
+        $('#nt_fulfill_qty').on('input',function(){
+            const currentVal = $(this).val();
+            const val = Number(currentVal.replace(/\D/g, ''));
+            $(this).val(currentVal ? val.toLocaleString() : '');
+            if($('#request_type_id').val() == 9){
+                validateQty();
+            }
+        })
+
+        if($('#request_type_id').val() == 9){
+            $('#btnSubmit').attr('disabled',true);
+            function validateQty(){
+                const inputs = $('.nt_fulfill_qty').get();
+                let isValid = true;
+                inputs.forEach(input =>{
+                    const currentVal = $(input).val(); 
+                    const value = Number(currentVal.replace(/\D/g, ''));
+                    const maxValue = Number($(input).attr('req-qty'));
+                    if (value > maxValue) {
+                        $(input).css('border', '2px solid red');
+                        isValid = false;
+                    } else if(!currentVal || currentVal == 0){
+                        isValid = false;
+                        $(input).css('border', '2px solid red');
+                    }else {
+                        $(input).css('border', '');
+                    }
+                });
+                isValid = isValid;
+                $('#btnSubmit').attr('disabled',!isValid);
+            }
+        }
     })
 
     $('.comments').each(function(){
@@ -475,33 +508,7 @@
         });
     });
 
-    $('#nt_fulfill_qty').on('input',function(){
-        const currentVal = $(this).val();
-        const val = Number(currentVal.replace(/\D/g, ''));
-        $(this).val(currentVal ? val.toLocaleString() : '');
-        validateQty();
-    })
-    $('#btnSubmit').attr('disabled',true);
-    function validateQty(){
-        const inputs = $('.nt_fulfill_qty').get();
-        let isValid = true;
-        inputs.forEach(input =>{
-            const currentVal = $(input).val(); 
-            const value = Number(currentVal.replace(/\D/g, ''));
-            const maxValue = Number($(input).attr('req-qty'));
-            if (value > maxValue) {
-                $(input).css('border', '2px solid red');
-                isValid = false;
-            } else if(!currentVal || currentVal == 0){
-                isValid = false;
-                $(input).css('border', '2px solid red');
-            }else {
-                $(input).css('border', '');
-            }
-        });
-        isValid = isValid;
-        $('#btnSubmit').attr('disabled',!isValid);
-    }
-
+   
+    
 </script>
 @endpush

@@ -813,7 +813,7 @@
 				if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
 					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
 				}else{
-					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
+					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereNotIn('item_category', ['IT ASSETS'])->whereIn('digits_code', $arrayDigitsCode)->get();
 				}
 			}else{
 				$data['assets_code'] = AssetsNonTradeInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->whereIn('digits_code', $arrayDigitsCode)->get();

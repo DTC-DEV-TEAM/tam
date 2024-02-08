@@ -92,7 +92,7 @@ return [
 
     'table' => [
         'tasteless_code'                 =>  'Tasteless Code',
-        'digits_code'                    =>  'Digits Code',
+        'digits_code'                    =>  'Item Code',
         'upc_code'                       =>  'UPC Code',
         'item_description'               =>  'Item Description',
         'reservable_quantity'            =>  'WH Reservable Qty',

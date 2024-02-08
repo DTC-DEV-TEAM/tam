@@ -89,11 +89,11 @@
             <table  class='table' id="asset-items">
                 <thead>
                     <tr>
-                        <th width="20%" class="text-center">Reference No</th>
+                        <th width="20%" class="text-center">{{ trans('message.table.reference') }}</th>
                         @if(in_array($Header->request_type_id, [1,5]))
-                            <th width="10%" class="text-center">Asset Code</th>
+                            <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                         @endif
-                        <th width="20%" class="text-center">Digits Code</th>
+                        <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                         <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
                         <th width="25%" class="text-center">Asset Type</th>                                                        
                     </tr>

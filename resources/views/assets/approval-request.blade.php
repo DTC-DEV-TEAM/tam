@@ -107,7 +107,7 @@
                         <th width="10%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
                         <th width="10%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                         
-                        <th width="5%" class="text-center">WH Qty</th>  
+                        <th width="5%" class="text-center">{{ trans('message.table.wh_qty') }}</th>  
                       
                         <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
                            

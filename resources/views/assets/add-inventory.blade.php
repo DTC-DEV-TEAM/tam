@@ -285,7 +285,7 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Please indicate Digits Code or Item Description</label>
+                            <label class="control-label"><span style="color:red">*</span> Please indicate Item Code or Item Description</label>
                             <input class="form-control auto finput" placeholder="Search Item..." id="search">
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-2" style="display: none; top: 60px; left: 15px; width: 520px;">
                                 <li>Loading...</li>
@@ -313,7 +313,7 @@
                                                 <th width="7%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                 <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>
                                                 <th width="8%" class="text-center">Category</th>
-                                                <th width="7%" class="text-center">Sub Category Code</th>
+                                                <th width="7%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                                                 <th width="2%" class="text-center">{{ trans('message.table.quantity_text') }}</th>
                                                 {{-- <th width="5%" class="text-center">Value</th>
                                                 <th width="7%" class="text-center"> Serial No <span style="font-style: italic; font-size:11px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
