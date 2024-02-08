@@ -180,8 +180,8 @@
         setTimeout("preventBack()", 0);
     //preview image before save
     $(function() {
-    // Multiple images preview in browser
-    var imagesPreview = function(input, placeToInsertImagePreview) {
+        // Multiple images preview in browser
+        var imagesPreview = function(input, placeToInsertImagePreview) {
 
         if (input.files) {
             var filesAmount = input.files.length;
