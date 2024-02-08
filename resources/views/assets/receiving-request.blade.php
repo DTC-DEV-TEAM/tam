@@ -39,8 +39,6 @@
                 <div class="col-md-4">
                         <p>{{$Header->created}}</p>
                 </div>
-
-
             </div>
 
 
@@ -57,8 +55,6 @@
             </div>
 
             <div class="row">                           
-
-
                 <label class="control-label col-md-2">{{ trans('message.form-label.department') }}:</label>
                 <div class="col-md-4">
                         <p>{{$Header->department}}</p>
@@ -68,7 +64,6 @@
                 <div class="col-md-4">
                         <p>{{$Header->position}}</p>
                 </div>
-
             </div>
 
             @if($Header->store_branch != null || $Header->store_branch != "")
@@ -99,17 +94,6 @@
 
         
             </div>
-            <!--
-            <hr/>
-
-            <div class="row">                           
-                <label class="control-label col-md-2">{{ trans('message.form-label.condition') }}:</label>
-                <div class="col-md-4">
-                        <p>{{$Header->condition_description}}</p>
-                </div>
-
-        
-            </div> -->
 
             @if($Header->requestor_comments != null || $Header->requestor_comments != "")
                 <hr/>
@@ -164,105 +148,93 @@
                     <div class="box-header text-center">
                         <h3 class="box-title"><b>Item Tagged</b></h3>
                     </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                            <div class="pic-container">
-                                                <div class="pic-row">
-                                                    <table id="asset-items">
-                                                        <tbody>
-                                                            <tr class="tbl_header_color dynamicRows">
-                                                                <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
-                                                                <!-- <th width="13%" class="text-center">{{ trans('message.table.status_id') }}</th> -->
-                                                                <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                                <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
-                                                                <th width="32%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                                <th width="18%" class="text-center">{{ trans('message.table.serial_no') }}</th>
-                                                                <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
-                                                                <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
-                                                                <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
-                                                                
-                                                            </tr>
-    
-                                                            <?php   $tableRow1 = 0; ?>
-    
-                                                            @if( !empty($MoveOrder) )
-    
-                                                              
-    
-                                                                @foreach($MoveOrder as $rowresult)
-    
-                                                                    <?php   $tableRow1++; ?>
-    
-                                                                    <tr>
-                                                                        <td style="text-align:center" height="10">
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                                <div class="pic-container">
+                                    <div class="pic-row">
+                                        <table id="asset-items">
+                                            <thead>
+                                                <tr class="tbl_header_color dynamicRows">
+                                                    <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
+                                                    <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                                    @if(in_array($Header->request_type_id, [1,5]))
+                                                        <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
+                                                    @endif
+                                                    <th width="32%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                                                    @if(in_array($Header->request_type_id, [1,5]))
+                                                        <th width="18%" class="text-center">{{ trans('message.table.serial_no') }}</th>
+                                                    @endif
+                                                    <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
+                                                    <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
+                                                    <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>
+                                                    
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php   $tableRow1 = 0; ?>
+                                                @if( !empty($MoveOrder) )                                                          
+                                                    @foreach($MoveOrder as $rowresult)
+                                                        <?php $tableRow1++; ?>
+                                                        <tr>
+                                                            <td style="text-align:center" height="10">
+                                                                <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
+                                                                <input type="hidden" value="{{$rowresult->inventory_id}}" name="inventory_id[]">
+                                                                {{$rowresult->mo_reference_number}}
+                                                            </td>
 
-                                                                            <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
-
-                                                                            <input type="hidden" value="{{$rowresult->inventory_id}}" name="inventory_id[]">
-
-                                                                            {{$rowresult->mo_reference_number}}
-
-                                                                        </td>
-                                                                        
-                                                                        <!--
-                                                                        <td style="text-align:center" height="10">
-    
-                                                                            <label style="color: #3c8dbc;">
-                                                                                {{$rowresult->status_description}}
-                                                                            </label>
-                                                                           
-    
-                                                                        </td>
-                                                                        -->
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->digits_code}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->asset_code}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->item_description}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10">
-                                                                            {{$rowresult->serial_no}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10" class="mo_qty">
-                                                                            {{$rowresult->quantity}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10" class="mo_unit_cost">
-                                                                            {{$rowresult->unit_cost}}
-                                                                        </td>
-    
-                                                                        <td style="text-align:center" height="10" class="mo_total_cost">
-                                                                            {{$rowresult->total_unit_cost}}
-                                                                        </td>
-                                                                         
-                                                                    </tr> 
-                                                                @endforeach
-    
-    
-                                                            @endif
-                                                            
-                                                            {{-- <tr class="tableInfo">
-                                                                <td colspan="7" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                                <td align="center" colspan="1">
-                                                                    <label>{{$Header->total}}</label>
+                                                            <td style="text-align:center" height="10">
+                                                                {{$rowresult->digits_code}}
+                                                            </td>
+                                                            @if(in_array($Header->request_type_id, [1,5]))
+                                                                <td style="text-align:center" height="10">
+                                                                    {{$rowresult->asset_code}}
                                                                 </td>
-                                                            </tr> --}}
-                                                        
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
+                                                            @endif
+                                                            <td style="text-align:center" height="10">
+                                                                {{$rowresult->item_description}}
+                                                            </td>
+                                                            @if(in_array($Header->request_type_id, [1,5]))
+                                                                <td style="text-align:center" height="10">
+                                                                    {{$rowresult->serial_no}}
+                                                                </td>
+                                                            @endif
+                                                            <td style="text-align:center" height="10" class="mo_qty">
+                                                                {{$rowresult->quantity}}
+                                                            </td>
+
+                                                            <td style="text-align:center" height="10" class="mo_unit_cost">
+                                                                {{$rowresult->unit_cost}}
+                                                            </td>
+
+                                                            <td style="text-align:center" height="10" class="mo_total_cost">
+                                                                {{$rowresult->total_unit_cost}}
+                                                            </td>
+                                                                
+                                                        </tr> 
+                                                    @endforeach
+                                                @endif        
+                                                @if(!in_array($Header->request_type_id,[1,5]))
+                                                    <tr>
+                                                        <td colspan="3" style="text-align: center;"><b>Total</b></td>
+                                                        <td class="text-center"><span id="totalQty">0</span></td>
+                                                        <td class="text-center"><span id="totalItemCost">0</span></td>
+                                                        <td class="text-center"><span id="totalCost">0</span></td>
+                                                    </tr>
+                                                @else
+                                                    <tr>
+                                                        <td colspan="5" style="text-align: center;"><b>Total</b></td>
+                                                        <td class="text-center"><span id="totalQty">0</span></td>
+                                                        <td class="text-center"><span id="totalItemCost">0</span></td>
+                                                        <td class="text-center"><span id="totalCost">0</span></td>
+                                                    </tr>
+                                                @endif                                                                                                             
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <br>
                                 </div>
+                        </div>
+                        <br>
+                    </div>
                 </div>
             </div>
             <hr>
@@ -344,6 +316,12 @@
     };
     setTimeout("preventBack()", 0);
 
+    $(document).ready(function() {
+        $('#totalQty').text(calculateTotalQuantity());
+        $('#totalItemCost').text(calculateTotalItemCost());
+        $('#totalCost').text(calculateTotalCost());
+    });
+
     $('#btnSubmit').click(function(event) {
         event.preventDefault();
         swal({
@@ -362,42 +340,44 @@
 
     });
 
-    var tds = document.getElementById("asset-items").getElementsByTagName("td");
-        var moQty        = 0;
-        var moUnitCost   = 0;
-        var moTotalCost  = 0;
-
-        for (var i = 0; i < tds.length; i++) {
-            if(tds[i].className == "mo_qty") {
-                moQty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-            }else if(tds[i].className == "mo_unit_cost"){
-                moUnitCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-            }else if(tds[i].className == "mo_total_cost"){
-                moTotalCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+    function calculateTotalQuantity() {
+        let totalQuantity = 0;
+        $('.mo_qty').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
             }
-        }
-        document.getElementById("asset-items").innerHTML +=
-        "<tr>"+
-            "<td colspan='5' style='text-align:right'>"+
-                    "<strong>TOTAL</strong>"+
-                "</td>"+
-                
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moQty +
-                    "</strong>"+
-                "</td>"+
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moUnitCost +
-                    "</strong>"+
-                "</td>"+
-                "<td style='text-align:center'>"+
-                    "<strong>" +
-                        moTotalCost +
-                    "</strong>"+
-                "</td>"+       
-        "</tr>";
+
+            totalQuantity += qty;
+        });
+        return totalQuantity;
+    }
+
+    function calculateTotalItemCost() {
+        let totalQuantity = 0;
+        $('.mo_unit_cost').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity.toFixed(2);
+    }
+
+    function calculateTotalCost() {
+        let totalQuantity = 0;
+        $('.mo_total_cost').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity.toFixed(2);
+    }
 
 </script>
 @endpush

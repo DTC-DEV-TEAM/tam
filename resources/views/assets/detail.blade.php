@@ -183,7 +183,7 @@
                         <div class="pic-container">
                             <div class="pic-row">
                                 <table id="asset-items1">
-                                    <tbody id="bodyTable">
+                                    <thead>
                                         <tr class="tbl_header_color dynamicRows">
                                             <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                             <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
@@ -222,6 +222,8 @@
                                                 @endif
                                             @endif --}}
                                         </tr>
+                                    </thead>
+                                    <tbody id="bodyTable">
                                         <tr id="tr-table">
                                             <?php   $tableRow = 1; ?>
                                             <tr>
@@ -406,70 +408,67 @@
                             <div class="pic-container">
                                 <div class="pic-row">
                                     <table id="asset-items">
-                                        <tbody>
+                                        <thead>
                                             <tr class="tbl_header_color dynamicRows">
-                                                <th width="10%" class="text-center">{{ trans('message.table.mo_reference_number') }}</th>
-                                                <th width="13%" class="text-center">{{ trans('message.table.status_id') }}</th>
-                                                <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
-                                                <th width="26%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                                                <th width="13%" class="text-center">{{ trans('message.table.serial_no') }}</th>
-                                                <th width="4%" class="text-center">{{ trans('message.table.item_quantity') }}</th>
-                                                <th width="8%" class="text-center">{{ trans('message.table.item_cost') }}</th>
-                                                <th width="16%" class="text-center">{{ trans('message.table.item_total_cost') }}</th>         
+                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.mo_reference_number') }}</th>
+                                                <th width="13%" class="text-center" height="10">{{ trans('message.table.status_id') }}</th>
+                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.item_code') }}</th>
+                                                @if(in_array($Header->request_type_id,[1,5]))
+                                                    <th width="10%" class="text-center" height="10">{{ trans('message.table.asset_tag') }}</th>
+                                                @endif
+                                                <th width="26%" class="text-center" height="10">{{ trans('message.table.item_description') }}</th>
+                                                @if(in_array($Header->request_type_id,[1,5]))
+                                                    <th width="13%" class="text-center" height="10">{{ trans('message.table.serial_no') }}</th>
+                                                @endif
+                                                <th width="4%" class="text-center" height="10">{{ trans('message.table.item_quantity') }}</th>
+                                                <th width="8%" class="text-center" height="10">{{ trans('message.table.item_cost') }}</th>
+                                                <th width="16%" class="text-center" height="10">{{ trans('message.table.item_total_cost') }}</th>         
                                             </tr>
+                                        </thead>
+                                        <tbody>
                                             <?php   $tableRow1 = 0; ?>
                                             @if( !empty($MoveOrder) )
                                                 @foreach($MoveOrder as $rowresult)
                                                     <?php   $tableRow1++; ?>
                                                     <tr>
                                                         <td style="text-align:center" height="10">
-
-                                                                        <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
-
-                                                                        {{$rowresult->mo_reference_number}}
-                                                                        
+                                                            <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
+                                                            {{$rowresult->mo_reference_number}}
                                                         </td>
                                                         <td style="text-align:center" height="10">
-
-                                                                        <label style="color: #3c8dbc;">
-                                                                            {{$rowresult->status_description}}
-                                                                        </label>
-                                                                    
-
+                                                            <label style="color: #3c8dbc;">
+                                                                {{$rowresult->status_description}}
+                                                            </label>
                                                         </td>
-                                                        <td style="text-align:center" height="10">
-                                                                        {{$rowresult->digits_code}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10">
-                                                                        {{$rowresult->asset_code}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10">
-                                                                        {{$rowresult->item_description}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10">
-                                                                        {{$rowresult->serial_no}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10" class="mo_qty">
-                                                                        {{$rowresult->quantity}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10" class="mo_unit_cost">
-                                                                        {{$rowresult->unit_cost}}
-                                                        </td>
-                                                        <td style="text-align:center" height="10" class="mo_total_cost">
-                                                                        {{$rowresult->total_unit_cost}}
-                                                        </td>
+                                                        <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
+                                                        @if(in_array($Header->request_type_id,[1,5]))
+                                                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
+                                                        @endif
+                                                        <td style="text-align:center" height="10">{{$rowresult->item_description}}</td>
+                                                        @if(in_array($Header->request_type_id,[1,5]))
+                                                            <td style="text-align:center" height="10">{{$rowresult->serial_no}}</td>
+                                                        @endif
+                                                        <td style="text-align:center" height="10" class="mo_qty">{{$rowresult->quantity}}</td>
+                                                        <td style="text-align:center" height="10" class="mo_unit_cost">{{$rowresult->unit_cost}}</td>
+                                                        <td style="text-align:center" height="10" class="mo_total_cost">{{$rowresult->total_unit_cost}}</td>
                                                     </tr>
                                                 @endforeach
                                             @endif       
-                                            {{-- <tr class="tableInfo">
-                                                <td colspan="6" align="right"><strong>{{ trans('message.table.total') }}</strong></td>
-                                                <td align="center">
-                                                    <label>{{$Header->quantity_total}}</label>
-                                                </td>
-                                                <td colspan="1"></td>
-                                            </tr> --}}
-    
+                                            @if(!in_array($Header->request_type_id,[1,5]))
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center;"><b>Total</b></td>
+                                                    <td class="text-center"><span id="totalQty">0</span></td>
+                                                    <td class="text-center"><span id="totalItemCost">0</span></td>
+                                                    <td class="text-center"><span id="totalCost">0</span></td>
+                                                </tr>
+                                            @else
+                                                <tr>
+                                                    <td colspan="6" style="text-align: center;"><b>Total</b></td>
+                                                    <td class="text-center"><span id="totalQty">0</span></td>
+                                                    <td class="text-center"><span id="totalItemCost">0</span></td>
+                                                    <td class="text-center"><span id="totalCost">0</span></td>
+                                                </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>
@@ -582,8 +581,10 @@
     var tableRow = <?php echo json_encode($tableRow); ?>;
 
     $(document).ready(function() {
+            $('#totalQty').text(calculateTotalQuantity());
+            $('#totalItemCost').text(calculateTotalItemCost());
+            $('#totalCost').text(calculateTotalCost());
             $(document).on('click', '.removeRow', function() {
-                
                 event.preventDefault();
                 if ($('#asset-items1 tbody tr').length != 1) { //check if not the first row then delete the other rows
                 var id_data = $(this).attr("data-id");    
@@ -707,7 +708,7 @@
 
     }
     
-    var tds = document.getElementById("asset-items1").getElementsByTagName("td");
+    var tds = document.getElementById('asset-items1').getElementsByTagName('td');
     var sumqty       = 0;
     var rep_qty      = 0;
     var ro_qty       = 0;
@@ -716,106 +717,110 @@
     var dr_qty       = 0;
     var po_qty       = 0;
     for (var i = 0; i < tds.length; i++) {
-        if(tds[i].className == "qty") {
+        if(tds[i].className == 'qty') {
             sumqty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "rep_qty"){
+        }else if(tds[i].className == 'rep_qty'){
             rep_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "ro_qty"){
+        }else if(tds[i].className == 'ro_qty'){
             ro_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "served_qty"){
+        }else if(tds[i].className == 'served_qty'){
             served_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "unserved_qty"){
+        }else if(tds[i].className == 'unserved_qty'){
             unserved_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "dr_qty"){
+        }else if(tds[i].className == 'dr_qty'){
             dr_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "po_qty"){
+        }else if(tds[i].className == 'po_qty'){
             po_qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
         }
     }
-    document.getElementById("asset-items1").innerHTML +=
-    "<tr>"+
-        "<td colspan='4' style='text-align:right'>"+
-                "<strong>TOTAL</strong>"+
-            "</td>"+
+    document.getElementById('asset-items1').innerHTML +=
+    '<tr>'+
+        '<td colspan="4" style="text-align:center">'+
+                '<strong>TOTAL</strong>'+
+            '</td>'+
             
-            "<td style='text-align:center'>"+
-                "<strong>" +
+            '<td style="text-align:center">'+
+                '<strong>' +
                 sumqty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                 rep_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                 ro_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                 served_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                 unserved_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                     dr_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+                '<strong>' +
                     po_qty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-            "</td>"+
-            "<td colspan='4' style='text-align:center'>"+
-            "</td>"+
+                '</strong>'+
+            '</td>'+
+            '<td style="text-align:center">'+
+            '</td>'+
+            '<td colspan="4" style="text-align:center">'+
+            '</td>'+
             
-    "</tr>";
-    
-    var tds = document.getElementById("asset-items").getElementsByTagName("td");
-    var moQty        = 0;
-    var moUnitCost   = 0;
-    var moTotalCost  = 0;
+    '</tr>';
 
-    for (var i = 0; i < tds.length; i++) {
-        if(tds[i].className == "mo_qty") {
-            moQty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "mo_unit_cost"){
-            moUnitCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }else if(tds[i].className == "mo_total_cost"){
-            moTotalCost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }
+    function calculateTotalQuantity() {
+        let totalQuantity = 0;
+        $('.mo_qty').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity;
     }
-    document.getElementById("asset-items").innerHTML +=
-    "<tr>"+
-        "<td colspan='6' style='text-align:right'>"+
-                "<strong>TOTAL</strong>"+
-            "</td>"+
-            
-            "<td style='text-align:center'>"+
-                "<strong>" +
-                    moQty +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
-                    moUnitCost +
-                "</strong>"+
-            "</td>"+
-            "<td style='text-align:center'>"+
-                "<strong>" +
-                    moTotalCost +
-                "</strong>"+
-            "</td>"+       
-    "</tr>";
+
+    function calculateTotalItemCost() {
+        let totalQuantity = 0;
+        $('.mo_unit_cost').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity.toFixed(2);
+    }
+
+    function calculateTotalCost() {
+        let totalQuantity = 0;
+        $('.mo_total_cost').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity.toFixed(2);
+    }
+  
+    
       
         
 </script>

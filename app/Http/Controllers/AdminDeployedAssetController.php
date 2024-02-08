@@ -11,6 +11,9 @@
 	use App\MoveOrder;
 	class AdminDeployedAssetController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private const Closed     = 13;
+		private const ForClosing = 19;
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -238,18 +241,15 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	        $closed =  	DB::table('statuses')->where('id', 13)->value('id');
-			$for_closing =  	DB::table('statuses')->where('id', 19)->value('id');
+	      	$closed      = self::Closed;
+			$for_closing = self::ForClosing;
            
 			$query->where('mo_body_request.request_created_by', CRUDBooster::myId())
 				//->orWhere('mo_body_request.created_by', CRUDBooster::myId())
 				->whereIn('mo_body_request.status_id', [$closed, $for_closing])
 				->whereNull('mo_body_request.return_flag')
-				//->whereNotIn('header_request.request_type_id', [6,7])
+				->whereNotIn('header_request.request_type_id', [9])
 				; 
-		
-			
-
 	    }
 
 	    /*
@@ -429,11 +429,8 @@
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
             }
 
-			//$header_id = DB::table('mo_body_request')->where('id', $id)->first();
 			$data = array();
-
 			$data['page_title'] = 'View Request';
-
 			$data['MoveOrder'] = MoveOrder::
 				select(
 				  'mo_body_request.*',
@@ -443,11 +440,7 @@
 				->leftjoin('statuses', 'mo_body_request.status_id', '=', 'statuses.id')
 				->orderby('mo_body_request.id', 'desc')
 				->get();
-
-			
-					
 			return $this->view("assets.deployed_details_mo_only", $data);
 		}
-
 
 	}

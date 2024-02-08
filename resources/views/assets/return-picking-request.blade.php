@@ -1,7 +1,6 @@
 @extends('crudbooster::admin_template')
 @push('head')
         <style type="text/css">   
-      
             .comment_div {
                 box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
                 background: #f5f5f5;
@@ -19,6 +18,10 @@
                 margin-bottom:0;
             }
             .select2-container--default .select2-selection--multiple .select2-selection__choice{color:black;}
+            input.qty:read-only {
+                background-color: #fff;
+                border: none
+            }
         </style>
     @endpush
 @section('content')
@@ -120,9 +123,14 @@
                         <th width="5%" class="text-center">Good</th> 
                         <th width="5%" class="text-center">Defective</th>
                         <th width="10%" class="text-center">Reference No</th>
-                        <th width="7%" class="text-center">Asset Code</th>
+                        @if(in_array($Header->request_type_id, [1,5]))
+                            <th width="7%" class="text-center">Asset Code</th>
+                        @endif
                         <th width="7%" class="text-center">Digits Code</th>
-                        <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                        <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>  
+                        @if(!in_array($Header->request_type_id, [1,5]))
+                            <th width="7%" class="text-center">Qty</th>
+                        @endif
                         <th width="10%" class="text-center">Asset Type</th>                                                         
                         <th width="12%" class="text-center">Comments</th>
                         @if(CRUDBooster::myPrivilegeId() == 6)
@@ -141,22 +149,29 @@
                                 <input type="checkbox" name="item_to_receive_id[]" id="item_to_receive_id{{$tableRow1}}" class="item_to_receive_id" required data-id="{{$tableRow1}}" value="{{$rowresult->body_id}}"/>
                             </td>
                             <td style="text-align:center" height="10">
-                            <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
-                            <input type="hidden" value="{{$rowresult->mo_id}}" name="mo_id[]">
-                            <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" />
-                            <input type="checkbox" name="good[]" id="good{{$tableRow1}}" class="good" required data-id="{{$tableRow1}}" value="{{$rowresult->asset_code}}"/>
-                            <input type="hidden" name="arf_number[]" id="arf_number[]" value="{{$rowresult->reference_no}}" />
-                            <input type="hidden" name="digits_code[]" id="digits_code{{$tableRow1}}" value="{{$rowresult->digits_code}}" />
-                            <input type="hidden" name="asset_code[]" id="asset_code{{$tableRow1}}" value="{{$rowresult->asset_code}}" />
+                                <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
+                                <input type="hidden" value="{{$rowresult->mo_id}}" name="mo_id[]">
+                                <input type="hidden" name="good_text[]" id="good_text{{$tableRow1}}" />
+                                <input type="checkbox" name="good[]" id="good{{$tableRow1}}" class="good" required data-id="{{$tableRow1}}" value="{{$rowresult->asset_code}}"/>
+                                <input type="hidden" name="arf_number[]" id="arf_number[]" value="{{$rowresult->reference_no}}" />
+                                <input type="hidden" name="digits_code[]" id="digits_code{{$tableRow1}}" value="{{$rowresult->digits_code}}" />
+                                <input type="hidden" name="asset_code[]" id="asset_code{{$tableRow1}}" value="{{$rowresult->asset_code}}" />
                             </td>
                             <td style="text-align:center" height="10">
                             <input type="hidden" name="defective_text[]" id="defective_text{{$tableRow1}}" />
                             <input type="checkbox" name="defective[]" id="defective{{$tableRow1}}" class="defective" required data-id="{{$tableRow1}}"  value="{{$rowresult->asset_code}}"/>
                             </td>
                             <td style="text-align:center" height="10">{{$rowresult->reference_no}}</td>
-                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
+                            @if(in_array($Header->request_type_id, [1,5]))
+                                <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
+                            @endif
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
+                            @if(!in_array($Header->request_type_id, [1,5]))
+                                <td style="text-align:center" height="10"> 
+                                    <input type="text" class="form-control text-center qty" name="mo_qty[]" value="{{$rowresult->quantity}}" readonly> 
+                                </td>
+                            @endif
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
                             <td style="text-align:center" height="10">
                                 <select required selected data-placeholder="Select Comments" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">

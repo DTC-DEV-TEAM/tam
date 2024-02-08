@@ -57,6 +57,13 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/selection-digits-code','AdminAssetsInventoryHeaderForApprovalController@selectionDigitsCode')->name('selection-digits-code'); // new 72723
     Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/sub-categories-code','AdminAssetsInventoryHeaderForApprovalController@subCatCode')->name('sub-categories-code'); // new 72723
 
+    //NON TRADE INVENTORY
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-approvedProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeApprovedProcess')->name('assets.non.trade.nonTradeApprovedProcess');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_inventory/get-non-trade-forPoProcess','AdminAssetsNonTradeInventoryHeaderController@nonTradeForPoProcess')->name('assets.non.trade.get.nonTradeForPoProcess');
+    Route::get(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-inventory-upload','AdminAssetsNonTradeInventoryBodyController@nonTradeUploadInventory');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-upload-inventory','AdminAssetsNonTradeInventoryBodyController@nonTradeInventoryUpload')->name('non-trade-upload-inventory');
+    Route::get(config('crudbooster.ADMIN_PATH').'/assets_non_trade_inventory_body/non-trade-upload-inventory-template','AdminAssetsNonTradeInventoryBodyController@nonTradeUploadInventoryTemplate'); 
+
     //CreateRequest
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition', 'AdminHeaderRequestController@getAddRequisition')->name('assets.add.requisition'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-search','AdminHeaderRequestController@itemSearch')->name('asset.item.search');
@@ -66,6 +73,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-fa', 'AdminHeaderRequestController@getAddRequisitionFA')->name('assets.add.requisition.fa'); 
     Route::get('admin/header_request/subcategories/{id}','AdminHeaderRequestController@SubCategories');
     Route::get('admin/header_request/RemoveItem','AdminHeaderRequestController@RemoveItem');
+    Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-non-trade', 'AdminHeaderRequestController@getAddRequisitionNonTrade')->name('assets.add.requisition.non.trade'); 
+
     //Cancel Request
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-request','AdminHeaderRequestController@cancelArfRequest')->name('cancel-arf-request');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-mo-perline-request','AdminHeaderRequestController@cancelArfMoPerLineRequest')->name('cancel-arf-mo-perline-request');
@@ -105,7 +114,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/move_order/ADFUpdate','AdminMoveOrderController@ADFUpdate');
     Route::get('/admin/move_order/GetExtractMO','AdminMoveOrderController@GetExtractMO')->name('GetExtractMO'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/get-available-digits-code','AdminMoveOrderController@getAvailableDigitsCode')->name('get-available-digits-code');
-    
+    Route::post(config('crudbooster.ADMIN_PATH').'/reallocate-request','AdminMoveOrderController@reAllocateRequest')->name('reallocate-request');
     //PickingRequest
     Route::get('/admin/picking/getRequestPicking/{id}','AdminPickingController@getRequestPicking')->name('picking-request');
     //ReceivingRequest
@@ -164,6 +173,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
     Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
+
+    //ASSET RETURN NON TRADE
+    Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/return-nontrade-assets', 'AdminReturnTransferAssetsHeaderController@getReturnNonTradeAssets')->name('assets.return.non.trade.assets'); 
 
      //inventory upload
      Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
@@ -253,6 +265,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-fa-search','AdminHeaderRequestController@itemFASearch')->name('item.fa.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-marketing-search','AdminHeaderRequestController@itemMarketingSearch')->name('item.marketing.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-supplies-search','AdminHeaderRequestController@itemSuppliesSearch')->name('item.supplies.search');
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-non-trade-search','AdminHeaderRequestController@itemNonTradeSearch')->name('item.non.trade.search');
+
 
     //Item Sourcing Routes
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/create-arf','AdminItemSourcingHeaderController@createArf')->name('create-arf');

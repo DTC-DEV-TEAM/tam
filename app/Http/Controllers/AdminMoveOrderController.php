@@ -20,6 +20,7 @@
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use PhpOffice\PhpSpreadsheet\IOFactory;
 	use App\WarehouseLocationModel;
+	use App\Models\AssetsNonTradeInventoryReserved;
 
 	class AdminMoveOrderController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -457,7 +458,7 @@
 			if(in_array(CRUDBooster::myPrivilegeId(),[5,17])){
 			    $query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 1);
 			}else if(in_array(CRUDBooster::myPrivilegeId(),[6,9,20,21,22])){
-				$query->whereIn('mo_body_request.id', $MOList)->where('header_request.request_type_id', 5);
+				$query->whereIn('mo_body_request.id', $MOList)->whereIn('header_request.request_type_id', [5,9]);
 			}else{
 				$query->whereIn('mo_body_request.id', $MOList);
 			}
@@ -585,7 +586,7 @@
 			$count_header 		= MoveOrder::count();
 			$count_header1  	= $count_header + 1;
 			//dd(count((array)$digits_code));
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
@@ -778,7 +779,7 @@
 			
 			$arf_header 		= HeaderRequest::where(['id' => $mo_request->header_request_id])->first();
 			
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
@@ -1007,7 +1008,7 @@
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)
-				->where('request_type_id' , 1)
+				->whereIn('request_type_id' , [1])
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 				->get();
@@ -1015,7 +1016,7 @@
 				$data['AssetRequest'] = HeaderRequest::
 				  where('mo_plug', 0)
 				->where('to_mo', 1)
-				->where('request_type_id' , 5)
+				->whereIn('request_type_id' , [5,9])
 				->whereNotIn('status_id',[8,13])
 				->whereNotNull('created_by')
 			
@@ -1330,7 +1331,7 @@
 			$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 
 			//$for_picking =  		DB::table('statuses')->where('id', 15)->value('id');
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_picking = 			StatusMatrix::where('current_step', 6)
 										->where('request_type', $arf_header->request_type_id)
@@ -1419,19 +1420,34 @@
 										'header_request.created_at as created_at'
 										)
 								->where('header_request.id', $search)->first();
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
+				->select(
+				  'body_request.*',
+				  'body_request.id as body_id',
+				  'assets_inventory_reserved.reserved as reserved'
+				)
+				->where('body_request.header_request_id', $search)
+				->where('body_request.mo_plug', 0)
+				->whereNull('deleted_at')
+				->orwhere('to_mo', 1)
+				->where('body_request.header_request_id', $search)
+				->get();
+			}else{
+				$data['Body'] = BodyRequest::leftjoin('assets_non_trade_inventory_reserved', 'body_request.id', '=', 'assets_non_trade_inventory_reserved.body_id')
+				->select(
+				  'body_request.*',
+				  'body_request.id as body_id',
+				  'assets_non_trade_inventory_reserved.reserved as reserved'
+				)
+				->where('body_request.header_request_id', $search)
+				->where('body_request.mo_plug', 0)
+				->whereNull('deleted_at')
+				->orwhere('to_mo', 1)
+				->where('body_request.header_request_id', $search)
+				->get();
+			}
 			
-			$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
-								->select(
-								  'body_request.*',
-								  'body_request.id as body_id',
-								  'assets_inventory_reserved.reserved as reserved'
-								)
-								->where('body_request.header_request_id', $search)
-								->where('body_request.mo_plug', 0)
-								->whereNull('deleted_at')
-								->orwhere('to_mo', 1)
-								->where('body_request.header_request_id', $search)
-								->get();
 
 			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,4])->get();
 		
@@ -1441,7 +1457,8 @@
 					<label class="control-label col-md-2">Reference Number:</label>
 					<div class="col-md-4">
 
-							<input type="hidden" value="'. $data['Header']->requestid .'" name="header_request_id" id="header_request_id">		
+							<input type="hidden" value="'. $data['Header']->requestid .'" name="header_request_id" id="header_request_id">	
+							<input type="hidden" value="'. $data['Header']->request_type_id .'" name="header_request_type_id" id="header_request_type_id">		
 							
 							<p>'. $data['Header']->reference_number .'</p>
 					</div>
@@ -1527,7 +1544,7 @@
 
 			$itUserLocation = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$itAssetLocation = DB::table('warehouse_location_model')->where('id', $itUserLocation->location_to_pick)->first();
-		
+			
 			foreach($data['Body'] as $rowresult){
 
 				$tableRow++;
@@ -1762,11 +1779,16 @@
 				$data['checkBoxHeader'] .= '<th width="3%" class="text-center">Cancel</th>';
 			}
 
+			if($data['Header']->request_type_id == 9){
+				$data['refresh'] .= '<button class="btn btn-warning pull-right" id="btnRefresh"><i class="fa fa-refresh"></i> Refresh</button>';
+			}
+			
 			$data['ARFBodyTable'] .= '
 				<hr/>
 				<div class="col-md-12">
 					<div class="box-header text-center">
 						<h3 class="box-title"><b>Recommendation</b></h3>
+						'.$data['refresh'].'
 					</div>
 					<div class="box-body no-padding">
 					  <div class="table-responsive">
@@ -1828,11 +1850,11 @@
 					$(".location").attr("disabled",true);
 					//Location Value
 					$(".location").change(function(){
-						var data_id     = $(this).attr("data-id");
-						var value_id    = $("#location" + data_id).val();
-						var digits_code = $("#add_digits_code" + data_id).val();
-						var value_text  = $("#location" +data_id+ " :selected").text();
-			
+						var data_id         = $(this).attr("data-id");
+						var value_id        = $("#location" + data_id).val();
+						var digits_code     = $("#add_digits_code" + data_id).val();
+						var value_text      = $("#location" +data_id+ " :selected").text();
+						var request_type_id = $("#header_request_type_id").val();
 	                    $.ajax({
 							type: "POST",
 							url: "'.route('get-available-digits-code').'",
@@ -1840,6 +1862,7 @@
 							data: {
 								"_token": $("#token").val(),
 								"id": value_id,
+								"request_type_id": request_type_id,
 								"digits_code": digits_code
 							},
 							success: function(response) {
@@ -1890,6 +1913,46 @@
 						$("#button_count").val(searchID);
 						$("#button_remove").val($("#remove_btn"+searchID).val());
 				 
+					 });
+
+					 //REFRESH REQUEST
+					 $("#btnRefresh").click(function(event) {
+						event.preventDefault();
+						var header_id = $("#header_request_id").val();
+						swal({
+							title: "Are you sure?",
+							text: "You wont be able to revert this!",
+							type: "warning",
+							showCancelButton: true,
+							confirmButtonColor: "#41B314",
+							cancelButtonColor: "#F9354C",
+							confirmButtonText: "Yes, re allocate it!",
+							}, function () {
+								$.ajax({
+									type: "POST",
+									url: "'.route('reallocate-request').'",
+									dataType: "json",
+									data: {
+										"_token": $("#token").val(),
+										"header_id": header_id
+									},
+									success: function(response) {
+										if(response.status == "success"){
+											swal({
+												type: "success",
+												title: "Suucess!",
+												icon: "success",
+												confirmButtonColor: "#5cb85c",
+											});
+										}
+										console.log(response);
+									},
+									error: function(e) {
+										console.log(e);
+									}
+								});                                                
+						});
+						
 					 });
 
 				</script>
@@ -1977,7 +2040,7 @@
 				$item_id = 		        $data['item_id'];
 				$arf_header = 			HeaderRequest::where(['id' => $requestid])->first();
 				
-				if(in_array($arf_header->request_type_id, [5, 6, 7])){
+				if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 				//if($arf_header->request_type_id == 5){
 					$for_receiving = 		StatusMatrix::where('current_step', 8)
 											->where('request_type', $arf_header->request_type_id)
@@ -2009,18 +2072,18 @@
 					if(in_array($arf_header->request_type_id, [1, 5])){
 						$email_info = 	DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->first();
 						//$mo_info = 		MoveOrder::where('inventory_id', $email_info->id)->whereNull('return_flag')->first();
-						$mo_info = 		MoveOrder::where('id', $mo_id[$x])->whereNull('return_flag')->first();
+						$mo_info    = 	MoveOrder::where('id', $mo_id[$x])->whereNull('return_flag')->first();
 					}else{
-						$email_info = 	DB::table('assets')->where('id', $item_id[$x])->first();
-						$mo_info = 		MoveOrder::where('item_id', $email_info->id)->whereNull('return_flag')->first();
+						$email_info = 	DB::table('assets_non_trade_inventory_body')->where('id', $inventory_id[$x])->first();
+						$mo_info    = 	MoveOrder::where('id', $mo_id[$x])->whereNull('return_flag')->first();
 					}
-					$category_id = 			DB::table('category')->where('id',	$email_info->category_id)->value('category_description');
+					$category_id    = 	DB::table('category')->where('id',	$email_info->category_id)->value('category_description');
 
 					array_push($mo_reference_number, $mo_info->mo_reference_number);
 					array_push($asset_code, $email_info->asset_code);
 					array_push($digits_code, $email_info->digits_code);
 					array_push($item_description, $email_info->item_description);
-					array_push($item_category, $email_info->item_category ? $email_info->item_category : $category_id);
+					array_push($item_category, $email_info->item_category);
 					array_push($serial_no, $email_info->serial_no ? $email_info->serial_no : "");
 
 						/*$full_date = 	"<b> Reference Number: </b> ".$mo_info->mo_reference_number."<br>".
@@ -2268,8 +2331,117 @@
 		public function getAvailableDigitsCode(Request $request){
 			$data = Request::all();
             $id = $data['id'];
+			$request_type_id = $data['request_type_id'];
 			$digits_code = $data['digits_code'];
-			$res = DB::table('assets_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			if($request_type_id == 9){
+				$res = DB::table('assets_non_trade_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			}else{
+				$res = DB::table('assets_inventory_body')->where('location',$id)->where('digits_code',$digits_code)->count();
+			}
+			return json_encode($res);
+		}
+
+		public function reAllocateRequest(Request $request){
+			$data = Request::all();
+            $id = $data['header_id'];
+			$arf_header = HeaderRequest::where(['id' => $id])->first();
+			$getBodyData = BodyRequest::where(['header_request_id' => $id])->where('reorder_qty','!=',0)->get();
+
+			//RE PROCESS REPLENISHMENT
+			//GET ASSETS NON TRADE INVENTORY AVAILABLE COUNT
+			$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
+			//GET RESERVED QTY 
+			$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+			
+			$resultInventory = [];
+			foreach($inventoryList as $invKey => $invVal){
+				$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
+				if($i !== false){
+					$invVal->reserved_value = $reservedList[$i];
+					$resultInventory[] = $invVal;
+				}else{
+					$invVal->reserved_value = "";
+					$resultInventory[] = $invVal;
+				}
+			}
+			//get the final available qty
+			$finalInventory = [];
+			foreach($resultInventory as $fKey => $fVal){
+				$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
+				$finalInventory[] = $fVal;
+			}
+
+			$finalItFaBodyValue = [];
+			foreach($getBodyData as $bodyItFafKey => $bodyItFaVal){
+				$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
+				if($i !== false){
+					$bodyItFaVal->inv_qty = $finalInventory[$i];
+					$finalItFaBodyValue[] = $bodyItFaVal;
+				}else{
+					$bodyItFaVal->inv_qty = "";
+					$finalItFaBodyValue[] = $bodyItFaVal;
+				}
+			}
+		   
+			foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
+				$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+				$reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+				$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
+				//dd($reservedListCount);
+				if($available_quantity >= $fBodyItFaVal->quantity){
+					//add to reserved taable
+					AssetsNonTradeInventoryReserved::where(['reference_number' => $arf_header->reference_number])
+					->update(
+						[
+							'reserved'            => 1,
+							'for_po'              => NULL,
+							'updated_by'          => CRUDBooster::myId(),
+							'updated_at'          => date('Y-m-d H:i:s')
+						]
+					);  
+					
+					//update details in body table
+					BodyRequest::where('id', $fBodyItFaVal->id)
+					->update([
+						'replenish_qty'      =>  $fBodyItFaVal->quantity,
+						'reorder_qty'        =>  NULL,
+						'serve_qty'          =>  NULL,
+						'unserved_qty'       =>  $fBodyItFaVal->quantity,
+						'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
+						'unserved_ro_qty'    =>  NULL
+					]);	
+
+					HeaderRequest::where('id',$id)
+					->update([
+						'to_mo' => 1
+					]);
+					 
+				}else{
+					$reorder = $fBodyItFaVal->quantity - $available_quantity;
+					AssetsNonTradeInventoryReserved::where([
+						'reference_number'    => $arf_header->reference_number, 
+					])->update(
+						[
+							'reserved'            => NULL,
+							'for_po'              => 1,
+							'updated_by'          => CRUDBooster::myId(),
+							'updated_at'          => date('Y-m-d H:i:s')
+						]
+					);  
+
+					BodyRequest::where('id', $fBodyItFaVal->id)
+					->update([
+						'replenish_qty'      =>  $available_quantity,
+						'reorder_qty'        =>  $reorder,
+						'serve_qty'          =>  NULL,
+						'unserved_qty'       =>  $fBodyItFaVal->quantity,
+						'unserved_rep_qty'   =>  $available_quantity,
+						'unserved_ro_qty'    =>  $reorder
+					]);	
+				}
+			}
+			$res = ['status'=>'success', 'message'=>'Success!'];
+
 			return json_encode($res);
 		}
 	}

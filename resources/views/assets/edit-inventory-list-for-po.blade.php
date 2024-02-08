@@ -128,11 +128,11 @@
                 <table id="asset-items">
                     <thead>
                         <tr>
-                            <th width="10%" class="text-center">Asset Code</th>
-                            <th width="10%" class="text-center">Digits Code</th>   
-                            <th width="30%" class="text-center">Item Condition</th>      
-                            <th width="5%" class="text-center">Location</th>                                         
-                            <th width="5%" class="text-center">Quantity</th>                   
+                            <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
+                            <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>   
+                            <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>      
+                            <th width="5%" class="text-center">{{ trans('message.table.location_id_text') }}</th>                                         
+                            <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th>                   
                         </tr>
                     </thead>
                     <tbody>

@@ -85,12 +85,16 @@
                                 <table border="1" width="100%" style="text-align:center;border-collapse: collapse; table-layout: fixed; font-size: 13px;">
                                     
                                     <thead>
-                                        <tr><th colspan="5"><h4 align="center" ><strong>Item Details</strong></h4></th></tr>
+                                        <tr><th colspan="4"><h4 align="center" ><strong>Item Details</strong></h4></th></tr>
                                         <tr>
-                                            <th style="text-align:center" height="10">Asset Code</th>
+                                            @if(in_array($Header->request_type_id,[1,5]))
+                                                <th style="text-align:center" height="10">Asset Code</th>
+                                            @endif
                                             <th style="text-align:center" height="10">Digits Code</th>
-                                            <th style="text-align:center" height="10">Item Description</th>          
-                                            <th style="text-align:center" height="10">Serial#</th>
+                                            <th style="text-align:center" height="10">Item Description</th>  
+                                            @if(in_array($Header->request_type_id,[1,5]))        
+                                                <th style="text-align:center" height="10">Serial#</th>
+                                            @endif
                                             <th style="text-align:center" height="10">Qty</th>
                                             <th style="text-align:center" height="10">Unit Cost</th>
                                         </tr>
@@ -105,20 +109,19 @@
 
                                             <tr>
                                                 @if($rowresult->digits_code != null)
-                                                <td height="10">{{$rowresult->asset_code}}</td>
+                                                    @if(in_array($Header->request_type_id,[1,5]))
+                                                        <td height="10">{{$rowresult->asset_code}}</td>
+                                                    @endif
                                                     <td height="10">
-
-                                                        <input type="hidden" value="{{$rowresult->id}}" name="mo_id[]">
-                                                       
+                                                        <input type="hidden" value="{{$rowresult->id}}" name="mo_id[]">    
                                                         <input type="hidden" value="{{$rowresult->inventory_id}}" name="inventory_id[]">
-
                                                         <input type="hidden" value="{{$rowresult->item_id}}" name="item_id[]">
-
                                                         {{$rowresult->digits_code}}
-
                                                     </td>
                                                     <td height="10">{{$rowresult->item_description}}</td>
-                                                    <td height="10">{{$rowresult->serial_no}}</td>
+                                                    @if(in_array($Header->request_type_id,[1,5]))
+                                                        <td height="10">{{$rowresult->serial_no}}</td>
+                                                    @endif
                                                     <td height="10">{{$rowresult->quantity}}</td>
                                                     <td height="10">{{$rowresult->unit_cost}}</td>
                                                 @endif
@@ -131,7 +134,7 @@
                                     </tbody>
 
                                     <tr>
-                                        <td colspan="5" style="text-align:right">
+                                        <td colspan="3" style="text-align:right">
                                             <label>Total:</label>
                                         </td>
 

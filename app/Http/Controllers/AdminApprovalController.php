@@ -10,7 +10,9 @@
 	use App\StatusMatrix;
 	use App\Users;
 	use App\Models\AssetsSuppliesInventory;
+	use App\Models\AssetsNonTradeInventory;
 	use App\Models\AssetsInventoryReserved;
+	use App\Models\AssetsNonTradeInventoryReserved;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -363,7 +365,7 @@
 			$approval_action 		= $fields['approval_action'];
 			$approver_comments 		= $fields['approver_comments'];
 			$body_ids 		        = $fields['body_ids'];
-			if(in_array($arf_header->request_type_id, [7])){
+			if(in_array($arf_header->request_type_id, [7,9])){
 			    $wh_qty 		    = $fields['wh_qty'];
 			}else{
 				$wh_qty 		    = $fields['it_wh_qty'];
@@ -399,8 +401,8 @@
 
 				if(in_array($arf_header->request_type_id, [7])){
 					//Get the inventory value per digits code
-					$arraySearch = DB::table('assets_supplies_inventory')->select('*')->get()->toArray();
-				
+					$arraySearch = DB::table('assets_non_trade_inventory')->select('*')->get()->toArray();
+									
 					$finalBodyValue = [];
 					foreach($arf_body as $bodyfKey => $bodyVal){
 						$i = array_search($bodyVal['digits_code'], array_column($arraySearch,'digits_code'));
@@ -417,7 +419,7 @@
 					$containerData = [];
 					$finalContData = [];
 					foreach($finalBodyValue as $fBodyKey => $fBodyVal){
-                        if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
+						if($fBodyVal['inv_value']->quantity > $fBodyVal['quantity']){
 							//less quantity in inventory
 							BodyRequest::where('id', $fBodyVal['id'])
 							->update([
@@ -428,13 +430,12 @@
 								'unserved_rep_qty'   =>  $fBodyVal['quantity'],
 								'unserved_ro_qty'    =>  NULL
 							]);	
-							DB::table('assets_supplies_inventory')
+							DB::table('assets_non_trade_inventory')
 							->where('digits_code', $fBodyVal['digits_code'])
 							->decrement('quantity', $fBodyVal['quantity']);
 						}else{
 							$reorder = $fBodyVal['quantity'] - $fBodyVal['inv_value']->quantity;
 							$containerData['serve_qty']     = $fBodyVal['inv_value']->quantity;  
-							$containerData['unserve_qty']   = $containerData['reorder_qty'];
 							BodyRequest::where('id', $fBodyVal['id'])
 							->update([
 								'replenish_qty'      =>  $fBodyVal['inv_value']->quantity,
@@ -444,14 +445,117 @@
 								'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
 								'unserved_ro_qty'    =>  $reorder
 							]);	
-							AssetsSuppliesInventory::where('digits_code', $fBodyVal['digits_code'])
+							AssetsNonTradeInventory::where('digits_code', $fBodyVal['digits_code'])
 							->update([
 								'quantity'   =>  0,
 							]);	
-					    }
-						$finalContData[] = $containerData;
+						}
 					}
-			    }else{
+				}else if(in_array($arf_header->request_type_id, [9])){
+					//GET ASSETS NON TRADE INVENTORY AVAILABLE COUNT
+					$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
+					//GET RESERVED QTY 
+					$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+					
+					$resultInventory = [];
+					foreach($inventoryList as $invKey => $invVal){
+						$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
+						if($i !== false){
+							$invVal->reserved_value = $reservedList[$i];
+							$resultInventory[] = $invVal;
+						}else{
+							$invVal->reserved_value = "";
+							$resultInventory[] = $invVal;
+						}
+					}
+					//get the final available qty
+					$finalInventory = [];
+					foreach($resultInventory as $fKey => $fVal){
+						$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
+						$finalInventory[] = $fVal;
+					}
+
+					$finalItFaBodyValue = [];
+					foreach($arf_body as $bodyItFafKey => $bodyItFaVal){
+						$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
+						if($i !== false){
+							$bodyItFaVal->inv_qty = $finalInventory[$i];
+							$finalItFaBodyValue[] = $bodyItFaVal;
+						}else{
+							$bodyItFaVal->inv_qty = "";
+							$finalItFaBodyValue[] = $bodyItFaVal;
+						}
+					}
+                   
+					foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
+						$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+                        $reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+						$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
+						//dd($reservedListCount);
+						if($available_quantity >= $fBodyItFaVal->quantity){
+							//add to reserved taable
+							AssetsNonTradeInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => $fBodyItFaVal->quantity,
+									'for_po'              => NULL,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							); 
+							
+							//update details in body table
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $fBodyItFaVal->quantity,
+								'reorder_qty'        =>  NULL,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
+								'unserved_ro_qty'    =>  NULL
+							]);	
+
+							HeaderRequest::where('id',$id)
+							->update([
+								'to_mo' => 1
+							]);
+							 
+						}else{
+							$reorder = $fBodyItFaVal->quantity - $available_quantity;
+							AssetsNonTradeInventoryReserved::Create(
+								[
+									'reference_number'    => $arf_header->reference_number, 
+									'body_id'             => $fBodyItFaVal->id,
+									'digits_code'         => $fBodyItFaVal->digits_code, 
+									'approved_qty'        => $fBodyItFaVal->quantity,
+									'reserved'            => NULL,
+									'for_po'              => 1,
+									'created_by'          => CRUDBooster::myId(),
+									'created_at'          => date('Y-m-d H:i:s'),
+									'updated_by'          => CRUDBooster::myId(),
+									'updated_at'          => date('Y-m-d H:i:s')
+								]
+							);  
+
+							BodyRequest::where('id', $fBodyItFaVal->id)
+							->update([
+								'replenish_qty'      =>  $available_quantity,
+								'reorder_qty'        =>  $reorder,
+								'serve_qty'          =>  NULL,
+								'unserved_qty'       =>  $fBodyItFaVal->quantity,
+								'unserved_rep_qty'   =>  $available_quantity,
+								'unserved_ro_qty'    =>  $reorder
+							]);	
+
+							
+					    }
+					}
+				}else{
 					//GET ASSETS INVENTORY AVAILABLE COUNT
 					$inventoryList = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
 					//GET RESERVED QTY 
@@ -672,11 +776,11 @@
 						'approved.name as approvedby'
 						)
 				->where('header_request.id', $id)->first();
-
-				$body = BodyRequest::leftjoin('assets_supplies_inventory', 'body_request.digits_code','=', 'assets_supplies_inventory.digits_code')
+				
+				$body = BodyRequest::leftjoin('assets_non_trade_inventory_body', 'body_request.digits_code','=', 'assets_non_trade_inventory_body.digits_code')
 				->select(
 				  'body_request.*',
-				  'assets_supplies_inventory.quantity as wh_qty'
+				  'assets_non_trade_inventory_body.quantity as wh_qty'
 				)
 				->where('body_request.header_request_id', $id)
 				->whereNull('deleted_at')

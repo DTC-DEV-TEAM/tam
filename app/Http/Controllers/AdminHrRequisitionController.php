@@ -788,7 +788,7 @@
 		public function positions(Request $request){
 			$data = Request::all();	
 			$id = $data['id'];
-			$positions = DB::table('positions')->select('positions.*')->where('department_id', $id)->where('status', "ACTIVE")->orderby('position_description', 'ASC')->get();
+			$positions = DB::table('positions')->select('positions.*')->where('department_id','LIKE', '%'.$id.'%')->where('status', "ACTIVE")->orderby('position_description', 'ASC')->get();
 			return($positions);
 		}
 

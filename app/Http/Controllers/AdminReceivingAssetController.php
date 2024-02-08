@@ -278,8 +278,6 @@
 								array_push($list_array, $matrix->mo_reference_number);
 								array_push($id_array, $matrix->id);
 							}
-								
-			
 						}
 			
 				$list_string = implode(",",$id_array);
@@ -298,8 +296,6 @@
 								array_push($list_array, $matrix->mo_reference_number);
 								array_push($id_array, $matrix->id);
 							}
-								
-			
 						}
 			
 				$list_string = implode(",",$id_array);
@@ -352,57 +348,32 @@
 			}
 
 			if($column_index == 4){
-
 				$request_type = 			DB::table('requests')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->request_name;
-
 				}
-
-
 			}
 
 			if($column_index == 5){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->bill_to;
-
 				}
-
-
 			}
 
 			if($column_index == 6){
-
 				$request_type = 			DB::table('departments')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->department_name;
-
 				}
-
-
 			}
 
 			if($column_index == 7){
-
 				$request_type = 			DB::table('cms_users')->where(['id' => $column_value])->first();
-				
 				if($column_value == $request_type->id){
-
 					$column_value = $request_type->name;
-
 				}
-
-
 			}
-			
 	    }
 
 	    /*
@@ -449,14 +420,14 @@
 			$arf_header 				= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 
 		
-			if($arf_header->request_type_id == 5){
+			if(in_array($arf_header->request_type_id, [5, 9])){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
 												//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 												->value('status_id');
 			}else if(in_array($arf_header->request_type_id, [6, 7])){
 				//if($arf_header->request_type_id == 5){
-					$for_closing 				= StatusMatrix::where('current_step', 10)
+				$for_closing 				= StatusMatrix::where('current_step', 10)
 													->where('request_type', $arf_header->request_type_id)
 													//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 													->value('status_id');
@@ -483,6 +454,12 @@
 							'location'=> 				4
 						]);
 						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->update(['quantity'=>0]);
+					}elseif(in_array($arf_header->request_type_id, [9])){
+						$quantity = MoveOrder::where(['id' => $item_id[$x]])->first()->quantity;
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'status_id'=> 	$for_closing
+						]);	
 					}else{
 						MoveOrder::where('id',$item_id[$x])
 						->update([
@@ -510,10 +487,7 @@
 					'status_id'    => $for_closing,
 					'received_by'  => CRUDBooster::myId(),
 					'received_at'  => date('Y-m-d H:i:s'),
-					'closing_plug' => 1,
-					'closed_by'    => CRUDBooster::myId(),
-					'closed_at'    => date('Y-m-d H:i:s')
-				
+					'closing_plug' => 1		
 				]);		
 			}
   		

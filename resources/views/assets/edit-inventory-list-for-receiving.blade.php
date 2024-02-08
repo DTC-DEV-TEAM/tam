@@ -251,15 +251,15 @@
                 <table id="asset-items" style="width: 130%">
                     <thead>
                         <tr>
-                            <th width="5%" class="text-center">Asset Code</th>
-                            <th width="5%" class="text-center">Digits Code</th>   
-                            <th width="12%" class="text-center">Item Condition</th>    
-                            <th width="2%" class="text-center">Quantity</th> 
-                            <th width="5%" class="text-center">Value</th>                                            
-                            <th width="7%" class="text-center"> Serial No <span style="font-style: italic; font-size:11px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
+                            <th width="5%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
+                            <th width="5%" class="text-center">{{ trans('message.table.digits_code') }}</th>   
+                            <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>    
+                            <th width="2%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
+                            <th width="5%" class="text-center">{{ trans('message.table.line_value_text') }}</th>                                            
+                            <th width="7%" class="text-center">{{ trans('message.table.serial_no') }}<span style="font-style: italic; font-size:11px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
                             <th width="5%" class="text-center"> Warranty Month Expiration <span style="font-style: italic; font-size:11px; color:red"> <br>(Note: 1 is equivalent of 1 month)</span></th>                                                     
-                            <th width="5%" class="text-center">UPC Code</th>     
-                            <th width="6%" class="text-center" >Brand</th>
+                            <th width="5%" class="text-center">{{ trans('message.table.upc_code') }}</th>     
+                            <th width="6%" class="text-center" >{{ trans('message.table.brand_id_text') }}</th>
                             <th width="7%" class="text-center" >Specs <span style="font-style: italic; font-size:11px; color:red"><br>(Ex: ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD)</span></th>                                      
                             <th width="10%" class="text-center">For Re Order Items(ARF Number)<span style="font-style: italic; font-size:12px; color:red"> <br>(Please check if item is assign to ARF)</span></th>
                         </tr>

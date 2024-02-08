@@ -10,6 +10,12 @@
 	use App\Models\ReturnTransferAssetsHeader;
 	class AdminReturnApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
+		private const Approved     = 4;
+		private const Rejected     = 5;
+		private const ForTurnOver  = 24;
+		private const ForReturn    = 26;
+		private const ForTransfer  = 27;
+
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -48,21 +54,6 @@
 			$this->form = [];
 
 			# END FORM DO NOT REMOVE THIS LINE
-
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Reference No","name"=>"reference_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Code","name"=>"asset_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Digits Code","name"=>"digits_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Type","name"=>"asset_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			# OLD END FORM
 
 			/* 
 	        | ---------------------------------------------------------------------- 
@@ -256,19 +247,13 @@
 	    */
 	    public function hook_query_index(&$query) {
 			if(CRUDBooster::isSuperadmin()){
-
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
 				$query->orderBy('return_transfer_assets_header.status', 'DESC')->where('return_transfer_assets_header.status', $pending)->orderBy('return_transfer_assets_header.id', 'DESC');
 			
 			}else{
-
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-
 				//$user_data         = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
 				$approvalMatrix = Users::where('cms_users.approver_id', CRUDBooster::myId())->get();
-			
 				$approval_array = array();
 				foreach($approvalMatrix as $matrix){
 				    array_push($approval_array, $matrix->id);
@@ -335,19 +320,18 @@
 	    public function hook_before_edit(&$postdata,$id) {        
 	         //Your code here
 			$fields = Request::all();
-			$header_id 					= $fields['header_id'];
-			$mo_id 					= $fields['mo_id'];
-			$dataLines = array();
-			$approval_action 		= $fields['approval_action'];
-			$approver_comments 		= $fields['approver_comments'];
-			$approved =  		DB::table('statuses')->where('id', 4)->value('id');
-			$rejected =  		DB::table('statuses')->where('id', 5)->value('id');
-			$forturnover =  		DB::table('statuses')->where('id', 24)->value('id');
-			$forReturn =  		DB::table('statuses')->where('id', 26)->value('id');
-			$forTransfer =  		DB::table('statuses')->where('id', 27)->value('id');
-
-			$header 	= 	ReturnTransferAssetsHeader::where('id',$header_id)->first();
-			$inventory_id 	= 	MoveOrder::whereIn('id',$mo_id)->get();
+			$header_id 		   = $fields['header_id'];
+			$mo_id 			   = $fields['mo_id'];
+			$dataLines         = array();
+			$approval_action   = $fields['approval_action'];
+			$approver_comments = $fields['approver_comments'];
+			$approved          = self::Approved;
+			$rejected          = self::Rejected;
+			$forturnover       = self::ForTurnOver;
+			$forReturn         = self::ForReturn;
+			$forTransfer       = self::ForTransfer;
+			$header 	       = ReturnTransferAssetsHeader::where('id',$header_id)->first();
+			$inventory_id 	   = MoveOrder::whereIn('id',$mo_id)->get();
 			$finalinventory_id = [];
 			foreach($inventory_id as $invData){
 				array_push($finalinventory_id, $invData['inventory_id']);
@@ -363,16 +347,18 @@
 					->update([
 							'status' => $forturnover
 					]);	
-					if(in_array($header->request_type_id, [1,5])){
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			$forReturn,
-						]);
-					}else{
-						DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-						->update([
-							'statuses_id'=> 			$forTransfer,
-						]);
+					if(in_array($header->request_type_id, [1,5,8])){
+						if(in_array($header->request_type_id, [1,5])){
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+							->update([
+								'statuses_id'=> 			$forReturn,
+							]);
+						}else{
+							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+							->update([
+								'statuses_id'=> 			$forTransfer,
+							]);
+						}
 					}
 					
 			    }
@@ -385,6 +371,13 @@
 				->update([
 					    'status' => $rejected
 				]);	
+
+				for ($i = 0; $i < count($mo_id); $i++) {
+					MoveOrder::where('id',$mo_id[$i])
+					->update([
+							'return_flag'=> NULL,
+					]);	
+				}
 			}
 
 	    }

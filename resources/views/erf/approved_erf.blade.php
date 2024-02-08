@@ -194,7 +194,7 @@
                         @endforeach   
                         @if($Header->replacement_of != NULL || $Header->replacement_of != "")
                             <div class="form-group">
-                                <input type="text" class="form-control finput" value="{{$Header->replacement_of}}" aria-describedby="basic-addon1">                                                                                    
+                                <input type="text" class="form-control finput" name="replacement_of" value="{{$Header->replacement_of}}" aria-describedby="basic-addon1">                                                                                    
                             </div>
                         @else
                             <div class="form-group" id="show_replacement_of" style="display:none;">

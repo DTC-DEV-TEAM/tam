@@ -12,6 +12,7 @@
 	use App\MoveOrder;
 	use App\GoodDefectLists;
 	use App\AssetsInventoryBody;
+	use App\Models\AssetsNonTradeInventoryBody;
 	//use Illuminate\Http\Request;
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
@@ -280,70 +281,38 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-
-			$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			$user_info = 		DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->get();
-
-			$approval_array = array();
-			foreach($user_info as $matrix){
-				array_push($approval_array, $matrix->location_to_pick);
-			}
-			$approval_string = implode(",",$approval_array);
-			$locationList = array_map('intval',explode(",",$approval_string));
-
-
-			$List = MoveOrder::whereIn('mo_body_request.location_id', $locationList)->where('mo_body_request.status_id', $for_picking)->orderby('mo_body_request.id', 'asc')->get();
-
-			$list_array = array();
-
-			$id_array = array();
-
-			foreach($List as $matrix){
-
-				if(! in_array($matrix->mo_reference_number,$list_array)) {
-
-					array_push($list_array, $matrix->mo_reference_number);
-					array_push($id_array, $matrix->id);
-				}
-					
-
-			}
-
-			$list_string = implode(",",$id_array);
-
-			$MOList = array_map('intval',explode(",",$list_string));
-          
-	        //Your code here
-	        // if(CRUDBooster::myPrivilegeId() == 5){ 
-
-			// 	$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			// 	$query->where('mo_body_request.status_id', $for_picking)
-			// 		  ->where('mo_body_request.to_reco', 1)
-			// 		  ->where('mo_body_request.to_pick', 0)
-			// 		  ->orderBy('mo_body_request.id', 'ASC');
-
-			// }else if(CRUDBooster::myPrivilegeId() == 6){ 
-
-			// 	$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
-			// 	$query->where('mo_body_request.status_id', $for_picking)
-			// 		->where('mo_body_request.to_reco', 0)
-			// 		->where('mo_body_request.to_pick', 0)
-			// 		->orderBy('mo_body_request.id', 'ASC');
-
-			// }else{
-				
-				$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
-
+			$for_picking = DB::table('statuses')->where('id', 15)->value('id');
+			$user_info   = DB::table('cms_users')->where(['id' => CRUDBooster::myId()])->get();
+			if(CRUDBooster::isSuperAdmin()){
 				$query->where('mo_body_request.status_id', $for_picking)
-					  ->where('mo_body_request.to_pick', 0)
-				      ->orderBy('mo_body_request.id', 'ASC');
+						->where('mo_body_request.to_pick', 0)
+						->orderBy('mo_body_request.id', 'ASC');
+			}else{
+				
+				$approval_array = array();
+				foreach($user_info as $matrix){
+					array_push($approval_array, $matrix->location_to_pick);
+				}
+				$approval_string = implode(",",$approval_array);
+				$locationList = array_map('intval',explode(",",$approval_string));
+				$List = MoveOrder::whereIn('mo_body_request.location_id', $locationList)->where('mo_body_request.status_id', $for_picking)->orderby('mo_body_request.id', 'asc')->get();
+				$list_array = array();
+				$id_array = array();
+				foreach($List as $matrix){
+					if(! in_array($matrix->mo_reference_number,$list_array)) {
+						array_push($list_array, $matrix->mo_reference_number);
+						array_push($id_array, $matrix->id);
+					}
+				}
 
-			//}
-
-			$query->whereIn('mo_body_request.id', $MOList);
+				$list_string = implode(",",$id_array);
+				$MOList = array_map('intval',explode(",",$list_string));
+				$for_picking =  	DB::table('statuses')->where('id', 15)->value('id');
+				$query->where('mo_body_request.status_id', $for_picking)
+						->where('mo_body_request.to_pick', 0)
+						->orderBy('mo_body_request.id', 'ASC');
+				$query->whereIn('mo_body_request.id', $MOList);
+			}
 	    }
 
 	    /*
@@ -454,17 +423,10 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-
 			$fields = Request::all();
-
-			$cont = (new static)->apiContext;
-
+			// dd($fields);
 			$item_id 					= $fields['item_id'];
-
-			//$pick_value 				= $fields['pick_value'];
-
 			$good_text 					= $fields['good_text'];
-
 			$defective_text 			= $fields['defective_text'];
  
 			//good and defect value
@@ -475,6 +437,7 @@
 			$other_comment  = $fields['other_comment'];
 			$asset_code_tag = $fields['asset_code_tag'];
 			$body_id        = $fields['body_id'];
+			$nt_full_qty    = $fields['nt_fulfill_qty'];
          
 			$HeaderID 					= MoveOrder::where('id', $id)->first();
 
@@ -482,7 +445,7 @@
 
 			$arf_header    = HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
-			if(in_array($arf_header->request_type_id, [5, 6, 7])){
+			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
 			//if($arf_header->request_type_id == 5){
 				$for_receiving 				= StatusMatrix::where('current_step', 7)
 												->where('request_type', $arf_header->request_type_id)
@@ -554,42 +517,74 @@
 
 
 				// }else{
-					$inventoryDetails = AssetsInventoryBody::where('id',$asset_code_tag[$x])->first();
+					if(in_array($arf_header->request_type_id, [1,5])){
+						$inventoryDetails = AssetsInventoryBody::where('id',$asset_code_tag[$x])->first();
 
-					MoveOrder::where('id',$item_id[$x])
-					->update([
-						'item_id'         => $inventoryDetails->item_id,
-						'inventory_id'    => $inventoryDetails->id,
-						'asset_code'      => $inventoryDetails->asset_code,
-						'serial_no'       => $inventoryDetails->serial_no,
-						'unit_cost'       => $inventoryDetails->value,
-						'total_unit_cost' => $inventoryDetails->value,
-						'status_id'       => $for_receiving,
-						'to_pick'         => 1,
-						'good'            => $good_text[$x],
-						'defective'       => $defective_text[$x]
-					]);	
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'item_id'         => $inventoryDetails->item_id,
+							'inventory_id'    => $inventoryDetails->id,
+							'asset_code'      => $inventoryDetails->asset_code,
+							'serial_no'       => $inventoryDetails->serial_no,
+							'unit_cost'       => $inventoryDetails->value,
+							'total_unit_cost' => $inventoryDetails->value,
+							'status_id'       => $for_receiving,
+							'to_pick'         => 1,
+							'good'            => $good_text[$x],
+							'defective'       => $defective_text[$x]
+						]);	
 
-					BodyRequest::where('id', $body_id[$x])
-					->update(
-								[
-								'serve_qty'        => 1, 
-								'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
-								'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
-								'unserved_qty'     => DB::raw("unserved_qty - 1"),      
-								'dr_qty'           => 1,
-								'mo_so_num'        => $HeaderID->mo_reference_number       
-								]
-							);
+						BodyRequest::where('id', $body_id[$x])
+						->update(
+									[
+									'serve_qty'        => 1, 
+									'unserved_rep_qty' => DB::raw("unserved_rep_qty - 1"), 
+									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - 1"), 
+									'unserved_qty'     => DB::raw("unserved_qty - 1"),      
+									'dr_qty'           => 1,
+									'mo_so_num'        => $HeaderID->mo_reference_number       
+									]
+								);
 
-					DB::table('assets_inventory_body')->where('id', $asset_code_tag[$x])
-					->update([
-						'statuses_id'=> 2,
-						'deployed_to'=> $employee_name->bill_to
-					]);
+						DB::table('assets_inventory_body')->where('id', $asset_code_tag[$x])
+						->update([
+							'statuses_id'=> 2,
+							'deployed_to'=> $employee_name->bill_to
+						]);
 
-					DB::table('assets_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+						DB::table('assets_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+					}else{
+						$bodeDetail = BodyRequest::where(['id' => $body_id[$x]])->first();
+						$inventoryDetails = AssetsNonTradeInventoryBody::where('digits_code',$bodeDetail->digits_code)->first();
+						$fulfillQty = intval(str_replace(',', '', $nt_full_qty[$x]));
+						MoveOrder::where('id',$item_id[$x])
+						->update([
+							'item_id'         => $inventoryDetails->item_id,
+							'inventory_id'    => $inventoryDetails->id,
+							'asset_code'      => $inventoryDetails->asset_code,
+							'serial_no'       => $inventoryDetails->serial_no,
+							'unit_cost'       => $inventoryDetails->value,
+							'total_unit_cost' => $inventoryDetails->value,
+							'status_id'       => $for_receiving,
+							'to_pick'         => 1,
+							'good'            => $good_text[$x],
+							'defective'       => $defective_text[$x]
+						]);	
 
+						BodyRequest::where('id', $body_id[$x])
+						->update(
+									[
+									'serve_qty'        => $fulfillQty, 
+									'unserved_rep_qty' => DB::raw("unserved_rep_qty - $fulfillQty"), 
+									'unserved_ro_qty'  => DB::raw("unserved_ro_qty - $fulfillQty"), 
+									'unserved_qty'     => DB::raw("unserved_qty - $fulfillQty"),      
+									'dr_qty'           => $fulfillQty,
+									'mo_so_num'        => $HeaderID->mo_reference_number       
+									]
+								);
+						DB::table('assets_non_trade_inventory_body')->where('id', $inventoryDetails->id)->decrement('quantity', $fulfillQty);
+						DB::table('assets_non_trade_inventory_reserved')->where('body_id', $body_id[$x])->delete();
+					}
 				//}
 				//}
 			}
@@ -814,11 +809,16 @@
 			$users_location = DB::table('cms_users')->where('id',CRUDBooster::myId())->first();
 			
 			$data['good_defect_lists'] = GoodDefectLists::all();
-			if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
-			    $data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				if(in_array(CRUDBooster::myPrivilegeId(),[5,6,17,20,21,22])){
+					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('digits_code', $arrayDigitsCode)->where('location',$users_location->location_to_pick)->get();
+				}else{
+					$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereNotIn('item_category', ['IT ASSETS'])->whereIn('digits_code', $arrayDigitsCode)->get();
+				}
 			}else{
-				$data['assets_code'] = AssetsInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->where('statuses_id',6)->whereIn('item_category', ['FIXED ASSETS','FIXED ASSET'])->whereIn('digits_code', $arrayDigitsCode)->get();
+				$data['assets_code'] = AssetsNonTradeInventoryBody::select('asset_code as asset_code','id as id','digits_code as digits_code')->whereIn('digits_code', $arrayDigitsCode)->get();
 			}
+			
 			return $this->view("assets.picking-request", $data);
 		}
 

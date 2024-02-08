@@ -74,7 +74,7 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Services Item Source Form
+        Non Trade Item Source Form
     </div>
 
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetRequest" enctype="multipart/form-data">
