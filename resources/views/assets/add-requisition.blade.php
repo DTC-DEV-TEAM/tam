@@ -39,7 +39,7 @@
             }
 
             input.sinput:read-only {
-                background-color: #fff;
+                background-color: #eee;
             }
 
             input.addinput:read-only {
@@ -68,6 +68,11 @@
                 background-color: #00a65a !important;
                 border: 1px solid rgb(255, 254, 254) !important;
                 color: #fff !important;
+            }
+
+            #asset-items th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
             }
 
         </style>
@@ -140,7 +145,7 @@
             <hr/>
 
             <div class="row"> 
-                <label class="require control-label col-md-2">*{{ trans('message.form-label.purpose') }}</label>
+                <label class="require control-label col-md-2"><span style="color:red">*</span>{{ trans('message.form-label.purpose') }}</label>
                     @foreach($purposes as $data)
                     
                         @if($data->id == 1)
@@ -162,57 +167,58 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-                    </div>
-                        <div class="box-body no-padding">
-                            <div class="table-responsive">
-                                <div class="pic-container">
-                                    <div class="pic-row">
-                                        <table class="table table-bordered" id="asset-items">
-                                            <tbody id="bodyTable">
-                                                <tr class="tbl_header_color dynamicRows">
-                                                    <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                    <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                    <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
-                                                    <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
-                                                    <th width="15%" class="text-center">{{ trans('message.table.wh_qty') }}</th>
-                                                    <th width="15%" class="text-center">{{ trans('message.table.prev_balance_quantity') }}</th> 
-                                                    <th width="7%" class="text-center">{{ trans('message.table.request_qty') }}</th> 
-                                                    <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <div class="pic-container">
+                                <div class="pic-row">
+                                    <table id="asset-items">
+                                        <tbody id="bodyTable">
+                                            <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                                                <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                                            </tr>
+                                            <tr class="tbl_header_color dynamicRows">
+                                                <th width="25%" class="text-center"><span style="color:red">*</span>{{ trans('message.table.item_description') }}</th>
+                                                <th width="15%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                                <th width="15%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
+                                                <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+                                                <th width="7%" class="text-center">{{ trans('message.table.wh_qty') }}</th>
+                                                <th width="7%" class="text-center">{{ trans('message.table.prev_balance_quantity') }}</th> 
+                                                <th width="7%" class="text-center">{{ trans('message.table.request_qty') }}</th> 
+                                                <th width="15%" class="text-center">{{ trans('message.table.budget_range') }}</th> 
+                                                <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
+                                            </tr>
+
+                                            <tr id="tr-table">
+                                                <tr>
+                                
                                                 </tr>
+                                            </tr>
+                                        
+                                        </tbody>
 
-                                                <tr id="tr-table">
-                                                    <tr>
-                                    
-                                                    </tr>
-                                                </tr>
-                                            
-                                            </tbody>
+                                        <tfoot>
+                                            <tr id="tr-table1" class="bottom">
+                                                <td colspan="6">
+                                                    <a type="button" id="add-Row" name="add-Row" class="btn btn-success add"> <i class="fa fa-plus-circle"></i> Add Item</a>
+                                                </td>
+                                                <td align="left" colspan="1">
+                                                    <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
 
-                                            <tfoot>
-
-                                                <tr id="tr-table1" class="bottom">
-    
-                                                    <td colspan="6">
-                                                        <input type="button" id="add-Row" name="add-Row" class="btn btn-success add" value='Add Item' />
-                                                    </td>
-                                                    <td align="left" colspan="1">
-                                                        <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
-
-                                        </table>
-                                    </div>
+                                    </table>
                                 </div>
-                        
                             </div>
+                    
                         </div>
-                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox" id="checkApplications"> <span style="font-style: italic"> Applications for Laptop or Desktop</span></label>      
+                    </div>
+                    <br>
+                    <label class="checkbox-inline mt-2 control-label col-md-12"><input type="checkbox" id="checkApplications"> <span style="font-style: italic"> Applications for Laptop or Desktop</span></label>      
                 </div>
-               
-                <div class="col-md-12" id="application_div">
+
+                <div class="col-md-12 mt-2" id="application_div">
                     <hr/>
                     
                     <div class="row"> 
@@ -273,7 +279,9 @@
 
 @push('bottom')
     <script type="text/javascript">
-
+        $(function(){
+            $('body').addClass("sidebar-collapse");
+        });
         function preventBack() {
             window.history.forward();
         }
@@ -391,64 +399,48 @@
                 if(count_fail == 0){
 
                     var newrow =
-                    '<tr>' +
+                    `<tr>
 
-                        '<td >' +
-                        '<input type="text" placeholder="Search Item ..." class="form-control finput itemDesc" id="itemDesc'+ tableRow +'" data-id="'+ tableRow +'"   name="item_description[]"  required maxlength="100">' +
-                          '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="'+ tableRow +'" id="ui-id-2'+ tableRow +'" style="display: none; top: 60px; left: 15px; width: 100%;">' +
-                           '<li>Loading...</li>' +
-                          '</ul>' +
-                         '<div id="display-error'+ tableRow +'"></div>'+
-                        '</td>'+
-                        '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code finput" data-id="'+ tableRow +'" id="digits_code'+ tableRow +'"  name="digits_code[]"   maxlength="100" readonly>' +
-                            '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="'+ tableRow +'" id="fixed_description'+ tableRow +'"  name="fixed_description[]"   maxlength="100" readonly>' +
-                        '</td>' +
-
-                        // '<td>'+
-                        //     '<select class="form-control category" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required required style="width:100%">' +
-                        //     //'  <option value="">- Select Category -</option>' +
-                        //     '        @foreach($categories as $data)'+
-                        //     '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
-                        //     '         @endforeach'+
-                        //     '</select>'+
-                        // '</td>' +
-                        '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id sinput" data-id="'+ tableRow +'" id="category_id'+ tableRow +'"  name="category_id[]"   maxlength="100" readonly>' +
-                        '</td>' +
-
-                        '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="'+ tableRow +'" id="sub_category_id'+ tableRow +'"  name="sub_category_id[]"   maxlength="100" readonly>' +
-                        '</td>' +
-                        // '<td>'+
-                        //     '<select selected data-placeholder="Select Sub Category" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                        //     '  <option value=""></option>' +
-                        //     '        @foreach($sub_categories as $data)'+
-                        //     '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
-                        //     '         @endforeach'+
-                        //     '</select>'+
-                        // '</td>' +
-
-                        '<td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +
+                        <td >
+                        <input type="text" placeholder="Search Item ..." class="form-control finput itemDesc" id="itemDesc${tableRow}" data-id="${tableRow}"   name="item_description[]"  required maxlength="100">
+                          <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display: none; top: 60px; left: 15px; width: 100%;">
+                           <li>Loading...</li>
+                          </ul>
+                         <div id="display-error${tableRow}"></div>
+                        </td>
+                        <td> 
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center digits_code sinput" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]"   maxlength="100" readonly> 
+                            <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="${tableRow}" id="fixed_description${tableRow}"  name="fixed_description[]"   maxlength="100" readonly> 
+                        </td>
+                        <td> 
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id sinput" data-id="${tableRow}" id="category_id${tableRow}"  name="category_id[]"   maxlength="100" readonly> 
+                        </td>
+                        <td> 
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]"   maxlength="100" readonly> 
+                        </td> 
+                        <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
                         
-                        '<td><input class="form-control text-center sinput unserved_quantity" type="text" required name="unserved_quantity[]" id="unserved_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +     
+                        <td><input class="form-control text-center sinput unserved_quantity" type="text" required name="unserved_quantity[]" id="unserved_quantity${tableRow}" data-id="${tableRow}" readonly></td>    
                         
-                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td>' +
-                        
-                        /*'<td><input type="file" name="image[]" id="image' + tableRow + '" accept="image/*"></td>' + */
-                        
-                        '<td>' +
-                            '<button id="deleteRow' + tableRow + '" name="removeRow" data-id="' + tableRow + '" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button>' +
-                        '</td>' +
+                        <td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity${tableRow}" data-id="${tableRow}"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td> 
+                        <td> 
+                            <select selected data-placeholder="Choose" class="form-control budget" name="budget" id="budget${tableRow}" required required style="width:100%"> 
+                                <option value=""></option> 
+                                @foreach($budget_range as $data)
+                                    <option value="{{$data->description}}">{{$data->description}}</option>
+                                @endforeach
+                            </select>
+                        </td> 
+                        <td> 
+                            <button id="deleteRow${tableRow}" name="removeRow" data-id="${tableRow}" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button> 
+                        </td> 
 
-                    '</tr>';
+                    </tr>`;
                     $(newrow).insertBefore($('table tr#tr-table1:last'));
 
                     //$('#sub_category_id'+tableRow).attr('disabled', true);
                    
-                    // $('#category_id'+tableRow).select2({
-                    // placeholder_text_single : "- Select Category -",
-                    // minimumResultsForSearch: -1});
+                    $('#budget'+tableRow).select2();
                     // $('.sub_category_id').select2({
                     // placeholder_text_single : "- Select Sub Category -"});
                     $('#app_id'+tableRow).change(function(){

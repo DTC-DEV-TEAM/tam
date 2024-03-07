@@ -35,6 +35,7 @@ class Users extends Model
       public function scopeUser($query, $id)
       {
           return $query->where('cms_users.id', $id)
+                        ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
                         ->leftjoin('cms_privileges', 'cms_users.id_cms_privileges','=','cms_privileges.id')
                         ->leftjoin('departments', 'cms_users.department_id','=','departments.id')
                         ->leftjoin('sub_department', 'cms_users.sub_department_id','=','sub_department.id')
@@ -46,8 +47,9 @@ class Users extends Model
                             'sub_department.*',
                             'locations.*',
                             'cms_privileges.name as privilege_name',
-                            'approver.name as approver'
-                         
+                            'approver.name as approver', 
+                            'positions.position_description as position_description', 
+                            'departments.department_name as department_name'
                           ) 
                         ->first();
       }

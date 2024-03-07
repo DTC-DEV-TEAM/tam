@@ -168,7 +168,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/return_close/getRequestClosingReturn/{id}','AdminReturnCloseController@getRequestClosingReturn')->name('return-closing-request');
     Route::get('/admin/return_picking/getRequestPickingReturn/{id}','AdminReturnPickingController@getRequestPickingReturn')->name('return-picking-request');
     Route::get('/admin/return_transfer_assets_header/getRequestPrintTF/{id}','AdminReturnTransferAssetsHeaderController@getRequestPrintTF')->name('print-request-tf');
-    
+    Route::get('/admin/return_approval/getRequestForVerificationReturn/{id}','AdminReturnApprovalController@getRequestForVerificationReturn')->name('verification-request-return');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header','AdminReturnApprovalController@submitForVerificationReturn')->name('submit-for-verification-return');
     //Transfer Assets
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');

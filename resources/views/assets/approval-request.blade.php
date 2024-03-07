@@ -95,12 +95,11 @@
 
             <hr/>                
             
-            <div class="box-header text-center">
-                <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-            </div>
-
             <table id="approval-table">
                 <thead>
+                    <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                        <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                    </tr>
                     <tr>
                         <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                         <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>

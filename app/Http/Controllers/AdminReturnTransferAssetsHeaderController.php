@@ -11,9 +11,14 @@
 	use App\MoveOrder;
 	use App\Users;
 	class AdminReturnTransferAssetsHeaderController extends \crocodicstudio\crudbooster\controllers\CBController {
-
-		private const Closed = 13;
-		private const ForClosing = 19;
+		private const ForApproval     = 1;
+		private const Rejected        = 5;
+		private const Cancelled       = 8;
+		private const ForTurnOver     = 24;
+		private const ToClosed        = 25;
+		private const Closed          = 13;
+		private const ForClosing      = 19;
+		private const ForVerification = 29;
 
 	    public function cbInit() {
 
@@ -51,18 +56,6 @@
 
 			# END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Reference No","name"=>"reference_no","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Code","name"=>"asset_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Digits Code","name"=>"digits_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Description","name"=>"description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Asset Type","name"=>"asset_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			# OLD END FORM
-
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -91,12 +84,14 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-				$forTurnOver  = 		DB::table('statuses')->where('id', 24)->value('id');
-
-				$this->addaction[] = ['title'=>'Cancel Request','url'=>CRUDBooster::mainpath('getRequestCancelReturn/[id]'),'icon'=>'fa fa-times', "showIf"=>"[status] == $pending"];
-				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintTF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status] == $forTurnOver || [status] == 25 || [status] == 13"];
+				$this->addaction[] = ['title'=>'Cancel Request',
+									  'url'=>CRUDBooster::mainpath('getRequestCancelReturn/[id]'),
+									  'icon'=>'fa fa-times', 
+									  'showIf'=>"[status] == ".self::ForApproval."",
+									  'confirmation'=>'yes',
+									  'confirmation_title'=>'Confirm Voiding',
+									  'confirmation_text'=>'Are you sure to VOID this request?'];
+				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintTF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status] == ".self::ForTurnOver." || [status] == ".self::ToClosed." || [status] == ".self::ForClosing.""];
 				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
 			}
 
@@ -172,21 +167,7 @@
 	        | $this->script_js = "function() { ... }";
 	        |
 	        */
-	        $this->script_js = "
-
-			$('.fa.fa-times').click(function(){
-
-				var strconfirm = confirm('Are you sure you want to cancel this request?');
-				if (strconfirm == true) {
-					return true;
-				}else{
-					return false;
-					window.stop();
-
-				}
-
-			})
-			";
+	        $this->script_js = "";
 
 
             /*
@@ -301,15 +282,18 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	$pending      =  	 DB::table('statuses')->where('id', 1)->value('status_description');
-			$rejected     =  	 DB::table('statuses')->where('id', 5)->value('status_description');
-			$cancelled    =  	 DB::table('statuses')->where('id', 8)->value('status_description');
-			$forturnover  =      DB::table('statuses')->where('id', 24)->value('status_description');
-			$toClose      =      DB::table('statuses')->where('id', 25)->value('status_description');
-			$closed       =      DB::table('statuses')->where('id', 13)->value('status_description');
+	    	$pending         = DB::table('statuses')->where('id', self::ForApproval)->value('status_description');
+			$forVerification = DB::table('statuses')->where('id', self::ForVerification)->value('status_description');
+			$rejected        = DB::table('statuses')->where('id', self::Rejected)->value('status_description');
+			$cancelled       = DB::table('statuses')->where('id', self::Cancelled)->value('status_description');
+			$forturnover     = DB::table('statuses')->where('id', self::ForTurnOver)->value('status_description');
+			$toClose         = DB::table('statuses')->where('id', self::ToClosed)->value('status_description');
+			$closed          = DB::table('statuses')->where('id', self::Closed)->value('status_description');
 			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
+				}else if($column_value == $forVerification){
+					$column_value = '<span class="label label-warning">'.$forVerification.'</span>';
 				}else if($column_value == $cancelled){
 					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
 				}else if($column_value == $rejected){
@@ -407,41 +391,10 @@
             }
 
 			$data = array();
-
 			$data['page_title'] = 'View Return Request';
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
-			->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
-			->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
-			->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
-			->leftjoin('cms_users as received', 'return_transfer_assets_header.transacted_by','=', 'received.id')
-			->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
-			->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
-			->select(
-					'return_transfer_assets_header.*',
-					'return_transfer_assets_header.id as requestid',
-					'requests.request_name as request_name',
-					'employees.name as employee_name',
-					'employees.company_name_id as company',
-					'employees.position_id as position',
-					'departments.department_name as department_name',
-					'approved.name as approvedby',
-					'received.name as receivedby',
-					'closed.name as closedby',
-					'locations.store_name as store_branch'
-					)
-			->where('return_transfer_assets_header.id', $id)->first();
-	   
-			$data['return_body'] = ReturnTransferAssets::
-					leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
-				
-				->select(
-					'return_transfer_assets.*',
-					'return_transfer_assets.status as body_status',
-					'statuses.*',
-					)
-					->where('return_transfer_assets.return_header_id', $id)->get();	
-					
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 
 			return $this->view("assets.view-return-details", $data);
@@ -457,14 +410,11 @@
 			$this->cbLoader();
 
 			$data = array();
-
 			$data['page_title'] = 'Return Request';
-
 			$closed      =  self::Closed;
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
-
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -487,17 +437,13 @@
 			$closed      =  self::Closed;
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-
 			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
-
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
 				$data['stores'] = NULL;
 			}	
-			
 			$data['users'] = Users::where('id_cms_privileges','!=',1)->where('department_id',$data['user']->department_id)->get();
-	
 			return $this->view("assets.transfer-assets", $data);
 		}
 

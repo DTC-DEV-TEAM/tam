@@ -5,7 +5,6 @@
             table, th, td {
             border: 1px solid rgba(000, 0, 0, .5);
             padding: 8px;
-            border-radius: 5px 0 0 5px;
             }
             #asset-items th, td, tr {
                 border: 1px solid rgba(000, 0, 0, .5);
@@ -78,12 +77,11 @@
 
             <hr/>
         
-            <div class="box-header text-center">
-                <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-            </div>
-
             <table  class='table' id="asset-items">
                 <thead>
+                    <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                        <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>Item details</b></h4></th>
+                    </tr>
                     <tr>
                         <th width="10%" class="text-center">Line status</th>
                         <th width="20%" class="text-center">Reference No</th>
@@ -142,8 +140,9 @@
                 
             </table> 
 
-            <hr/>
+      
             @if($Header->approvedby != null || $Header->approvedby != "")
+            <hr/>
             <div class="row">                           
                 <label class="control-label col-md-2">{{ trans('message.form-label.approved_by') }}:</label>
                 <div class="col-md-4">
@@ -163,8 +162,9 @@
                     </div>
                 </div>
             @endif 
-            <hr>
+        
             @if( $Header->receivedby != null )
+            <hr>
                 <div class="row">                           
                     @if($Header->transfer_to == null)                        
                         <label class="control-label col-md-2">Transacted By:</label>
@@ -187,8 +187,9 @@
                     @endif
                 </div>
             @endif
-            <hr>
+        
             @if( $Header->closedby != null )
+            <hr>
                 <div class="row">                           
                     <label class="control-label col-md-2">{{ trans('message.form-label.closed_by') }}:</label>
                     <div class="col-md-4">

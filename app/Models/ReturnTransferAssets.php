@@ -80,6 +80,15 @@ class ReturnTransferAssets extends Model
 				$query->where('return_transfer_assets_header.request_type_id', $category);
 			}
 			return  $query->get();
-
     }
+
+	public function scopeDetail($query, $id){
+		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			->select(
+			'return_transfer_assets.*',
+			'return_transfer_assets.status as body_status',
+			'statuses.*',
+			)
+			->where('return_transfer_assets.return_header_id', $id);
+	}
 }

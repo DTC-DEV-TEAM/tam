@@ -4,6 +4,7 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use App\Users;
 	use App\HeaderRequest;
 	use App\BodyRequest;
 	use App\ApprovalMatrix;
@@ -133,7 +134,13 @@
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
 				$released  = 		DB::table('statuses')->where('id', 12)->value('id');
 
-				$this->addaction[] = ['title'=>'Cancel Request','url'=>CRUDBooster::mainpath('getRequestCancel/[id]'),'icon'=>'fa fa-times', "showIf"=>"[status_id] == $pending"];
+				$this->addaction[] = ['title'=>'Cancel Request',
+				'url'=>CRUDBooster::mainpath('getRequestCancel/[id]'),
+				'icon'=>'fa fa-times', 
+				"showIf"=>"[status_id] == $pending",
+				'confirmation'=>'yes',
+				'confirmation_title'=>'Confirm Voiding',
+				'confirmation_text'=>'Are you sure to VOID this request?'];
 				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
 			}
 			
@@ -183,7 +190,7 @@
 				}
 				$this->index_button[] = ["label"=>"IT Asset Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"FA Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-fa'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Non Trade","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-non-trade'),"color"=>"success"];
+				// $this->index_button[] = ["label"=>"Non Trade","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-non-trade'),"color"=>"success"];
 			
 			}
 
@@ -222,15 +229,15 @@
 	        */
 	        $this->script_js = NULL;
 			$this->script_js = "
-				$('.fa.fa-times').click(function(){
-					var strconfirm = confirm('Are you sure you want to cancel this request?');
-					if (strconfirm == true) {
-						return true;
-					}else{
-						return false;
-						window.stop();
-					}
-				});
+				// $('.fa.fa-times').click(function(){
+				// 	var strconfirm = confirm('Are you sure you want to cancel this request?');
+				// 	if (strconfirm == true) {
+				// 		return true;
+				// 	}else{
+				// 		return false;
+				// 		window.stop();
+				// 	}
+				// });
 				
 				
 				$('.fa.fa-check').click(function(){
@@ -904,7 +911,6 @@
 
 	    //By the way, you can still create your own method in here... :) 
 		public function getAddRequisition() {
-
 			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
 				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 			}
@@ -916,16 +922,12 @@
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['employeeinfos'] = DB::table('cms_users')
-										 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
-										 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
-										 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
-										 ->where('cms_users.id', $data['user']->id)->first();
+			$data['employeeinfos'] = Users::user($data['user']->id);
 			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
-			
+			$data['budget_range'] = DB::table('sub_masterfile_budget_range')->where('status', 'ACTIVE')->get();
 			$privilegesMatrix = DB::table('cms_privileges')->get();
 			$privileges_array = array();
 			foreach($privilegesMatrix as $matrix){
@@ -955,11 +957,7 @@
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['employeeinfos'] = DB::table('cms_users')
-										 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
-										 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
-										 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
-										 ->where('cms_users.id', $data['user']->id)->first();
+			$data['employeeinfos'] = Users::user($data['user']->id);
 			$data['categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
 													   ->orderby('category_description', 'asc')
 													   ->get();
@@ -983,89 +981,89 @@
 				
 		}
 
-		public function getAddRequisitionNonTrade() {
+		// public function getAddRequisitionNonTrade() {
 
-			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
-				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
-			}
+		// 	if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+		// 		CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+		// 	}
 
-			$this->cbLoader();
-			$data['page_title'] = 'Create New Non Trade Request';
-			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['employeeinfos'] = DB::table('cms_users')
-										 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
-										 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
-										 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
-										 ->where('cms_users.id', $data['user']->id)->first();
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
-			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
-			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
-			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
+		// 	$this->cbLoader();
+		// 	$data['page_title'] = 'Create New Non Trade Request';
+		// 	$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
+		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+		// 	$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
+		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+		// 	$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+		// 	$data['employeeinfos'] = DB::table('cms_users')
+		// 								 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
+		// 								 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
+		// 								 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
+		// 								 ->where('cms_users.id', $data['user']->id)->first();
+		// 	$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
+		// 	$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
+		// 	$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
+		// 	$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
 			
-			$privilegesMatrix = DB::table('cms_privileges')->get();
-			$privileges_array = array();
-			foreach($privilegesMatrix as $matrix){
-				array_push($privileges_array, $matrix->id);
-			}
-			$privileges_string = implode(",",$privileges_array);
-			$privilegeslist = array_map('intval',explode(",",$privileges_string));
+		// 	$privilegesMatrix = DB::table('cms_privileges')->get();
+		// 	$privileges_array = array();
+		// 	foreach($privilegesMatrix as $matrix){
+		// 		array_push($privileges_array, $matrix->id);
+		// 	}
+		// 	$privileges_string = implode(",",$privileges_array);
+		// 	$privilegeslist = array_map('intval',explode(",",$privileges_string));
 
-			if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
-				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
-				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-				return $this->view("non-trade.add-requisition-non-trade", $data);
+		// 	if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
+		// 		$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
+		// 		$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+		// 		return $this->view("non-trade.add-requisition-non-trade", $data);
 
-			}			
-		}
+		// 	}			
+		// }
 
-		public function getAddRequisitionSupplies() {
+		// public function getAddRequisitionSupplies() {
 
-			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
-				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
-			}
-			$this->cbLoader();
-			$data['page_title'] = 'Create New Supplies Request';
-			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['employeeinfos'] = DB::table('cms_users')
-										 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
-										 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
-										 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
-										 ->where('cms_users.id', $data['user']->id)->first();
-			$data['categories'] = DB::table('category')->where('id', 2)->where('category_status', 'ACTIVE')
-													   ->orderby('category_description', 'asc')
-													   ->get();
-			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->where('category_id', 2)->orderby('class_description', 'asc')->get();
-			$data['item_description'] = DB::table('assets')->where('category_id', 2)
-			                                           //->where('category_status', 'ACTIVE')
-													   ->orderby('item_description', 'asc')
-													   ->get();  
-			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();	
-			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
+		// 	if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+		// 		CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+		// 	}
+		// 	$this->cbLoader();
+		// 	$data['page_title'] = 'Create New Supplies Request';
+		// 	$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
+		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+		// 	$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
+		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+		// 	$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+		// 	$data['employeeinfos'] = DB::table('cms_users')
+		// 								 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
+		// 								 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
+		// 								 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
+		// 								 ->where('cms_users.id', $data['user']->id)->first();
+		// 	$data['categories'] = DB::table('category')->where('id', 2)->where('category_status', 'ACTIVE')
+		// 											   ->orderby('category_description', 'asc')
+		// 											   ->get();
+		// 	$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->where('category_id', 2)->orderby('class_description', 'asc')->get();
+		// 	$data['item_description'] = DB::table('assets')->where('category_id', 2)
+		// 	                                           //->where('category_status', 'ACTIVE')
+		// 											   ->orderby('item_description', 'asc')
+		// 											   ->get();  
+		// 	$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();	
+		// 	$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
 
-			//$privilegesMatrix = DB::table('cms_privileges')->where('id', '!=', 8)->get();
-			$privilegesMatrix = DB::table('cms_privileges')->get();
-			$privileges_array = array();
-			foreach($privilegesMatrix as $matrix){
-				array_push($privileges_array, $matrix->id);
-			}
-			$privileges_string = implode(",",$privileges_array);
-			$privilegeslist = array_map('intval',explode(",",$privileges_string));
+		// 	//$privilegesMatrix = DB::table('cms_privileges')->where('id', '!=', 8)->get();
+		// 	$privilegesMatrix = DB::table('cms_privileges')->get();
+		// 	$privileges_array = array();
+		// 	foreach($privilegesMatrix as $matrix){
+		// 		array_push($privileges_array, $matrix->id);
+		// 	}
+		// 	$privileges_string = implode(",",$privileges_array);
+		// 	$privilegeslist = array_map('intval',explode(",",$privileges_string));
 
-			if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
-				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
-				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-				return $this->view("assets.add-requisition-supplies", $data);
-			}
+		// 	if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
+		// 		$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
+		// 		$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+		// 		return $this->view("assets.add-requisition-supplies", $data);
+		// 	}
 				
-		}
+		// }
 
 		public function getDetail($id){
 			$this->cbLoader();
