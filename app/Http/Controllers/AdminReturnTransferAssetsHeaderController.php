@@ -19,6 +19,7 @@
 		private const Closed          = 13;
 		private const ForClosing      = 19;
 		private const ForVerification = 29;
+		private const ToSchedule      = 48;
 
 	    public function cbInit() {
 
@@ -48,6 +49,7 @@
 			$this->col[] = ["label"=>"Name","name"=>"requestor_name","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Return Type","name"=>"request_type_id","join"=>"requests,request_name"];
 			$this->col[] = ["label"=>"Type of Request","name"=>"request_type"];
+			$this->col[] = ["label"=>"Purpose","name"=>"purpose"];
 			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
@@ -133,7 +135,6 @@
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Return Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('return-assets'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Transfer Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('transfer-assets'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"Return Non Trade Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('return-non-trade-assets'),"color"=>"success"];
 			}
 
 
@@ -284,6 +285,7 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	$pending         = DB::table('statuses')->where('id', self::ForApproval)->value('status_description');
 			$forVerification = DB::table('statuses')->where('id', self::ForVerification)->value('status_description');
+			$toSchedule      = DB::table('statuses')->where('id', self::ToSchedule)->value('status_description');
 			$rejected        = DB::table('statuses')->where('id', self::Rejected)->value('status_description');
 			$cancelled       = DB::table('statuses')->where('id', self::Cancelled)->value('status_description');
 			$forturnover     = DB::table('statuses')->where('id', self::ForTurnOver)->value('status_description');
@@ -294,6 +296,8 @@
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $forVerification){
 					$column_value = '<span class="label label-warning">'.$forVerification.'</span>';
+				}else if($column_value == $toSchedule){
+					$column_value = '<span class="label label-info">'.$toSchedule.'</span>';
 				}else if($column_value == $cancelled){
 					$column_value = '<span class="label label-danger">'.$cancelled.'</span>';
 				}else if($column_value == $rejected){
@@ -415,6 +419,7 @@
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -438,6 +443,7 @@
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -461,7 +467,7 @@
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturnNonTrade($closed, $for_closing, CRUDBooster::myId());
-
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -476,7 +482,7 @@
 			$request_type_id = array_unique($rid);
 			$location = $request['location_id'];
 			$asset_location_id = $request['asset_location_id'];
-   
+			$purpose = $request['purpose'];
 			$getData = MoveOrder::leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
 			->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
 			->select(
@@ -525,6 +531,7 @@
 				$conHeader['requestor_name'] = CRUDBooster::myId();
 				$conHeader['request_type_id'] = $hData;
 				$conHeader['request_type'] = "RETURN";
+				$conHeader['purpose'] = $purpose;
 				$conHeader['requested_by'] = CRUDBooster::myId(); 
 				$conHeader['requested_date'] = date('Y-m-d H:i:s');
 				if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
@@ -635,6 +642,7 @@
 			$request_type_id = $rid;
 			$location = $request['location_id'];
 			$user_id = $request['users_id'];
+			$purpose = $request['purpose'];
             //dd($request->all());
 			$getData = MoveOrder::leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
 			->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
@@ -686,6 +694,7 @@
                     'requestor_name' => CRUDBooster::myId(), 
                     'request_type_id' => 8,
                     'request_type' => "TRANSFER",
+					'purpose'      => $purpose,
                     'requested_by' => CRUDBooster::myId(),
                     'requested_date' => date('Y-m-d H:i:s'),
 					'approved_date'  => $approved,

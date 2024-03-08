@@ -44,6 +44,7 @@
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="0" name="action" id="action">
         <input type="hidden" value="{{$Header->request_type_id}}" name="request_type_id" id="request_type_id">
+        <input type="hidden" value="{{$Header->requestid}}" name="header_id" id="header_id">
 
         <div class='panel-body'>
 
@@ -87,10 +88,21 @@
 
             <hr/>
             <div class="row">
-                <label class="control-label col-md-2">Purpose:</label>
+                <label class="control-label col-md-2">Request type:</label>
                 <div class="col-md-4">
                         <p>{{$Header->request_type}}</p>
-                </div>                    
+                </div> 
+                @if($Header->transfer_to != null)    
+                    <label class="control-label col-md-2">Purpose:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->purpose}}</p>
+                    </div>                    
+                    @else
+                    <label class="control-label col-md-2">Purpose:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->purpose}}</p>
+                    </div>
+                @endif
             </div>
 
             <hr/>
@@ -215,9 +227,6 @@
         </div>
 
     </form>
-
-
-
 </div>
 
 @endsection

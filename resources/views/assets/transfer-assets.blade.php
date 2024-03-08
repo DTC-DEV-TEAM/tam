@@ -1,10 +1,18 @@
 @extends('crudbooster::admin_template')
     @push('head')
         <style type="text/css">   
-
             .select2-selection__choice{
                     font-size:14px !important;
                     color:black !important;
+            }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
             }
             table.dataTable td.dataTables_empty {
                 text-align: center;    
@@ -29,22 +37,35 @@
     <div class='panel-heading'>
         Asset Form
     </div>
-
+    <div class="panel-body">
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetReturnRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
          
-           <div class="form-group" style="padding:10px">
-                <label class="require control-label" style="font-style: italic">Transfer to:</label>
-                <select class="users" data-placeholder="** Select Transfer to **"  style="width: 50%;" name="users_id" id="users_id">
-                    <option value=""></option>
-                    @foreach($users as $value)
-                        <option value="{{$value->id}}">{{$value->name}}</option>
-                    @endforeach
-                </select>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="require control-label" style="font-style: italic">Transfer to:</label>
+                    <select class="users" data-placeholder="Select Transfer to" name="users_id" id="users_id" style="width: 100%;">
+                        <option value=""></option>
+                        @foreach($users as $value)
+                            <option value="{{$value->id}}">{{$value->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-      
-            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="require control-label">Purpose:</label>
+                    <select class="users" data-placeholder="Choose purpose" name="purpose" id="purpose" style="width: 100%;">
+                        <option value=""></option>
+                        @foreach($purposes as $purpose)
+                            <option value="{{$purpose->description}}">{{$purpose->description}}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+        </div>
         <div class="box-body">
             <div class="table-responsive"> 
                 <table id='table_dashboard' class="table table-hover table-striped table-bordered">
@@ -130,13 +151,21 @@ var table;
             request_type_id = $("#request_type_id"+$(this).attr("data-id")).val();
             location_id = $("#location_id"+$(this).attr("data-id")).val();
         });
-
+        const purpose = $('#purpose').val();
         var check = $('input:checkbox:checked').length;
         event.preventDefault();
         if($('#users_id').val() == "") {
             swal({
                 type: 'error',
                 title: 'Please select Transfer to!',
+                icon: 'error',
+                confirmButtonColor: "#367fa9",
+            }); 
+            event.preventDefault(); // cancel default behavior
+        }else if ($('#purpose').val() == "") {
+            swal({
+                type: 'error',
+                title: 'Please choose purpose!',
                 icon: 'error',
                 confirmButtonColor: "#367fa9",
             }); 
@@ -165,11 +194,12 @@ var table;
                         type: "POST",
                         dataType: 'json',
                         data: {
-                            //"_token": token,
+                            _token: "{{ csrf_token() }}",
                             "Ids": Ids,
                             "request_type_id": request_type_id,
                             "location_id": location_id,
                             "users_id" : $('#users_id').val(),
+                            'purpose': purpose
                         },
                         success: function (data) {
                             if (data.status == "success") {

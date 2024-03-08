@@ -84,10 +84,13 @@ class ReturnTransferAssets extends Model
 
 	public function scopeDetail($query, $id){
 		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
 			->select(
 			'return_transfer_assets.*',
 			'return_transfer_assets.status as body_status',
 			'statuses.*',
+			'return_transfer_assets.id as body_id',
+			'mo_body_request.serial_no'
 			)
 			->where('return_transfer_assets.return_header_id', $id);
 	}

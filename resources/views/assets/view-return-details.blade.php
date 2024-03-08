@@ -62,15 +62,19 @@
             </div>
             <hr>
             <div class="row">
+                <label class="control-label col-md-2">Request type:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->request_type}}</p>
+                </div> 
                 @if($Header->transfer_to != null)    
                     <label class="control-label col-md-2">Purpose:</label>
                     <div class="col-md-4">
-                            <p>{{$Header->request_type}}</p>
+                            <p>{{$Header->purpose}}</p>
                     </div>                    
                     @else
                     <label class="control-label col-md-2">Purpose:</label>
                     <div class="col-md-4">
-                            <p>{{$Header->request_type}}</p>
+                            <p>{{$Header->purpose}}</p>
                     </div>
                 @endif
             </div>
@@ -117,6 +121,10 @@
                                 <label class="label label-info" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
                                 </td>
                             @elseif($rowresult['body_status'] == 27)
+                                <td style="text-align:center">
+                                <label class="label label-info" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
+                                </td>
+                            @elseif($rowresult['body_status'] == 48)
                                 <td style="text-align:center">
                                 <label class="label label-info" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
                                 </td>

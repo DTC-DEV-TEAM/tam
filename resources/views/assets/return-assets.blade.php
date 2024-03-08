@@ -1,11 +1,20 @@
 @extends('crudbooster::admin_template')
     @push('head')
         <style type="text/css">   
-
             .select2-selection__choice{
                     font-size:14px !important;
                     color:black !important;
             }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
+
             table.dataTable td.dataTables_empty {
                 text-align: center;    
             }
@@ -33,6 +42,16 @@
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetReturnRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
+        
+        <div class="form-group" style="padding:10px">
+            <label class="require control-label">Purpose:</label>
+            <select class="users" data-placeholder="Choose purpose"  style="width: 50%;" name="purpose" id="purpose">
+                <option value=""></option>
+                @foreach($purposes as $purpose)
+                    <option value="{{$purpose->description}}">{{$purpose->description}}</option>
+                @endforeach
+            </select>
+        </div>
 
         <div class="box-body">
             <div class="table-responsive">           
@@ -102,9 +121,8 @@ var table;
         null;
     };
     setTimeout("preventBack()", 0);
-    var tableRow = <?php echo json_encode($tableRow); ?>;
-    var tableRow1 = tableRow;
-    tableRow1++;
+    $('#purpose').select2();
+
     table = $("#table_dashboard").DataTable({
         ordering:false,
         pageLength:100,
@@ -120,39 +138,48 @@ var table;
             location_id.push($("#location_id"+$(this).attr("data-id")).val());
             asset_location_id.push($("#asset_location_id"+$(this).attr("data-id")).val());
         });
-    
+        const purpose = $('#purpose').val();
         var check = $('input:checkbox:checked').length;
        
         event.preventDefault();
-        if (check == 0) {
+        if ($('#purpose').val() == '') {
+            swal({
+                type: 'error',
+                title: 'Please choose purpose!',
+                icon: 'error',
+                confirmButtonColor: '#367fa9',
+            }); 
+            event.preventDefault(); // cancel default behavior
+        }else if (check == 0) {
             swal({
                 type: 'error',
                 title: 'Please select asset to return!',
                 icon: 'error',
-                confirmButtonColor: "#367fa9",
+                confirmButtonColor: '#367fa9',
             }); 
             event.preventDefault(); // cancel default behavior
         }else{
             swal({
-                title: "Are you sure?",
-                type: "warning",
+                title: 'Are you sure?',
+                type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: "#41B314",
-                cancelButtonColor: "#F9354C",
-                confirmButtonText: "Yes, send it!",
+                confirmButtonColor: '#41B314',
+                cancelButtonColor: '#F9354C',
+                confirmButtonText: 'Yes, send it!',
                 width: 450,
                 height: 200
                 }, function () {
                     $.ajax({
-                        url: "{{ route('assets.save.return.assets') }}",
-                        type: "POST",
+                        url: '{{ route("assets.save.return.assets") }}',
+                        type: 'POST',
                         dataType: 'json',
                         data: {
-                            //"_token": token,
-                            "Ids": Ids,
-                            "request_type_id": request_type_id,
-                            "location_id": location_id,
-                            "asset_location_id": asset_location_id
+                            _token: "{{ csrf_token() }}",
+                            'Ids': Ids,
+                            'request_type_id': request_type_id,
+                            'location_id': location_id,
+                            'asset_location_id': asset_location_id,
+                            'purpose': purpose
                         },
                         success: function (data) {
                             if (data.status == "success") {

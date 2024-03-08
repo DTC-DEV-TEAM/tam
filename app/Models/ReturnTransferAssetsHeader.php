@@ -14,11 +14,17 @@ class ReturnTransferAssetsHeader extends Model
         'reference_no', 
         'request_type_id',
         'request_type',
+        'purpose',
         'requested_by',
         'requested_date',
         'location_to_pick',
         'store_branch',
-        'transfer_to'
+        'transfer_to',
+        'schedule_by',
+        'schedule_at',
+        'transport_type',
+        'hand_carry_name',
+        'hand_carry_schedule'
     ];
 
     public function scopeDetail($query, $id){
