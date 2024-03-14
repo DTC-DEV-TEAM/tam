@@ -171,6 +171,9 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/return_approval/getRequestForVerificationReturn/{id}','AdminReturnApprovalController@getRequestForVerificationReturn')->name('verification-request-return');
     Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header','AdminReturnApprovalController@submitForVerificationReturn')->name('submit-for-verification-return');
     Route::get('/admin/schedule_return_transfer/getToScheduleReturn/{id}','AdminScheduleReturnTransferController@getToScheduleReturn')->name('toschedule-return');
+    //EDIT RETURN ASSETS
+    Route::get('admin/return_transfer_assets_header/getEdit/{id}','AdminReturnTransferAssetsHeaderController@getEdit')->name('getEdit');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/search-item','AdminReturnTransferAssetsHeaderController@searchItem')->name('searchItem');
     
     //Transfer Assets
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 

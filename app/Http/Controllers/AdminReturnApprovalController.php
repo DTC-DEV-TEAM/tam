@@ -14,15 +14,14 @@
 
 	class AdminReturnApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
-		private const ForApproval      = 4;
-		private const Approved         = 4;
-		private const Rejected         = 5;
-		private const ForTurnOver      = 24;
-		private const ForReturn        = 26;
-		private const ForTransfer      = 27;
-		private const ForVerification  = 29;
-		private const ToSchedule       = 48;
-
+		private const ForApproval        = 1;
+		private const Rejected           = 5;
+		private const ForTurnOver        = 24;
+		private const ForReturn          = 26;
+		private const ForTransfer        = 27;
+		private const ForVerification    = 29;
+		private const ToSchedule         = 48;
+		private const returnForApproval  = 49;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -95,6 +94,7 @@
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	$pending          = DB::table('statuses')->where('id', self::ForApproval)->value('status_description');
 			$forVerification  = DB::table('statuses')->where('id', self::ForVerification)->value('status_description');
+			
 			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
@@ -144,6 +144,13 @@
 					}
 					
 			    }
+			}else if($approval_action  == 2){
+				$postdata['status'] 			= self::returnForApproval;
+				$postdata['approver_comments'] 	= $approver_comments;
+				ReturnTransferAssets::where('return_header_id',$id)
+				->update([
+					    'status' => self::returnForApproval
+				]);	
 			}else{
 				$postdata['status'] 			= self::Rejected;
 				$postdata['approver_comments'] 	= $approver_comments;

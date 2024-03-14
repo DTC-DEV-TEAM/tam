@@ -11,15 +11,16 @@
 	use App\MoveOrder;
 	use App\Users;
 	class AdminReturnTransferAssetsHeaderController extends \crocodicstudio\crudbooster\controllers\CBController {
-		private const ForApproval     = 1;
-		private const Rejected        = 5;
-		private const Cancelled       = 8;
-		private const ForTurnOver     = 24;
-		private const ToClosed        = 25;
-		private const Closed          = 13;
-		private const ForClosing      = 19;
-		private const ForVerification = 29;
-		private const ToSchedule      = 48;
+		private const ForApproval       = 1;
+		private const Rejected          = 5;
+		private const Cancelled         = 8;
+		private const ForTurnOver       = 24;
+		private const ToClosed          = 25;
+		private const Closed            = 13;
+		private const ForClosing        = 19;
+		private const ForVerification   = 29;
+		private const ToSchedule        = 48;
+		private const returnForApproval = 49;
 
 	    public function cbInit() {
 
@@ -53,37 +54,7 @@
 			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
-			# START FORM DO NOT REMOVE THIS LINE
-			$this->form = [];
 
-			# END FORM DO NOT REMOVE THIS LINE
-
-			/* 
-	        | ---------------------------------------------------------------------- 
-	        | Sub Module
-	        | ----------------------------------------------------------------------     
-			| @label          = Label of action 
-			| @path           = Path of sub module
-			| @foreign_key 	  = foreign key of sub table/module
-			| @button_color   = Bootstrap Class (primary,success,warning,danger)
-			| @button_icon    = Font Awesome Class  
-			| @parent_columns = Sparate with comma, e.g : name,created_at
-	        | 
-	        */
-	        $this->sub_module = array();
-
-
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Add More Action Button / Menu
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
-	        | @url         = Target URL, you can use field alias. e.g : [id], [name], [title], etc
-	        | @icon        = Font awesome class icon. e.g : fa fa-bars
-	        | @color 	   = Default is primary. (primary, warning, succecss, info)     
-	        | @showIf 	   = If condition when action show. Use field alias. e.g : [id] == 1
-	        | 
-	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
 				$this->addaction[] = ['title'=>'Cancel Request',
@@ -94,127 +65,15 @@
 									  'confirmation_title'=>'Confirm Voiding',
 									  'confirmation_text'=>'Are you sure to VOID this request?'];
 				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintTF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status] == ".self::ForTurnOver." || [status] == ".self::ToClosed." || [status] == ".self::ForClosing.""];
-				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
+				$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getEdit/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == ".self::returnForApproval.""];
 			}
 
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Add More Button Selected
-	        | ----------------------------------------------------------------------     
-	        | @label       = Label of action 
-	        | @icon 	   = Icon from fontawesome
-	        | @name 	   = Name of button 
-	        | Then about the action, you should code at actionButtonSelected method 
-	        | 
-	        */
-	        $this->button_selected = array();
-
-	                
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Add alert message to this module at overheader
-	        | ----------------------------------------------------------------------     
-	        | @message = Text of message 
-	        | @type    = warning,success,danger,info        
-	        | 
-	        */
-	        $this->alert        = array();
-	                
-
-	        
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Add more button to header button 
-	        | ----------------------------------------------------------------------     
-	        | @label = Name of button 
-	        | @url   = URL Target
-	        | @icon  = Icon from Awesome.
-	        | 
-	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Return Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('return-assets'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"Transfer Assets","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('transfer-assets'),"color"=>"success"];
 			}
 
-
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Customize Table Row Color
-	        | ----------------------------------------------------------------------     
-	        | @condition = If condition. You may use field alias. E.g : [id] == 1
-	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
-	        | 
-	        */
-	        $this->table_row_color = array();     	          
-
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | You may use this bellow array to add statistic at dashboard 
-	        | ---------------------------------------------------------------------- 
-	        | @label, @count, @icon, @color 
-	        |
-	        */
-	        $this->index_statistic = array();
-
-
-
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Add javascript at body 
-	        | ---------------------------------------------------------------------- 
-	        | javascript code in the variable 
-	        | $this->script_js = "function() { ... }";
-	        |
-	        */
-	        $this->script_js = "";
-
-
-            /*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code before index table 
-	        | ---------------------------------------------------------------------- 
-	        | html code to display it before index table
-	        | $this->pre_index_html = "<p>test</p>";
-	        |
-	        */
-	        $this->pre_index_html = null;
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code after index table 
-	        | ---------------------------------------------------------------------- 
-	        | html code to display it after index table
-	        | $this->post_index_html = "<p>test</p>";
-	        |
-	        */
-	        $this->post_index_html = null;
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include Javascript File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your javascript each array 
-	        | $this->load_js[] = asset("myfile.js");
-	        |
-	        */
-	        $this->load_js = array();
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Add css style at body 
-	        | ---------------------------------------------------------------------- 
-	        | css code in the variable 
-	        | $this->style_css = ".style{....}";
-	        |
-	        */
 	        $this->style_css = "
 			.fa.fa-times{
 				color:#df4759;
@@ -223,43 +82,12 @@
 			}
 			";
 	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include css File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your css each array 
-	        | $this->load_css[] = asset("myfile.css");
-	        |
-	        */
 	        $this->load_css = array();
 	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
 
-	    /*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for button selected
-	    | ---------------------------------------------------------------------- 
-	    | @id_selected = the id selected
-	    | @button_name = the name of button
-	    |
-	    */
-	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here
-	            
-	    }
-
-
-	    /*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate query of index result 
-	    | ---------------------------------------------------------------------- 
-	    | @query = current sql query 
-	    |
-	    */
 	    public function hook_query_index(&$query) {
 			if(CRUDBooster::isSuperadmin()){
 				$query->whereNull('return_transfer_assets_header.archived')
@@ -283,14 +111,15 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	$pending         = DB::table('statuses')->where('id', self::ForApproval)->value('status_description');
-			$forVerification = DB::table('statuses')->where('id', self::ForVerification)->value('status_description');
-			$toSchedule      = DB::table('statuses')->where('id', self::ToSchedule)->value('status_description');
-			$rejected        = DB::table('statuses')->where('id', self::Rejected)->value('status_description');
-			$cancelled       = DB::table('statuses')->where('id', self::Cancelled)->value('status_description');
-			$forturnover     = DB::table('statuses')->where('id', self::ForTurnOver)->value('status_description');
-			$toClose         = DB::table('statuses')->where('id', self::ToClosed)->value('status_description');
-			$closed          = DB::table('statuses')->where('id', self::Closed)->value('status_description');
+	    	$pending           = DB::table('statuses')->where('id', self::ForApproval)->value('status_description');
+			$forVerification   = DB::table('statuses')->where('id', self::ForVerification)->value('status_description');
+			$toSchedule        = DB::table('statuses')->where('id', self::ToSchedule)->value('status_description');
+			$rejected          = DB::table('statuses')->where('id', self::Rejected)->value('status_description');
+			$cancelled         = DB::table('statuses')->where('id', self::Cancelled)->value('status_description');
+			$forturnover       = DB::table('statuses')->where('id', self::ForTurnOver)->value('status_description');
+			$toClose           = DB::table('statuses')->where('id', self::ToClosed)->value('status_description');
+			$closed            = DB::table('statuses')->where('id', self::Closed)->value('status_description');
+			$returnForApproval = DB::table('statuses')->where('id', self::returnForApproval)->value('status_description');
 			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
@@ -308,87 +137,14 @@
 					$column_value = '<span class="label label-info">'.$toClose.'</span>';
 				}else if($column_value == $closed){
 					$column_value = '<span class="label label-success">'.$closed.'</span>';
+				}else if($column_value == $returnForApproval){
+					$column_value = '<span class="label label-warning">'.$returnForApproval.'</span>';
 				}
 			}
 	    }
 
-	    /*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate data input before add data is execute
-	    | ---------------------------------------------------------------------- 
-	    | @arr
-	    |
-	    */
-	    public function hook_before_add(&$postdata) {        
-	        
-		
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after add public static function called 
-	    | ---------------------------------------------------------------------- 
-	    | @id = last insert id
-	    | 
-	    */
-	    public function hook_after_add($id) {        
-	        //Your code here
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate data input before update data is execute
-	    | ---------------------------------------------------------------------- 
-	    | @postdata = input post data 
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after edit public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_after_edit($id) {
-	        //Your code here 
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command before delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_before_delete($id) {
-	        //Your code here
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_after_delete($id) {
-	        //Your code here
-
-	    }
 
 		public function getDetail($id){
-			
-
 			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -816,5 +572,46 @@
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			
 			return $this->view("assets.print-request-trf", $data);
+		}
+
+		public function getEdit($id){
+			$this->cbLoader();
+            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+			$data = array();
+			$data['page_title'] = 'Edit Return Request';
+			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
+			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+
+			return $this->view("assets.return-edit-details", $data);
+		}
+
+		public function searchItem(Request $request){
+		
+			$search 		= $request->search;
+			$data = [];
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$items = MoveOrder::moSearchItem($search, CRUDBooster::myId());
+			if($items){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				foreach ($items as $key => $value) {
+					$return_data[$key]['id']                = $value->mo_id;
+					$return_data[$key]['asset_code']        = $value->asset_code;
+					$return_data[$key]['digits_code']       = $value->digits_code;
+					$return_data[$key]['item_description']  = $value->item_description;
+					$return_data[$key]['asset_type']        = $value->asset_type;
+				}
+				$data['items'] = $return_data;
+			}
+			echo json_encode($data);
+			exit;  
 		}
 	}
