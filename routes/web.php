@@ -174,7 +174,9 @@ Route::group(['middleware' => ['web']], function() {
     //EDIT RETURN ASSETS
     Route::get('admin/return_transfer_assets_header/getEdit/{id}','AdminReturnTransferAssetsHeaderController@getEdit')->name('getEdit');
     Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/search-item','AdminReturnTransferAssetsHeaderController@searchItem')->name('searchItem');
-    
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/edit-item','AdminReturnTransferAssetsHeaderController@editReturnAssets')->name('editReturnAssets');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/delete-line-return-assets','AdminReturnTransferAssetsHeaderController@deleteLineReturnAssets')->name('delete-line-return-assets');
+
     //Transfer Assets
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');

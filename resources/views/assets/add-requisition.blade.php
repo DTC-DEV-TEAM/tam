@@ -424,7 +424,7 @@
                         
                         <td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity${tableRow}" data-id="${tableRow}"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td> 
                         <td> 
-                            <select selected data-placeholder="Choose" class="form-control budget" name="budget" id="budget${tableRow}" required required style="width:100%"> 
+                            <select selected data-placeholder="Choose" class="form-control budget" name="budget_range[]" id="budget${tableRow}" required required style="width:100%"> 
                                 <option value=""></option> 
                                 @foreach($budget_range as $data)
                                     <option value="{{$data->description}}">{{$data->description}}</option>

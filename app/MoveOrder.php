@@ -7,10 +7,12 @@ use DB;
 class MoveOrder extends Model
 {
 
-    private const It = 1;
-    private const Fa = 5;
-    private const Nt = 9;
-    //
+    private const It         = 1;
+    private const Fa         = 5;
+    private const Nt         = 9;
+    private const Closed     = 13;
+    private const ForClosing = 19;
+
     protected $table = 'mo_body_request';
     protected $fillable = [
         'status_id', 
@@ -154,9 +156,9 @@ class MoveOrder extends Model
                              'header_request.created_at as created_at',
                              DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
                              )
-                     ->where('mo_body_request.request_created_by', $user)
-                     ->where('mo_body_request.asset_code','LIKE','%'.$search.'%')->orWhere('mo_body_request.item_description','LIKE','%'.$search.'%')
+                     ->where('mo_body_request.asset_code','LIKE','%'.$search.'%')->orWhere('mo_body_request.item_description','LIKE','%'.$search.'%')->where('mo_body_request.request_created_by', $user)
                      ->whereIn('header_request.request_type_id', [self::It, self::Fa])
+                     ->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
                      ->whereNull('mo_body_request.return_flag')
                      ->get();
      }

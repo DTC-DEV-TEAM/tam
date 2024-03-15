@@ -145,7 +145,6 @@
 
 
 		public function getDetail($id){
-			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
             }
@@ -575,12 +574,11 @@
 		}
 
 		public function getEdit($id){
-			$this->cbLoader();
-            if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
+            if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
             }
 
-			$data = array();
+			$data = [];
 			$data['page_title'] = 'Edit Return Request';
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
@@ -591,7 +589,6 @@
 		}
 
 		public function searchItem(Request $request){
-		
 			$search 		= $request->search;
 			$data = [];
 			$data['status_no'] = 0;
@@ -613,5 +610,62 @@
 			}
 			echo json_encode($data);
 			exit;  
+		}
+
+		public function editReturnAssets(Request $request){
+			$header_id = $request->header_id;
+			$mo_id     = $request->mo_id;
+			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first()->reference_no;
+	
+			$container = [];
+			$containerSave = [];
+			if(is_array($request->asset_code)){
+				foreach($request->asset_code as $key => $val){
+					$insertLines = new ReturnTransferAssets([
+						'status'           => self::ForApproval,
+						'return_header_id' => $header_id,
+						'reference_no'     => $headerInfo,
+						'mo_id'            => $mo_id[$key],
+						'asset_code'       => $request->asset_code[$key],
+						'digits_code'      => $request->digits_code[$key],
+						'description'      => $request->item_description[$key],
+						'asset_type'       => $request->asset_type[$key],
+						'requested_by'     => CRUDBooster::myId(), 
+						'requested_date'   => date('Y-m-d H:i:s')
+					]);
+					$insertLines->save();
+					//UPDATE FLAG RETURN
+					MoveOrder::where(['id' => $mo_id[$key]])
+					->update([
+						'return_flag' => 1
+					]);
+				}
+				// ReturnTransferAssets::insert($containerSave);
+				ReturnTransferAssetsHeader::where(['id' => $header_id])
+				->update([
+					'status' => self::ForApproval
+				]);
+			}
+
+			$message = ['status'=>'success', 'message' => 'Update Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+			echo json_encode($message);
+		}
+
+		public function deleteLineReturnAssets(Request $request){
+			$lineInfo = ReturnTransferAssets::lineDetail($request->lineId)->first();
+
+			ReturnTransferAssets::where(['id' => $request->lineId])
+			->update([
+				'status'   => self::Cancelled,
+				'archived' => date('Y-m-d H:i:s')
+			]);
+
+			MoveOrder::where(['id' => $lineInfo->mo_id])
+			->update([
+				'return_flag' => 1
+			]);
+
+			$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+			echo json_encode($message);
 		}
 	}

@@ -521,6 +521,7 @@
 			$quantity 			= $fields['quantity'];
 			$image 				= $fields['image'];
 			$request_type_id 	= $fields['request_type_id'];
+			$budget_range 	    = $fields['budget_range'];
 			$app_count = 2;
          
 			for($x=0; $x < count((array)$item_description); $x++) {
@@ -554,9 +555,8 @@
 				$dataLines[$x]['app_id'] 			= implode(", ",$apps_array);
 				$dataLines[$x]['app_id_others'] 	= $app_id_others[$x];
 				$dataLines[$x]['quantity'] 			= intval(str_replace(',', '', $quantity[$x]));
-				//$dataLines[$x]['unserved_qty']      = $quantity[$x];
 				$dataLines[$x]['unit_cost'] 		= $supplies_cost[$x];
-
+				$dataLines[$x]['budget_range'] 		= $budget_range[$x];
 				if($request_type_id == 5){
 					$dataLines[$x]['to_reco'] = 0;
 				}else{
