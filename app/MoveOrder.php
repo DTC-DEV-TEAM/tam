@@ -156,9 +156,8 @@ class MoveOrder extends Model
                              'header_request.created_at as created_at',
                              DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
                              )
-                     ->where('mo_body_request.asset_code','LIKE','%'.$search.'%')->orWhere('mo_body_request.item_description','LIKE','%'.$search.'%')->where('mo_body_request.request_created_by', $user)
-                     ->whereIn('header_request.request_type_id', [self::It, self::Fa])
-                     ->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
+                     ->where('mo_body_request.asset_code','LIKE','%'.$search.'%')->where('mo_body_request.request_created_by', $user)->whereIn('header_request.request_type_id', [self::It, self::Fa])->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
+                     ->orWhere('mo_body_request.item_description','LIKE','%'.$search.'%')->where('mo_body_request.request_created_by', $user)->whereIn('header_request.request_type_id', [self::It, self::Fa])->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
                      ->whereNull('mo_body_request.return_flag')
                      ->get();
      }

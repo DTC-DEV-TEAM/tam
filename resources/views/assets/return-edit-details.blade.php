@@ -208,7 +208,6 @@
     var token = $("#token").val();
     $(document).ready(function() {
         //Add Row
-        $('#btnUpdate').prop("disabled", true);
         $("#add-Row").click(function() {
             event.preventDefault();
             var count_fail = 0;
@@ -354,7 +353,6 @@
                             $('#digits_code'+$(this).attr("data-id")).val(e.digits_code);
                             $('#item_description'+$(this).attr("data-id")).val(e.value);
                             $('#asset_type'+$(this).attr("data-id")).val(e.asset_type);
-                            $('#btnUpdate').prop("disabled", false);
                             return false;
 
                         }

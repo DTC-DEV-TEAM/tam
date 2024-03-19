@@ -521,9 +521,6 @@
 		}
 
 		public function getRequestPrintTF($id){
-			
-		
-			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}  
@@ -566,6 +563,7 @@
 					'mo_body_request.*',
 					'statuses.*',
 					)
+					->whereNull('archived')
 					->where('return_transfer_assets.return_header_id', $id)->get();	
 		
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
@@ -621,34 +619,55 @@
 			$containerSave = [];
 			if(is_array($request->asset_code)){
 				foreach($request->asset_code as $key => $val){
-					$insertLines = new ReturnTransferAssets([
-						'status'           => self::ForApproval,
-						'return_header_id' => $header_id,
-						'reference_no'     => $headerInfo,
-						'mo_id'            => $mo_id[$key],
-						'asset_code'       => $request->asset_code[$key],
-						'digits_code'      => $request->digits_code[$key],
-						'description'      => $request->item_description[$key],
-						'asset_type'       => $request->asset_type[$key],
-						'requested_by'     => CRUDBooster::myId(), 
-						'requested_date'   => date('Y-m-d H:i:s')
-					]);
-					$insertLines->save();
+					$isExist = ReturnTransferAssets::where([
+						'reference_no' =>$headerInfo,
+						'asset_code'   =>$request->asset_code[$key],
+						'digits_code'  =>$request->digits_code[$key]
+					])->exists();
+					if($isExist){
+						ReturnTransferAssets::where([
+							'reference_no' =>$headerInfo,
+							'asset_code'   =>$request->asset_code[$key],
+							'digits_code'  =>$request->digits_code[$key]
+						])
+						->update([
+							'status'   => self::ForApproval,
+							'archived' => NULL
+						]);
+					}else{
+						$insertLines = new ReturnTransferAssets([
+							'status'           => self::ForApproval,
+							'return_header_id' => $header_id,
+							'reference_no'     => $headerInfo,
+							'mo_id'            => $mo_id[$key],
+							'asset_code'       => $request->asset_code[$key],
+							'digits_code'      => $request->digits_code[$key],
+							'description'      => $request->item_description[$key],
+							'asset_type'       => $request->asset_type[$key],
+							'requested_by'     => CRUDBooster::myId(), 
+							'requested_date'   => date('Y-m-d H:i:s')
+						]);
+						$insertLines->save();
+					}
+					
 					//UPDATE FLAG RETURN
 					MoveOrder::where(['id' => $mo_id[$key]])
 					->update([
 						'return_flag' => 1
 					]);
 				}
-				// ReturnTransferAssets::insert($containerSave);
-				ReturnTransferAssetsHeader::where(['id' => $header_id])
-				->update([
-					'status' => self::ForApproval
-				]);
 			}
+			// ReturnTransferAssets::insert($containerSave);
+			ReturnTransferAssetsHeader::where(['id' => $header_id])
+			->update([
+				'status' => self::ForApproval
+			]);
+			ReturnTransferAssets::where(['return_header_id' => $header_id])
+			->update([
+				'status' => self::ForApproval
+			]);
 
-			$message = ['status'=>'success', 'message' => 'Update Successfully!','redirect_url'=>CRUDBooster::mainpath()];
-			echo json_encode($message);
+			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Updated successfully!"), 'info');
 		}
 
 		public function deleteLineReturnAssets(Request $request){
@@ -662,7 +681,7 @@
 
 			MoveOrder::where(['id' => $lineInfo->mo_id])
 			->update([
-				'return_flag' => 1
+				'return_flag' => NULL
 			]);
 
 			$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];

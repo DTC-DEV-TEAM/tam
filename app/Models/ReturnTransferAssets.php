@@ -125,6 +125,7 @@ class ReturnTransferAssets extends Model
 			'mo_body_request.serial_no',
 			'mo_body_request.id AS mo_id'
 			)
-			->where('return_transfer_assets.id', $id);
+			->where('return_transfer_assets.id', $id)
+			->whereNull('return_transfer_assets.archived');
 	}
 }
