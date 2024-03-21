@@ -96,15 +96,24 @@
                                 </td>                              
                             </tr>
                             <tr>
-                                <th class="control-label col-md-3">Schedule date:</th>
+                                <th class="control-label col-md-3">Pick up by:</th>
                                 <td>
-                                   <input type="text" class="form-control date" placeholder="Select date" name="schedule_date" id="schedule_date" autocomplete="off">
+                                    <select class="users" data-placeholder="Choose transport type"  style="width: 100%;" name="transport_type" id="transport_type">
+                                        <option value=""></option>
+                                        @foreach($transport_types as $type)
+                                            <option value="{{$type->id}}">{{$type->transport_type}}</option>
+                                        @endforeach
+                                    </select>
+                                    <div class="form-group" id="hand_carry_div" style="display: none; margin-top:6px">
+                                        <label for="">Hand Carrier:</label>
+                                        <input type="text" class="form-control"  id="hand_carry" name="hand_carry" placeholder="Fullname">   
+                                    </div>
                                 </td>                              
                             </tr>
                             <tr>
-                                <th class="control-label col-md-3">Pick up by:</th>
+                                <th class="control-label col-md-3">Schedule date:</th>
                                 <td>
-                                   <input type="text" class="form-control" name="pickup_by" id="pickup_by">
+                                   <input type="text" class="form-control date" autocomplete="off" placeholder="Select date" name="schedule_date" id="schedule_date">
                                 </td>                              
                             </tr>
                         </tbody>
@@ -201,23 +210,76 @@
     };
     setTimeout("preventBack()", 0);
     $(document).ready(function() {
-        $('#location_to_pick').select2();
+        $('#location_to_pick, #transport_type').select2();
 
         $('.date').datetimepicker({
+            minDate: moment().millisecond(0).second(0).minute(0).hour(0),
             viewMode: 'days',
             format: 'YYYY-MM-DD',
             dayViewHeaderFormat: 'MMMM YYYY'
         });
+        $(".date").val('');
+        $("#transport_type").change(function() {
+            var value = $(this).val();
+            if(value == 2){
+                $("#hand_carry_div").show();
+            }else{
+                $("#hand_carry_div").hide();
+            }
+        });
 
         $('#btnApprove').click(function(event) {
             event.preventDefault();
+            if($("#location_to_pick").val() === ''){
+                swal({
+                    type: 'error',
+                    title: 'Location required!',
+                    icon: 'error',
+                    confirmButtonColor: "#00a65a",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }
+            if($("#schedule_date").val() === ''){
+                swal({
+                    type: 'error',
+                    title: 'Schedule date required!',
+                    icon: 'error',
+                    confirmButtonColor: "#00a65a",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }
+            if($("#transport_type").val() === ''){
+                swal({
+                    type: 'error',
+                    title: 'Transport type required!',
+                    icon: 'error',
+                    confirmButtonColor: "#00a65a",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }
+            if($("#transport_type :selected").val() == 2){
+                if($("#hand_carry").val() === ''){
+                    swal({
+                        type: 'error',
+                        title: 'Hand carrier required!',
+                        icon: 'error',
+                        confirmButtonColor: "#00a65a",
+                    }); 
+                    event.preventDefault(); // cancel default behavior
+                    return false;
+                }
+            }
+            console.log($("#transport_type :selected").val());
             swal({
                 title: "Are you sure?",
                 type: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#41B314",
                 cancelButtonColor: "#F9354C",
-                confirmButtonText: "Yes, approve it!",
+                confirmButtonText: "Yes, schedule it!",
                 width: 450,
                 height: 200
                 }, function () {

@@ -12,6 +12,7 @@
 
 	class AdminScheduleReturnTransferController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private const ToSchedule       = 48;
+		private const ForTurnOver      = 24;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -57,6 +58,7 @@
 			$this->load_js = array();
 			$this->load_js[] = asset("datetimepicker/bootstrap-datetimepicker.min.js");
 	        $this->load_css = array();
+			$this->load_css[] = asset("datetimepicker/bootstrap-datetimepicker.min.css");
 			$this->load_css[] = asset("css/font-family.css");
   	        
 	    }
@@ -110,7 +112,16 @@
 
 
 	    public function hook_before_edit(&$postdata,$id) {        
-
+			$fields = Request::all();
+			$postdata['status']		 	     = self::ForTurnOver;
+			$postdata['schedule_by'] 		 = CRUDBooster::myId();
+			$postdata['schedule_at'] 		 = $fields['schedule_date'];
+			$postdata['transport_type']      = $fields['transport_type'];
+			if($fields['hand_carry']){
+				$postdata['hand_carry_name'] = $fields['hand_carry'];
+			}
+			$postdata['location_to_pick']    = $fields['location_to_pick'];
+			dd($fields);
 	    }
 
 	    public function hook_after_edit($id) { 
@@ -129,6 +140,7 @@
 			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
 			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+			$data['transport_types'] = DB::table('transport_types')->get();
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("assets.schedule-return-transfer", $data);
 		}
