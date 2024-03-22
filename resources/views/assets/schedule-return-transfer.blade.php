@@ -175,16 +175,6 @@
                 </tbody>
                 
             </table> 
-            
-            <hr/>
-            <div class="row">  
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>{{ trans('message.table.comments') }}:</label>
-                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="approver_comments">{{$Header->approver_comments}}</textarea>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class='panel-footer'>
