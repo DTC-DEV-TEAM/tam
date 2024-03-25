@@ -46,23 +46,6 @@
 
 			# END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requestor Name","name"=>"requestor_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"request_type,id"];
-			//$this->form[] = ["label"=>"Request Type","name"=>"request_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved Date","name"=>"approved_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rejected Date","name"=>"rejected_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			# OLD END FORM
-
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -309,11 +292,11 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        $fields = Request::all();
+	        $fields  = Request::all();
 
-			$item_id 					= $fields['item_id'];
+			$item_id = $fields['item_id'];
 
-			$closed  = 		DB::table('statuses')->where('id',13)->value('id');
+			$closed  = DB::table('statuses')->where('id',13)->value('id');
 			ReturnTransferAssets::where('return_header_id',$id)
 			->update([
 					'status' => $closed
@@ -363,53 +346,14 @@
 
 	    }
 		public function getRequestClosingReturn($id){
-			
-
-			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}  
 
-
 			$data = array();
-
 			$data['page_title'] = 'Close Return/Transfer Asset';
-
-			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
-				->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
-				->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
-				->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
-				->leftjoin('cms_users as received', 'return_transfer_assets_header.transacted_by','=', 'received.id')
-				->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
-				->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
-				->select(
-						'return_transfer_assets_header.*',
-						'return_transfer_assets_header.id as requestid',
-						'requests.request_name as request_name',
-						'employees.name as employee_name',
-						'employees.company_name_id as company',
-						'employees.position_id as position',
-						'departments.department_name as department_name',
-						'locations.store_name as store_branch',
-						'approved.name as approvedby',
-						'received.name as receivedby',
-						'closed.name as closedby',
-						'locations.store_name as store_branch'
-						)
-				->where('return_transfer_assets_header.id', $id)->first();
-           
-		
-
-			$data['return_body'] = ReturnTransferAssets::
-			           leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
-				
-				->select(
-						'return_transfer_assets.*',
-						'statuses.*',
-						)
-						->where('return_transfer_assets.return_header_id', $id)->get();	
-			// dd($data['return_body']);
-	
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			return $this->view("assets.return-closing-request", $data);
 		}
 

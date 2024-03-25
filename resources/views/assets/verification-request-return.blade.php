@@ -143,9 +143,9 @@
                         @endif
                         <th width="7%" class="text-center">Digits Code</th>
                         <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>  
-                        @if(!in_array($Header->request_type_id, [1,5]))
+                        {{-- @if(!in_array($Header->request_type_id, [1,5]))
                             <th width="7%" class="text-center">Qty</th>
-                        @endif
+                        @endif --}}
                         <th width="10%" class="text-center">Asset Type</th>                                                         
                         <th width="12%" class="text-center">Comments</th>
                         @if(CRUDBooster::myPrivilegeId() == 6)
@@ -182,11 +182,11 @@
                             @endif
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
-                            @if(!in_array($Header->request_type_id, [1,5]))
+                            {{-- @if(!in_array($Header->request_type_id, [1,5]))
                                 <td style="text-align:center" height="10"> 
                                     <input type="text" class="form-control text-center qty" name="mo_qty[]" value="{{$rowresult->quantity}}" readonly> 
                                 </td>
-                            @endif
+                            @endif --}}
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
                             <td style="text-align:center" height="10">
                                 <select required selected data-placeholder="Select Comments" id="comments{{$tableRow1}}" data-id="{{$tableRow1}}" name="comments[]" class="form-select select2 comments" style="width:100%;" multiple="multiple">

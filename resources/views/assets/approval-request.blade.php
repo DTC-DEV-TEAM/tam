@@ -207,8 +207,8 @@
 
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-           
             <button class="btn btn-danger pull-right" type="button" id="btnReject" style="margin-left: 5px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
+            <button class="btn btn-warning pull-right" type="button" id="btnReturn" style="margin-left: 5px;"><i class="fa fa-refresh" ></i> Return</button>
             <button class="btn btn-success pull-right" type="button" id="btnApprove"><i class="fa fa-thumbs-up" ></i> Approve</button>
         </div>
     </form>
@@ -242,6 +242,24 @@
             }, function () {
                 $(this).attr('disabled','disabled');
                 $('#approval_action').val('1');
+                $("#myform").submit();                   
+        });
+    });
+
+    $('#btnReturn').click(function(event) {
+        event.preventDefault();
+        swal({
+            title: "Are you sure?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, return it!",
+            width: 450,
+            height: 200
+            }, function () {
+                $(this).attr('disabled','disabled');
+                $('#approval_action').val('2');
                 $("#myform").submit();                   
         });
     });
@@ -300,7 +318,7 @@
     }
     document.getElementById("approval-table").innerHTML +=
     "<tr>"+
-        "<td colspan='5' style='text-align:right'>"+
+        "<td colspan='5' style='text-align:center'>"+
                 "<strong>TOTAL</strong>"+
             "</td>"+
             

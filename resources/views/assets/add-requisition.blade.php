@@ -403,8 +403,8 @@
 
                         <td >
                         <input type="text" placeholder="Search Item ..." class="form-control finput itemDesc" id="itemDesc${tableRow}" data-id="${tableRow}"   name="item_description[]"  required maxlength="100">
-                          <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display: none; top: 60px; left: 15px; width: 100%;">
-                           <li>Loading...</li>
+                          <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display: none; top: 60px; left: 15px; width: 98%;">
+                           <li class="text-center">Loading...</li>
                           </ul>
                          <div id="display-error${tableRow}"></div>
                         </td>
@@ -530,7 +530,7 @@
 
                                         $('.ui-menu-item').remove();
                                         $('.addedLi').remove();
-                                        $("#ui-id-2"+tableRow).append($("<li class='addedLi'>").text(data.message));
+                                        $("#ui-id-2"+tableRow).append($("<li class='addedLi text-center'>").text(data.message));
                                         var searchVal = $('#itemDesc'+tableRow).val();
                                         if (searchVal.length > 0) {
                                             $("#ui-id-2"+tableRow).css('display', 'block');

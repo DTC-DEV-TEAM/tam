@@ -75,6 +75,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/header_request/RemoveItem','AdminHeaderRequestController@RemoveItem');
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-non-trade', 'AdminHeaderRequestController@getAddRequisitionNonTrade')->name('assets.add.requisition.non.trade'); 
 
+    //EDIT REQUEST
+    Route::get(config('crudbooster.ADMIN_PATH').'/header_request/getEdit/{id}','AdminHeaderRequestController@getEdit')->name('getEditRequest');
     //Cancel Request
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-request','AdminHeaderRequestController@cancelArfRequest')->name('cancel-arf-request');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-mo-perline-request','AdminHeaderRequestController@cancelArfMoPerLineRequest')->name('cancel-arf-mo-perline-request');

@@ -363,6 +363,8 @@
 				$finalContainerSave[] = $finalContainer;
 			}
 			CommentsGoodDefect::insert($finalContainerSave);
+
+			CRUDBooster::redirect(CRUDBooster::mainpath(), 'Verified!', 'success');
 		}
 
 	}

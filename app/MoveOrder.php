@@ -29,7 +29,7 @@ class MoveOrder extends Model
         'unit_cost',    
         'item_id'
     ];
-    public function scopeArrayMO($query, $closed, $for_closing){
+    public function scopeArrayMO($query){
        return $query->leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
                     ->leftjoin('body_request', 'mo_body_request.body_request_id', '=', 'body_request.id')
                     ->leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
@@ -70,12 +70,12 @@ class MoveOrder extends Model
                             'body_request.item_description as body_description',
                             DB::raw('IF(header_request.created_at IS NULL, mo_body_request.created_at, header_request.created_at) as received_at')
                             )
-                    ->whereIn('mo_body_request.status_id', [$closed, $for_closing])
+                    ->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
                     ->whereNull('mo_body_request.return_flag')
                     ->get();
     }
 
-    public function scopeMoReturn($query, $closed, $for_closing, $user){
+    public function scopeMoReturn($query, $user){
        return $query->leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
                     ->leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
                     ->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
@@ -89,7 +89,6 @@ class MoveOrder extends Model
                     ->leftjoin('cms_users as approved', 'header_request.approved_by','=', 'approved.id')
                     ->leftjoin('cms_users as recommended', 'header_request.recommended_by','=', 'recommended.id')
                     ->leftjoin('cms_users as tagged', 'header_request.purchased2_by','=', 'tagged.id')
-                
                     ->select(
                             'header_request.*',
                             'mo_body_request.*',
@@ -113,8 +112,8 @@ class MoveOrder extends Model
                             DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
                             )
                     ->where('mo_body_request.request_created_by', $user)
-                    ->whereIn('mo_body_request.status_id', [$closed, $for_closing])
-                    ->whereIn('header_request.request_type_id', [self::It, self::Fa])
+                    ->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
+                    ->whereIn('mo_body_request.request_type_id_mo', [self::It, self::Fa])
                     ->whereNull('mo_body_request.return_flag')
                     ->get();
     }
@@ -162,7 +161,7 @@ class MoveOrder extends Model
                      ->get();
      }
 
-    public function scopeMoReturnNonTrade($query, $closed, $for_closing, $user){
+    public function scopeMoReturnNonTrade($query, $user){
         return $query->leftjoin('header_request', 'mo_body_request.header_request_id', '=', 'header_request.id')
                      ->leftjoin('request_type', 'header_request.purpose', '=', 'request_type.id')
                      ->leftjoin('requests', 'header_request.request_type_id', '=', 'requests.id')
@@ -200,7 +199,7 @@ class MoveOrder extends Model
                              DB::raw('IF(header_request.request_type_id IS NULL, mo_body_request.request_type_id_mo, header_request.request_type_id) as request_type_id')
                              )
                      ->where('mo_body_request.request_created_by', $user)
-                     ->whereIn('mo_body_request.status_id', [$closed, $for_closing])
+                     ->whereIn('mo_body_request.status_id', [self::Closed, self::ForClosing])
                      ->whereIn('header_request.request_type_id', [self::Nt])
                      ->whereNull('mo_body_request.return_flag')
                      ->get();

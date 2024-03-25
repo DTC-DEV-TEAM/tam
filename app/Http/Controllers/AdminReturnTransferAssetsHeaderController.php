@@ -173,7 +173,8 @@
 			$closed      =  self::Closed;
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
+
 			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
@@ -613,40 +614,69 @@
 		public function editReturnAssets(Request $request){
 			$header_id = $request->header_id;
 			$mo_id     = $request->mo_id;
-			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first()->reference_no;
+			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first();
 	
 			$container = [];
 			$containerSave = [];
 			if(is_array($request->asset_code)){
 				foreach($request->asset_code as $key => $val){
 					$isExist = ReturnTransferAssets::where([
-						'reference_no' =>$headerInfo,
+						'reference_no' =>$headerInfo->reference_no,
 						'asset_code'   =>$request->asset_code[$key],
 						'digits_code'  =>$request->digits_code[$key]
 					])->exists();
 					if($isExist){
-						ReturnTransferAssets::where([
-							'reference_no' =>$headerInfo,
-							'asset_code'   =>$request->asset_code[$key],
-							'digits_code'  =>$request->digits_code[$key]
-						])
-						->update([
-							'status'   => self::ForApproval,
-							'archived' => NULL
-						]);
+						if($headerInfo->request_type_id == 8){
+							ReturnTransferAssets::where([
+								'reference_no' =>$headerInfo->reference_no,
+								'asset_code'   =>$request->asset_code[$key],
+								'digits_code'  =>$request->digits_code[$key]
+							])
+							->update([
+								'status'      => self::ForApproval,
+								'transfer_to' => $headerInfo->transfer_to,
+								'archived'    => NULL
+							]);
+						}else{
+							ReturnTransferAssets::where([
+								'reference_no' =>$headerInfo->reference_no,
+								'asset_code'   =>$request->asset_code[$key],
+								'digits_code'  =>$request->digits_code[$key]
+							])
+							->update([
+								'status'   => self::ForApproval,
+								'archived' => NULL
+							]);
+						}
 					}else{
-						$insertLines = new ReturnTransferAssets([
-							'status'           => self::ForApproval,
-							'return_header_id' => $header_id,
-							'reference_no'     => $headerInfo,
-							'mo_id'            => $mo_id[$key],
-							'asset_code'       => $request->asset_code[$key],
-							'digits_code'      => $request->digits_code[$key],
-							'description'      => $request->item_description[$key],
-							'asset_type'       => $request->asset_type[$key],
-							'requested_by'     => CRUDBooster::myId(), 
-							'requested_date'   => date('Y-m-d H:i:s')
-						]);
+						if($headerInfo->request_type_id == 8){
+							$insertLines = new ReturnTransferAssets([
+								'status'           => self::ForApproval,
+								'return_header_id' => $header_id,
+								'reference_no'     => $headerInfo->reference_no,
+								'mo_id'            => $mo_id[$key],
+								'asset_code'       => $request->asset_code[$key],
+								'digits_code'      => $request->digits_code[$key],
+								'description'      => $request->item_description[$key],
+								'asset_type'       => $request->asset_type[$key],
+								'requested_by'     => CRUDBooster::myId(), 
+								'requested_date'   => date('Y-m-d H:i:s'),
+								'transfer_to'      => $headerInfo->transfer_to,
+							]);
+						}else{
+							$insertLines = new ReturnTransferAssets([
+								'status'           => self::ForApproval,
+								'return_header_id' => $header_id,
+								'reference_no'     => $headerInfo->reference_no,
+								'mo_id'            => $mo_id[$key],
+								'asset_code'       => $request->asset_code[$key],
+								'digits_code'      => $request->digits_code[$key],
+								'description'      => $request->item_description[$key],
+								'asset_type'       => $request->asset_type[$key],
+								'requested_by'     => CRUDBooster::myId(), 
+								'requested_date'   => date('Y-m-d H:i:s')
+							]);
+						}
 						$insertLines->save();
 					}
 					

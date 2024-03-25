@@ -42,6 +42,7 @@
 		private $for_closing; 		
 		private $for_move_order;  	
 		private $for_printing;  	
+		private const returnForApproval  = 49;
         public function __construct() {
 			// Register ENUM type
 			$this->middleware('check.orderschedule',['only' => ['getAddRequisitionSupplies']]);
@@ -142,6 +143,8 @@
 				'confirmation_title'=>'Confirm Voiding',
 				'confirmation_text'=>'Are you sure to VOID this request?'];
 				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
+				$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getEdit/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == ".self::returnForApproval.""];
+			
 			}
 			
 	        /* 
@@ -364,23 +367,23 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	//Your code here
-			$pending          = DB::table('statuses')->where('id', $this->pending)->value('status_description');
-			$approved         = DB::table('statuses')->where('id', $this->approved)->value('status_description');
-			$rejected         = DB::table('statuses')->where('id', $this->rejected)->value('status_description');
-			$it_reco          = DB::table('statuses')->where('id', $this->it_reco)->value('status_description');
-			$cancelled        = DB::table('statuses')->where('id', $this->cancelled)->value('status_description');
-			$released         = DB::table('statuses')->where('id', $this->released)->value('status_description');
-			$processing       = DB::table('statuses')->where('id', $this->processing)->value('status_description');
-			$closed           = DB::table('statuses')->where('id', $this->closed)->value('status_description');
-			$received         = DB::table('statuses')->where('id', $this->received)->value('status_description');
-			$for_picking      = DB::table('statuses')->where('id', $this->for_picking)->value('status_description');
-			$for_printing_adf = DB::table('statuses')->where('id', $this->for_printing_adf)->value('status_description');
-			$for_closing      = DB::table('statuses')->where('id', $this->for_closing)->value('status_description');
-			$for_move_order   = DB::table('statuses')->where('id', $this->for_move_order)->value('status_description');
-			$for_printing     = DB::table('statuses')->where('id', $this->for_printing)->value('status_description');
+			$pending           = DB::table('statuses')->where('id', $this->pending)->value('status_description');
+			$approved          = DB::table('statuses')->where('id', $this->approved)->value('status_description');
+			$rejected          = DB::table('statuses')->where('id', $this->rejected)->value('status_description');
+			$it_reco           = DB::table('statuses')->where('id', $this->it_reco)->value('status_description');
+			$cancelled         = DB::table('statuses')->where('id', $this->cancelled)->value('status_description');
+			$released          = DB::table('statuses')->where('id', $this->released)->value('status_description');
+			$processing        = DB::table('statuses')->where('id', $this->processing)->value('status_description');
+			$closed            = DB::table('statuses')->where('id', $this->closed)->value('status_description');
+			$received          = DB::table('statuses')->where('id', $this->received)->value('status_description');
+			$for_picking       = DB::table('statuses')->where('id', $this->for_picking)->value('status_description');
+			$for_printing_adf  = DB::table('statuses')->where('id', $this->for_printing_adf)->value('status_description');
+			$for_closing       = DB::table('statuses')->where('id', $this->for_closing)->value('status_description');
+			$for_move_order    = DB::table('statuses')->where('id', $this->for_move_order)->value('status_description');
+			$for_printing      = DB::table('statuses')->where('id', $this->for_printing)->value('status_description');
+			$forReturnApproval = DB::table('statuses')->where('id', self::returnForApproval)->value('status_description');
 
 			if($column_index == 2){
-
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $approved){
@@ -409,6 +412,8 @@
 					$column_value = '<span class="label label-info">'.$for_closing.'</span>';
 				}else if($column_value == $for_printing){
 					$column_value = '<span class="label label-info">'.$for_printing.'</span>';
+				}else if($column_value == $forReturnApproval){
+					$column_value = '<span class="label label-warning">'.$forReturnApproval.'</span>';
 				}
 
 			}
@@ -942,6 +947,22 @@
 				return $this->view("assets.add-requisition", $data);
 
 			}			
+		}
+
+		public function getEdit($id){
+            if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
+                CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+            }
+
+			$data = [];
+			$data['page_title'] = 'Edit Assets Request';
+			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['Header'] = HeaderRequest::header($id);
+			$data['Body'] = BodyRequest::select('body_request.*')->where('body_request.header_request_id', $id)->get();
+			
+			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
+			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+			return $this->view("assets.edit-requisition", $data);
 		}
 
 		public function getAddRequisitionFA() {
