@@ -198,7 +198,7 @@
 			$closed      =  self::Closed;
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['mo_body'] = MoveOrder::moReturn($closed, $for_closing, CRUDBooster::myId());
+			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
 			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
@@ -583,7 +583,8 @@
 			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
 			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
+			$data['users'] = Users::where('id_cms_privileges','!=',1)->where('department_id',$data['user']->department_id)->get();
 			return $this->view("assets.return-edit-details", $data);
 		}
 
@@ -615,7 +616,7 @@
 			$header_id = $request->header_id;
 			$mo_id     = $request->mo_id;
 			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first();
-	
+			
 			$container = [];
 			$containerSave = [];
 			if(is_array($request->asset_code)){
@@ -634,7 +635,7 @@
 							])
 							->update([
 								'status'      => self::ForApproval,
-								'transfer_to' => $headerInfo->transfer_to,
+								'transfer_to' => $request->users_id,
 								'archived'    => NULL
 							]);
 						}else{
@@ -661,7 +662,7 @@
 								'asset_type'       => $request->asset_type[$key],
 								'requested_by'     => CRUDBooster::myId(), 
 								'requested_date'   => date('Y-m-d H:i:s'),
-								'transfer_to'      => $headerInfo->transfer_to,
+								'transfer_to'      => $request->users_id,
 							]);
 						}else{
 							$insertLines = new ReturnTransferAssets([
@@ -687,11 +688,21 @@
 					]);
 				}
 			}
-			// ReturnTransferAssets::insert($containerSave);
-			ReturnTransferAssetsHeader::where(['id' => $header_id])
-			->update([
-				'status' => self::ForApproval
-			]);
+			if(!$request->users_id){
+				ReturnTransferAssetsHeader::where(['id' => $header_id])
+				->update([
+					'status'  => self::ForApproval,
+					'purpose' => $request->purpose
+				]);
+			}else{
+				ReturnTransferAssetsHeader::where(['id' => $header_id])
+				->update([
+					'status'  => self::ForApproval,
+					'purpose' => $request->purpose,
+					'transfer_to' => $request->users_id
+				]);
+			}
+		
 			ReturnTransferAssets::where(['return_header_id' => $header_id])
 			->update([
 				'status' => self::ForApproval

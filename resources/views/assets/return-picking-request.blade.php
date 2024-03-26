@@ -268,10 +268,11 @@
         $('body').addClass("sidebar-collapse");
     });
     $('.select2').select2({multiple: true});
-
+    // $('#btnSubmit').attr("disabled", true);
     $('#check_all').change(function() {
         if(this.checked) {
-            $(".item_to_receive_id").prop("checked", true);
+            $('.item_to_receive_id').prop('checked', true);
+            // $('#btnSubmit').attr('disabled', false);
             // $('.good').attr("disabled", false);
             // $('.defective').attr("disabled", false);
             // $('.comments').attr("disabled", false);
@@ -290,7 +291,8 @@
         }
         else{
             // $('#btnSubmit').attr("disabled", true);
-            $(".item_to_receive_id").prop("checked", false);
+            $('.item_to_receive_id').prop('checked', false);
+            // $('#btnSubmit').attr('disabled', true);
             // $('.good').attr("disabled", true);
             // $('.good').prop("checked", false);
             // $('.defective').attr("disabled", true);
@@ -321,59 +323,13 @@
     //     $("#defective_text"+id).val("0");
     //     var ischecked= $(this).is(':checked');
     //     if(ischecked == false){
-    //         count_pick--;
-           
+    //         $('#btnSubmit').attr("disabled", true);  
+    //     }else{
     //         if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
-    //             if ($('.good:checked').length == $('.good').length) {
-    //                 $('#btnSubmit').attr("disabled", false);
-    //             }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
-    //                 $('#btnSubmit').attr("disabled", false);
-    //             }else{
-    //                 $('#btnSubmit').attr("disabled", true);  
-    //             }
-    //         }
-
-    //         if ($('#good'+id).is(':checked')) {
-    //             $('#btnSubmit').attr("disabled", false);
-    //         }else if ($('#defective'+id).is(':checked')) {
     //             $('#btnSubmit').attr("disabled", false);
     //         }else{
     //             $('#btnSubmit').attr("disabled", true);  
-    //         }
-
-    //         if ($('.item_to_receive_id:checked').length == 0) {
-    //             $('#btnSubmit').attr("disabled", true); 
-    //         }
-
-    //         $('#good'+id).attr("disabled", true);
-    //         $('#good'+id).not(this).prop('checked', false); 
-
-    //         $('#defective'+id).attr("disabled", true);
-    //         $('#defective'+id).not(this).prop('checked', false); 
-           
-    //         $('#comments'+id).attr("disabled", true);
-                    
-    //     }else{
-    //         count_pick++;
-    //         if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
-    //             if ($('.good:checked').length == $('.good').length) {
-    //                 $('#btnSubmit').attr("disabled", false);
-    //             }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
-    //                 $('#btnSubmit').attr("disabled", false);
-    //             }else{
-    //                 $('#btnSubmit').attr("disabled", true);  
-    //             }
-    //         }else{
-    //             if ($('#good'+id).is(':checked').length) {
-    //                 $('#btnSubmit').attr("disabled", false);
-    //             }else{
-    //                 $('#btnSubmit').attr("disabled", true);  
-    //             }
-    //         }
-         
-    //         $('#good'+id).removeAttr("disabled");
-    //         $('#defective'+id).removeAttr("disabled");
-    //         $('#comments'+id).removeAttr("disabled");
+    //         }   
     //     }
 
     // });
@@ -575,16 +531,16 @@
 
     $('#btnSubmit').click(function(event) {
             event.preventDefault();
-            // if(!$(".item_to_receive_id").is(':checked')){
-            //     swal({
-            //         type: 'error',
-            //         title: 'Please select item to receive!',
-            //         icon: 'error',
-            //         confirmButtonColor: "#367fa9",
-            //     }); 
-            //     event.preventDefault(); // cancel default behavior
-            //     return false;
-            // }else{
+            if(!$(".item_to_receive_id").is(':checked')){
+                swal({
+                    type: 'error',
+                    title: 'Please select item to receive!',
+                    icon: 'error',
+                    confirmButtonColor: "#367fa9",
+                }); 
+                event.preventDefault(); // cancel default behavior
+                return false;
+            }else{
                 swal({
                     title: "Are you sure?",
                     type: "warning",
@@ -598,7 +554,7 @@
                         $(this).attr('disabled','disabled');
                         $('#myform').submit();                                                  
                 });
-           // }
+           }
            
         });
 

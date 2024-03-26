@@ -2,6 +2,19 @@
 @section('content')
     @push('head')
         <style type="text/css">   
+            .select2-selection__choice{
+                    font-size:14px !important;
+                    color:black !important;
+            }
+            .select2-selection__rendered {
+                line-height: 31px !important;
+            }
+            .select2-container .select2-selection--single {
+                height: 35px !important;
+            }
+            .select2-selection__arrow {
+                height: 34px !important;
+            }
             table, th, td {
             border: 1px solid rgba(000, 0, 0, .5);
             padding: 8px;
@@ -75,18 +88,34 @@
                 <div class="col-md-4">
                         <p>{{$Header->request_type}}</p>
                 </div> 
-                @if($Header->transfer_to != null)    
-                    <label class="control-label col-md-2">Purpose:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->purpose}}</p>
-                    </div>                    
-                    @else
-                    <label class="control-label col-md-2">Purpose:</label>
-                    <div class="col-md-4">
-                            <p>{{$Header->purpose}}</p>
-                    </div>
-                @endif
+               
+                <label class="control-label col-md-2">Purpose:</label>
+                <div class="col-md-4">
+                    <select id="purpose" name="purpose" class="form-select" style="width:100%;">
+                        @foreach($purposes as $res)
+                        <option value="{{ $res->description }}"
+                            {{ isset($Header->purpose) && $Header->purpose == $res->description ? 'selected' : '' }}>
+                            {{ $res->description }} 
+                        </option>>
+                        @endforeach
+                    </select>
+                </div>                    
             </div>
+            @if($Header->transfer_to != null)    
+                <div class="row">
+                    <label class="control-label col-md-2">Transfer to:</label>
+                    <div class="col-md-4">
+                        <select id="users_id" name="users_id" class="form-select" style="width:100%;">
+                            @foreach($users as $transfer)
+                            <option value="{{ $transfer->id }}"
+                                {{ isset($Header->transfer_to) && $Header->transfer_to == $transfer->id ? 'selected' : '' }}>
+                                {{ $transfer->name }} 
+                            </option>>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            @endif
 
             <hr/>
         
@@ -96,9 +125,7 @@
                         <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>Item details</b></h4></th>
                     </tr>
                     <tr>
-                        @if(in_array($Header->request_type_id, [1,5]))
-                            <th width="15%" class="text-center">Asset Code</th>
-                        @endif
+                        <th width="15%" class="text-center">Asset Code</th>
                         <th width="15%" class="text-center">Digits Code</th>
                         <th width="25%" class="text-center">{{ trans('message.table.item_description') }}</th>
                         <th width="25%" class="text-center">Asset Type</th>        
@@ -108,9 +135,7 @@
                 <tbody>
                     @foreach($return_body as $rowresult)
                         <tr>
-                            @if(in_array($Header->request_type_id, [1,5]))
-                                <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
-                            @endif
+                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
@@ -207,6 +232,7 @@
     var tableRow = 1;
     var token = $("#token").val();
     $(document).ready(function() {
+        $('#purpose,#users_id').select2();
         //Add Row
         $("#add-Row").click(function() {
             event.preventDefault();

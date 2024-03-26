@@ -17,6 +17,9 @@
             table.dataTable td.dataTables_empty {
                 text-align: center;    
             }
+            table.dataTable th {
+                text-align: center;    
+            }
             .active{
                 font-weight: bold;
                 font-size: 13px;
@@ -71,7 +74,7 @@
                 <table id='table_dashboard' class="table table-hover table-striped table-bordered">
                     <thead>
                         <tr class="active">
-                            <th>Select to Return</th>  
+                            <th><input type="checkbox" id="check_all" style="margin-left:21px"></th>  
                             <th>Arf Number</th>  
                             <th>Reference Number</th> 
                             <th>Asset Code</th>  
@@ -89,7 +92,7 @@
                         <?Php $item_count++; ?>
                             <tr>
                             <td style="text-align:center">
-                              <input type="checkbox" name="mo_id[]" id="mo_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$res->mo_id}}"/>
+                              <input type="checkbox" name="mo_id[]" id="mo_id{{$tableRow1}}" class="checkboxid" required data-id="{{$tableRow1}}" value="{{$res->mo_id}}"/>
                               <input type="hidden" name="request_type_id[]" id="request_type_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$res->request_type_id}}"/>
                               <input type="hidden" name="location_id" id="location_id{{$tableRow1}}" class="id" required data-id="{{$tableRow1}}" value="{{$stores->id}}"/>
                             </td>
@@ -141,6 +144,14 @@ var table;
     table = $("#table_dashboard").DataTable({
         ordering:false,
         pageLength:100,
+    });
+    $('#check_all').change(function() {
+        if(this.checked) {
+            $(".checkboxid").prop("checked", true);
+        }
+        else{
+            $(".checkboxid").prop("checked", false);
+        }
     });
     $("#btnSubmit").click(function(event) {
         var Ids = [];

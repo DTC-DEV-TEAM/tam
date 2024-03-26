@@ -320,7 +320,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
-        
+	
 			$selectedItem       = $fields['item_to_receive_id'];
 			$selectedItem_array = array();
 			foreach($selectedItem as $select){
@@ -402,14 +402,15 @@
 						'transacted_date' => date('Y-m-d H:i:s')
 					]);	
 				}
-				
+			
 				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
 				->update([
 					'statuses_id'        => 3,
 					'deployed_to'        => $employee_name->bill_to,
 					'deployed_to_id'     => NULL
 				]);
-		
+				
+				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>0]);
 				MoveOrder::create([
 					'status_id'           => 13,
 					'mo_reference_number' => $arf_header->reference_no,

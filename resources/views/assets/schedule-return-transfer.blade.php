@@ -149,9 +149,7 @@
                     </tr>
                     <tr>
                         <th width="20%" class="text-center">{{ trans('message.form-label.reference') }}</th>
-                        @if(in_array($Header->request_type_id, [1,5]))
-                            <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
-                        @endif
+                        <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                         <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                         <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
                         <th width="25%" class="text-center">Asset Type</th>                                                        
@@ -162,9 +160,7 @@
                         <tr>
                             <input type="hidden" value="{{$rowresult->mo_id}}" name="mo_id[]">
                             <td style="text-align:center" height="10">{{$rowresult->reference_no}}</td>
-                            @if(in_array($Header->request_type_id, [1,5]))
-                                <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
-                            @endif
+                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>

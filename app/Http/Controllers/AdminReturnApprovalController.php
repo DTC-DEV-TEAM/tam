@@ -214,7 +214,7 @@
 			$selectedItemlist = array_map('intval',explode(",",$selectedItem_string));
 
 			$getSelectedItemList = DB::table('return_transfer_assets')->whereIn('id',$selectedItemlist)->get();
-
+	
 			//MO ID, Item ID
 			$mo_id       = [];
 			$item_id     = [];
@@ -280,14 +280,12 @@
 					if($arf_header->request_type_id == 1){
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
 						->update([
-							'statuses_id'=> 			23,
 							'item_condition'=> 			"Defective"
 						]);
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);
 					}else{
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
 						->update([
-							'statuses_id'=> 			23,
 							'item_condition'=> 			"Defective"
 						]);
 						DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)->update(['quantity'=>1]);

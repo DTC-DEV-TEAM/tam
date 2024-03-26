@@ -422,10 +422,11 @@
 					]);	
 				}
 				
-				if($arf_header->request_type_id == 1){
+				$isDefective = DB::table('assets_inventory_body')->where(['id' => $finalinventory_id[$x]])->first();
+				if($isDefective->item_condition == "Defective"){
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
 					->update([
-						'statuses_id'=> 			6,
+						'statuses_id'=> 			23,
 						'deployed_to'=> 			NULL,
 						'deployed_to_id'=> 			NULL
 					]);

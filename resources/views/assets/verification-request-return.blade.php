@@ -134,13 +134,11 @@
                         <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>Item details</b></h4></th>
                     </tr>
                     <tr>
-                        <th width="10%" class="text-center">Item to Receive <br> <span>Check All <br> <input type="checkbox" id="check_all"> </span></th> 
+                        {{-- <th width="10%" class="text-center">Item to Receive <br> <span>Check All <br> <input type="checkbox" id="check_all"> </span></th>  --}}
                         <th width="5%" class="text-center">Good</th> 
                         <th width="5%" class="text-center">Defective</th>
                         <th width="10%" class="text-center">Reference No</th>
-                        @if(in_array($Header->request_type_id, [1,5]))
-                            <th width="7%" class="text-center">Asset Code</th>
-                        @endif
+                        <th width="7%" class="text-center">Asset Code</th>
                         <th width="7%" class="text-center">Digits Code</th>
                         <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>  
                         {{-- @if(!in_array($Header->request_type_id, [1,5]))
@@ -160,9 +158,10 @@
                     <?php $tableRow1++; ?>
                     <?Php $item_count++; ?>
                         <tr>
-                            <td style="text-align:center" height="10">
+                            {{-- <td style="text-align:center" height="10">
                                 <input type="checkbox" name="item_to_receive_id[]" id="item_to_receive_id{{$tableRow1}}" class="item_to_receive_id" required data-id="{{$tableRow1}}" value="{{$rowresult->body_id}}"/>
-                            </td>
+                            </td> --}}
+                            <input type="hidden" value="{{$rowresult->body_id}}" name="item_to_receive_id[]">
                             <td style="text-align:center" height="10">
                                 <input type="hidden" value="{{$rowresult->id}}" name="item_id[]">
                                 <input type="hidden" value="{{$rowresult->mo_id}}" name="mo_id[]">
@@ -177,9 +176,7 @@
                             <input type="checkbox" name="defective[]" id="defective{{$tableRow1}}" class="defective" required data-id="{{$tableRow1}}"  value="{{$rowresult->asset_code}}"/>
                             </td>
                             <td style="text-align:center" height="10">{{$rowresult->reference_no}}</td>
-                            @if(in_array($Header->request_type_id, [1,5]))
-                                <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
-                            @endif
+                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             {{-- @if(!in_array($Header->request_type_id, [1,5]))
@@ -275,76 +272,74 @@
     };
     setTimeout("preventBack()", 0);
    
-    setTimeout("preventBack()", 0);
-
     $('#btnSubmit').attr("disabled", true);
-    $('.good').attr("disabled", true);
-    $('.defective').attr("disabled", true);
+    // $('.good').attr("disabled", true);
+    // $('.defective').attr("disabled", true);
     $('.comments').attr("disabled", true);
     var count_pick = 0;
     //ITEM TO SELECT
-    $('.item_to_receive_id').change(function() {
-        var asset_code = $(this).val();
-        var id = $(this).attr("data-id");
-        $("#defective_text"+id).val("0");
-        var ischecked= $(this).is(':checked');
-        if(ischecked == false){
-            count_pick--;
+    // $('.item_to_receive_id').change(function() {
+    //     var asset_code = $(this).val();
+    //     var id = $(this).attr("data-id");
+    //     $("#defective_text"+id).val("0");
+    //     var ischecked= $(this).is(':checked');
+    //     if(ischecked == false){
+    //         count_pick--;
            
-            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
-                if ($('.good:checked').length == $('.good').length) {
-                    $('#btnSubmit').attr("disabled", false);
-                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
-                    $('#btnSubmit').attr("disabled", false);
-                }else{
-                    $('#btnSubmit').attr("disabled", true);  
-                }
-            }
+    //         if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+    //             if ($('.good:checked').length == $('.good').length) {
+    //                 $('#btnSubmit').attr("disabled", false);
+    //             }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+    //                 $('#btnSubmit').attr("disabled", false);
+    //             }else{
+    //                 $('#btnSubmit').attr("disabled", true);  
+    //             }
+    //         }
 
-            if ($('#good'+id).is(':checked')) {
-                $('#btnSubmit').attr("disabled", false);
-            }else if ($('#defective'+id).is(':checked')) {
-                $('#btnSubmit').attr("disabled", false);
-            }else{
-                $('#btnSubmit').attr("disabled", true);  
-            }
+    //         if ($('#good'+id).is(':checked')) {
+    //             $('#btnSubmit').attr("disabled", false);
+    //         }else if ($('#defective'+id).is(':checked')) {
+    //             $('#btnSubmit').attr("disabled", false);
+    //         }else{
+    //             $('#btnSubmit').attr("disabled", true);  
+    //         }
 
-            if ($('.item_to_receive_id:checked').length == 0) {
-                $('#btnSubmit').attr("disabled", true); 
-            }
+    //         if ($('.item_to_receive_id:checked').length == 0) {
+    //             $('#btnSubmit').attr("disabled", true); 
+    //         }
 
-            $('#good'+id).attr("disabled", true);
-            $('#good'+id).not(this).prop('checked', false); 
+    //         $('#good'+id).attr("disabled", true);
+    //         $('#good'+id).not(this).prop('checked', false); 
 
-            $('#defective'+id).attr("disabled", true);
-            $('#defective'+id).not(this).prop('checked', false); 
+    //         $('#defective'+id).attr("disabled", true);
+    //         $('#defective'+id).not(this).prop('checked', false); 
            
-            $('#comments'+id).attr("disabled", true);
+    //         $('#comments'+id).attr("disabled", true);
                     
-        }else{
-            count_pick++;
-            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
-                if ($('.good:checked').length == $('.good').length) {
-                    $('#btnSubmit').attr("disabled", false);
-                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
-                    $('#btnSubmit').attr("disabled", false);
-                }else{
-                    $('#btnSubmit').attr("disabled", true);  
-                }
-            }else{
-                if ($('#good'+id).is(':checked').length) {
-                    $('#btnSubmit').attr("disabled", false);
-                }else{
-                    $('#btnSubmit').attr("disabled", true);  
-                }
-            }
+    //     }else{
+    //         count_pick++;
+    //         if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+    //             if ($('.good:checked').length == $('.good').length) {
+    //                 $('#btnSubmit').attr("disabled", false);
+    //             }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+    //                 $('#btnSubmit').attr("disabled", false);
+    //             }else{
+    //                 $('#btnSubmit').attr("disabled", true);  
+    //             }
+    //         }else{
+    //             if ($('#good'+id).is(':checked').length) {
+    //                 $('#btnSubmit').attr("disabled", false);
+    //             }else{
+    //                 $('#btnSubmit').attr("disabled", true);  
+    //             }
+    //         }
          
-            $('#good'+id).removeAttr("disabled");
-            $('#defective'+id).removeAttr("disabled");
-            $('#comments'+id).removeAttr("disabled");
-        }
+    //         $('#good'+id).removeAttr("disabled");
+    //         $('#defective'+id).removeAttr("disabled");
+    //         $('#comments'+id).removeAttr("disabled");
+    //     }
 
-    });
+    // });
 
     var a = 0;
     var alreadyAdded = [];
@@ -356,78 +351,79 @@
         if(ischecked == false){
             $(".comment_div").html("");
             $("#good_text"+id).val("0");
+            $('#comments'+id).attr("disabled", true);
             count_pick--;
 
-            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+            //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                 if ($('.good:checked').length == $('.good').length) {
                     $('#btnSubmit').attr("disabled", false);
-                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                }else if($('#asset-items tbody tr').length - 2 == $('.good:checked').length + $('.defective:checked').length){
                     $('#btnSubmit').attr("disabled", false);
                 }else{
                     $('#btnSubmit').attr("disabled", true);  
                 }
-            }else{
-                if(count_pick == 0){
-                    $('#btnSubmit').attr("disabled", true);
-                }   
-                $('#btnSubmit').attr("disabled", true);  
-            }
-             
+            // }else{
+            //     if(count_pick == 0){
+            //         $('#btnSubmit').attr("disabled", true);
+            //     }   
+            //     $('#btnSubmit').attr("disabled", true);  
+            // }
+            console.log($('.item_to_receive_id:checked').length, $('.item_to_receive_id').length);
         }else{
             $("#good_text"+id).val("1");
             $('#defective'+id).not(this).prop('checked', false); 
+            $('#comments'+id).removeAttr("disabled");
             $.ajax({
-            url: "{{ route('assets.get.comments') }}",
-            dataType: "json",
-            type: "POST",
-            data: {
-                "asset_code": asset_code
-            },
-            success: function (data) {
-                var json = JSON.parse(JSON.stringify(data.items));
-                if(data.items != null){
-                    $.each(json, function (index, item) { 
-                            var row = '<span class="text-comment" id="text-comment-id'+id+'">' + 
-                                    '<p style="margin-top:5px"><strong>' + item.asset_code + 
-                                    ':</strong>' + item.comments + 
-                                    '</p>' + 
-                                    '<p style="text-align:right; font-size:10px; font-style: italic; border-bottom:1px solid #d2d6de">' + item.created_at + 
-                                    '</p></span>'
-                                    ;
-                    $(".comment_div").append(row);
-                }); 
+                url: "{{ route('assets.get.comments') }}",
+                dataType: "json",
+                type: "POST",
+                data: {
+                    "asset_code": asset_code
+                },
+                success: function (data) {
+                    var json = JSON.parse(JSON.stringify(data.items));
+                    if(data.items != null){
+                        $.each(json, function (index, item) { 
+                                var row = '<span class="text-comment" id="text-comment-id'+id+'">' + 
+                                        '<p style="margin-top:5px"><strong>' + item.asset_code + 
+                                        ':</strong>' + item.comments + 
+                                        '</p>' + 
+                                        '<p style="text-align:right; font-size:10px; font-style: italic; border-bottom:1px solid #d2d6de">' + item.created_at + 
+                                        '</p></span>'
+                                        ;
+                        $(".comment_div").append(row);
+                    }); 
+                    }
+                    
+                    
                 }
-                
-                
-            }
-        });
+            });
             $("#good_text"+id).val("1");
             //$("#defective"+id).val("1");
             count_pick++;
-            if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+            // if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                 if ($('.good:checked').length == $('.good').length) {
                     $('#btnSubmit').attr("disabled", false);
-                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
+                }else if($('#asset-items tbody tr').length - 2 == $('.good:checked').length + $('.defective:checked').length){
                     $('#btnSubmit').attr("disabled", false);
                 }else{
                     $('#btnSubmit').attr("disabled", true);  
                 }
-            }else{
-                if ($('.good:checked').length == $('.good').length) {
-                    $('#btnSubmit').attr("disabled", false);
-                }else if($('.item_to_receive_id:checked').length == $('.good:checked').length + $('.defective:checked').length){
-                    $('#btnSubmit').attr("disabled", false);
-                }else{
-                    $('#btnSubmit').attr("disabled", true);  
-                } 
-            }
+            // }else{
+            //     if ($('.good:checked').length == $('.good').length) {
+            //         $('#btnSubmit').attr("disabled", false);
+            //     }else if($('#asset-items tbody tr').length -2 == $('.good:checked').length + $('.defective:checked').length){
+            //         $('#btnSubmit').attr("disabled", false);
+            //     }else{
+            //         $('#btnSubmit').attr("disabled", true);  
+            //     } 
+            // }
             //$('#btnSubmit').attr("disabled", false);
             
             
         }
 
     });
-
 
     $('.defective').change(function() {
         // $('.good').not(this).prop('checked', false);    
@@ -439,26 +435,28 @@
                 //$("#good"+id).val("0");
                 $(".comment_div").html("");
                 $("#defective_text"+id).val("0");
+                $('#comments'+id).attr("disabled", true);
                 count_pick--;
 
-                if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                     if ($('.defective:checked').length == $('.defective').length) {
                         $('#btnSubmit').attr("disabled", false);
-                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                    }else if($('#asset-items tbody tr').length - 2 == $('.defective:checked').length + $('.good:checked').length){
                         $('#btnSubmit').attr("disabled", false);
                     }else{
                         $('#btnSubmit').attr("disabled", true);  
                     }
-                }else{
-                    if(count_pick == 0){
-                        $('#btnSubmit').attr("disabled", true);
-                    }   
-                    $('#btnSubmit').attr("disabled", true);  
-                }    
+                // }else{
+                //     if(count_pick == 0){
+                //         $('#btnSubmit').attr("disabled", true);
+                //     }   
+                //     $('#btnSubmit').attr("disabled", true);  
+                // }    
         
             }else{
                 $("#defective_text"+id).val("1");
                 $('#good'+id).not(this).prop('checked', false); 
+                $('#comments'+id).removeAttr("disabled");
                 $.ajax({
                 url: "{{ route('assets.get.comments') }}",
                 dataType: "json",
@@ -490,23 +488,23 @@
 
                 count_pick++;
 
-                if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
+                //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                     if ($('.defective:checked').length == $('.defective').length) {
                         $('#btnSubmit').attr("disabled", false);
-                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                    }else if($('#asset-items tbody tr').length - 2 == $('.defective:checked').length + $('.good:checked').length){
                         $('#btnSubmit').attr("disabled", false);
                     }else{
                         $('#btnSubmit').attr("disabled", true);  
                     }
-                }else{ 
-                    if ($('.good:checked').length == $('.good').length) {
-                        $('#btnSubmit').attr("disabled", false);
-                    }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
-                        $('#btnSubmit').attr("disabled", false);
-                    }else{
-                        $('#btnSubmit').attr("disabled", true);  
-                    } 
-                }    
+                // }else{ 
+                //     if ($('.good:checked').length == $('.good').length) {
+                //         $('#btnSubmit').attr("disabled", false);
+                //     }else if($('.item_to_receive_id:checked').length == $('.defective:checked').length + $('.good:checked').length){
+                //         $('#btnSubmit').attr("disabled", false);
+                //     }else{
+                //         $('#btnSubmit').attr("disabled", true);  
+                //     } 
+                // }    
                 
                 
             }
