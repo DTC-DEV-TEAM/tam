@@ -95,50 +95,57 @@
 
         <div class='panel-body'>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label require">{{ trans('message.form-label.employee_name') }}</label>          
-                        <input type="text" class="form-control finput"  id="employee_name" name="employee_name"  required readonly value="{{$employeeinfos->bill_to}}"> 
-                    </div>
+            <div class="row">                           
+                <label class="control-label col-md-2">{{ trans('message.form-label.reference_number') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->reference_number}}</p>
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label require">{{ trans('message.form-label.company_name') }}</label>
-                        <input type="text" class="form-control finput"  id="company_name" name="company_name"  required readonly value="{{$employeeinfos->company_name_id}}">                                   
-                    </div>
+                <label class="control-label col-md-2">{{ trans('message.form-label.created_at') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->created}}</p>
                 </div>
+
+
             </div>
 
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label require">{{ trans('message.form-label.department') }}</label>
-                        <input type="text" class="form-control finput"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}">
-                    </div>
-
+            <div class="row">                           
+                <label class="control-label col-md-2">{{ trans('message.form-label.employee_name') }}:</label>
+                <div class="col-md-4">
+                   @if($Header->header_created_by != null || $Header->header_created_by != "")
+                        <p>{{$Header->employee_name}}</p>
+                    @else
+                    <p>{{$Header->header_emp_name}}</p>
+                    @endif
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label require">{{ trans('message.form-label.position') }}</label>
-                        <input type="text" class="form-control finput"  id="position" name="position"  required readonly value="{{$employeeinfos->position_id}}">                                   
-                    </div>
+                <label class="control-label col-md-2">{{ trans('message.form-label.company_name') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->company_name}}</p>
                 </div>
             </div>
 
-            @if(CRUDBooster::myPrivilegeId() == 8)
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label require">{{ trans('message.form-label.store_branch') }}</label>
-                            
-                            <input type="text" class="form-control finput"  id="store_branch" name="store_branch"  required readonly value="{{$stores->store_name}}"> 
-                            <input type="hidden" class="form-control"  id="store_branch_id" name="store_branch_id"  required readonly value="{{$stores->id}}"> 
+            <div class="row">                           
 
-                        </div>
+
+                <label class="control-label col-md-2">{{ trans('message.form-label.department') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->department}}</p>
+                </div>
+
+                <label class="control-label col-md-2">{{ trans('message.form-label.position') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->position}}</p>
+                </div>
+
+            </div>
+
+            @if(CRUDBooster::myPrivilegeId() == 8 || CRUDBooster::isSuperadmin())
+                <div class="row">                           
+                    <label class="control-label col-md-2">{{ trans('message.form-label.store_branch') }}:</label>
+                    <div class="col-md-4">
+                            <p>{{$Header->store_branch}}</p>
                     </div>
                 </div>
             @endif
@@ -146,21 +153,13 @@
 
             <div class="row"> 
                 <label class="require control-label col-md-2"><span style="color:red">*</span>{{ trans('message.form-label.purpose') }}</label>
-                    @foreach($purposes as $data)
-                    
-                        @if($data->id == 1)
-                                    <div class="col-md-5">
-                                        <label class="radio-inline control-label col-md-5" ><input type="radio" required   class="purpose" name="purpose" value="{{$data->id}}" >{{$data->request_description}}</label>
-                                        <br>
-                                    </div>
-                            @else
-                                    <div class="col-md-5">
-                                        <label class="radio-inline control-label col-md-5"><input type="radio" required  class="purpose" name="purpose" value="{{$data->id}}" >{{$data->request_description}}</label>
-                                        <br>
-                                    </div>
-                        @endif
-
-                    @endforeach
+                @foreach($purposes as $data)
+                    <div class="col-md-5">
+                        <label class="radio-inline control-label col-md-5"><input type="radio" required  class="purpose" name="purpose" value="{{$data->id}}" {{ ($Header->purpose == $data->id) ? "checked" : ""}}>{{$data->request_description}}</label>
+             
+                        <br>
+                    </div>
+                @endforeach
             </div>
 
             <hr/>
@@ -172,7 +171,7 @@
                             <div class="pic-container">
                                 <div class="pic-row">
                                     <table id="asset-items">
-                                        <tbody id="bodyTable">
+                                        <thead>
                                             <tr style="background-color:#00a65a; border: 0.5px solid #000;">
                                                 <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
                                             </tr>
@@ -187,19 +186,28 @@
                                                 <th width="15%" class="text-center">{{ trans('message.table.budget_range') }}</th> 
                                                 <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
                                             </tr>
-
-                                            <tr id="tr-table">
+                                        </thead>
+                                            
+                                        <tbody id="bodyTable">
+                                            @foreach($Body as $rowresult)
                                                 <tr>
-                                
+                                                    <td style="text-align:center" height="10">{{$rowresult->item_description}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->category_id}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->sub_category_id}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->wh_qty}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->unserved_qty}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->quantity}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->budget_range}}</td>
+                                                    <th></th>
                                                 </tr>
-                                            </tr>
-                                        
+                                            @endforeach
                                         </tbody>
 
                                         <tfoot>
                                             <tr id="tr-table1" class="bottom">
                                                 <td colspan="6">
-                                                    <a type="button" id="add-Row" name="add-Row" class="btn btn-success add"> <i class="fa fa-plus-circle"></i> Add Item</a>
+                                                    <a type="button" id="add-Row" name="add-Row" class="btn btn-success add"> <i class="fa fa-plus-circle"></i> Add new item</a>
                                                 </td>
                                                 <td align="left" colspan="1">
                                                     <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
@@ -214,8 +222,6 @@
                     
                         </div>
                     </div>
-                    <br>
-                    <label class="checkbox-inline mt-2 control-label col-md-12"><input type="checkbox" id="checkApplications"> <span style="font-style: italic"> Applications for Laptop or Desktop</span></label>      
                 </div>
 
                 <div class="col-md-12 mt-2" id="application_div">
@@ -223,12 +229,12 @@
                     
                     <div class="row"> 
                         <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
-                            @foreach($applications as $data)
-                                <div class="col-md-2">
-                                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" >{{$data->app_name}}</label>
-                                    <br>
-                                </div>
-                            @endforeach
+                        @foreach($applications as $key => $data)
+                            <div class="col-md-2">
+                                <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
+                                <br>
+                            </div>             
+                        @endforeach
                     </div>
                     <hr/>
                 </div>
@@ -246,7 +252,7 @@
                 <div class="col-md-12" style="margin-top: 10px">
                     <div class="form-group">
                         <label>{{ trans('message.table.note') }}</label>
-                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="requestor_comments"></textarea>
+                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="requestor_comments">{{ $Header->requestor_comments }}</textarea>
                     </div>
                 </div>
             </div>
@@ -260,23 +266,13 @@
         </div>
 
         <div class='panel-footer'>
-
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-
-            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
-
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.update') }}</button>
         </div>
-
     </form>
-
-
 </div>
 
-
-
 @endsection
-
-
 @push('bottom')
     <script type="text/javascript">
         $(function(){
@@ -289,8 +285,199 @@
             null;
         };
         setTimeout("preventBack()", 0);
-        
         var tableRow = 1;
+        $("#application_others_div").hide();
+        $("#application_others").removeAttr('required');
+    
+
+        $('#OTHERS').change(function() {
+		    var ischecked= $(this).is(':checked');
+		    if(ischecked == false){
+                $("#application_others_div").hide();
+                $("#application_others").removeAttr('required');
+		    }else{
+                $("#application_others_div").show();
+                $("#application_others").attr('required', 'required');
+            }	
+		});
+
+        $('#checkApplications').change(function() {
+            if(this.checked) {
+                $("#application_div").show();
+            }else{
+                $("#application_div").hide();
+                $("#application_others_div").hide();
+                $(".application").prop('checked', false);
+                $(".application_others").prop('checked', false);
+                $("#application_others").removeAttr('required');
+            }
+        });
+
+        $("#add-Row").click(function() {
+            event.preventDefault();
+            var count_fail = 0;
+            tableRow++;
+
+            if(count_fail == 0){
+                $('#add-Row').prop("disabled", false);
+                $('#display_error').html("");
+                addRow();
+            }
+        });
+
+        function addRow(){
+            $('.digits_code').each(function() {
+                digits_code = $(this).val();
+                if (digits_code == null || digits_code == "") {
+                    swal({  
+                        type: 'error',
+                        title: 'Please fill all Fields!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    count_fail++;
+
+                }else{
+                    count_fail = 0;
+                }
+            });
+            $('.item_description').each(function() {
+                item_description = $(this).val();
+                if (item_description == null || item_description == "") {
+                    swal({  
+                        type: 'error',
+                        title: 'Please fill all Fields!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    count_fail++;
+
+                }else{
+                    count_fail = 0;
+                }
+            });
+            $('.asset_type').each(function() {
+                asset_type = $(this).val();
+                if (asset_type == null || asset_type == "") {
+                    swal({  
+                        type: 'error',
+                        title: 'Please fill all Fields!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    });
+                    count_fail++;
+
+                }else{
+                    count_fail = 0;
+                }
+            });
+            var newrow =
+                `<tr>
+                    <td>
+                        <input type="text" placeholder="Search item" class="form-control search_asset_code text-center" data-id="${tableRow}" id="search_asset_code${tableRow}"  name="asset_code[]" required maxlength="100">
+                        <input type="hidden" name="mo_id[]" id="mo_id${tableRow}" class="id" required data-id="${tableRow}"/>
+                            <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display:none; top: 60px; left: 15px; width: 100%;">
+                                <li>Loading...</li>
+                            </ul>
+                    </td>   
+                    <td>
+                        <input type="text" placeholder="Digits code" class="form-control digits_code text-center" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]" readonly>
+                    </td>  
+                    <td>
+                        <input type="text" placeholder="Item description" class="form-control item_description text-center" data-id="${tableRow}" id="item_description${tableRow}"  name="item_description[]" readonly>
+                    </td>   
+                    <td>
+                        <input type="text" placeholder="Asset type" class="form-control asset_type text-center" data-id="${tableRow}" id="asset_type${tableRow}"  name="asset_type[]" readonly>
+                    </td> 
+                    <td style="text-align:center">
+                        <button id="deleteRow" name="removeRow" data-id="${tableRow}" class="btn btn-danger btn-sm removeRow" ><i class="glyphicon glyphicon-trash"></i></button>
+                    </td>
+                </tr>`;
+            $('#asset-items tbody').append(newrow);
+            
+            //Search item
+            let countrow = 1;
+            
+            $(function(){
+                countrow++;
+                $('#search_asset_code'+tableRow).autocomplete({
+                    source: function (request, response) {
+                    $.ajax({
+                        url: "{{ route('searchItem') }}",
+                        dataType: "json",
+                        type: "POST",
+                        data: {
+                            "_token": token,
+                            "search": request.term
+                        },
+                        success: function (data) {
+                        
+                            if(data.items === null){
+                                swal({  
+                                    type: 'error',
+                                    title: 'No Found Item',
+                                    icon: 'error',
+                                    confirmButtonColor: "#5cb85c",
+                                });
+                            }else{ 
+                                if (data.status_no == 1) {
+                                    var data = data.items;
+                                    $('#ui-id-2'+tableRow).css('display', 'none');
+                                    response($.map(data, function (item) {
+                                        return {
+                                            id:                 item.id,
+                                            asset_code:         item.asset_code,
+                                            digits_code:        item.digits_code,
+                                            value:              item.item_description,
+                                            asset_type:         item.asset_type
+                                        }
+
+                                    }));
+
+                                } else {
+                                    $('.ui-menu-item').remove();
+                                    $('.addedLi').remove();
+                                    $("#ui-id-2"+tableRow).append($("<li class='addedLi'>").text(data.message));
+                                    var searchVal = $('#search_asset_code'+tableRow).val();
+                                    if (searchVal.length > 0) {
+                                        $("#ui-id-2"+tableRow).css('display', 'block');
+                                    } else {
+                                        $("#ui-id-2"+tableRow).css('display', 'none');
+                                    }
+                                }
+                            }
+                        }
+                    })
+                    },
+                    select: function (event, ui) {
+                        var e = ui.item;
+                        if (e.id) {
+                            $("#search_asset_code"+$(this).attr("data-id")).val(e.asset_code);
+                            $('#search_asset_code'+$(this).attr("data-id")).attr('readonly','readonly');
+                            $('#mo_id'+$(this).attr("data-id")).val(e.id);
+                            $('#digits_code'+$(this).attr("data-id")).val(e.digits_code);
+                            $('#item_description'+$(this).attr("data-id")).val(e.value);
+                            $('#asset_type'+$(this).attr("data-id")).val(e.asset_type);
+                            return false;
+
+                        }
+                    },
+
+                    minLength: 1,
+                    autoFocus: true
+                });
+
+            });
+        }
+
+        //deleteRow
+        $(document).on('click', '.removeRow', function() {
+            if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
+                tableRow--;
+                $(this).closest('tr').remove();
+                return false;
+            }
+        });
 
     </script>
 @endpush

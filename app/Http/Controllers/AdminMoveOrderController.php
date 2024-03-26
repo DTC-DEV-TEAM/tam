@@ -1449,7 +1449,7 @@
 			}
 			
 
-			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,4])->get();
+			$data['locations'] = WarehouseLocationModel::select('*')->whereNotIn('id',[1,3,4])->get();
 		
 			$data['ARFHeader'] .= '
 				<hr/>

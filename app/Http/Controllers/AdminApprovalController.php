@@ -535,6 +535,8 @@
 			$rejected       =  DB::table('statuses')->where('id', 5)->value('id');
 			$for_tagging    =  DB::table('statuses')->where('id', 7)->value('id');
 			$for_move_order =  DB::table('statuses')->where('id', 14)->value('id');
+			$returnForApproval =  DB::table('statuses')->where('id', self::returnForApproval)->value('id');
+			
 
 			if($arf_header->status_id  == $approved){
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_approve_success",['reference_number'=>$arf_header->reference_number]), 'info');
@@ -542,6 +544,8 @@
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_approve_success",['reference_number'=>$arf_header->reference_number]), 'info');
 			}elseif($arf_header->status_id  == $for_move_order){
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_approve_success",['reference_number'=>$arf_header->reference_number]), 'info');
+			}elseif($arf_header->status_id  == $returnForApproval){
+				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_request_assets_return",['reference_number'=>$arf_header->reference_number]), 'info');
 			}else{
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_petty_cash_reject_success",['reference_number'=>$arf_header->reference_number]), 'danger');
 			}

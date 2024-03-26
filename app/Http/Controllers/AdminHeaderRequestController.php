@@ -956,12 +956,25 @@
 
 			$data = [];
 			$data['page_title'] = 'Edit Assets Request';
+			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
+			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
+			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['employeeinfos'] = Users::user($data['user']->id);
+			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
+			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
+			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
+			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
+			$data['budget_range'] = DB::table('sub_masterfile_budget_range')->where('status', 'ACTIVE')->get();
 			$data['Header'] = HeaderRequest::header($id);
 			$data['Body'] = BodyRequest::select('body_request.*')->where('body_request.header_request_id', $id)->get();
 			
 			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+			$applicationsExplode = explode(",",$data['Header']->application);
+			$data['applicationsExplode'] = array_map('trim', $applicationsExplode);
+			// dd($data['purposes'],$data['Header']->purpose);
 			return $this->view("assets.edit-requisition", $data);
 		}
 
