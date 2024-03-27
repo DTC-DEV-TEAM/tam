@@ -50,7 +50,7 @@
                 background-color: #f5f5f5 !important;
             }
 
-            ::-webkit-input-placeholder {
+            /* ::-webkit-input-placeholder {
             font-style: italic;
             }
             :-moz-placeholder {
@@ -61,7 +61,7 @@
             }
             :-ms-input-placeholder {  
             font-style: italic; 
-            }
+            } */
 
             .ui-state-focus {
                 background: none !important;
@@ -86,13 +86,13 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Fill up IT asset form
+        Edit request form
     </div>
 
-    <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetRequest" enctype="multipart/form-data">
+    <form action="{{ route('editRequestAssets')}}" method="POST" id="EditAssetRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
-
+        <input type="hidden" value="{{$Header->requestid}}" name="headerID" id="headerID">
         <div class='panel-body'>
 
             <div class="row">                           
@@ -197,9 +197,11 @@
                                                     <td style="text-align:center" height="10">{{$rowresult->sub_category_id}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->wh_qty}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->unserved_qty}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->quantity}}</td>
+                                                    <td style="text-align:center" height="10" class="qty">{{$rowresult->quantity}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->budget_range}}</td>
-                                                    <th></th>
+                                                    <td style="text-align:center" height="10">
+                                                        <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
+                                                    </td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -210,7 +212,7 @@
                                                     <a type="button" id="add-Row" name="add-Row" class="btn btn-success add"> <i class="fa fa-plus-circle"></i> Add new item</a>
                                                 </td>
                                                 <td align="left" colspan="1">
-                                                    <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
+                                                    <input type="text" name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
                                                 </td>
                                                 <td colspan="2"></td>
                                             </tr>
@@ -277,6 +279,7 @@
     <script type="text/javascript">
         $(function(){
             $('body').addClass("sidebar-collapse");
+            $('#quantity_total').val(calculateTotalQuantity());
         });
         function preventBack() {
             window.history.forward();
@@ -285,6 +288,7 @@
             null;
         };
         setTimeout("preventBack()", 0);
+        var token = $("#token").val();
         var tableRow = 1;
         $("#application_others_div").hide();
         $("#application_others").removeAttr('required');
@@ -322,6 +326,7 @@
                 $('#add-Row').prop("disabled", false);
                 $('#display_error').html("");
                 addRow();
+                $('#quantity_total').val(calculateTotalQuantity());
             }
         });
 
@@ -374,36 +379,50 @@
             var newrow =
                 `<tr>
                     <td>
-                        <input type="text" placeholder="Search item" class="form-control search_asset_code text-center" data-id="${tableRow}" id="search_asset_code${tableRow}"  name="asset_code[]" required maxlength="100">
+                        <input type="text" placeholder="Search item" class="form-control itemDesc text-center" data-id="${tableRow}" id="itemDesc${tableRow}"  name="asset_code[]" required maxlength="100">
                         <input type="hidden" name="mo_id[]" id="mo_id${tableRow}" class="id" required data-id="${tableRow}"/>
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display:none; top: 60px; left: 15px; width: 100%;">
                                 <li>Loading...</li>
                             </ul>
                     </td>   
                     <td>
-                        <input type="text" placeholder="Digits code" class="form-control digits_code text-center" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]" readonly>
+                        <input type="text" placeholder="Item code" class="form-control digits_code text-center" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]" readonly>
                     </td>  
                     <td>
-                        <input type="text" placeholder="Item description" class="form-control item_description text-center" data-id="${tableRow}" id="item_description${tableRow}"  name="item_description[]" readonly>
+                        <input type="text" placeholder="Catrgory" class="form-control category text-center" data-id="${tableRow}" id="category${tableRow}"  name="category[]" readonly>
                     </td>   
                     <td>
-                        <input type="text" placeholder="Asset type" class="form-control asset_type text-center" data-id="${tableRow}" id="asset_type${tableRow}"  name="asset_type[]" readonly>
+                        <input type="text" placeholder="Sub category" class="form-control sub_category text-center" data-id="${tableRow}" id="sub_category${tableRow}"  name="sub_category[]" readonly>
+                    </td> 
+             
+                    <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
+                        
+                    <td><input class="form-control text-center sinput unserved_quantity" type="text" required name="unserved_quantity[]" id="unserved_quantity${tableRow}" data-id="${tableRow}" readonly></td>    
+                    
+                    <td class="qty text-center">1</td> 
+                    <td> 
+                        <select selected data-placeholder="Choose" class="form-control budget" name="budget_range[]" id="budget${tableRow}" required required style="width:100%"> 
+                            <option value=""></option> 
+                            @foreach($budget_range as $data)
+                                <option value="{{$data->description}}">{{$data->description}}</option>
+                            @endforeach
+                        </select>
                     </td> 
                     <td style="text-align:center">
                         <button id="deleteRow" name="removeRow" data-id="${tableRow}" class="btn btn-danger btn-sm removeRow" ><i class="glyphicon glyphicon-trash"></i></button>
                     </td>
                 </tr>`;
             $('#asset-items tbody').append(newrow);
-            
+            $('#budget'+tableRow).select2();
             //Search item
             let countrow = 1;
             
             $(function(){
                 countrow++;
-                $('#search_asset_code'+tableRow).autocomplete({
+                $('#itemDesc'+tableRow).autocomplete({
                     source: function (request, response) {
                     $.ajax({
-                        url: "{{ route('searchItem') }}",
+                        url: "{{ route('item.it.search') }}",
                         dataType: "json",
                         type: "POST",
                         data: {
@@ -425,11 +444,17 @@
                                     $('#ui-id-2'+tableRow).css('display', 'none');
                                     response($.map(data, function (item) {
                                         return {
-                                            id:                 item.id,
-                                            asset_code:         item.asset_code,
-                                            digits_code:        item.digits_code,
-                                            value:              item.item_description,
-                                            asset_type:         item.asset_type
+                                            id:                         item.id,
+                                            asset_code:                 item.asset_code,
+                                            digits_code:                item.digits_code,
+                                            asset_tag:                  item.asset_tag,
+                                            serial_no:                  item.serial_no,
+                                            value:                      item.item_description,
+                                            category_description:       item.category_description,
+                                            sub_category_description:   item.sub_category_description,
+                                            item_cost:                  item.item_cost,
+                                            wh_qty:                     item.wh_qty,
+                                            unserved_qty:               item.unserved_qty,
                                         }
 
                                     }));
@@ -438,7 +463,7 @@
                                     $('.ui-menu-item').remove();
                                     $('.addedLi').remove();
                                     $("#ui-id-2"+tableRow).append($("<li class='addedLi'>").text(data.message));
-                                    var searchVal = $('#search_asset_code'+tableRow).val();
+                                    var searchVal = $('#itemDesc'+tableRow).val();
                                     if (searchVal.length > 0) {
                                         $("#ui-id-2"+tableRow).css('display', 'block');
                                     } else {
@@ -452,12 +477,17 @@
                     select: function (event, ui) {
                         var e = ui.item;
                         if (e.id) {
-                            $("#search_asset_code"+$(this).attr("data-id")).val(e.asset_code);
-                            $('#search_asset_code'+$(this).attr("data-id")).attr('readonly','readonly');
-                            $('#mo_id'+$(this).attr("data-id")).val(e.id);
-                            $('#digits_code'+$(this).attr("data-id")).val(e.digits_code);
-                            $('#item_description'+$(this).attr("data-id")).val(e.value);
-                            $('#asset_type'+$(this).attr("data-id")).val(e.asset_type);
+                            $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
+                            $('#category'+$(this).attr("data-id")).val(e.category_description);
+                            $('#sub_category'+$(this).attr("data-id")).val(e.sub_category_description);
+                            $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
+                            $('#itemDesc'+$(this).attr("data-id")).val(e.value);
+                            $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
+                            $('#fixed_description'+$(this).attr("data-id")).val(e.value);
+                            $('#wh_quantity'+$(this).attr("data-id")).val(e.wh_qty);
+                            $('#unserved_quantity'+$(this).attr("data-id")).val(e.unserved_qty);
+                            $('#val_item').html('');
+                            return false;
                             return false;
 
                         }
@@ -475,9 +505,64 @@
             if ($('#asset-items tbody tr').length != 1) { //check if not the first row then delete the other rows
                 tableRow--;
                 $(this).closest('tr').remove();
+                $('#quantity_total').val(calculateTotalQuantity());
                 return false;
             }
         });
+
+        //DELETE EXISTING LINES
+        $(".deleteRowData").click(function(event) {
+            event.preventDefault();
+            const id = $(this).val();
+            swal({
+                    title: "Are you sure?",
+                    type: "warning",
+                    text: "You won't be able to revert this!",
+                    showCancelButton: true,
+                    confirmButtonColor: "#41B314",
+                    cancelButtonColor: "#F9354C",
+                    confirmButtonText: "Yes, delete it!"
+                    }, function () {
+                    $.ajax({
+                        url: "{{ route('delete-line-assets-from-approval') }}",
+                        type: "POST",
+                        dataType: 'json',
+                        data: {
+                            '_token': token,
+                            'lineId': id
+                        },
+                        success: function (data) {
+                            if (data.status == "success") {
+                                swal({
+                                    type: data.status,
+                                    title: data.message,
+                                });
+                                setTimeout(function(){
+                                    location.reload();
+                                    }, 1000);
+                                } else if (data.status == "error") {
+                                swal({
+                                    type: data.status,
+                                    title: data.message,
+                                });
+                            }
+                        }
+                    }); 
+            });
+        });
+
+        function calculateTotalQuantity() {
+            let totalQuantity = 0;
+            $('.qty').each(function() {
+                let qty = 0;
+                if($(this).text().trim()) {
+                    qty = parseInt($(this).text().replace(/,/g, ''));
+                }
+
+                totalQuantity += qty;
+            });
+            return totalQuantity;
+        }
 
     </script>
 @endpush

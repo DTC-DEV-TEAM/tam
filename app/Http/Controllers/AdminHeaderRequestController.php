@@ -968,7 +968,7 @@
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
 			$data['budget_range'] = DB::table('sub_masterfile_budget_range')->where('status', 'ACTIVE')->get();
 			$data['Header'] = HeaderRequest::header($id);
-			$data['Body'] = BodyRequest::select('body_request.*')->where('body_request.header_request_id', $id)->get();
+			$data['Body'] = BodyRequest::select('body_request.*')->where('body_request.header_request_id', $id)->whereNull('deleted_at')->get();
 			
 			$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
@@ -1176,8 +1176,7 @@
 		}
 
 
-		public function Employees(Request $request)
-		{
+		public function Employees(Request $request){
 			$employees = 	DB::table('employees')
 							->leftjoin('positions', 'employees.position_id', '=', 'positions.id')
 							->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
@@ -1189,8 +1188,7 @@
 		}
 
 
-		public function Companies(Request $request)
-		{
+		public function Companies(Request $request){
 
 			$companies = DB::table('companies')->where('company_name', $request->company_name)->first();
 
@@ -1962,5 +1960,23 @@
 			$message = ['status'=>'success', 'message' => 'Cancelled Successfully!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 			
+		}
+
+		//EDIT REQUEST FROM RETURN APPROVAL
+		public function editRequestAssets(Request $request){
+			dd(Request::all());
+		}
+
+		//DELETE LINES FROM RETURN APPROVAL
+		public function deleteLinetAssetsFromApproval(Request $request){
+			$fields = Request::all();
+			$id     = $fields['lineId'];
+			BodyRequest::where('id', $id)
+			->update([
+				'deleted_at'=> 		date('Y-m-d H:i:s'),
+				'deleted_by'=> 		CRUDBooster::myId()
+			]);	
+			$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+			echo json_encode($message);
 		}
 	}
