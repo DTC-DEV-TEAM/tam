@@ -157,7 +157,7 @@
             </div>
         </div>
         <hr>
-        @if(in_array(CRUDBooster::myPrivilegeId(),[1,6]))
+        @if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9]))
             @if($Header->header_approval_status == 47)
             <button class="btn btn-success pull-right" type="submit" id="btnSubmit" style="margin-right:12px"> <i class="fa fa-check-circle"></i> Submit</button>
             {{-- <button class="btn btn-success pull-right" value="approvercancel" type="submit" id="btnSubmit" style="margin-right:12px"><i class="fa fa-check-circle" ></i> Submit</button> --}}

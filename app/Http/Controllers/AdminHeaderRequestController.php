@@ -353,7 +353,7 @@
 							->whereNull('header_request.deleted_at'); 
 				});
 
-				$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
+				$query->orderBy('header_request.id', 'desc')->orderBy('header_request.created_at', 'desc');
 				//$query->orderByRaw('FIELD( header_request.status_id, "For Approval")');
 			}
 	            
@@ -994,11 +994,11 @@
 			$data['employeeinfos'] = Users::user($data['user']->id);
 			$data['categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
 													   ->orderby('category_description', 'asc')
-													   ->get();
+													   ->first();
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->whereIn('category_id', [1,4,7,8])->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
-			
+			$data['budget_range'] = DB::table('sub_masterfile_budget_range')->where('status', 'ACTIVE')->get();
 			$privilegesMatrix = DB::table('cms_privileges')->get();
 			$privileges_array = array();
 			foreach($privilegesMatrix as $matrix){
@@ -1232,8 +1232,7 @@
 			//CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been cancelled successfully!"), 'info');
 		}
 
-		public function SubCategories(Request $request)
-		{
+		public function SubCategories(Request $request){
 			$data = Request::all();	
 			$id = $data['id'];
 
@@ -1249,9 +1248,7 @@
 			return($subcategories);
 		}
 
-		public function RemoveItem(Request $request)
-		{
-
+		public function RemoveItem(Request $request){
 			$data = 				Request::all();	
 			$headerID = 			$data['headerID'];
 			$bodyID = 				$data['bodyID'];
@@ -1964,7 +1961,74 @@
 
 		//EDIT REQUEST FROM RETURN APPROVAL
 		public function editRequestAssets(Request $request){
-			dd(Request::all());
+			$fields             = Request::all();
+			$dataLines          = array();
+			$arf_header         = DB::table('header_request')->where(['id' => $fields['headerID']])->first();
+			$digits_code 		= $fields['digits_code'];
+			$supplies_cost 		= $fields['supplies_cost'];
+			$item_description 	= $fields['item_description'];
+			$category 		    = $fields['category'];
+			$sub_category 	    = $fields['sub_category'];
+			$app_id_others 		= $fields['app_id_others'];
+			$quantity 			= $fields['quantity'];
+			$request_type_id 	= $fields['request_type_id'];
+			$budget_range 	    = $fields['budget_range'];
+			$app_count          = 2;
+
+	
+			if(!empty($fields['application'])){
+				$application 				        = implode(", ",$fields['application']);
+				$application_others		            = $fields['application_others'];
+			}
+
+			HeaderRequest::where('id',$fields['headerID'])
+			->update([
+					'status_id'          => $this->pending,
+					'purpose'            => $fields['purpose'],
+					'quantity_total'     => $fields['quantity_total'],
+					'application'        => $application,
+					'application_others' => $application_others,
+					'requestor_comments' => $fields['requestor_comments']
+			]);	
+			if(is_array($digits_code)){
+				foreach($digits_code as $key => $val){
+					$apps_array = array();
+					$app_no     = 'app_id'.$app_count;
+					$app_id     = $fields[$app_no];
+					for($xxx=0; $xxx < count((array)$app_id); $xxx++) {
+						array_push($apps_array,$app_id[$xxx]); 
+					}
+
+					$dataLines[$key]['header_request_id']   = $arf_header->id;
+					$dataLines[$key]['digits_code'] 	    = $digits_code[$key];
+					$dataLines[$key]['item_description'] 	= $item_description[$key];
+					$dataLines[$key]['category_id'] 		= $category[$key];
+					$dataLines[$key]['sub_category_id'] 	= $sub_category[$key];
+					$dataLines[$key]['app_id'] 			    = implode(", ",$apps_array);
+					$dataLines[$key]['app_id_others'] 	    = $app_id_others[$key];
+					$dataLines[$key]['quantity'] 			= 1;
+					$dataLines[$key]['unit_cost'] 		    = $supplies_cost[$key];
+					$dataLines[$key]['budget_range'] 		= $budget_range[$key];
+					$dataLines[$key]['created_by'] 		    = CRUDBooster::myId();
+					$dataLines[$key]['created_at'] 		    = date('Y-m-d H:i:s');
+
+					unset($apps_array);
+				}
+
+				DB::beginTransaction();
+				try {
+					BodyRequest::insert($dataLines);
+					DB::commit();
+				} catch (\Exception $e) {
+					DB::rollback();
+					CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_database_error",['database_error'=>$e]), 'danger');
+				}
+				
+			}
+
+			
+			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_edit_employee",['reference_number'=>$arf_header->reference_number]), 'success');
+
 		}
 
 		//DELETE LINES FROM RETURN APPROVAL

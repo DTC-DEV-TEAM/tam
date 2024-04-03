@@ -91,7 +91,7 @@
 
     <form action="{{ route('editRequestAssets')}}" method="POST" id="EditAssetRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
-        <input type="hidden" value="1" name="request_type_id" id="request_type_id">
+        <input type="hidden" value="{{$Header->request_type_id}}" name="request_type_id" id="request_type_id">
         <input type="hidden" value="{{$Header->requestid}}" name="headerID" id="headerID">
         <div class='panel-body'>
 
@@ -226,30 +226,43 @@
                     </div>
                 </div>
 
-                <div class="col-md-12 mt-2" id="application_div">
-                    <hr/>
-                    
-                    <div class="row"> 
-                        <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
-                        @foreach($applications as $key => $data)
-                            <div class="col-md-2">
-                                <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
-                                <br>
-                            </div>             
-                        @endforeach
-                    </div>
-                    <hr/>
-                </div>
-
-                <div class="col-md-12" id="application_others_div">
-                    <div class="row">
-                        <label class="require control-label col-md-2">*{{ trans('message.form-label.application_others') }}</label>
-                        <div class="col-md-6">
-                            <input type="text" class="form-control"  id="application_others" name="application_others"  required placeholder="e.g. VIBER, WHATSAPP, TELEGRAM" onkeyup="this.value = this.value.toUpperCase();">
+                @if($Header->request_type_id == 1)
+                    <div class="col-md-12 mt-2" id="application_div">
+                        <hr/>
+                        
+                        <div class="row"> 
+                            <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
+                            @foreach($applications as $key => $data)
+                                <div class="col-md-2">
+                                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
+                                    <br>
+                                </div>             
+                            @endforeach
+                        
                         </div>
+                        <br>
+                        <div class="row mt-2">
+                            @if($Header->application_others != null || $Header->application_others != "")
+                                <label class="control-label col-md-2">{{ trans('message.form-label.application_others') }}:</label>
+                                <div class="col-md-4">
+                                        <p>{{$Header->application_others}}</p>
+                                </div>
+                            @endif 
+                        </div>
+                        
+                        <hr/>
                     </div>
-                    <hr/>
-                </div>
+
+                    <div class="col-md-12" id="application_others_div">
+                        <div class="row">
+                            <label class="require control-label col-md-2">*{{ trans('message.form-label.application_others') }}</label>
+                            <div class="col-md-6">
+                                <input type="text" class="form-control"  id="application_others" name="application_others"  required placeholder="e.g. VIBER, WHATSAPP, TELEGRAM" onkeyup="this.value = this.value.toUpperCase();">
+                            </div>
+                        </div>
+                        <hr/>
+                    </div>
+                @endif
 
                 <div class="col-md-12" style="margin-top: 10px">
                     <div class="form-group">
@@ -259,17 +272,19 @@
                 </div>
             </div>
             <hr>
-            <div class="col-md-12">
-                <div class="form-group text-center">
-                    <label>CAN'T FIND WHAT YOU ARE LOOKING FOR?</label>
-                    <a href='{{CRUDBooster::adminpath("header_request/download")."?return_url=".urlencode(Request::fullUrl())}}'>CHECK HERE</a>
+            @if($Header->request_type_id == 1)
+                <div class="col-md-12">
+                    <div class="form-group text-center">
+                        <label>CAN'T FIND WHAT YOU ARE LOOKING FOR?</label>
+                        <a href='{{CRUDBooster::adminpath("header_request/download")."?return_url=".urlencode(Request::fullUrl())}}'>CHECK HERE</a>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
 
         <div class='panel-footer'>
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.update') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnUpdate"> <i class="fa fa-save" ></i> {{ trans('message.form.update') }}</button>
         </div>
     </form>
 </div>
@@ -379,7 +394,7 @@
             var newrow =
                 `<tr>
                     <td>
-                        <input type="text" placeholder="Search item" class="form-control itemDesc text-center" data-id="${tableRow}" id="itemDesc${tableRow}"  name="asset_code[]" required maxlength="100">
+                        <input type="text" placeholder="Search item" class="form-control itemDesc text-center" data-id="${tableRow}" id="itemDesc${tableRow}"  name="item_description[]" required maxlength="100">
                         <input type="hidden" name="mo_id[]" id="mo_id${tableRow}" class="id" required data-id="${tableRow}"/>
                             <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow}" id="ui-id-2${tableRow}" style="display:none; top: 60px; left: 15px; width: 100%;">
                                 <li>Loading...</li>
@@ -414,6 +429,12 @@
                 </tr>`;
             $('#asset-items tbody').append(newrow);
             $('#budget'+tableRow).select2();
+            var url = '';
+            if($('#request_type_id').val() == 1){
+                 url = "{{ route('item.it.search') }}";
+            }else{
+                 url = "{{ route('item.fa.search') }}";
+            }
             //Search item
             let countrow = 1;
             
@@ -422,7 +443,7 @@
                 $('#itemDesc'+tableRow).autocomplete({
                     source: function (request, response) {
                     $.ajax({
-                        url: "{{ route('item.it.search') }}",
+                        url: url,
                         dataType: "json",
                         type: "POST",
                         data: {
@@ -563,6 +584,39 @@
             });
             return totalQuantity;
         }
+
+        $('#btnUpdate').click(function(event) {
+            event.preventDefault();
+            var item = $("input[name^='item_description']").length;
+            var item_value = $("input[name^='item_description']");
+            for(i=0;i<item;i++){
+                if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please fill fields!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+        
+            } 
+
+            swal({
+                title: "Are you sure?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#41B314",
+                cancelButtonColor: "#F9354C",
+                confirmButtonText: "Yes, update it!",
+                width: 450,
+                height: 200
+                }, function () {
+                    $('#btnUpdate').attr('disabled',true);
+                    $('#EditAssetRequest').submit();                 
+            });
+        });
 
     </script>
 @endpush

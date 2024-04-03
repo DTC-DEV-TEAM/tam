@@ -401,6 +401,21 @@
 
         $('#btnUpdate').click(function(event) {
             event.preventDefault();
+            var item = $("input[name^='asset_code']").length;
+            var item_value = $("input[name^='asset_code']");
+            for(i=0;i<item;i++){
+                if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please fill fields!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+        
+            } 
             swal({
                 title: "Are you sure?",
                 type: "warning",

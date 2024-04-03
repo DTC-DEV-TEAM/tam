@@ -136,7 +136,7 @@
 	        | 
 	        */
 	        $this->addaction = array(); 
-			if(CRUDBooster::myPrivilegeId() == 6){
+			if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9])){
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->recieved"];
 				//$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_receiving && [location] == 2"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_receiving && [location] == 2"];
@@ -192,7 +192,7 @@
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Export","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
-				if(in_array(CRUDBooster::myPrivilegeId(),[1,6])){ 
+				if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9])){ 
 				    $this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-inventory'),"color"=>"success"];
 				}
 			}
@@ -340,7 +340,7 @@
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else if(in_array(CRUDBooster::myPrivilegeId(),[9])){ 
-				$query->whereIn('assets_inventory_header_for_approval.location', [$this->admin_threef, $this->admin_gf])
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->admin_threef, $this->admin_gf,$this->p_tuazon,$this->san_juan,$this->p_tuazon])
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else if(CRUDBooster::myPrivilegeId() == 20){ 

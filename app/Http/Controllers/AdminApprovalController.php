@@ -76,8 +76,8 @@
 				
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
 
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApproval/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $pending && [request_type_id] != 7"];
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalSupplies/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $pending && [request_type_id] == 7"];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApproval/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] != 7"];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalSupplies/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] == 7"];
 				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
 			}
 

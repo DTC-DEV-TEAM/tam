@@ -407,7 +407,8 @@
 				->update([
 					'statuses_id'        => 3,
 					'deployed_to'        => $employee_name->bill_to,
-					'deployed_to_id'     => NULL
+					'deployed_to_id'     => NULL,
+					'location'           => 4
 				]);
 				
 				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>0]);

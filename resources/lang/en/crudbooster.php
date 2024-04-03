@@ -73,7 +73,7 @@ return [
     'arf_picked_success'                  => ':reference_number has been picked successfully!',
     'alert_receiving_success'             => ':reference_number has been received successfully!',
     'alert_closing_success'               => ':reference_number has been closed successfully!',
-    'mo_success'                          => ':reference_number has been moved order successfully!',
+    'mo_success'                          => ':reference_number has been transact successfully!',
     'alert_delete_selected'               => 'Are you sure want to delete all selected data ?',
     'alert_delete_selected_success'       => 'Delete selected success !',
     'alert_bulk_action_button'            => 'Are you sure want to',
