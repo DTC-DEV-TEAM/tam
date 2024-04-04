@@ -26,7 +26,8 @@
 	use PhpOffice\PhpSpreadsheet\Spreadsheet;
 	use PhpOffice\PhpSpreadsheet\Reader\Exception;
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-	
+	use Illuminate\Support\Facades\Response;
+
 	class AdminHeaderRequestController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $pending;   		
 		private $approved;  		
@@ -191,8 +192,8 @@
 				if(CRUDBooster::isSuperadmin()){
 					$this->index_button[] = ["label"=>"Export Lists","icon"=>"fa fa-download","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
 				}
-				$this->index_button[] = ["label"=>"IT Asset Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition'),"color"=>"success"];
-				$this->index_button[] = ["label"=>"FA Request","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-fa'),"color"=>"success"];
+				$this->index_button[] = ["label"=>"IT Asset Request","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-requisition'),"color"=>"success"];
+				$this->index_button[] = ["label"=>"FA Request","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-requisition-fa'),"color"=>"success"];
 				// $this->index_button[] = ["label"=>"Non Trade","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-non-trade'),"color"=>"success"];
 			
 			}
@@ -1963,6 +1964,18 @@
 			$message = ['status'=>'success', 'message' => 'Cancelled Successfully!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 			
+		}
+
+		public function getDownload() {
+			$file= public_path(). "/vendor/crudbooster/it_assets_price/IT Assets Pricelist.xlsx";
+            if(in_array($getFile->ext,['xlsx','docs','pdf'])){
+			    $headers = array(
+					'Content-Type: application/pdf',
+					);
+			    return Response::download($file, $getFile->file_name, $headers);
+			}else{
+				return Response::download($file, $getFile->file_name);
+			}
 		}
 
 		//EDIT REQUEST FROM RETURN APPROVAL

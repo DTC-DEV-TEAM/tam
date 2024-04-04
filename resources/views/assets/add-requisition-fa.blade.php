@@ -30,7 +30,7 @@
             }
 
             input.sinput:read-only {
-                background-color: #fff;
+                background-color: #eee;
             }
 
             input.addinput:read-only {
@@ -165,7 +165,7 @@
                                                 <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
                                             </tr>
                                             <tr class="tbl_header_color dynamicRows">
-                                                <th width="25%" class="text-center">*{{ trans('message.table.item_description') }}</th>
+                                                <th width="22%" class="text-center">*{{ trans('message.table.item_description') }}</th>
                                                 <th width="15%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                 <th width="15%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
                                                 <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
@@ -222,7 +222,7 @@
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
 
-            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.create') }}</button>
 
         </div>
 
@@ -325,13 +325,13 @@
                         </ul>
                         <div id="display-error${tableRow}"></div>
                          <td>
-                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code text-center finput" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]"   maxlength="100" readonly>
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code text-center sinput" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]"   maxlength="100" readonly>
                             <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="${tableRow}" id="fixed_description${tableRow}"  name="fixed_description[]"   maxlength="100" readonly>
                          </td>
 
                         <td>
 
-                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id" name="category_id[]" data-id="${tableRow}" id="category_id${tableRow}" readonly>
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sinput category_id" name="category_id[]" data-id="${tableRow}" id="category_id${tableRow}" readonly>
                         </td>
 
                         <td>  
@@ -754,6 +754,21 @@
                         } 
                 
                     }  
+
+                    var budget = $(".budget option").length;
+                    var budget_value = $('.budget').find(":selected");
+                    for(i=0;i<budget;i++){
+                        if(budget_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please choose budget range!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#5cb85c",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                    } 
                                           
                         swal({
                             title: "Are you sure?",
@@ -761,7 +776,7 @@
                             showCancelButton: true,
                             confirmButtonColor: "#41B314",
                             cancelButtonColor: "#F9354C",
-                            confirmButtonText: "Yes, send it!",
+                            confirmButtonText: "Yes, create it!",
                             width: 450,
                             height: 200
                             }, function () {

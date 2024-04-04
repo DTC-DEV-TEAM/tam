@@ -152,7 +152,7 @@
             <hr/>
 
             <div class="row"> 
-                <label class="require control-label col-md-2"><span style="color:red">*</span>{{ trans('message.form-label.purpose') }}</label>
+                <label class="require control-label col-md-2"><span style="color:red"></span>{{ trans('message.form-label.purpose') }}</label>
                 @foreach($purposes as $data)
                     <div class="col-md-5">
                         <label class="radio-inline control-label col-md-5"><input type="radio" required  class="purpose" name="purpose" value="{{$data->id}}" {{ ($Header->purpose == $data->id) ? "checked" : ""}}>{{$data->request_description}}</label>
@@ -241,7 +241,7 @@
                         <hr/>
                         
                         <div class="row"> 
-                            <label class="require control-label col-md-2" required>*{{ trans('message.form-label.application') }}</label>
+                            <label class="require control-label col-md-2" required>{{ trans('message.form-label.application') }}</label>
                             @foreach($applications as $key => $data)
                                 <div class="col-md-2">
                                     <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
@@ -265,7 +265,7 @@
 
                     <div class="col-md-12" id="application_others_div">
                         <div class="row">
-                            <label class="require control-label col-md-2">*{{ trans('message.form-label.application_others') }}</label>
+                            <label class="require control-label col-md-2">{{ trans('message.form-label.application_others') }}</label>
                             <div class="col-md-6">
                                 <input type="text" class="form-control"  id="application_others" name="application_others"  required placeholder="e.g. VIBER, WHATSAPP, TELEGRAM" onkeyup="this.value = this.value.toUpperCase();">
                             </div>

@@ -177,7 +177,7 @@
                                                 <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
                                             </tr>
                                             <tr class="tbl_header_color dynamicRows">
-                                                <th width="25%" class="text-center"><span style="color:red">*</span>{{ trans('message.table.item_description') }}</th>
+                                                <th width="22%" class="text-center"><span style="color:red">*</span>{{ trans('message.table.item_description') }}</th>
                                                 <th width="15%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                 <th width="15%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
                                                 <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
@@ -263,7 +263,7 @@
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
 
-            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.create') }}</button>
 
         </div>
 
@@ -790,7 +790,21 @@
                                 event.preventDefault();
                                 return false;
                         } 
-                
+                    } 
+
+                    var budget = $(".budget option").length;
+                    var budget_value = $('.budget').find(":selected");
+                    for(i=0;i<budget;i++){
+                        if(budget_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please choose budget range!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#5cb85c",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
                     } 
                     //quantity validation
                     var v = $("input[name^='quantity']").length;
@@ -847,7 +861,7 @@
                                 showCancelButton: true,
                                 confirmButtonColor: "#41B314",
                                 cancelButtonColor: "#F9354C",
-                                confirmButtonText: "Yes, send it!",
+                                confirmButtonText: "Yes, create it!",
                                 width: 450,
                                 height: 200
                                 }, function () {
