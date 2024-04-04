@@ -165,6 +165,10 @@
                                 <td style="text-align:center">
                                 <label class="label label-info" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
                                 </td>
+                            @elseif($rowresult['body_status'] == 49)
+                                <td style="text-align:center">
+                                <label class="label label-warning" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>
+                                </td>
                             @else
                                <td style="text-align:center">
                                 <label class="label label-success" style="align:center; font-size:10px">{{$rowresult->status_description}}</label>

@@ -339,7 +339,10 @@
                                     title: 'No Found Item',
                                     icon: 'error',
                                     confirmButtonColor: "#5cb85c",
+                                },function(){
+                                    $('#search_asset_code'+tableRow).val('');
                                 });
+                               
                             }else{ 
                                 if (data.status_no == 1) {
                                     var data = data.items;
@@ -415,6 +418,21 @@
                         return false;
                 } 
         
+            } 
+
+            var item = $("input[name^='digits_code']").length;
+            var item_value = $("input[name^='digits_code']");
+            for(i=0;i<item;i++){
+                if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please fill fields!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
             } 
             swal({
                 title: "Are you sure?",

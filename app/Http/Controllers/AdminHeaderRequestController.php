@@ -1210,6 +1210,12 @@
 					'cancelled_by'=> CRUDBooster::myId(),
 					'cancelled_at'=> date('Y-m-d H:i:s')	
 			]);	
+
+			BodyRequest::where('header_request_id', $id)
+			->update([
+				'deleted_at'=> 		date('Y-m-d H:i:s'),
+				'deleted_by'=> 		CRUDBooster::myId()
+			]);	
 			
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Request has been cancelled successfully!"), 'info');
 		}
@@ -1974,13 +1980,14 @@
 			$request_type_id 	= $fields['request_type_id'];
 			$budget_range 	    = $fields['budget_range'];
 			$app_count          = 2;
+			$body_budget_range 	= $fields['body_budget_range'];
 
-	
 			if(!empty($fields['application'])){
 				$application 				        = implode(", ",$fields['application']);
 				$application_others		            = $fields['application_others'];
 			}
 
+			//UPDATE HEADER
 			HeaderRequest::where('id',$fields['headerID'])
 			->update([
 					'status_id'          => $this->pending,
@@ -1990,6 +1997,15 @@
 					'application_others' => $application_others,
 					'requestor_comments' => $fields['requestor_comments']
 			]);	
+			//UPDATE BODY
+			foreach($fields['body_id'] as $key => $line){
+				BodyRequest::where('id',$line)
+				->update([
+						'budget_range'   => $body_budget_range[$key]
+				]);	
+			}
+
+			//INSERT NEW LINES
 			if(is_array($digits_code)){
 				foreach($digits_code as $key => $val){
 					$apps_array = array();

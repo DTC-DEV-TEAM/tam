@@ -53,7 +53,7 @@
 
 			$this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getToScheduleReturn/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == ".self::ToSchedule.""];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getToScheduleReturn/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == ".self::ToSchedule.""];
 			}
 			$this->load_js = array();
 			$this->load_js[] = asset("datetimepicker/bootstrap-datetimepicker.min.js");
@@ -154,7 +154,7 @@
 			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			$data['transport_types'] = DB::table('transport_types')->get();
-			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			$data['warehouse_location'] = WarehouseLocationModel::whereNotIn('id',[1,4])->get();
 			return $this->view("assets.schedule-return-transfer", $data);
 		}
 

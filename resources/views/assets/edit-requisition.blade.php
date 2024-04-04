@@ -191,6 +191,7 @@
                                         <tbody id="bodyTable">
                                             @foreach($Body as $rowresult)
                                                 <tr>
+                                                    <input type="hidden" name="body_id[]" value="{{$rowresult->id}}">
                                                     <td style="text-align:center" height="10">{{$rowresult->item_description}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->category_id}}</td>
@@ -198,7 +199,16 @@
                                                     <td style="text-align:center" height="10">{{$rowresult->wh_qty}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->unserved_qty}}</td>
                                                     <td style="text-align:center" height="10" class="qty">{{$rowresult->quantity}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->budget_range}}</td>
+                                                    <td style="text-align:center" height="10">
+                                                        <select selected data-placeholder="Choose" class="form-control budget" name="body_budget_range[]" id="budget${tableRow}" required required style="width:100%"> 
+                                                            <option value=""></option> 
+                                                            @foreach($budget_range as $data)
+                                                                <option value="{{$data->description}}" {{ isset($rowresult->budget_range) && $rowresult->budget_range == $data->description ? 'selected' : '' }}>
+                                                                    {{$data->description}}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
                                                     <td style="text-align:center" height="10">
                                                         <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
                                                     </td>
@@ -308,7 +318,7 @@
         $("#application_others_div").hide();
         $("#application_others").removeAttr('required');
     
-
+        $('.budget').select2();
         $('#OTHERS').change(function() {
 		    var ischecked= $(this).is(':checked');
 		    if(ischecked == false){
@@ -594,6 +604,36 @@
                     swal({  
                             type: 'error',
                             title: 'Please fill fields!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+            } 
+
+            var item = $("input[name^='digits_code']").length;
+            var item_value = $("input[name^='digits_code']");
+            for(i=0;i<item;i++){
+                if(item_value.eq(i).val() == 0 || item_value.eq(i).val() == null){
+                    swal({  
+                            type: 'error',
+                            title: 'Please fill fields!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+            } 
+
+            var sub_cat = $(".budget option").length;
+            var sub_cat_value = $('.budget').find(":selected");
+            for(i=0;i<sub_cat;i++){
+                if(sub_cat_value.eq(i).val() == ""){
+                    swal({  
+                            type: 'error',
+                            title: 'Please choose budget range!',
                             icon: 'error',
                             confirmButtonColor: "#5cb85c",
                         });

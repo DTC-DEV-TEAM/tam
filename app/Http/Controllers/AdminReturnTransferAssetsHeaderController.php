@@ -100,7 +100,7 @@
 					$sub_query->where('return_transfer_assets_header.requested_by', CRUDBooster::myId())
 							  ->whereNull('return_transfer_assets_header.archived'); 
 				});
-				$query->orderBy('return_transfer_assets_header.status', 'asc')->orderBy('return_transfer_assets_header.id', 'DESC');
+				$query->orderBy('return_transfer_assets_header.id', 'DESC')->orderBy('return_transfer_assets_header.created_at', 'DESC');
 			}
 	    }
 
@@ -153,7 +153,7 @@
 			$data['page_title'] = 'View Return Request';
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
-			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
+			$data['return_body'] = ReturnTransferAssets::viewDetail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 
 			return $this->view("assets.view-return-details", $data);

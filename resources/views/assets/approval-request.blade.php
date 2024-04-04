@@ -106,18 +106,18 @@
                         <th width="10%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                         
                         <th width="10%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                         
-                        <th width="5%" class="text-center">{{ trans('message.table.wh_qty') }}</th>  
+                        <th width="3%" class="text-center">{{ trans('message.table.wh_qty') }}</th>  
                       
-                        <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
+                        <th width="3%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
                            
-                        <th width="5%" class="text-center">For Replenish Qty</th> 
-                        <th width="5%" class="text-center">For Re Order Qty</th> 
-                        <th width="5%" class="text-center">Serve Qty</th> 
-                        <th width="5%" class="text-center">UnServe Qty</th> 
+                        <th width="3%" class="text-center">For Replenish Qty</th> 
+                        <th width="3%" class="text-center">For Re Order Qty</th> 
+                        <th width="3%" class="text-center">Serve Qty</th> 
+                        <th width="3%" class="text-center">UnServe Qty</th> 
                         <th width="7%" class="text-center">Item Cost</th> 
                         <th width="7%" class="text-center">Total Cost</th>                                                                                                                                            
                         <th width="10%" class="text-center">MO/SO</th>                                                  
-                       
+                        <th width="10%" class="text-center">Budget Range</th>     
                     </tr>
                 </thead>
                 <tbody>
@@ -145,7 +145,7 @@
                             <td style="text-align:center" class="unit_cost">{{$rowresult->unit_cost ? $rowresult->unit_cost : 0}}</td>
                             <td style="text-align:center" class="total_cost">{{$rowresult->unit_cost * $rowresult->serve_qty}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->mo_so_num}}</td>   
-                                
+                            <td style="text-align:center" height="10">{{$rowresult->budget_range}}</td>    
                            
                         </tr>
                     @endforeach

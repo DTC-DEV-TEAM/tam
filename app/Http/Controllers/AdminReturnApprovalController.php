@@ -58,10 +58,10 @@
 
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalReturn/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == ".self::ForApproval.""];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalReturn/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == ".self::ForApproval.""];
 			}
 			if(in_array(CRUDBooster::myPrivilegeId(),[9])){
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestForVerificationReturn/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == ".self::ForVerification.""];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestForVerificationReturn/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == ".self::ForVerification.""];
 			}
 
 	        $this->load_css = array();

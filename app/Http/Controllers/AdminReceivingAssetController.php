@@ -103,7 +103,7 @@
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
 
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestReceiving/[id]'),'icon'=>'fa fa-pencil'];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestReceiving/[id]'),'icon'=>'fa fa-edit'];
 
 			}
 
