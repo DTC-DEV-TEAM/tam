@@ -734,8 +734,8 @@
 			$data['items'] = array();
 
 			$items = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
 			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
 			->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
@@ -749,7 +749,6 @@
 				'sub_category.class_description as dam_sub_category_description'
 			)
 			->take(10)
-			->whereNotNull('assets.from_dam')
 			->get();
 			
 			if($items){

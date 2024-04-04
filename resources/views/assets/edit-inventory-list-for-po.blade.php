@@ -118,15 +118,18 @@
 
         <!-- Body Area -->
       
-        <div class="box-header text-center">
+        {{-- <div class="box-header text-center">
         <!-- <a style="float:left" class='btn btn-success btn-xs' href='{{CRUDBooster::mainpath("generate-barcode/".$Header->header_id)."?return_url=".urlencode(Request::fullUrl())}}'><i class='fa fa-barcode'></i> Print all Barcode</a> -->
             <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-        </div>
+        </div> --}}
 
         <div class="box-body">
             <div class="table-responsive">           
                 <table id="asset-items">
                     <thead>
+                        <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                            <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                        </tr>
                         <tr>
                             <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                             <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>   
@@ -154,7 +157,7 @@
             </div>
         </div>
         <hr>
-        @if(in_array(CRUDBooster::myPrivilegeId(),[1,6]))
+        @if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9]))
             @if($Header->header_approval_status == 47)
             <button class="btn btn-success pull-right" type="submit" id="btnSubmit" style="margin-right:12px"> <i class="fa fa-check-circle"></i> Submit</button>
             {{-- <button class="btn btn-success pull-right" value="approvercancel" type="submit" id="btnSubmit" style="margin-right:12px"><i class="fa fa-check-circle" ></i> Submit</button> --}}
@@ -180,8 +183,8 @@
         setTimeout("preventBack()", 0);
     //preview image before save
     $(function() {
-    // Multiple images preview in browser
-    var imagesPreview = function(input, placeToInsertImagePreview) {
+        // Multiple images preview in browser
+        var imagesPreview = function(input, placeToInsertImagePreview) {
 
         if (input.files) {
             var filesAmount = input.files.length;

@@ -176,14 +176,14 @@
             <hr/>                
             <div class="row">
                 <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Item Request</b></h3>
-                    </div>
                     <div class="box-body no-padding">
                         <div class="pic-container">
                             <div class="pic-row">
                                 <table id="asset-items1">
                                     <thead>
+                                        <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                                            <th style="text-align: center" colspan="17"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                                        </tr>
                                         <tr class="tbl_header_color dynamicRows">
                                             <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                             <th width="20%" class="text-center">{{ trans('message.table.item_description') }}</th>
@@ -200,7 +200,8 @@
                                             <th width="10%" class="text-center">DR#</th>         
                                             <th width="10%" class="text-center">PO#</th>   
                                             <th width="5%" class="text-center">Cancelled Qty</th> 
-                                            <th>Reason</th>                                
+                                            <th>Reason</th>     
+                                            <th>Budget Range</th>                                
                        
                                             @if($Header->recommendedby != null || $Header->recommendedby != "")
                                                 <th width="13%" class="text-center">{{ trans('message.table.recommendation_text') }}</th> 
@@ -211,7 +212,7 @@
                                             @if($Header->approved_by == null || $Header->approved_by == "")
                                                 <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
                                             @endif 
-
+                                   
                                             {{-- @if(in_array($Header->request_type_id, [6,7]))
                                                 @if($Header->approved_by == null || $Header->approved_by == "")
                                                     <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
@@ -263,7 +264,7 @@
                                                                 <td style="text-align:center">{{$rowresult->po_no}}</td>  
                                                                 <td style="text-align:center">{{$rowresult->cancelled_qty ? $rowresult->cancelled_qty : 0}}</td>   
                                                                 <td style="text-align:center">{{$rowresult->reason_to_cancel}}</td>  
-                                                            
+                                                                <td style="text-align:center">{{$rowresult->budget_range}}</td>  
 
                                                                 @if($Header->recommendedby != null || $Header->recommendedby != "")                                                                               
                                                                     <td style="text-align:center" height="10">
@@ -315,7 +316,7 @@
                                                                 <td style="text-align:center">{{$rowresult->po_no}}</td>     
                                                                 <td style="text-align:center" class="po_qty">{{$rowresult->cancelled_qty ? $rowresult->cancelled_qty : 0}}</td>                                                                 <td style="text-align:center">{{$rowresult->reason_to_cancel}}</td>  
                                                                 
-                                                             
+                                                                <td style="text-align:center">{{$rowresult->budget_range}}</td>  
                                                                 @if($Header->recommendedby != null || $Header->recommendedby != "")                                                                               
                                                                     <td style="text-align:center" height="10">
                                                                         {{$rowresult->recommendation}}
@@ -333,6 +334,7 @@
                                                                         <button id="deleteRow{{$tableRow}}" name="removeRow" data-id="{{$tableRow}}" class="btn btn-danger removeRow btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
                                                                     </td>
                                                                 @endif
+                                                             
                                                                 {{-- @if(in_array($Header->request_type_id, [6,7]))
                                                                     @if($Header->status_id == 1)    
                                                                         <td style="text-align:center" height="10">
@@ -401,18 +403,18 @@
             <hr>
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="box-header text-center">
-                            <h3 class="box-title"><b>Item Mo Details</b></h3>
-                        </div>
                         <div class="box-body no-padding">
                             <div class="pic-container">
                                 <div class="pic-row">
-                                    <table id="asset-items">
+                                    <table id="asset-items1">
                                         <thead>
+                                            <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                                                <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>Item Mo Details</b></h4></th>
+                                            </tr>
                                             <tr class="tbl_header_color dynamicRows">
                                                 <th width="10%" class="text-center" height="10">{{ trans('message.table.mo_reference_number') }}</th>
                                                 <th width="13%" class="text-center" height="10">{{ trans('message.table.status_id') }}</th>
-                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.item_code') }}</th>
+                                                <th width="10%" class="text-center" height="10">{{ trans('message.table.digits_code') }}</th>
                                                 @if(in_array($Header->request_type_id,[1,5]))
                                                     <th width="10%" class="text-center" height="10">{{ trans('message.table.asset_tag') }}</th>
                                                 @endif
@@ -776,7 +778,7 @@
             '</td>'+
             '<td style="text-align:center">'+
             '</td>'+
-            '<td colspan="4" style="text-align:center">'+
+            '<td colspan="5" style="text-align:center">'+
             '</td>'+
             
     '</tr>';

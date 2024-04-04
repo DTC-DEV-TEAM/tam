@@ -241,15 +241,18 @@
 	    |
 	    */
 	    public function hook_query_index(&$query) {
-	      	$closed      = self::Closed;
-			$for_closing = self::ForClosing;
-           
-			$query->where('mo_body_request.request_created_by', CRUDBooster::myId())
+			$closed =  	DB::table('statuses')->where('id', 13)->value('id');
+			$for_closing =  	DB::table('statuses')->where('id', 19)->value('id');
+			if(CRUDBooster::isSuperadmin()){
+			    $query->orderBy('mo_body_request.status_id', 'asc')->orderBy('mo_body_request.id', 'DESC');
+			}else{
+				$query->where('mo_body_request.request_created_by', CRUDBooster::myId())
 				//->orWhere('mo_body_request.created_by', CRUDBooster::myId())
 				->whereIn('mo_body_request.status_id', [$closed, $for_closing])
 				->whereNull('mo_body_request.return_flag')
-				->whereNotIn('header_request.request_type_id', [9])
+				//->whereNotIn('header_request.request_type_id', [6,7])
 				; 
+			}
 	    }
 
 	    /*

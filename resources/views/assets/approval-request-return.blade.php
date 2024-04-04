@@ -6,6 +6,10 @@
             border: 1px solid rgba(000, 0, 0, .5);
             padding: 8px;
         }
+        .finput {
+            border:none;
+            border-bottom: 1px solid rgba(18, 17, 17, 0.5);
+        }
     </style>
 @endpush
 @if(g('return_url'))
@@ -81,15 +85,14 @@
             </div>
 
             <hr/>
-        
-            <div class="box-header text-center">
-                <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-            </div>
-
+    
             <table  class='table' id="asset-items">
                 <thead>
+                    <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                        <th style="text-align: center" colspan="16"><h4 class="box-title" style="color: #fff;"><b>Item details</b></h4></th>
+                    </tr>
                     <tr>
-                        <th width="20%" class="text-center">{{ trans('message.table.reference') }}</th>
+                        <th width="20%" class="text-center">{{ trans('message.form-label.reference') }}</th>
                         @if(in_array($Header->request_type_id, [1,5]))
                             <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                         @endif
@@ -122,7 +125,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label>{{ trans('message.table.comments') }}:</label>
-                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control" name="approver_comments">{{$Header->approver_comments}}</textarea>
+                        <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="approver_comments">{{$Header->approver_comments}}</textarea>
                     </div>
                 </div>
             </div>
@@ -136,6 +139,7 @@
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
            
             <button class="btn btn-danger pull-right" type="button" id="btnReject" style="margin-left: 5px;"><i class="fa fa-thumbs-down" ></i> Reject</button>
+            <button class="btn btn-warning pull-right" type="button" id="btnReturn" style="margin-left: 5px;"><i class="fa fa-refresh" ></i> Return</button>
             <button class="btn btn-success pull-right" type="button" id="btnApprove"><i class="fa fa-thumbs-up" ></i> Approve</button>
         </div>
 
@@ -171,6 +175,24 @@
             }, function () {
                 $(this).attr('disabled','disabled');
                 $('#approval_action').val('1');
+                $("#myform").submit();                   
+        });
+    });
+
+    $('#btnReturn').click(function(event) {
+        event.preventDefault();
+        swal({
+            title: "Are you sure?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, return it!",
+            width: 450,
+            height: 200
+            }, function () {
+                $(this).attr('disabled','disabled');
+                $('#approval_action').val('2');
                 $("#myform").submit();                   
         });
     });

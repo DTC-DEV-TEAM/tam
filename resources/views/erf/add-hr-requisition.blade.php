@@ -403,7 +403,7 @@
             <div class="card8">
                 <div class="row">
                     <div class="col-md-12">              
-                     <table id="asset-items">
+                        <table id="asset-items">
                             <tbody id="bodyTable">
                                 <tr class="tbl_header_color dynamicRows">
                                     <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th> 
@@ -462,6 +462,7 @@
                                 <a href='{{CRUDBooster::adminpath("header_request/download")."?return_url=".urlencode(Request::fullUrl())}}'>CHECK HERE</a>
                             </div>
                         </div>
+                      
                     </div> 
                </div>
             </div>
@@ -471,9 +472,6 @@
             </div>  
     </form>
    
-                       
-
-
 @endsection
 @push('bottom')
 <script type="text/javascript">

@@ -65,15 +65,20 @@
                         </tr>
 
                         <tr>
-                                <td width="20%"><label><strong>Purpose:<strong></label></td>
+                                <td width="20%"><label><strong>Request Type:<strong></label></td>
                                 <td width="40%"><p>{{$Header->request_type}}</p></td>
-                                @if($Header->request_type == "TRANSFER")
+                                <td width="20%"><label><strong>Purpose:<strong></label></td>
+                                <td width="40%"><p>{{$Header->purpose}}</p></td>
+                        </tr>
+
+                        @if($Header->request_type == "TRANSFER")
+                            <tr>
                                 <td width="10%">
                                     <label><strong>Transferred To:<strong></label>
                                 </td>
                                 <td><p>{{$Header->transferTo}}</p></td>
-                                @endif
-                        </tr>
+                            </tr>
+                        @endif
 
                         <tr>
                             <td colspan="4"><hr/></td>
@@ -112,7 +117,7 @@
                                                     </td>
                                                     <td height="10">{{$rowresult->description}}</td>
                                                     <td height="10">{{$rowresult->serial_no}}</td>
-                                                    <td height="10">{{$rowresult->quantity}}</td>
+                                                    <td height="10" class="qty">{{$rowresult->quantity}}</td>
                                                     <td height="10" class="cost">{{$rowresult->unit_cost}}</td>
                                                 @endif
                                             </tr>
@@ -278,14 +283,28 @@
         var sumqty = 0;
         var sumcost = 0;
         for (var i = 0; i < tds.length; i++) {
-        if (tds[i].className == "cost") {
-            sumcost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
-        }
+            if (tds[i].className == "cost") {
+                sumcost += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+            }else if(tds[i].className == "qty"){
+                sumqty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
+            }
         }
         document.getElementById("total").innerHTML +=
-        "<tr><td colspan='4' style='text-align:right'><strong>TOTAL</strong></td><td><strong>" +
-        sumcost.toFixed(2) +
-        "</strong></td></tr>";
+        "<tr>" +
+            "<td colspan=3' style='text-align:center'>" +
+                "<strong>TOTAL</strong>" +
+            "</td>" +
+            "<td>" +
+                    "<strong>" +
+                        sumqty +
+                    "</strong>" +
+                "</td>" +
+                "<td>" +
+                    "<strong>" +
+                        sumcost.toFixed(2) +
+                    "</strong>" +
+                "</td>" +
+        "</tr>";
 
     </script>
 @endpush

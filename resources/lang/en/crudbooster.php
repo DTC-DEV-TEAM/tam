@@ -55,48 +55,30 @@ return [
     'log_forgot' => 'Someone with IP :ip request a password for :email',
     'log_logout' => ':email logout',
 
-    'alert_add_employee'    => ':reference_number has been created successfully!',
-
-    'alert_edit_employee'    => ':reference_number has been updated successfully!',
-
-    'alert_add_success'    => ':reference_number has been created successfully!',
-
-    'alert_petty_cash_edit_success'    => ':reference_number has been edited successfully!',
-
-    'alert_petty_cash_reject_success'    => ':reference_number has been rejected successfully!',
-
+    'alert_add_employee'                  => ':reference_number has been created successfully!',
+    'alert_edit_employee'                 => ':reference_number has been updated successfully!',
+    'alert_add_success'                   => ':reference_number has been created successfully!',
+    'alert_petty_cash_edit_success'       => ':reference_number has been edited successfully!',
+    'alert_petty_cash_reject_success'     => ':reference_number has been rejected successfully!',
     'alert_petty_cash_approve_success'    => ':reference_number has been approved successfully!',
-
-    'alert_petty_cash_validate_success'    => ':reference_number has been validated successfully!',
-
-    'alert_petty_cash_record_success'    => ':reference_number has been recorded successfully!',
-
-    'alert_petty_cash_paid_success'    => ':reference_number has been paid successfully!',
-
-
-    'alert_petty_cash_close_success'    => ':reference_number has been closed successfully!',
-
-    'arf_recommended_success'    => ':reference_number has been recommended successfully!',
-
-    'arf_purchasing_success'    => ':reference_number has been processed successfully!',
-
-    'arf_proceed_success'    => ':reference_number has been proceeded successfully!',
-    
-    'arf_print_success'    => ':reference_number has been printed successfully!',
-
-    'arf_picked_success'    => ':reference_number has been picked successfully!',
-
-    'alert_receiving_success'    => ':reference_number has been received successfully!',
-
-    'alert_closing_success'    => ':reference_number has been closed successfully!',
-
-    'mo_success'    => ':reference_number has been moved order successfully!',
-    
-    'alert_delete_selected' => 'Are you sure want to delete all selected data ?',
-    'alert_delete_selected_success' => 'Delete selected success !',
-    'alert_bulk_action_button' => 'Are you sure want to',
-    'alert_action' => 'You have :action successfully !',
-    'alert_add_data_success' => 'The data has been added !',
+    'alert_petty_cash_validate_success'   => ':reference_number has been validated successfully!',
+    'alert_petty_cash_record_success'     => ':reference_number has been recorded successfully!',
+    'alert_petty_cash_paid_success'       => ':reference_number has been paid successfully!',
+    'alert_petty_cash_close_success'      => ':reference_number has been closed successfully!',
+    'alert_request_assets_return'         => ':reference_number has been return successfully!',
+    'arf_recommended_success'             => ':reference_number has been recommended successfully!',
+    'arf_purchasing_success'              => ':reference_number has been processed successfully!',
+    'arf_proceed_success'                 => ':reference_number has been proceeded successfully!',
+    'arf_print_success'                   => ':reference_number has been printed successfully!',
+    'arf_picked_success'                  => ':reference_number has been picked successfully!',
+    'alert_receiving_success'             => ':reference_number has been received successfully!',
+    'alert_closing_success'               => ':reference_number has been closed successfully!',
+    'mo_success'                          => ':reference_number has been transact successfully!',
+    'alert_delete_selected'               => 'Are you sure want to delete all selected data ?',
+    'alert_delete_selected_success'       => 'Delete selected success !',
+    'alert_bulk_action_button'            => 'Are you sure want to',
+    'alert_action'                        => 'You have :action successfully !',
+    'alert_add_data_success'              => 'The data has been added !',
     'alert_add_data_failed' => 'Failed to save the data !',
     'alert_update_data_success' => 'The data has been updated !',
     'alert_update_data_failed' => 'Failed to update the data',

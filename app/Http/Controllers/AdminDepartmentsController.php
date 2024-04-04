@@ -1,11 +1,9 @@
 <?php namespace App\Http\Controllers;
 
 	use Session;
+	use Request;
 	use DB;
 	use CRUDBooster;
-	use Excel;
-	use App\Imports\DepartmentsImport;
-	use Illuminate\Http\Request;
 
 	class AdminDepartmentsController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -25,8 +23,8 @@
 			$this->button_table_action = true;
 			$this->button_bulk_action = true;
 			$this->button_action_style = "button_icon";
-			$this->button_add = false;
-			$this->button_edit = false;
+			$this->button_add = true;
+			$this->button_edit = true;
 			$this->button_delete = true;
 			$this->button_detail = true;
 			$this->button_show = true;
@@ -49,8 +47,8 @@
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Department Name','name'=>'department_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5', 'readonly'=>true];
-			$this->form[] = ['label'=>'COA','name'=>'coa_id','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
+			$this->form[] = ['label'=>'Department Name','name'=>'department_name','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
+			$this->form[] = ['label'=>'COA','name'=>'coa_id','type'=>'text','validation'=>'min:1|max:255','width'=>'col-sm-5'];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				$this->form[] = ['label'=>'Status','name'=>'status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 			}
@@ -136,16 +134,8 @@
 	        | 
 	        */
 	        $this->index_button = array();
-			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
-				if(CRUDBooster::isSuperadmin()){
-					$this->index_button[] = [
-						"title"=>"Import Departments",
-						"label"=>"Import Departments",
-						"icon"=>"fa fa-download",
-						"color"=>"success",
-						"url"=>CRUDBooster::mainpath('departments-upload')];
-				}
-			}
+
+
 
 	        /* 
 	        | ---------------------------------------------------------------------- 
@@ -180,9 +170,9 @@
 	        $this->script_js = NULL;
 			$this->script_js = "
 					$(document).ready(function() {
-						$('#department_name').keyup(function() {
-							this.value = this.value.toLocaleUpperCase();
-						});
+						// $('#department_name').keyup(function() {
+						// 	this.value = this.value.toLocaleUpperCase();
+						// });
 					});
 			";
 
@@ -360,34 +350,9 @@
 
 	    }
 
-		public function uploadDepartmentsTemplate() {
-			$filename = "Departments-upload-".date("Ymd")."-".date("h.i.sa"). ".csv";
-				header("Content-Disposition: attachment; filename=\"$filename\"");
-				header("Content-Type: text/csv; charset=UTF-16LE");
-				$out = fopen("php://output", 'w');
-				$flag = false;
-				if(!$flag) {
-					// display field/column names as first row
-					fputcsv($out, array('DEPARTMENT_NAME'));
-					$flag = true;
-				}
-				fputcsv($out, array('The Grid - Tsukemen'));
-				fclose($out);
-				exit;
-		}
 
-		public function UploadDepartmentsView() {
-			// if(!CRUDBooster::isSuperadmin()) {    
-			// 	CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
-			// }
-			$data['page_title']= 'Departments Upload';
-			return view('imports.departments-import', $data)->render();
-		}
 
-		public function departmentsUpload(Request $request) {
-			$path_excel = $request->file('import_file')->store('temp');
-			$path = storage_path('app').'/'.$path_excel;
-			Excel::import(new DepartmentsImport, $path);	
-			CRUDBooster::redirect(CRUDBooster::adminpath('departments'), trans("Upload Successfully!"), 'success');
-		}
+	    //By the way, you can still create your own method in here... :) 
+
+
 	}

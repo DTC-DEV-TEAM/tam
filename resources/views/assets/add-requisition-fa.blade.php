@@ -30,7 +30,7 @@
             }
 
             input.sinput:read-only {
-                background-color: #fff;
+                background-color: #eee;
             }
 
             input.addinput:read-only {
@@ -58,6 +58,12 @@
                 background-color: #00a65a !important;
                 border: 1px solid rgb(255, 254, 254) !important;
                 color: #fff !important;
+            }
+
+            
+            #asset-items th, td {
+                border: 1px solid rgba(000, 0, 0, .5);
+                padding: 8px;
             }
         </style>
     @endpush
@@ -149,54 +155,56 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-                    </div>
-                                <div class="box-body no-padding">
-                                    <div class="table-responsive">
-                                        <div class="pic-container">
-                                            <div class="pic-row">
-                                                <table class="table table-bordered" id="asset-items">
-                                                    <tbody id="bodyTable">
-                                                        <tr class="tbl_header_color dynamicRows">
-                                                            <th width="30%" class="text-center">*{{ trans('message.table.item_description') }}</th>
-                                                            <th width="20%" class="text-center">{{ trans('message.table.digits_code') }}</th>
-                                                            <th width="25%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
-                                                            <th width="20%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
-                                                            <th width="15%" class="text-center">{{ trans('message.table.wh_qty') }}</th>
-                                                            <th width="15%" class="text-center">{{ trans('message.table.prev_balance_quantity') }}</th> 
-                                                            <th width="7%" class="text-center">{{ trans('message.table.request_qty') }}</th> 
-                                                            <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
-                                                        </tr>
-                
-                                                        <tr id="tr-table">
-                                                            <tr>
-                                            
-                                                            </tr>
-                                                        </tr>
-                                                    
-                                                    </tbody>
-
-                                                    <tfoot>
-
-                                                        <tr id="tr-table1" class="bottom">
-            
-                                                            <td colspan="6">
-                                                                <input type="button" id="add-Row" name="add-Row" class="btn btn-success add" value='Add Item' />
-                                                            </td>
-                                                            <td align="left" colspan="1">
-                                                                <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
-                                                            </td>
-                                                        </tr>
-                                                    </tfoot>
-
-                                                </table>
-                                            </div>
-                                        </div>
+                    <div class="box-body no-padding">
+                        <div class="table-responsive">
+                            <div class="pic-container">
+                                <div class="pic-row">
+                                    <table id="asset-items">
+                                        <tbody id="bodyTable">
+                                            <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                                                <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                                            </tr>
+                                            <tr class="tbl_header_color dynamicRows">
+                                                <th width="22%" class="text-center">*{{ trans('message.table.item_description') }}</th>
+                                                <th width="15%" class="text-center">{{ trans('message.table.digits_code') }}</th>
+                                                <th width="15%" class="text-center">{{ trans('message.table.category_id_text') }}</th>                                                                                                                    
+                                                <th width="15%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
+                                                <th width="7%" class="text-center">{{ trans('message.table.wh_qty') }}</th>
+                                                <th width="7%" class="text-center">{{ trans('message.table.prev_balance_quantity') }}</th> 
+                                                <th width="7%" class="text-center">{{ trans('message.table.request_qty') }}</th> 
+                                                <th width="15%" class="text-center">{{ trans('message.table.budget_range') }}</th> 
+                                                <th width="5%" class="text-center">{{ trans('message.table.action') }}</th>
+                                            </tr>
+    
+                                            <tr id="tr-table">
+                                                <tr>
                                 
-                                    </div>
-                                    <br>
+                                                </tr>
+                                            </tr>
+                                        
+                                        </tbody>
+
+                                        <tfoot>
+
+                                            <tr id="tr-table1" class="bottom">
+
+                                                <td colspan="6">
+                                                    <a type="button" id="add-Row" name="add-Row" class="btn btn-success add"> <i class="fa fa-plus-circle"></i> Add Item</a>
+                                                </td>
+                                                <td align="left" colspan="1">
+                                                    <input type='number' name="quantity_total" class="form-control text-center" id="quantity_total" readonly>
+                                                </td>
+                                                <td colspan="2"></td>
+                                            </tr>
+                                        </tfoot>
+
+                                    </table>
                                 </div>
+                            </div>
+                    
+                        </div>
+                        <br>
+                    </div>
                 </div>
           
                 <div class="col-md-12">
@@ -214,7 +222,7 @@
 
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
 
-            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
+            <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.create') }}</button>
 
         </div>
 
@@ -230,7 +238,9 @@
 
 @push('bottom')
     <script type="text/javascript">
-
+        $(function(){
+            $('body').addClass("sidebar-collapse");
+        });
         function preventBack() {
             window.history.forward();
         }
@@ -306,60 +316,54 @@
                 if(count_fail == 0){
 
                     var newrow =
-                    '<tr>' +
+                    `<tr>
 
-                        '<td >' +
-                        '  <input type="text" placeholder="Search Item ..." class="form-control finput itemDesc" id="itemDesc'+ tableRow +'" data-id="'+ tableRow +'"   name="item_description[]"  required maxlength="100">' +
-                          '<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="'+ tableRow +'" id="ui-id-2'+ tableRow +'" style="display: none; top: 60px; left: 15px; width: 100%;">' +
-                          '<li>Loading...</li>' +
-                        '</ul>' +
-                        '<div id="display-error'+ tableRow +'"></div>'+
-                        '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code text-center finput" data-id="'+ tableRow +'" id="digits_code'+ tableRow +'"  name="digits_code[]"   maxlength="100" readonly>' +
-                            '<input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="'+ tableRow +'" id="fixed_description'+ tableRow +'"  name="fixed_description[]"   maxlength="100" readonly>' +
-                        '</td>' +
+                        <td >
+                            <input type="text" placeholder="Search Item ..." class="form-control finput itemDesc" id="itemDesc${tableRow}" data-id="${tableRow}"   name="item_description[]"  required maxlength="100">
+                          <ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" data-id="${tableRow }" id="ui-id-2${tableRow}" style="display: none; top: 60px; left: 15px; width: 100%;">
+                          <li>Loading...</li>
+                        </ul>
+                        <div id="display-error${tableRow}"></div>
+                         <td>
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control digits_code text-center sinput" data-id="${tableRow}" id="digits_code${tableRow}"  name="digits_code[]"   maxlength="100" readonly>
+                            <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control fixed_description finput" data-id="${tableRow}" id="fixed_description${tableRow}"  name="fixed_description[]"   maxlength="100" readonly>
+                         </td>
 
-                        '<td>'+
-                            '<select selected data-placeholder="- Select Category -" class="form-control category_id" name="category_id[]" data-id="' + tableRow + '" id="category_id' + tableRow + '" required style="width:100%">' +
-                            //'  <option value=""></option>' +
-                            '        @foreach($categories as $data)'+
-                            '        <option value="{{$data->category_description}}">{{$data->category_description}}</option>'+
-                            '         @endforeach'+
-                            '</select>'+
-                        '</td>' +
+                        <td>
 
-                        '<td>' + 
-                            '<input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="'+ tableRow +'" id="sub_category_id'+ tableRow +'"  name="sub_category_id[]"   maxlength="100" readonly>' +
-                        '</td>' +
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sinput category_id" name="category_id[]" data-id="${tableRow}" id="category_id${tableRow}" readonly>
+                        </td>
 
-                        // '<td>'+
-                        //     '<select selected data-placeholder="- Select Sub Category -" class="form-control sub_category_id" name="sub_category_id[]" data-id="' + tableRow + '" id="sub_category_id' + tableRow + '" required style="width:100%">' +
-                        //     '  <option value=""></option>' +
-                        //     '        @foreach($sub_categories as $data)'+
-                        //     '        <option value="{{$data->class_description}}">{{$data->class_description}}</option>'+
-                        //     '         @endforeach'+
-                        //     '</select>'+
-                        // '</td>' +  
+                        <td>  
+                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]"   maxlength="100" readonly> 
+                        </td> 
 
-                        '<td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +
+                        <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
                         
-                        '<td><input class="form-control text-center sinput unserved_quantity" type="text" required name="unserved_quantity[]" id="unserved_quantity' + tableRow + '" data-id="' + tableRow  + '" readonly></td>' +
+                        <td><input class="form-control text-center sinput unserved_quantity" type="text" required name="unserved_quantity[]" id="unserved_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
                         
-                        '<td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity' + tableRow + '" data-id="' + tableRow  + '"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td>' +
-                                       
-                        '<td>' +
-                            '<button id="deleteRow" name="removeRow" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button>' +
-                        '</td>' +
+                        <td><input class="form-control text-center quantity_item" type="number" required name="quantity[]" id="quantity${tableRow}" data-id="${tableRow}"  value="1" min="0" max="9999999999" step="any" onKeyPress="if(this.value.length==4) return false;" oninput="validity.valid;" readonly></td> 
+                        <td> 
+                            <select selected data-placeholder="Choose" class="form-control budget" name="budget_range[]" id="budget${tableRow}" required required style="width:100%"> 
+                                <option value=""></option> 
+                                @foreach($budget_range as $data)
+                                    <option value="{{$data->description}}">{{$data->description}}</option>
+                                @endforeach
+                            </select>
+                        </td>                
+                        <td> 
+                            <button id="deleteRow" name="removeRow" class="btn btn-danger removeRow"><i class="glyphicon glyphicon-trash"></i></button> 
+                        </td> 
 
-                    '</tr>';
+                    </tr>`;
                     $(newrow).insertBefore($('table tr#tr-table1:last'));
 
                     $('#app_id'+tableRow).attr('disabled', true);
-
+                    $('#budget'+tableRow).select2();
                     $('.js-example-basic-multiple').select2();
-                    $('#category_id'+tableRow).select2({
-                    placeholder_text_single : "- Select Category -",
-                    minimumResultsForSearch: -1});
+                    // $('#category_id'+tableRow).select2({
+                    // placeholder_text_single : "- Select Category -",
+                    // minimumResultsForSearch: -1});
                     // $('#sub_category_id'+tableRow).select2({
                     // placeholder_text_single : "- Select Sub Category -"});
 
@@ -392,7 +396,8 @@
 
                     var stack = [];
                     var token = $("#token").val();
-                    var searchcount = <?php echo json_encode($tableRow); ?>;
+                    var categories = <?php echo json_encode($categories->category_description); ?>;
+               
 
                     let countrow = 1;
                     $(function(){
@@ -425,17 +430,17 @@
 
                                     response($.map(data, function (item) {
                                         return {
-                                            id:                         item.id,
-                                            asset_code:                 item.asset_code,
-                                            digits_code:                item.digits_code,
-                                            asset_tag:                  item.asset_tag,
-                                            serial_no:                  item.serial_no,
-                                            value:                      item.item_description,
-                                            category_description:       item.category_description,
-                                            sub_category_description:   item.sub_category_description,
-                                            item_cost:                  item.item_cost,
-                                            wh_qty:                     item.wh_qty,
-                                            unserved_qty:               item.unserved_qty,
+                                            id:                            item.id,
+                                            asset_code:                    item.asset_code,
+                                            digits_code:                   item.digits_code,
+                                            asset_tag:                     item.asset_tag,
+                                            serial_no:                     item.serial_no,
+                                            value:                         item.item_description,
+                                            category_description:          item.category_description,
+                                            tam_sub_category_description:  item.sub_category_description,
+                                            item_cost:                     item.item_cost,
+                                            wh_qty:                        item.wh_qty,
+                                            unserved_qty:                  item.unserved_qty,
                                         }
 
                                     }));
@@ -462,7 +467,8 @@
                             if (e.id) {
                             
                                 $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
-                                $('#sub_category_id'+$(this).attr("data-id")).val(e.sub_category_description);
+                                $('#category_id'+$(this).attr("data-id")).val(categories);
+                                $('#sub_category_id'+$(this).attr("data-id")).val(e.tam_sub_category_description);
                                 $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
                                 $('#itemDesc'+$(this).attr("data-id")).val(e.value);
                                 $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
@@ -748,6 +754,21 @@
                         } 
                 
                     }  
+
+                    var budget = $(".budget option").length;
+                    var budget_value = $('.budget').find(":selected");
+                    for(i=0;i<budget;i++){
+                        if(budget_value.eq(i).val() == ""){
+                            swal({  
+                                    type: 'error',
+                                    title: 'Please choose budget range!',
+                                    icon: 'error',
+                                    confirmButtonColor: "#5cb85c",
+                                });
+                                event.preventDefault();
+                                return false;
+                        } 
+                    } 
                                           
                         swal({
                             title: "Are you sure?",
@@ -755,7 +776,7 @@
                             showCancelButton: true,
                             confirmButtonColor: "#41B314",
                             cancelButtonColor: "#F9354C",
-                            confirmButtonText: "Yes, send it!",
+                            confirmButtonText: "Yes, create it!",
                             width: 450,
                             height: 200
                             }, function () {

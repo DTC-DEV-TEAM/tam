@@ -49,28 +49,6 @@
 
 			# END FORM DO NOT REMOVE THIS LINE
 
-			# OLD START FORM
-			//$this->form = [];
-			//$this->form[] = ["label"=>"Status","name"=>"status","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requestor Name","name"=>"requestor_name","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Store Branch","name"=>"store_branch","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Request Type Id","name"=>"request_type_id","type"=>"select2","required"=>TRUE,"validation"=>"required|min:1|max:255","datatable"=>"request_type,id"];
-			//$this->form[] = ["label"=>"Request Type","name"=>"request_type","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Requested By","name"=>"requested_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Requested Date","name"=>"requested_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Transacted By","name"=>"transacted_by","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Transacted Date","name"=>"transacted_date","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Approved By","name"=>"approved_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Approved Date","name"=>"approved_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Approver Comments","name"=>"approver_comments","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Rejected Date","name"=>"rejected_date","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Location To Pick","name"=>"location_to_pick","type"=>"textarea","required"=>TRUE,"validation"=>"required|string|min:5|max:5000"];
-			//$this->form[] = ["label"=>"Close By","name"=>"close_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Close At","name"=>"close_at","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Archived","name"=>"archived","type"=>"datetime","required"=>TRUE,"validation"=>"required|date_format:Y-m-d H:i:s"];
-			//$this->form[] = ["label"=>"Transfer To","name"=>"transfer_to","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			# OLD END FORM
-
 			/* 
 	        | ---------------------------------------------------------------------- 
 	        | Sub Module
@@ -342,7 +320,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        $fields = Request::all();
-        
+	
 			$selectedItem       = $fields['item_to_receive_id'];
 			$selectedItem_array = array();
 			foreach($selectedItem as $select){
@@ -365,12 +343,11 @@
 		
 			}
 
-			$filter_good_text 		    = array_filter($fields['good_text'], fn($value) => !is_null($value) && $value !== '');
-			$good_text                  = array_values($filter_good_text);
-			$filter_defective_text 		= array_filter($fields['defective_text'], fn($value) => !is_null($value) && $value !== '');
-			$defective_text             = array_values($filter_defective_text);
+			// $filter_good_text 		    = array_filter($fields['good_text'], fn($value) => !is_null($value) && $value !== '');
+			// $good_text                  = array_values($filter_good_text);
+			// $filter_defective_text 		= array_filter($fields['defective_text'], fn($value) => !is_null($value) && $value !== '');
+			// $defective_text             = array_values($filter_defective_text);
 			
-
 			//good and defect value
 			$comments = $fields['comments'];
 			$other_comment = $fields['other_comment'];
@@ -402,156 +379,55 @@
 			$employee_name = DB::table('cms_users')->where('id', $arf_header->transfer_to)->first();
 
 			for($x=0; $x < count((array)$item_id); $x++) {
-				//if($item_id[$x] == 1){
-				if($defective_text[$x] == 1){
-					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
-					$deployed  = 		DB::table('statuses')->where('id',3)->value('id');
-					$mo_info 	= 		MoveOrder::where('id',$mo_id[$x])->first();
-
-					ReturnTransferAssets::where('id',$selectedItemlist[$x])
-					->update([
-							'status' => $to_close,
-					]);	
-
-					$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
-					
-					ReturnTransferAssetsHeader::where('id', $id)
-					->update([
-						'transacted_by'   => CRUDBooster::myId(),
-						'transacted_date' => date('Y-m-d H:i:s')
-					]);	
-
-                    if($countItem == 0){
-						ReturnTransferAssetsHeader::where('id', $id)
-						->update([
-							'status'          => $to_close,
-							'transacted_by'   => CRUDBooster::myId(),
-							'transacted_date' => date('Y-m-d H:i:s')
-						]);	
-					}
+				$to_close  = DB::table('statuses')->where('id',25)->value('id');
 				
-					DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
-					->update([
-						'statuses_id'        => 23,
-						'deployed_to'        => $employee_name->bill_to,
-						'item_condition'     => "Defective",
-						'deployed_to_id'     => NULL    
-					]);
-			
-					MoveOrder::create([
-						'status_id'           => 13,
-						'mo_reference_number' => $arf_header->reference_no,
-						'inventory_id'        => $finalinventory_id[$x],
-						'item_id'             => $mo_item_id[$x],
-						'request_created_by'  => $employee_name->id,
-						'request_type_id_mo'  => $request_type_id_mo[$x],
-						'digits_code'         => $digits_code[$x],
-						'asset_code'          => $asset_code[$x],
-						'item_description'    => $item_description[$x],
-						'category_id'         => $category[$x],
-						'serial_no'           => $serial_no[$x],
-						'quantity'            => 1,
-						'unit_cost'           => $unit_cost[$x],
-                    ]);
-										
-				}else{
-					$to_close  = 		DB::table('statuses')->where('id',25)->value('id');
-					
-					ReturnTransferAssets::where('id',$selectedItemlist[$x])
-					->update([
-							'status' => $to_close
-					]);	
+				ReturnTransferAssets::where('id',$selectedItemlist[$x])
+				->update([
+						'status' => $to_close
+				]);	
 
-					$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
-					
+				$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
+				
+				ReturnTransferAssetsHeader::where('id', $id)
+				->update([
+					'received_by' => CRUDBooster::myId(),
+					'received_at' => date('Y-m-d H:i:s')
+				]);	
+
+				if($countItem == 0){
 					ReturnTransferAssetsHeader::where('id', $id)
 					->update([
+						'status'          => $to_close,
 						'transacted_by'   => CRUDBooster::myId(),
 						'transacted_date' => date('Y-m-d H:i:s')
 					]);	
-
-                    if($countItem == 0){
-						ReturnTransferAssetsHeader::where('id', $id)
-						->update([
-							'status'          => $to_close,
-							'transacted_by'   => CRUDBooster::myId(),
-							'transacted_date' => date('Y-m-d H:i:s')
-						]);	
-					}
-					
-					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
-					->update([
-						'statuses_id'        => 3,
-						'deployed_to'        => $employee_name->bill_to,
-						'deployed_to_id'     => NULL
-					]);
+				}
 			
-			    	 MoveOrder::create([
-						'status_id'           => 13,
-						'mo_reference_number' => $arf_header->reference_no,
-						'inventory_id'        => $finalinventory_id[$x],
-						'item_id'             => $mo_item_id[$x],
-						'request_created_by'  => $employee_name->id,
-						'request_type_id_mo'  => $request_type_id_mo[$x],
-						'digits_code'         => $digits_code[$x],
-						'asset_code'          => $asset_code[$x],
-						'item_description'    => $item_description[$x],
-						'category_id'         => $category[$x],
-						'serial_no'           => $serial_no[$x],
-						'quantity'            => 1,
-						'unit_cost'           => $unit_cost[$x],
-                    ]);
-
-				}
+				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+				->update([
+					'statuses_id'        => 3,
+					'deployed_to'        => $employee_name->bill_to,
+					'deployed_to_id'     => NULL,
+					'location'           => 4
+				]);
+				
+				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>0]);
+				MoveOrder::create([
+					'status_id'           => 13,
+					'mo_reference_number' => $arf_header->reference_no,
+					'inventory_id'        => $finalinventory_id[$x],
+					'item_id'             => $mo_item_id[$x],
+					'request_created_by'  => $employee_name->id,
+					'request_type_id_mo'  => $request_type_id_mo[$x],
+					'digits_code'         => $digits_code[$x],
+					'asset_code'          => $asset_code[$x],
+					'item_description'    => $item_description[$x],
+					'category_id'         => $category[$x],
+					'serial_no'           => $serial_no[$x],
+					'quantity'            => 1,
+					'unit_cost'           => $unit_cost[$x],
+				]);
 			}
-
-			//save defect and good comments
-			$container = [];
-			$containerSave = [];
-			foreach((array)$comments as $key => $val){
-				$container['arf_number'] = $arf_number[$key] ? $arf_number[$key] : NULL;
-				$container['digits_code'] = explode("|",$val)[1];
-				$container['asset_code'] = explode("|",$val)[0];
-				$container['comments'] = explode("|",$val)[2];
-				$container['users'] = CRUDBooster::myId();
-				$container['created_at'] = date('Y-m-d H:i:s');
-				$containerSave[] = $container;
-			}
-			$otherCommentContainer = [];
-			$otherCommentFinalData = [];
-			foreach((array)$asset_code as $aKey => $aVal){
-				$otherCommentContainer['asset_code'] = $aVal;
-				$otherCommentContainer['digits_code'] = $digits_code[$aKey];
-				$otherCommentContainer['other_comment'] = $other_comment[$aKey];
-				$otherCommentFinalData[] = $otherCommentContainer;
-			}
-			//search other comment in another array
-			$finalData = [];
-			foreach((array)$containerSave as $csKey => $csVal){
-				$i = array_search($csVal['asset_code'], array_column($otherCommentFinalData,'asset_code'));
-				if($i !== false){
-					$csVal['other_comment'] = $otherCommentFinalData[$i];
-					$finalData[] = $csVal;
-				}else{
-					$csVal['other_comment'] = "";
-					$finalData[] = $csVal;
-				}
-			}
-			$finalContainerSave = [];
-			$finalContainer = [];
-			foreach((array)$finalData as $key => $val){
-				$finalContainer['arf_number'] = $val['arf_number'];
-				$finalContainer['digits_code'] = $val['digits_code'];
-				$finalContainer['asset_code'] = $val['asset_code'];
-				$finalContainer['comments'] = $val['comments'];
-				$finalContainer['other_comment'] = $val['other_comment']['other_comment'];
-				$finalContainer['users'] = $val['users'];
-				$finalContainer['created_at'] = $val['created_at'];
-				$finalContainerSave[] = $finalContainer;
-			}
- 
-			CommentsGoodDefect::insert($finalContainerSave);
-
 	    }
 
 	    /* 
@@ -591,98 +467,30 @@
 	    }
 
 		public function getRequestPickingTransfer($id){
-			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
 				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
 			}  
 
-
 			$data = array();
-
 			$data['page_title'] = 'Asset Transfer Receiving';
-
-			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
-				->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
-				->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
-				->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
-				->leftjoin('cms_users as transfer_to', 'return_transfer_assets_header.transfer_to','=', 'transfer_to.id')
-				->select(
-						'return_transfer_assets_header.*',
-						'return_transfer_assets_header.id as requestid',
-						'requests.request_name as request_name',
-						'employees.name as employee_name',
-						'employees.company_name_id as company',
-						'employees.position_id as position',
-						'departments.department_name as department_name',
-						'locations.store_name as store_branch',
-						'transfer_to.name as transfer_to',
-						)
-				->where('return_transfer_assets_header.id', $id)->first();
-           
-		
-
-			$data['return_body'] = ReturnTransferAssets::
-			           leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
-				
-				->select(
-						'return_transfer_assets.*',
-						'return_transfer_assets.id as body_id',
-						'statuses.*',
-						)
-						->where('return_transfer_assets.return_header_id', $id)
-						->where('return_transfer_assets.status', 24)
-						->get();	
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detailForReturnReceiving($id)->get();		
 			// dd($data['return_body']);
 			$data['good_defect_lists'] = GoodDefectLists::all();
 			return $this->view("assets.transfer-picking-request", $data);
 		}
 
 		public function getDetail($id){
-			
-
-			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
             }
 
 			$data = array();
-
 			$data['page_title'] = 'View Return Request';
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-			$data['Header'] = ReturnTransferAssetsHeader::leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
-			->leftjoin('requests', 'return_transfer_assets_header.request_type_id', '=', 'requests.id')
-			->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
-			->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
-			->leftjoin('cms_users as received', 'return_transfer_assets_header.transacted_by','=', 'received.id')
-			->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
-			->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
-			->leftjoin('cms_users as transfer_to', 'return_transfer_assets_header.transfer_to','=', 'transfer_to.id')
-			->select(
-					'return_transfer_assets_header.*',
-					'return_transfer_assets_header.id as requestid',
-					'requests.request_name as request_name',
-					'employees.name as employee_name',
-					'employees.company_name_id as company',
-					'employees.position_id as position',
-					'departments.department_name as department_name',
-					'approved.name as approvedby',
-					'received.name as receivedby',
-					'closed.name as closedby',
-					'locations.store_name as store_branch',
-					'transfer_to.name as transfer_to',
-					)
-			->where('return_transfer_assets_header.id', $id)->first();
-	   
-			$data['return_body'] = ReturnTransferAssets::
-					leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
-				
-				->select(
-					'return_transfer_assets.*',
-					'statuses.*',
-					)
-					->where('return_transfer_assets.return_header_id', $id)->get();	
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-
 			return $this->view("assets.view-return-details", $data);
 		}
 

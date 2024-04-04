@@ -75,6 +75,12 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/header_request/RemoveItem','AdminHeaderRequestController@RemoveItem');
     Route::get(config('crudbooster.ADMIN_PATH').'/header_request/add-requisition-non-trade', 'AdminHeaderRequestController@getAddRequisitionNonTrade')->name('assets.add.requisition.non.trade'); 
 
+    //EDIT REQUEST
+    Route::get(config('crudbooster.ADMIN_PATH').'/header_request/getEdit/{id}','AdminHeaderRequestController@getEdit')->name('getEditRequest');
+    // Edit request from return approval
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/edit-item','AdminHeaderRequestController@editRequestAssets')->name('editRequestAssets');
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/delete-line-assets-from-approval','AdminHeaderRequestController@deleteLinetAssetsFromApproval')->name('delete-line-assets-from-approval');
+
     //Cancel Request
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-request','AdminHeaderRequestController@cancelArfRequest')->name('cancel-arf-request');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/cancel-arf-mo-perline-request','AdminHeaderRequestController@cancelArfMoPerLineRequest')->name('cancel-arf-mo-perline-request');
@@ -168,7 +174,15 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/return_close/getRequestClosingReturn/{id}','AdminReturnCloseController@getRequestClosingReturn')->name('return-closing-request');
     Route::get('/admin/return_picking/getRequestPickingReturn/{id}','AdminReturnPickingController@getRequestPickingReturn')->name('return-picking-request');
     Route::get('/admin/return_transfer_assets_header/getRequestPrintTF/{id}','AdminReturnTransferAssetsHeaderController@getRequestPrintTF')->name('print-request-tf');
-    
+    Route::get('/admin/return_approval/getRequestForVerificationReturn/{id}','AdminReturnApprovalController@getRequestForVerificationReturn')->name('verification-request-return');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header','AdminReturnApprovalController@submitForVerificationReturn')->name('submit-for-verification-return');
+    Route::get('/admin/schedule_return_transfer/getToScheduleReturn/{id}','AdminScheduleReturnTransferController@getToScheduleReturn')->name('toschedule-return');
+    //EDIT RETURN ASSETS
+    Route::get('admin/return_transfer_assets_header/getEdit/{id}','AdminReturnTransferAssetsHeaderController@getEdit')->name('getEdit');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/search-item','AdminReturnTransferAssetsHeaderController@searchItem')->name('searchItem');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/edit-item','AdminReturnTransferAssetsHeaderController@editReturnAssets')->name('editReturnAssets');
+    Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header/delete-line-return-assets','AdminReturnTransferAssetsHeaderController@deleteLineReturnAssets')->name('delete-line-return-assets');
+
     //Transfer Assets
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');

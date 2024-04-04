@@ -136,7 +136,7 @@
 	        | 
 	        */
 	        $this->addaction = array(); 
-			if(CRUDBooster::myPrivilegeId() == 6){
+			if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9])){
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-view-print/[id]'),'icon'=>'fa fa-eye','color'=>'default', "showIf"=>"[header_approval_status] == $this->recieved"];
 				//$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $for_receiving && [location] == 2"];
 				$this->addaction[] = ['url'=>CRUDBooster::mainpath('detail-for-receiving/[id]'),'icon'=>'fa fa-pencil','color'=>'default', "showIf"=>"[header_approval_status] == $this->for_receiving && [location] == 2"];
@@ -192,7 +192,7 @@
 	        $this->index_button = array();
             if(CRUDBooster::getCurrentMethod() == 'getIndex'){
 				$this->index_button[] = ["label"=>"Export","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
-				if(in_array(CRUDBooster::myPrivilegeId(),[1,6])){ 
+				if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9])){ 
 				    $this->index_button[] = ["label"=>"Add Inventory","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-inventory'),"color"=>"success"];
 				}
 			}
@@ -340,7 +340,7 @@
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else if(in_array(CRUDBooster::myPrivilegeId(),[9])){ 
-				$query->whereIn('assets_inventory_header_for_approval.location', [$this->admin_threef, $this->admin_gf])
+				$query->whereIn('assets_inventory_header_for_approval.location', [$this->admin_threef, $this->admin_gf,$this->p_tuazon,$this->san_juan,$this->p_tuazon])
 					  ->orderBy('assets_inventory_header_for_approval.id', 'DESC');
 
 			}else if(CRUDBooster::myPrivilegeId() == 20){ 
@@ -1724,11 +1724,26 @@
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
+			// dd($fields);
             if($type == "" || $type == NULL){
 				$items = [];
-			}else if($type == 3){
+			}else if(in_array($type, [3])){
 				$items = DB::table('assets')
-				->orWhere('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
+				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
+				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
+				->select(	'assets.*',
+				            'tam_categories.id as cat_id',
+							'assets.id as assetID',
+							'tam_categories.category_description as tam_category_description',
+							'category.category_description as dam_category_description'
+						)
+				->take(10)
+				->get();
+			}else if(in_array($type, [5,6,7])){
+				$items = DB::table('assets')
+				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
 				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
 				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
@@ -1739,12 +1754,11 @@
 							'category.category_description as dam_category_description'
 						)
 				->take(10)
-				->whereNotNull('assets.from_dam')
 				->get();
 			}else{
 				$items = DB::table('assets')
-				->orWhere('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
-				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
+				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
 				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
 				->select(	'assets.*',
@@ -1754,7 +1768,6 @@
 							'category.category_description as dam_category_description'
 						)
 				->take(10)
-				->whereNull('assets.from_dam')
 				->get();
 			}
 			

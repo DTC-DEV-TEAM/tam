@@ -204,72 +204,6 @@
                 <div id="loading-content"></div>
             </section>
 
-            {{-- <div class="row">
-                <div class="col-md-12">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> PO NO</label>
-                            <input class="form-control finput" type="text"  placeholder="PO NO" name="po_no" id="po_no">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Location</label>
-                            <select  id="location" name="location" class="form-select select2" style="width:100%;">
-                            @foreach($warehouse_location as $res)
-                                <option value="{{ $res->id }}">{{ $res->location }}</option>
-                            @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                      <div class="col-md-6">
-                          <div class="form-group">
-                              <label class="control-label"><span style="color:red">*</span>  Invoice Date</label>
-                              <input type="text" class="form-control date finput" placeholder="Select Date" name="invoice_date" id="invoice_date">
-                          
-                          </div>
-                      </div>
-                      <div class="col-md-6">
-                          <div class="form-group">
-                              <label class="control-label"><span style="color:red">*</span>  Invoice No.</label>
-                              <input type="text" class="form-control finput" style="" placeholder="Invoice NO" name="invoice_no" id="invoice_no">
-                          </div>
-                      </div>
-                      
-                  </div>
-            </div>
-          
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> RR Date</label>
-                            <input class="form-control date finput" type="text" placeholder="Select Date" name="rr_date" id="rr_date">
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label class="control-label"><span style="color:red">*</span> Upload SI/DR</label>
-                            <input type="file" class="form-control finput" style="" name="si_dr[]" id="si_dr" multiple accept="image/png, image/gif, image/jpeg">
-                            <div class="gallery" style="margin-bottom:5px; margin-top:15px"></div>
-                            <a class="btn btn-xs btn-danger" style="display:none; margin-left:10px" id="removeImageHeader" href="#"><i class="fa fa-remove"></i></a>
-                            @foreach($header_images as $res_header_images)                                    
-                                @if ($res_header_images->file_name)
-                                <img style="margin-right:5px" width="120px"; height="90px"; src="{{URL::to('vendor/crudbooster/inventory_header').'/'.$res_header_images->file_name}}" alt="" data-action="zoom"> 
-                                @else
-                                
-                                @endif                                         
-                            @endforeach
-                        </div>
-                    </div>          
-                </div>
-            </div> --}}
-
             <div class="row">
                 <div class="col-md-12">
                     <div class="col-md-6">
@@ -300,27 +234,21 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <div class="box-header text-center">
-                        <h3 class="box-title"><b>Item Details</b></h3>
-                    </div>
                     <div class="box-body no-padding">
                         <div class="table-responsive">
                             <div class="pic-container">
                                 <div class="pic-row">
                                     <table id="asset-items">
                                         <tbody id="bodyTable">
+                                            <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                                                <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                                            </tr>
                                             <tr class="tbl_header_color dynamicRows">
                                                 <th width="7%" class="text-center">{{ trans('message.table.digits_code') }}</th>
                                                 <th width="12%" class="text-center">{{ trans('message.table.item_description') }}</th>
                                                 <th width="8%" class="text-center">Category</th>
                                                 <th width="7%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                                                 <th width="2%" class="text-center">{{ trans('message.table.quantity_text') }}</th>
-                                                {{-- <th width="5%" class="text-center">Value</th>
-                                                <th width="7%" class="text-center"> Serial No <span style="font-style: italic; font-size:11px; color:red"> <br>(Put N/A if not Applicable)</span></th> 
-                                                <th width="5%" class="text-center"> Warranty Month Expiration <span style="font-style: italic; font-size:11px; color:red"> <br>(Note: 1 is equivalent of 1 month)</span></th>                                                     
-                                                <th width="5%" class="text-center">UPC Code</th>     
-                                                <th width="6%" class="text-center" >Brand</th>
-                                                <th width="7%" class="text-center" >Specs <span style="font-style: italic; font-size:11px; color:red"><br>(Ex: ADM Ryzen 5 3rd Gen/8 GB DDR4 RAM 512 GB SSD)</span></th>     --}}
                                                 <th width="3%" class="text-center">Action</th>
                                             </tr>
                                     
@@ -332,7 +260,6 @@
                                         </tbody>
 
                                         <tfoot>
-
                                             <tr id="tr-table1" class="bottom">
                                                 <td colspan="4" class="text-center">
                                                     <span ><strong>Total</strong></span>

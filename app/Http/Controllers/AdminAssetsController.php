@@ -551,7 +551,7 @@
 			curl_close($ch);
 
 			$cURLresponse = json_decode($cURLresponse, true);
-
+			dd($cURLresponse);
 			$data = [];
 			$count = 0;
 			if(!empty($cURLresponse["data"])) {
@@ -622,7 +622,7 @@
 			curl_close($ch);
 
 			$cURLresponse = json_decode($cURLresponse, true);
-            dd($cURLresponse);
+            //dd($cURLresponse);
 			$data = [];
 			$count = 0;
 			if(!empty($cURLresponse["data"])) {

@@ -6,8 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReturnTransferAssets extends Model
 {
+	const CREATED_AT = 'requested_date';
     protected $table = 'return_transfer_assets';
 
+    protected $fillable = [
+        'status',
+        'return_header_id' ,
+        'mo_id',
+		'reference_no',
+		'asset_code',
+		'digits_code',
+		'description',
+		'asset_type',
+		'transacted_type',
+		'transacted_date',
+		'location_to_pick',
+		'requested_by',
+        'requested_date',
+        'updated_at',
+        'transfer_to'
+    ] ;
     public function scopeArraytwo($query){
        return $query->leftjoin('return_transfer_assets_header', 'return_transfer_assets.return_header_id', '=', 'return_transfer_assets_header.id')
 			->leftjoin('cms_users as employees', 'return_transfer_assets_header.requestor_name', '=', 'employees.id')
@@ -80,6 +98,60 @@ class ReturnTransferAssets extends Model
 				$query->where('return_transfer_assets_header.request_type_id', $category);
 			}
 			return  $query->get();
-
     }
+
+	public function scopeDetail($query, $id){
+		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
+			->select(
+			'return_transfer_assets.*',
+			'return_transfer_assets.status as body_status',
+			'statuses.*',
+			'return_transfer_assets.id as body_id',
+			'mo_body_request.serial_no'
+			)
+			->where('return_transfer_assets.return_header_id', $id)
+			->whereNull('return_transfer_assets.archived');
+	}
+
+	public function scopeViewDetail($query, $id){
+		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
+			->select(
+			'return_transfer_assets.*',
+			'return_transfer_assets.status as body_status',
+			'statuses.*',
+			'return_transfer_assets.id as body_id',
+			'mo_body_request.serial_no'
+			)
+			->where('return_transfer_assets.return_header_id', $id);
+	}
+
+	public function scopeLineDetail($query, $id){
+		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+			->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
+			->select(
+			'return_transfer_assets.*',
+			'return_transfer_assets.status as body_status',
+			'statuses.*',
+			'return_transfer_assets.id as body_id',
+			'mo_body_request.serial_no',
+			'mo_body_request.id AS mo_id'
+			)
+			->where('return_transfer_assets.id', $id)
+			->whereNull('return_transfer_assets.archived');
+	}
+
+	public function scopeDetailForReturnReceiving($query, $id){
+		return $query->leftjoin('statuses', 'return_transfer_assets.status', '=', 'statuses.id')
+		->leftjoin('mo_body_request', 'return_transfer_assets.mo_id', '=', 'mo_body_request.id')
+		->select(
+				'return_transfer_assets.*',
+				'return_transfer_assets.id as body_id',
+				'statuses.*',
+				'mo_body_request.quantity'
+				)
+		->where('return_transfer_assets.return_header_id', $id)
+		->where('return_transfer_assets.status', 24);
+	}
 }

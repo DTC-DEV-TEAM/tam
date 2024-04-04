@@ -157,6 +157,7 @@ return [
         'ac_comments'                    =>  'AC Comments',
         'reco_digits_code_text_mo'       =>  'Digits Code',
         'reco_item_description_text_mo'  =>  'Item Description',
+        'budget_range'                   =>  'Budget Range'
 
     ],
     'form' => [
