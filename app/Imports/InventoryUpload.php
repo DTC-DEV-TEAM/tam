@@ -26,7 +26,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
      *
      * @return Users|null
      */
-    public function collection(Collection $rows){
+    public function collection(Collection $rows){   
         $cooking_and_equipment = DB::table('class')->find(1);
         $DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
         $refrigeration_equipment = DB::table('class')->find(2);
@@ -69,7 +69,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
         foreach ($rows->toArray() as $row) {
             $name_id      = DB::table('cms_users')->where('id','!=',1)->where(DB::raw('LOWER(TRIM(email))'),strtolower(trim($row['email'])))->value('id');
             $name         = DB::table('cms_users')->where('id','!=',1)->where(DB::raw('LOWER(TRIM(email))'),strtolower(trim($row['email'])))->value('name');
-            $item_id 	  = DB::table('assets')->where(['digits_code' => $row['digits_code']])->first();
+            $item_id 	  = DB::table('assets')->where(['digits_code' => preg_replace('/\s+/', '', $row['digits_code'])])->first();
             $itemCat 	  = DB::table('tam_categories')->where(['id' => $item_id->category_id])->first();
             $location_id  = DB::table('warehouse_location_model')->where(DB::raw('LOWER(TRIM(location))'),strtolower(trim($row['location'])))->first();
             $sub_cat_code = DB::table('class')->where(DB::raw('LOWER(TRIM(class_description))'),strtolower(trim($row['sub_category_code'])))->value('id');
@@ -462,6 +462,19 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
     public function prepareForValidation($data, $index)
     {
         //DIGITS CODE
+        $data['digits_code_exist']['check'] = false;
+        $checkRowDbCode = DB::table('assets')->select("digits_code AS digits_code")->get()->toArray();
+        $checkRowDbCodeColumn = array_column($checkRowDbCode, 'digits_code');
+        $data['digits_code_exist']['code'] = $data['digits_code'];
+        if(!empty($data['digits_code'])){
+            if(in_array(preg_replace('/\s+/', '', $data['digits_code']), $checkRowDbCodeColumn)){
+                $data['digits_code_exist']['check'] = true;
+            }
+        }else{
+            $data['digits_code_exist']['check'] = true;
+        }
+
+        //EMPLOYEE 
         $data['employee_exist']['check'] = false;
         $checkRowDb = DB::table('cms_users')->select(DB::raw("LOWER(TRIM(email)) AS emails"))->get()->toArray();
         $checkRowDbColumn = array_column($checkRowDb, 'emails');
@@ -505,7 +518,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
 
     public function rules(): array
     {
-        $digits_code = $this->digits_code->pluck('digits_code')->all();
+       
         return [
             '*.employee_exist' => function($attribute, $value, $onFailure) {
                 if ($value['check'] === false) {
@@ -522,14 +535,18 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                     $onFailure('Digits Code and Serial No Exist!');
                 }
             },
-            '*.digits_code' => ['required', Rule::in($digits_code)],
+            '*.digits_code_exist' => function($attribute, $value, $onFailure) {
+                if ($value['check'] === false) {
+                    $onFailure('Digits Code '.$value['code'].' not exist in Item Master');
+                }
+            },
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            '*.digits_code.in' => 'Digits Code :input not exist in Item Master.',
+            '*.digits_code_exist.in' => 'Digits Code :input not exist in Item Master.',
             '*.digits_code.required' => 'Digits Code Required!',
             '*.employee_name.employee_exist' => 'Employee Name :input not exist in Users list.',
         ];
