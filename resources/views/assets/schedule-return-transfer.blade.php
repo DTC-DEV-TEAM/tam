@@ -84,17 +84,19 @@
                 <div class="col-md-6">
                     <table style="width:100%">
                         <tbody id="footer">
-                            <tr>
-                                <th class="control-label col-md-3">Location:</th>
-                                <td>
-                                    <select class="users" data-placeholder="Choose location"  style="width: 100%;" name="location_to_pick" id="location_to_pick">
-                                        <option value=""></option>
-                                        @foreach($warehouse_location as $location)
-                                            <option value="{{$location->id}}">{{$location->location}}</option>
-                                        @endforeach
-                                    </select>
-                                </td>                              
-                            </tr>
+                            @if($Header->request_type_id == 1)
+                                <tr>
+                                    <th class="control-label col-md-3">Location:</th>
+                                    <td>
+                                        <select class="users" data-placeholder="Choose location"  style="width: 100%;" name="location_to_pick" id="location_to_pick">
+                                            <option value=""></option>
+                                            @foreach($warehouse_location as $location)
+                                                <option value="{{$location->id}}">{{$location->location}}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>                              
+                                </tr>
+                            @endif
                             <tr>
                                 <th class="control-label col-md-3">Pick up by:</th>
                                 <td>

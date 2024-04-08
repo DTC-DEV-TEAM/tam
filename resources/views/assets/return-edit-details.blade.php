@@ -44,6 +44,7 @@
     <form action="{{ route('editReturnAssets')}}" method="POST" id="EditAssetReturnRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" name="header_id" id="header_id" value="{{$Header->requestid}}">
+        <input type="hidden" value="{{$Header->request_type_id}}" name="request_type_id" id="request_type_id">
         <div class='panel-body'>
 
             <div class="row">                           
@@ -89,7 +90,7 @@
                         <p>{{$Header->request_type}}</p>
                 </div> 
                
-                <label class="control-label col-md-2">Purpose:</label>
+                <label class="control-label col-md-2">Reason:</label>
                 <div class="col-md-4">
                     <select id="purpose" name="purpose" class="form-select" style="width:100%;">
                         @foreach($purposes as $res)
@@ -318,18 +319,19 @@
             
             //Search item
             let countrow = 1;
-            
+           
             $(function(){
                 countrow++;
                 $('#search_asset_code'+tableRow).autocomplete({
                     source: function (request, response) {
                     $.ajax({
-                        url: "{{ route('searchItem') }}",
-                        dataType: "json",
-                        type: "POST",
+                        url: '{{ route("searchItem") }}',
+                        dataType: 'json',
+                        type: 'POST',
                         data: {
-                            "_token": token,
-                            "search": request.term
+                            '_token': token,
+                            'search': request.term,
+                            'type'  : $('#request_type_id').val()
                         },
                         success: function (data) {
                         

@@ -196,8 +196,8 @@
                                                     <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->category_id}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->sub_category_id}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->wh_qty}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->unserved_qty}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->wh_qty ? $rowresult->wh_qty : 0}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->unserved_qty ? $rowresult->unserved_qty : 0}}</td>
                                                     <td style="text-align:center" height="10" class="qty">{{$rowresult->quantity}}</td>
                                                     <td style="text-align:center" height="10">
                                                         <select selected data-placeholder="Choose" class="form-control budget" name="body_budget_range[]" id="budget${tableRow}" required required style="width:100%"> 

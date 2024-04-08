@@ -175,7 +175,7 @@
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
 
-			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->where('id','!=',3)->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -199,7 +199,7 @@
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
-			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->where('id','!=',1)->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -593,7 +593,11 @@
 			$data = [];
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
-			$items = MoveOrder::moSearchItem($search, CRUDBooster::myId());
+			if($request->type == 1){
+				$items = MoveOrder::moSearchItem($search, CRUDBooster::myId());
+			}else{
+				$items = MoveOrder::moSearchItemFa($search, CRUDBooster::myId());
+			}
 			if($items){
 				$data['status'] = 1;
 				$data['problem']  = 1;

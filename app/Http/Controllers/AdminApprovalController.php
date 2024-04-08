@@ -17,6 +17,7 @@
 	//use Illuminate\Support\Facades\Input;
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
+	use Carbon\Carbon;
 
 	class AdminApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -36,7 +37,7 @@
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = true;
 			$this->button_edit = false;
@@ -64,6 +65,7 @@
 			$this->col[] = ["label"=>"Approved By","name"=>"approved_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Approved Date","name"=>"approved_at"];
 			$this->col[] = ["label"=>"Rejected Date","name"=>"rejected_at"];
+			$this->col[] = ["label"=>"Age of ticket","name"=>"reference_number"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -142,7 +144,7 @@
 			$rejected =  		DB::table('statuses')->where('id', 5)->value('status_description');
 			$it_reco  = 		DB::table('statuses')->where('id', 7)->value('status_description');
 
-			if($column_index == 2){
+			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $approved){
@@ -151,6 +153,17 @@
 					$column_value = '<span class="label label-danger">'.$rejected.'</span>';
 				}else if($column_value == $it_reco){
 					$column_value = '<span class="label label-info">'.$it_reco.'</span>';
+				}
+			}
+
+			if($column_index == 12){
+				$info = HeaderRequest::where('reference_number',$column_value)->first();
+				if(!in_array($info->status_id,[13,19])){
+					$start = Carbon::parse($info->created_at);
+					$now = Carbon::now();
+					$column_value = $start->diffInDays($now) .' Days';
+				}else{
+					$column_value = 'Transacted';
 				}
 			}
 

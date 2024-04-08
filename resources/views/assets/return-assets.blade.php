@@ -47,8 +47,8 @@
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
         
         <div class="form-group" style="padding:10px">
-            <label class="require control-label">Purpose:</label>
-            <select class="users" data-placeholder="Choose purpose"  style="width: 50%;" name="purpose" id="purpose">
+            <label class="require control-label">Reason:</label>
+            <select class="users" data-placeholder="Choose reason"  style="width: 50%;" name="purpose" id="purpose">
                 <option value=""></option>
                 @foreach($purposes as $purpose)
                     <option value="{{$purpose->description}}">{{$purpose->description}}</option>

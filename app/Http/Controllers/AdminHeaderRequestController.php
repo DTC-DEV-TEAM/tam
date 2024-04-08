@@ -27,6 +27,7 @@
 	use PhpOffice\PhpSpreadsheet\Reader\Exception;
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use Illuminate\Support\Facades\Response;
+	use Carbon\Carbon;
 
 	class AdminHeaderRequestController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $pending;   		
@@ -99,6 +100,7 @@
 			$this->col[] = ["label"=>"Approved By","name"=>"approved_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Approved Date","name"=>"approved_at"];
 			$this->col[] = ["label"=>"Rejected Date","name"=>"rejected_at"];
+			$this->col[] = ["label"=>"Age of ticket","name"=>"reference_number"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
@@ -424,6 +426,17 @@
 					$column_value = "ERF";
 				}
 			}
+			
+			if($column_index == 13){
+				$info = HeaderRequest::where('reference_number',$column_value)->first();
+				if(!in_array($info->status_id,[13,19])){
+					$start = Carbon::parse($info->created_at);
+					$now = Carbon::now();
+					$column_value = $start->diffInDays($now) .' Days';
+				}else{
+					$column_value = 'Transacted';
+				}
+			}
 
 	    }
 
@@ -519,7 +532,7 @@
 			$dataLines          = array();
 			$arf_header         = DB::table('header_request')->where(['created_by' => CRUDBooster::myId()])->orderBy('id','desc')->first();
 			$digits_code 		= $fields['digits_code'];
-			$supplies_cost 		= $fields['supplies_cost'];
+			$item_cost 		    = $fields['item_cost'];
 			$item_description 	= $fields['item_description'];
 			$category_id 		= $fields['category_id'];
 			$sub_category_id 	= $fields['sub_category_id'];
@@ -561,7 +574,8 @@
 				$dataLines[$x]['app_id'] 			= implode(", ",$apps_array);
 				$dataLines[$x]['app_id_others'] 	= $app_id_others[$x];
 				$dataLines[$x]['quantity'] 			= intval(str_replace(',', '', $quantity[$x]));
-				$dataLines[$x]['unit_cost'] 		= $supplies_cost[$x];
+				$dataLines[$x]['unit_cost'] 		= $item_cost[$x];
+				$dataLines[$x]['total_unit_cost'] 	= $item_cost[$x];
 				$dataLines[$x]['budget_range'] 		= $budget_range[$x];
 				if($request_type_id == 5){
 					$dataLines[$x]['to_reco'] = 0;

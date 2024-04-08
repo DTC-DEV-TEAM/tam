@@ -121,19 +121,21 @@
 				$postdata['hand_carry_name'] = $fields['hand_carry'];
 			}
 			$postdata['location_to_pick']    = $fields['location_to_pick'];
+			$header = ReturnTransferAssetsHeader::where('id',$id)->first();
 
-			ReturnTransferAssets::where('return_header_id', $id)
-			->update([
-				'status'           => self::ForTurnOver,
-				'location_to_pick' => $fields['location_to_pick']
-			]);	
-
-			foreach($fields['mo_id'] as $key => $val){
-				$mo_info = MoveOrder::where('id',$val)->first();
-				DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
+			if($header->request_type_id == 1){
+				ReturnTransferAssets::where('return_header_id', $id)
 				->update([
-					'location'=> $fields['location_to_pick']
-				]);
+					'status'           => self::ForTurnOver,
+					'location_to_pick' => $fields['location_to_pick']
+				]);	
+				foreach($fields['mo_id'] as $key => $val){
+					$mo_info = MoveOrder::where('id',$val)->first();
+					DB::table('assets_inventory_body')->where('id', $mo_info->inventory_id)
+					->update([
+						'location'=> $fields['location_to_pick']
+					]);
+				}
 			}
 	    }
 

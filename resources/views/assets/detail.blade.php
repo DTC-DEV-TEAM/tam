@@ -46,6 +46,15 @@
 <div class='panel panel-default'>
     <div class='panel-heading'>
         Detail Form
+        <span class="pull-right">
+            @if(!in_array($Header->status_id,[13,19]))
+                <?php $start = \Carbon\Carbon::parse($Header->created_at);
+                    $now = \Carbon\Carbon::now();
+                    ;
+                ?>
+                Age of ticket: {{$start->diffInDays($now).' Days'}}
+            @endif
+        </span>
     </div>
 
     <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>
