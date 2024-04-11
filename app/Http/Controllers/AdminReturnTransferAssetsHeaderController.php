@@ -620,9 +620,10 @@
 			$header_id = $request->header_id;
 			$mo_id     = $request->mo_id;
 			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first();
-			
+		
 			$container = [];
 			$containerSave = [];
+
 			if(is_array($request->asset_code)){
 				foreach($request->asset_code as $key => $val){
 					$isExist = ReturnTransferAssets::where([
@@ -707,10 +708,29 @@
 				]);
 			}
 		
-			ReturnTransferAssets::where(['return_header_id' => $header_id])
+			ReturnTransferAssets::where(['return_header_id' => $header_id, 'archived'=> NULL])
 			->update([
 				'status' => self::ForApproval
 			]);
+
+			//DELETE IF SELECTED
+			if(is_array($request->deleteRowData)){
+				foreach($request->deleteRowData as $dKey => $dVal){
+					$lineInfo = ReturnTransferAssets::lineDetail($dVal)->first();
+
+					ReturnTransferAssets::where(['id' => $dVal])
+					->update([
+						'status'   => self::Cancelled,
+						'archived' => date('Y-m-d H:i:s')
+					]);
+
+					//UNPLAG RETURN FLAG
+					MoveOrder::where(['id' => $lineInfo->mo_id])
+					->update([
+						'return_flag' => NULL
+					]);
+				}
+			}
 
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Updated successfully!"), 'info');
 		}

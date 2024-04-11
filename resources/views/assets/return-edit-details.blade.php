@@ -1,6 +1,7 @@
 @extends('crudbooster::admin_template')
 @section('content')
     @push('head')
+    <link rel="stylesheet" type="text/css" href="https://flatlogic.github.io/awesome-bootstrap-checkbox/demo/build.css" />
         <style type="text/css">   
             .select2-selection__choice{
                     font-size:14px !important;
@@ -29,6 +30,28 @@
                 background-color: #00a65a !important;
                 border: 1px solid rgb(255, 254, 254) !important;
                 color: #fff !important;
+            }
+
+            .selected {
+                border:none;
+                background-color:#d4edda
+            }
+            .selectedAlternative {
+                border:none;
+                background-color:#f0ad4e
+            }
+            .cancelled {
+                border:none;
+                background-color:#dd4b39;
+                color:#fff;
+            }
+            .green-color {
+                color:green;
+                margin-top:12px;
+            }
+
+            .checkbox label::before {
+             border: 1px solid #111111 !important;
             }
         </style>
     @endpush
@@ -141,7 +164,11 @@
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
                             <td style="text-align:center" height="10">
-                                <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->body_id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
+                                {{-- <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->body_id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button> --}}
+                                <div style="margin-left:9px;" class="checkbox checkbox-danger checkbox-circle" data-toggle="tooltip" data-placement="bottom" title="Check to delete">
+                                    <input  type="checkbox" id="chkSuccess" class="checkbox3" name="deleteRowData[]" value="{{$rowresult->body_id}}" />
+                                    <label for="chkSuccess"></label>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

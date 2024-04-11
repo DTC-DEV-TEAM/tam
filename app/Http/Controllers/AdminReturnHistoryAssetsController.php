@@ -50,8 +50,9 @@
 			$this->col[] = ["label"=>"Type of Request","name"=>"request_type"];
 			$this->col[] = ["label"=>"Requested Date","name"=>"requested_date"];
 			# END COLUMNS DO NOT REMOVE THIS LINE	        
+			$this->load_css[] = asset("css/font-family.css");
 	    }
-
+		
 	    public function hook_query_index(&$query) {
 	        if(CRUDBooster::isSuperadmin()){
 		

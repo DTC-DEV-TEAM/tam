@@ -125,7 +125,7 @@
 					$postdata['status']		 	    = self::ForVerification;
 					$postdata['approved_by'] 		= CRUDBooster::myId();
 					$postdata['approved_date'] 		= date('Y-m-d H:i:s');
-					ReturnTransferAssets::where('return_header_id',$id)
+					ReturnTransferAssets::where(['return_header_id'=>$id, 'archived'=> NULL])
 					->update([
 							'status' => self::ForVerification
 					]);	
@@ -147,7 +147,10 @@
 			}else if($approval_action  == 2){
 				$postdata['status'] 			= self::returnForApproval;
 				$postdata['approver_comments'] 	= $approver_comments;
-				ReturnTransferAssets::where('return_header_id',$id)
+				ReturnTransferAssets::where([
+					'return_header_id'=>$id,
+					'status'=>self::ForApproval
+				])
 				->update([
 					    'status' => self::returnForApproval
 				]);	

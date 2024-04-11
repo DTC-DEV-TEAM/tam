@@ -101,7 +101,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $cooking_and_equipment->from_code + $DatabaseCounterCE;
                 $DatabaseCounterCE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $cooking_and_equipment->to_code){
@@ -116,7 +116,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $refrigeration_equipment->from_code + $DatabaseCounterRE;
                 $DatabaseCounterRE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $refrigeration_equipment->to_code){
@@ -131,7 +131,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $commercial_ovens->from_code + $DatabaseCounterCO;
                 $DatabaseCounterCO++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $commercial_ovens->to_code){
@@ -146,7 +146,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $refrigeration_and_freezer->from_code + $DatabaseCounterRAF;
                 $DatabaseCounterRAF++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $refrigeration_and_freezer->to_code){
@@ -161,7 +161,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $commercial_sinks->from_code + $DatabaseCounterCS;
                 $DatabaseCounterCS++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $commercial_sinks->to_code){
@@ -176,7 +176,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $work_table_stations->from_code + $DatabaseCounterWTS;
                 $DatabaseCounterWTS++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $work_table_stations->to_code){
@@ -191,7 +191,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $food_preparation_equipmen->from_code + $DatabaseCounterFPE;
                 $DatabaseCounterFPE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $food_preparation_equipmen->to_code){
@@ -206,7 +206,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $faucet_and_plumbing->from_code + $DatabaseCounterFAP;
                 $DatabaseCounterFAP++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $faucet_and_plumbing->to_code){
@@ -221,7 +221,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $food_holding_warming_equip->from_code + $DatabaseCounterFHWE;
                 $DatabaseCounterFHWE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $food_holding_warming_equip->to_code){
@@ -236,7 +236,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $other_restaurant_equipment->from_code + $DatabaseCounterORE;
                 $DatabaseCounterORE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $other_restaurant_equipment->to_code){
@@ -251,7 +251,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $other_vehicle->from_code + $DatabaseCounterOV;
                 $DatabaseCounterOV++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $other_vehicle->to_code){
@@ -266,7 +266,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $other_fixed_asset->from_code + $DatabaseCounterOFA;
                 $DatabaseCounterOFA++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $other_fixed_asset->to_code){
@@ -280,8 +280,8 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
             }else if($sub_cat_code == 13){
                 $asset_code                = $communication_equipment->from_code + $DatabaseCounterCOMME;
                 $DatabaseCounterCOMME++; 
-                $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $request_type_id_inventory = 1;
+                $item_category             = "IT ASSETS";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $communication_equipment->to_code){
@@ -296,7 +296,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $furnitures_fixtures->from_code + $DatabaseCounterFF;
                 $DatabaseCounterFF++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $furnitures_fixtures->to_code){
@@ -311,7 +311,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $facilities_equipment->from_code + $DatabaseCounterFE;
                 $DatabaseCounterFE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $facilities_equipment->to_code){
@@ -326,7 +326,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $leasehold_equipment->from_code + $DatabaseCounterLE;
                 $DatabaseCounterLE++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $leasehold_equipment->to_code){
@@ -341,7 +341,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $machinery_equipmen->from_code + $DatabaseCounterME;
                 $DatabaseCounterME++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $machinery_equipmen->to_code){
@@ -356,7 +356,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $vehicle->from_code + $DatabaseCounterV;
                 $DatabaseCounterV++; 
                 $request_type_id_inventory = 5;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "FIXED ASSET";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $vehicle->to_code){
@@ -371,7 +371,7 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 $asset_code                = $computer_software_program->from_code + $DatabaseCounterCSP;
                 $DatabaseCounterCSP++; 
                 $request_type_id_inventory = 1;
-                $item_category             = $itemCat->category_description;
+                $item_category             = "IT ASSETS";
                 $sub_cat_id                = $sub_cat_code;
 
                 if($asset_code > $computer_software_program->to_code){

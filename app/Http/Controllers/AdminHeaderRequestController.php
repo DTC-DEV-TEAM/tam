@@ -2069,21 +2069,29 @@
 				
 			}
 
+			//DELETE LINES IF SELECTED
+			foreach($fields['deleteRowData'] as $dKey => $dLine){
+				BodyRequest::where('id', $dLine)
+				->update([
+					'deleted_at'=> 		date('Y-m-d H:i:s'),
+					'deleted_by'=> 		CRUDBooster::myId()
+				]);	
+			}
 			
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_edit_employee",['reference_number'=>$arf_header->reference_number]), 'success');
 
 		}
 
-		//DELETE LINES FROM RETURN APPROVAL
-		public function deleteLinetAssetsFromApproval(Request $request){
-			$fields = Request::all();
-			$id     = $fields['lineId'];
-			BodyRequest::where('id', $id)
-			->update([
-				'deleted_at'=> 		date('Y-m-d H:i:s'),
-				'deleted_by'=> 		CRUDBooster::myId()
-			]);	
-			$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
-			echo json_encode($message);
-		}
+		// //DELETE LINES FROM RETURN APPROVAL
+		// public function deleteLinetAssetsFromApproval(Request $request){
+		// 	$fields = Request::all();
+		// 	$id     = $fields['lineId'];
+		// 	BodyRequest::where('id', $id)
+		// 	->update([
+		// 		'deleted_at'=> 		date('Y-m-d H:i:s'),
+		// 		'deleted_by'=> 		CRUDBooster::myId()
+		// 	]);	
+		// 	$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+		// 	echo json_encode($message);
+		// }
 	}

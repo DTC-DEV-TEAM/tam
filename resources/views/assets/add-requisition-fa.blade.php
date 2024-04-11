@@ -336,7 +336,7 @@
 
                         <td>  
                             <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]"   maxlength="100" readonly> 
-                            <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center item_cost sinput" data-id="${tableRow}" id="item_cost${tableRow}"  name="item_cost[]"   maxlength="100" readonly> 
+                            <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center item_cost sinput" data-id="${tableRow}" id="item_cost${tableRow}"  name="item_cost[]"   maxlength="100" readonly> 
                         </td> 
 
                         <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 

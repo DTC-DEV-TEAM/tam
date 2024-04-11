@@ -23,7 +23,7 @@
 @endif
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Request Form
+        Closing Return/Transfer Form
     </div>
 
     <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>
@@ -68,14 +68,16 @@
                 <div class="col-md-6">
                     <table style="width:100%">
                         <tbody id="footer">
-                            <tr>
-                                <th class="control-label col-md-3">Location:</th>
-                                <td>
-                                    @if($Header->location_pick != null || $Header->location_pick != "")
-                                     {{$Header->location_pick}}
-                                    @endif
-                                </td>                              
-                            </tr>
+                            @if($Header->request_type_id == 1)
+                                <tr>
+                                    <th class="control-label col-md-3">Location:</th>
+                                    <td>
+                                        @if($Header->location_pick != null || $Header->location_pick != "")
+                                        {{$Header->location_pick}}
+                                        @endif
+                                    </td>                              
+                                </tr>
+                            @endif
                             <tr>
                                 <th class="control-label col-md-3">Pick up by:</th>
                                 <td>
@@ -112,12 +114,12 @@
                         <p>{{$Header->request_type}}</p>
                 </div> 
                 @if($Header->transfer_to != null)    
-                    <label class="control-label col-md-2">Purpose:</label>
+                    <label class="control-label col-md-2">Reason:</label>
                     <div class="col-md-4">
                             <p>{{$Header->purpose}}</p>
                     </div>                    
                     @else
-                    <label class="control-label col-md-2">Purpose:</label>
+                    <label class="control-label col-md-2">Reason:</label>
                     <div class="col-md-4">
                             <p>{{$Header->purpose}}</p>
                     </div>
@@ -125,37 +127,38 @@
             </div> 
 
             <hr/>
-        
-            <div class="box-header text-center">
-                <h3 class="box-title"><b>{{ trans('message.form-label.asset_items') }}</b></h3>
-            </div>
-
+    
             <table  class='table' id="asset-items">
                 <thead>
+                    <tr style="background-color:#00a65a; border: 0.5px solid #000;">
+                        <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                    </tr>
                     <tr>
-                        <th width="20%" class="text-center">Reference No</th>
-                        @if(in_array($Header->request_type_id, [1,5]))
-                            <th width="20%" class="text-center">Asset Code</th>
-                        @endif
-                        <th width="20%" class="text-center">Digits Code</th>
-                        <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>
-                        <th width="25%" class="text-center">Asset Type</th>                                                         
+                        <th width="15%" class="text-center">Reference No</th>
+                        <th width="15%" class="text-center">Asset Code</th>
+                        <th width="15%" class="text-center">Digits Code</th>
+                        <th width="10%" class="text-center">Serial No</th>
+                        <th width="25%" class="text-center">{{ trans('message.table.item_description') }}</th>
+                        <th width="20%" class="text-center">Asset Type</th>   
+                        <th width="25%" class="text-center">Cost</th>                                                          
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($return_body as $rowresult)
                         <tr>
                             <td style="text-align:center" height="10">{{$rowresult->reference_no}}</td>
-                            @if(in_array($Header->request_type_id, [1,5]))
-                                <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
-                            @endif
+                            <td style="text-align:center" height="10">{{$rowresult->asset_code}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
+                            <td style="text-align:center" height="10">{{$rowresult->serial_no}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
-                                                   
+                            <td style="text-align:center" height="10" class="unit_cost">{{$rowresult->unit_cost}}</td>               
                         </tr>
                     @endforeach
-
+                    <tr>
+                        <td colspan="6" style="text-align: center;"><b>Total</b></td>
+                        <td class="text-center"><span id="unitCost">0</span></td>
+                    </tr>
                 </tbody>
                 
             </table> 
@@ -232,6 +235,10 @@
     };
     setTimeout("preventBack()", 0);
 
+    $(document).ready(function() {
+        $('#unitCost').text(calculateUnitCost().toFixed(2));
+    });
+
     $('#btnSubmit').click(function(event) {
         event.preventDefault();
         swal({
@@ -250,6 +257,18 @@
 
     });
 
+    function calculateUnitCost() {
+        let totalQuantity = 0;
+        $('.unit_cost').each(function() {
+            let qty = 0;
+            if($(this).text().trim()) {
+                qty = parseInt($(this).text().replace(/,/g, ''));
+            }
+
+            totalQuantity += qty;
+        });
+        return totalQuantity;
+    }
 
 </script>
 @endpush
