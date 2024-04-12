@@ -73,7 +73,7 @@
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = false;
@@ -386,7 +386,7 @@
 			$for_printing      = DB::table('statuses')->where('id', $this->for_printing)->value('status_description');
 			$forReturnApproval = DB::table('statuses')->where('id', self::returnForApproval)->value('status_description');
 
-			if($column_index == 2){
+			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $approved){
@@ -421,20 +421,26 @@
 
 			}
 
-			if($column_index == 6){
+			if($column_index == 5){
 				if($column_value == null){
 					$column_value = "ERF";
 				}
 			}
 			
-			if($column_index == 13){
+			if($column_index == 12){
 				$info = HeaderRequest::where('reference_number',$column_value)->first();
-				if(!in_array($info->status_id,[13,19])){
+				if(!in_array($info->status_id,[5,8,13,19])){
 					$start = Carbon::parse($info->created_at);
 					$now = Carbon::now();
-					$column_value = $start->diffInDays($now) .' Days';
+					if($start->diffInDays($now) > 15){
+						$column_value = '<span class="label label-danger">'.$start->diffInDays($now).' Days'.'</span>';
+					}else{
+						$column_value = '<span class="label label-info">'.$start->diffInDays($now).' Days'.'</span>';
+					}
+				}else if(in_array($info->status_id,[5,8])){
+					$column_value = '<span class="label label-success">'."".'</span>';
 				}else{
-					$column_value = 'Transacted';
+					$column_value = '<span class="label label-success">'."Transacted".'</span>';
 				}
 			}
 

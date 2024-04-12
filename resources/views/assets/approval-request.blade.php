@@ -24,11 +24,15 @@
         Request Form 
         <span class="pull-right">
             @if(!in_array($Header->status_id,[13,19]))
-                <?php $start = \Carbon\Carbon::parse($Header->created_at);
+                <?php $start = \Carbon\Carbon::parse($Header->created);
                     $now = \Carbon\Carbon::now();
-                    ;
                 ?>
-                Age of ticket: {{$start->diffInDays($now).' Days'}}
+                Age of ticket: 
+                @if($start->diffInDays($now) > 15)
+                    <span class="label label-danger">{{$start->diffInDays($now).' Days'}}</span>
+                @else
+                    <span class="label label-info">{{$start->diffInDays($now).' Days'}}</span>
+                @endif
             @endif
         </span>
     </div>

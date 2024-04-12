@@ -158,12 +158,18 @@
 
 			if($column_index == 12){
 				$info = HeaderRequest::where('reference_number',$column_value)->first();
-				if(!in_array($info->status_id,[13,19])){
+				if(!in_array($info->status_id,[5,8,13,19])){
 					$start = Carbon::parse($info->created_at);
 					$now = Carbon::now();
-					$column_value = $start->diffInDays($now) .' Days';
+					if($start->diffInDays($now) > 15){
+						$column_value = '<span class="label label-danger">'.$start->diffInDays($now).' Days'.'</span>';
+					}else{
+						$column_value = '<span class="label label-info">'.$start->diffInDays($now).' Days'.'</span>';
+					}
+				}else if(in_array($info->status_id,[5,8])){
+					$column_value = '<span class="label label-success">'."".'</span>';
 				}else{
-					$column_value = 'Transacted';
+					$column_value = '<span class="label label-success">'."Transacted".'</span>';
 				}
 			}
 
