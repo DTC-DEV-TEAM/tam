@@ -638,8 +638,16 @@
 				)
 				->where('assets_inventory_body.header_id', $id)
 				->get();
-
-				return $this->view("assets.edit-inventory-list-for-po", $data);
+			$arrayDigitsCode = [];
+			foreach($data['Body'] as $codes) {
+				$digits_code['digits_code'] = $codes['digits_code'];
+				array_push($arrayDigitsCode, $codes['digits_code']);
+			}
+			$data['reserved_assets'] = AssetsInventoryReserved::
+										leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')
+										->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')
+										->whereNotNull('for_po')->whereIn('digits_code', $arrayDigitsCode)->get();
+			return $this->view("assets.edit-inventory-list-for-po", $data);
 		}
 
 		public function getDetailForReceiving($id){
@@ -1543,16 +1551,43 @@
 			//parse data in form
 			parse_str($fields['form_data'], $fields);
 			$po_no        = $fields['po_no'];
+			$arf_tag      = $fields['arf_tag'];
+			$body_id      = $fields['body_id'];
+			// dd($fields);
+			if($arf_tag){
+				foreach($arf_tag as $key => $tag_id){
+					$arfBodyId = AssetsInventoryReserved::where(['id' => $tag_id])->first();
+					BodyRequest::where(['id' => $arfBodyId->body_id])
+					->update([
+							'direct_delivery_inv_id' => $body_id[$key]
+							]);
 
+					AssetsInventoryReserved::where(['id' => $tag_id[$t]])
+					->update([
+							'reserved' => 1,
+							'for_po'   => NULL
+							]);
+					$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
+					foreach($arfNumber as $val){
+						HeaderRequest::where('reference_number',$val->reference_number)
+						->update([
+							'to_mo'              => 1,
+							'is_direct_deliver'  => 1
+						]);
+					}
+				}
+			}
 			AssetsInventoryHeaderForApproval::where('id', $id)
 			->update([
 				'header_approval_status' => 20, 
-				'po_no'                  => $po_no
+				'po_no'                  => $po_no,
+				'location'               => 8
 			]);
 
 			AssetsInventoryBody::where(['header_id' => $id])
 			->update([
-					'statuses_id'  => 20
+					'statuses_id'  => 20,
+					'location'     => 8
 					]);
 
 			$message = ['status'=>'success', 'message' => 'Success!','redirect_url'=>CRUDBooster::mainpath()];

@@ -1,7 +1,19 @@
 @extends('crudbooster::admin_template')
 @push('head')
 <style type="text/css">   
-    
+    .select2-selection__choice{
+        font-size:14px !important;
+        color:black !important;
+    }
+    .select2-selection__rendered {
+        line-height: 31px !important;
+    }
+    .select2-container .select2-selection--single {
+        height: 35px !important;
+    }
+    .select2-selection__arrow {
+        height: 34px !important;
+    }
     .zoom-overlay-open,
     .zoom-overlay-transitioning {
     cursor: default;
@@ -111,9 +123,19 @@
                         <input class="form-control finput" type="text"  placeholder="PO NO" name="po_no" id="po_no">
                     </div>
                 </div>
+                {{-- <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label"> Direct Deliver(ARF Request)</label>
+                        <select selected data-placeholder="Select ARF" class="form-control select2 arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" style="width:100%">
+                            <option value=""></option>
+                                   @foreach($reserved_assets as $reserve)
+                                       <option value="{{$reserve->arf_id}}">{{$reserve->reference_number}}</option> 
+                                   @endforeach
+                        </select>
+                    </div>                                                                                         
+                </div> --}}
             </div>
         </div>
-            
         <hr>
 
         <!-- Body Area -->
@@ -135,11 +157,14 @@
                             <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>   
                             <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>      
                             <th width="5%" class="text-center">{{ trans('message.table.location_id_text') }}</th>                                         
-                            <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th>                   
+                            <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
+                            <th width="5%" class="text-center">Direct Deliver(ARF Request)</th>                   
                         </tr>
                     </thead>
                     <tbody>
+                        <?php   $tableRow = 1; ?>
                         @foreach($Body as $res)
+                        <?php   $tableRow++; ?>
                             <tr>
                             <td style="display:none">
                                 <input class="form-control" type="text"name="body_id[]" value="{{$res->for_approval_body_id}}">
@@ -149,7 +174,16 @@
                             <td class="text-center">{{$res->digits_code}}</td>
                             <td class="text-center">{{$res->item_description}}</td>   
                             <td class="qty" style="text-align:center">{{$res->warehouse_location}}</td>  
-                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>                                                                                                       
+                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>   
+                            <td>
+                                <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
+                                    <option value=""></option>
+                                           @foreach($reserved_assets as $reserve)
+                                               <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
+                                           @endforeach
+                                </select>
+                            </td>                                                                                                
+                                                                                                                            
                             </tr>
                         @endforeach
                     </tbody>
@@ -207,12 +241,36 @@
             $("#removeImageHeader").toggle(); 
         });
     });
-    $('.select2').select2({placeholder_text_single : "-- Select --"})
+
     $(".date").datetimepicker({
         viewMode: "days",
         format: "YYYY-MM-DD",
         dayViewHeaderFormat: "MMMM YYYY",
     });
+
+    $(document).ready(function () {
+        var $selects = $('.arf_tag');
+        $selects.select2();
+        $('.arf_tag').change(function () {
+            $('option:hidden', $selects).each(function () {
+                var self = this,
+                    toShow = true;
+                $selects.not($(this).parent()).each(function () {
+                    if (self.value == this.value) toShow = false;
+                })
+                if (toShow) {
+                    $(this).removeAttr('disabled');
+                    $(this).parent().select2();
+                }
+            });
+            if (this.value != "") {
+                //$selects.not(this).children('option[value=' + this.value + ']').attr('disabled', 'disabled');
+                $selects.not(this).children('option[value=' + this.value + ']').remove();
+                $selects.select2();
+            }
+   
+        });
+    })
    
     /**Send Request*/
     $('#btnSubmit').on('click', function (event) {
@@ -313,6 +371,7 @@
                     qty +
                 "</strong>"+
             "</td>"+
+            "<td></td>"+
     "</tr>";
 
     </script>
