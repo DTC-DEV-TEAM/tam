@@ -175,7 +175,7 @@
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
 
-			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->where('id','!=',3)->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -199,7 +199,7 @@
 			$for_closing =  self::ForClosing;
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['mo_body'] = MoveOrder::moReturn(CRUDBooster::myId());
-			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->get();
+			$data['purposes'] = DB::table('purposes')->where('status', 'ACTIVE')->where('type', 'RETURN')->where('id','!=',1)->get();
 			if(CRUDBooster::myPrivilegeId() == 8){ 
 				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			}else{
@@ -593,7 +593,11 @@
 			$data = [];
 			$data['status_no'] = 0;
 			$data['message']   ='No Item Found!';
-			$items = MoveOrder::moSearchItem($search, CRUDBooster::myId());
+			if($request->type == 1){
+				$items = MoveOrder::moSearchItem($search, CRUDBooster::myId());
+			}else{
+				$items = MoveOrder::moSearchItemFa($search, CRUDBooster::myId());
+			}
 			if($items){
 				$data['status'] = 1;
 				$data['problem']  = 1;
@@ -616,9 +620,10 @@
 			$header_id = $request->header_id;
 			$mo_id     = $request->mo_id;
 			$headerInfo = ReturnTransferAssetsHeader::detail($header_id)->first();
-			
+		
 			$container = [];
 			$containerSave = [];
+
 			if(is_array($request->asset_code)){
 				foreach($request->asset_code as $key => $val){
 					$isExist = ReturnTransferAssets::where([
@@ -703,10 +708,29 @@
 				]);
 			}
 		
-			ReturnTransferAssets::where(['return_header_id' => $header_id])
+			ReturnTransferAssets::where(['return_header_id' => $header_id, 'archived'=> NULL])
 			->update([
 				'status' => self::ForApproval
 			]);
+
+			//DELETE IF SELECTED
+			if(is_array($request->deleteRowData)){
+				foreach($request->deleteRowData as $dKey => $dVal){
+					$lineInfo = ReturnTransferAssets::lineDetail($dVal)->first();
+
+					ReturnTransferAssets::where(['id' => $dVal])
+					->update([
+						'status'   => self::Cancelled,
+						'archived' => date('Y-m-d H:i:s')
+					]);
+
+					//UNPLAG RETURN FLAG
+					MoveOrder::where(['id' => $lineInfo->mo_id])
+					->update([
+						'return_flag' => NULL
+					]);
+				}
+			}
 
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Updated successfully!"), 'info');
 		}

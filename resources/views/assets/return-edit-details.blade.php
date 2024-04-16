@@ -1,6 +1,7 @@
 @extends('crudbooster::admin_template')
 @section('content')
     @push('head')
+    <link rel="stylesheet" type="text/css" href="https://flatlogic.github.io/awesome-bootstrap-checkbox/demo/build.css" />
         <style type="text/css">   
             .select2-selection__choice{
                     font-size:14px !important;
@@ -30,6 +31,28 @@
                 border: 1px solid rgb(255, 254, 254) !important;
                 color: #fff !important;
             }
+
+            .selected {
+                border:none;
+                background-color:#d4edda
+            }
+            .selectedAlternative {
+                border:none;
+                background-color:#f0ad4e
+            }
+            .cancelled {
+                border:none;
+                background-color:#dd4b39;
+                color:#fff;
+            }
+            .green-color {
+                color:green;
+                margin-top:12px;
+            }
+
+            .checkbox label::before {
+             border: 1px solid #111111 !important;
+            }
         </style>
     @endpush
 @if(g('return_url'))
@@ -44,6 +67,7 @@
     <form action="{{ route('editReturnAssets')}}" method="POST" id="EditAssetReturnRequest" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" name="header_id" id="header_id" value="{{$Header->requestid}}">
+        <input type="hidden" value="{{$Header->request_type_id}}" name="request_type_id" id="request_type_id">
         <div class='panel-body'>
 
             <div class="row">                           
@@ -89,7 +113,7 @@
                         <p>{{$Header->request_type}}</p>
                 </div> 
                
-                <label class="control-label col-md-2">Purpose:</label>
+                <label class="control-label col-md-2">Reason:</label>
                 <div class="col-md-4">
                     <select id="purpose" name="purpose" class="form-select" style="width:100%;">
                         @foreach($purposes as $res)
@@ -140,7 +164,11 @@
                             <td style="text-align:center" height="10">{{$rowresult->description}}</td>
                             <td style="text-align:center" height="10">{{$rowresult->asset_type}}</td>
                             <td style="text-align:center" height="10">
-                                <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->body_id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
+                                {{-- <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->body_id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button> --}}
+                                <div style="margin-left:9px;" class="checkbox checkbox-danger checkbox-circle" data-toggle="tooltip" data-placement="bottom" title="Check to delete">
+                                    <input  type="checkbox" id="chkSuccess" class="checkbox3" name="deleteRowData[]" value="{{$rowresult->body_id}}" />
+                                    <label for="chkSuccess"></label>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -318,18 +346,19 @@
             
             //Search item
             let countrow = 1;
-            
+           
             $(function(){
                 countrow++;
                 $('#search_asset_code'+tableRow).autocomplete({
                     source: function (request, response) {
                     $.ajax({
-                        url: "{{ route('searchItem') }}",
-                        dataType: "json",
-                        type: "POST",
+                        url: '{{ route("searchItem") }}',
+                        dataType: 'json',
+                        type: 'POST',
                         data: {
-                            "_token": token,
-                            "search": request.term
+                            '_token': token,
+                            'search': request.term,
+                            'type'  : $('#request_type_id').val()
                         },
                         success: function (data) {
                         

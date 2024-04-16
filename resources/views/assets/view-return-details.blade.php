@@ -60,6 +60,7 @@
                 <div class="col-md-6">
                     <table style="width:100%">
                         <tbody id="footer">
+                            @if($Header->request_type_id == 1)
                             <tr>
                                 <th class="control-label col-md-3">Location:</th>
                                 <td>
@@ -68,6 +69,7 @@
                                     @endif
                                 </td>                              
                             </tr>
+                            @endif
                             <tr>
                                 <th class="control-label col-md-3">Pick up by:</th>
                                 <td>

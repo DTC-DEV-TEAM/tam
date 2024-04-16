@@ -1783,7 +1783,7 @@
 					$return_data[$i]['cat_id']               = $value->cat_id;
 					$return_data[$i]['digits_code']          = $value->digits_code;
 					$return_data[$i]['item_description']     = $value->item_description;
-					$return_data[$i]['category_description'] = $value->tam_category_description ? $value->tam_category_description : $value->dam_category_description;
+					$return_data[$i]['category_description'] = $value->dam_category_description ? $value->dam_category_description : "FIXED ASSET";
 					$return_data[$i]['item_cost']            = $value->item_cost;
 					$i++;
 

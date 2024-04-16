@@ -417,6 +417,7 @@
                         </td>
                         <td> 
                             <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]"   maxlength="100" readonly> 
+                            <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center item_cost sinput" data-id="${tableRow}" id="item_cost${tableRow}"  name="item_cost[]"   maxlength="100" readonly> 
                         </td> 
                         <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
                         
@@ -550,7 +551,7 @@
                                     $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
                                     $('#category_id'+$(this).attr("data-id")).val(e.category_description);
                                     $('#sub_category_id'+$(this).attr("data-id")).val(e.sub_category_description);
-                                    $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
+                                    $("#item_cost"+$(this).attr("data-id")).val(e.item_cost);
                                     $('#itemDesc'+$(this).attr("data-id")).val(e.value);
                                     $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
                                     $('#fixed_description'+$(this).attr("data-id")).val(e.value);

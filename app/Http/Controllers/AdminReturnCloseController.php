@@ -237,8 +237,6 @@
 	    */
 	    public function hook_query_index(&$query) {
 	        $toClose  = 	DB::table('statuses')->where('id', 25)->value('id');
-
-     
 			$query->where('return_transfer_assets_header.status', $toClose)
 				  ->orderBy('return_transfer_assets_header.id', 'asc');
 	            
@@ -297,7 +295,7 @@
 			$item_id = $fields['item_id'];
 
 			$closed  = DB::table('statuses')->where('id',13)->value('id');
-			ReturnTransferAssets::where('return_header_id',$id)
+			ReturnTransferAssets::where(['return_header_id'=>$id, 'archived'=> NULL])
 			->update([
 					'status' => $closed
 			]);	

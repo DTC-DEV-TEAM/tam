@@ -1,5 +1,6 @@
 @extends('crudbooster::admin_template')
     @push('head')
+    <link rel="stylesheet" type="text/css" href="https://flatlogic.github.io/awesome-bootstrap-checkbox/demo/build.css" />
         <style type="text/css">   
 
             .select2-selection__choice{
@@ -73,6 +74,28 @@
             #asset-items th, td {
                 border: 1px solid rgba(000, 0, 0, .5);
                 padding: 8px;
+            }
+
+            .selected {
+                border:none;
+                background-color:#d4edda
+            }
+            .selectedAlternative {
+                border:none;
+                background-color:#f0ad4e
+            }
+            .cancelled {
+                border:none;
+                background-color:#dd4b39;
+                color:#fff;
+            }
+            .green-color {
+                color:green;
+                margin-top:12px;
+            }
+
+            .checkbox label::before {
+             border: 1px solid #111111 !important;
             }
 
         </style>
@@ -196,8 +219,8 @@
                                                     <td style="text-align:center" height="10">{{$rowresult->digits_code}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->category_id}}</td>
                                                     <td style="text-align:center" height="10">{{$rowresult->sub_category_id}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->wh_qty}}</td>
-                                                    <td style="text-align:center" height="10">{{$rowresult->unserved_qty}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->wh_qty ? $rowresult->wh_qty : 0}}</td>
+                                                    <td style="text-align:center" height="10">{{$rowresult->unserved_qty ? $rowresult->unserved_qty : 0}}</td>
                                                     <td style="text-align:center" height="10" class="qty">{{$rowresult->quantity}}</td>
                                                     <td style="text-align:center" height="10">
                                                         <select selected data-placeholder="Choose" class="form-control budget" name="body_budget_range[]" id="budget${tableRow}" required required style="width:100%"> 
@@ -210,7 +233,11 @@
                                                         </select>
                                                     </td>
                                                     <td style="text-align:center" height="10">
-                                                        <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button>
+                                                        {{-- <button id="deleteRowData{{$tableRow}}" value="{{$rowresult->id}}" name="deleteRowData" data-id="{{$tableRow}}" class="btn btn-danger deleteRowData btn-sm" data-toggle="tooltip" data-placement="bottom" title="Cancel"><i class="fa fa-trash"></i></button> --}}
+                                                        <div style="margin-left:9px;" class="checkbox checkbox-danger checkbox-circle" data-toggle="tooltip" data-placement="bottom" title="Check to delete">
+                                                            <input  type="checkbox" id="chkSuccess" class="checkbox3" name="deleteRowData[]" value="{{$rowresult->id}}" />
+                                                            <label for="chkSuccess"></label>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach

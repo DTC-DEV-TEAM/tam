@@ -147,7 +147,7 @@
                             </td>
                             <td class="text-center">{{$res->asset_code}}</td>
                             <td class="text-center">{{$res->digits_code}}</td>
-                            <td>{{$res->item_description}}</td>   
+                            <td class="text-center">{{$res->item_description}}</td>   
                             <td class="qty" style="text-align:center">{{$res->warehouse_location}}</td>  
                             <td class="qty" style="text-align:center">{{$res->quantity}}</td>                                                                                                       
                             </tr>

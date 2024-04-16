@@ -108,7 +108,8 @@ class ReturnTransferAssets extends Model
 			'return_transfer_assets.status as body_status',
 			'statuses.*',
 			'return_transfer_assets.id as body_id',
-			'mo_body_request.serial_no'
+			'mo_body_request.serial_no',
+			'mo_body_request.unit_cost'
 			)
 			->where('return_transfer_assets.return_header_id', $id)
 			->whereNull('return_transfer_assets.archived');
@@ -152,6 +153,7 @@ class ReturnTransferAssets extends Model
 				'mo_body_request.quantity'
 				)
 		->where('return_transfer_assets.return_header_id', $id)
-		->where('return_transfer_assets.status', 24);
+		->where('return_transfer_assets.status', 24)
+		->whereNull('return_transfer_assets.archived');
 	}
 }

@@ -46,6 +46,23 @@
 <div class='panel panel-default'>
     <div class='panel-heading'>
         Detail Form
+        <span class="pull-right">
+            @if(!in_array($Header->status_id,[13,19]))
+                <?php $start = \Carbon\Carbon::parse($Header->created_at);
+                    $now = \Carbon\Carbon::now();
+                ?>
+                Age of ticket: 
+                @if($start->diffInDays($now) > 15)
+                    <span class="label label-danger">{{$start->diffInDays($now).' Days'}}</span>
+                @else
+                    <span class="label label-info">{{$start->diffInDays($now).' Days'}}</span>
+                @endif
+            @elseif(in_array($info->status_id,[5,8]))
+                    <span></span>
+            @else
+                    <span class="label label-success">Transacted</span>
+            @endif
+        </span>
     </div>
 
     <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>

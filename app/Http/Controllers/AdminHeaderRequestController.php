@@ -27,6 +27,7 @@
 	use PhpOffice\PhpSpreadsheet\Reader\Exception;
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use Illuminate\Support\Facades\Response;
+	use Carbon\Carbon;
 
 	class AdminHeaderRequestController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $pending;   		
@@ -72,7 +73,7 @@
 			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
-			$this->button_bulk_action = true;
+			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
 			$this->button_edit = false;
@@ -99,6 +100,7 @@
 			$this->col[] = ["label"=>"Approved By","name"=>"approved_by","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Approved Date","name"=>"approved_at"];
 			$this->col[] = ["label"=>"Rejected Date","name"=>"rejected_at"];
+			$this->col[] = ["label"=>"Age of ticket","name"=>"reference_number"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
@@ -384,7 +386,7 @@
 			$for_printing      = DB::table('statuses')->where('id', $this->for_printing)->value('status_description');
 			$forReturnApproval = DB::table('statuses')->where('id', self::returnForApproval)->value('status_description');
 
-			if($column_index == 2){
+			if($column_index == 1){
 				if($column_value == $pending){
 					$column_value = '<span class="label label-warning">'.$pending.'</span>';
 				}else if($column_value == $approved){
@@ -419,9 +421,26 @@
 
 			}
 
-			if($column_index == 6){
+			if($column_index == 5){
 				if($column_value == null){
 					$column_value = "ERF";
+				}
+			}
+			
+			if($column_index == 12){
+				$info = HeaderRequest::where('reference_number',$column_value)->first();
+				if(!in_array($info->status_id,[5,8,13,19])){
+					$start = Carbon::parse($info->created_at);
+					$now = Carbon::now();
+					if($start->diffInDays($now) > 15){
+						$column_value = '<span class="label label-danger">'.$start->diffInDays($now).' Days'.'</span>';
+					}else{
+						$column_value = '<span class="label label-info">'.$start->diffInDays($now).' Days'.'</span>';
+					}
+				}else if(in_array($info->status_id,[5,8])){
+					$column_value = '<span class="label label-success">'."".'</span>';
+				}else{
+					$column_value = '<span class="label label-success">'."Transacted".'</span>';
 				}
 			}
 
@@ -519,7 +538,7 @@
 			$dataLines          = array();
 			$arf_header         = DB::table('header_request')->where(['created_by' => CRUDBooster::myId()])->orderBy('id','desc')->first();
 			$digits_code 		= $fields['digits_code'];
-			$supplies_cost 		= $fields['supplies_cost'];
+			$item_cost 		    = $fields['item_cost'];
 			$item_description 	= $fields['item_description'];
 			$category_id 		= $fields['category_id'];
 			$sub_category_id 	= $fields['sub_category_id'];
@@ -561,7 +580,8 @@
 				$dataLines[$x]['app_id'] 			= implode(", ",$apps_array);
 				$dataLines[$x]['app_id_others'] 	= $app_id_others[$x];
 				$dataLines[$x]['quantity'] 			= intval(str_replace(',', '', $quantity[$x]));
-				$dataLines[$x]['unit_cost'] 		= $supplies_cost[$x];
+				$dataLines[$x]['unit_cost'] 		= $item_cost[$x];
+				$dataLines[$x]['total_unit_cost'] 	= $item_cost[$x];
 				$dataLines[$x]['budget_range'] 		= $budget_range[$x];
 				if($request_type_id == 5){
 					$dataLines[$x]['to_reco'] = 0;
@@ -2055,21 +2075,29 @@
 				
 			}
 
+			//DELETE LINES IF SELECTED
+			foreach($fields['deleteRowData'] as $dKey => $dLine){
+				BodyRequest::where('id', $dLine)
+				->update([
+					'deleted_at'=> 		date('Y-m-d H:i:s'),
+					'deleted_by'=> 		CRUDBooster::myId()
+				]);	
+			}
 			
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_edit_employee",['reference_number'=>$arf_header->reference_number]), 'success');
 
 		}
 
-		//DELETE LINES FROM RETURN APPROVAL
-		public function deleteLinetAssetsFromApproval(Request $request){
-			$fields = Request::all();
-			$id     = $fields['lineId'];
-			BodyRequest::where('id', $id)
-			->update([
-				'deleted_at'=> 		date('Y-m-d H:i:s'),
-				'deleted_by'=> 		CRUDBooster::myId()
-			]);	
-			$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
-			echo json_encode($message);
-		}
+		// //DELETE LINES FROM RETURN APPROVAL
+		// public function deleteLinetAssetsFromApproval(Request $request){
+		// 	$fields = Request::all();
+		// 	$id     = $fields['lineId'];
+		// 	BodyRequest::where('id', $id)
+		// 	->update([
+		// 		'deleted_at'=> 		date('Y-m-d H:i:s'),
+		// 		'deleted_by'=> 		CRUDBooster::myId()
+		// 	]);	
+		// 	$message = ['status'=>'success', 'message' => 'Delete Successfully!','redirect_url'=>CRUDBooster::mainpath()];
+		// 	echo json_encode($message);
+		// }
 	}
