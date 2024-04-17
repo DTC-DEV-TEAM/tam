@@ -680,5 +680,57 @@
             return $responseData['data']['access_token'];
 		}
 
+		//TIMFS FIXED ASSETS API
+		public function assetsFaTimfs(){
+        $api = 'https://timfs.tasteless.com.ph/item_masters_fas/api/get-items/9190564927eea2402d14d47ace841eab';
+        
+        $ch = curl_init($api);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        curl_close($ch);
+    
+        $data = json_decode($response, true);
+
+        $tableName = 'items';
+
+        $pdo = DB::connection()->getPdo();
+        $columns = $pdo->query("DESCRIBE $tableName")->fetchAll(PDO::FETCH_COLUMN);
+		$not_included = ['id', 'warehouse_qty', 'reservable_qty', 'is_orderable'];
+
+		$all_items = array_merge($data['created_items'] ?? [], $data['updated_items'] ?? []);
+	
+		$with_default_values = [
+			'id',
+			'warehouse_qty', 
+			'reservable_qty', 
+			'is_orderable',
+			'owned_price',
+			'franchise_price',
+			'partner_price',
+			'external_price',
+		];
+	
+		foreach ($all_items as $item) {
+			$to_be_inserted = [];
+			foreach ($columns as $column) {
+				$to_be_inserted['digits_code'] = $item['tasteless_code'];
+				$to_be_inserted[$column]    = $item[$column];
+			}
+
+			$tasteless_code = $item['tasteless_code'];
+			
+			$is_existing = DB::table('items')
+				->where('tasteless_code', $tasteless_code)
+				->exists();
+
+			if ($is_existing) {
+				DB::table('items')
+					->where('tasteless_code', $item['tasteless_code'])
+					->update($to_be_inserted);
+			} else {
+				DB::table('items')->insert($to_be_inserted);
+			}
+		}
+    }
 
 	}

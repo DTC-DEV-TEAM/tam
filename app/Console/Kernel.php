@@ -40,8 +40,10 @@ class Kernel extends ConsoleKernel
         /** DAM Class */
         // $schedule->call('\App\Http\Controllers\AdminClassesController@getClassCreatedDataApi')->hourly()->between('9:00', '21:00');
         // $schedule->call('\App\Http\Controllers\AdminClassesController@getClassUpdatedDataApi')->hourly()->between('9:00', '21:00');
-        
+        $schedule->call('\App\Http\Controllers\AdminAssetsController@assetsFaTimfs')->everyMinute();
+
         $schedule->command('mysql:backup')->daily()->at('20:00');
+
     }
 
     /**
