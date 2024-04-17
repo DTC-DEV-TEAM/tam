@@ -28,6 +28,8 @@
 	use Illuminate\Support\Facades\File;
 	use Illuminate\Contracts\Cache\LockTimeoutException;
 	use Carbon\Carbon;
+	use App\Assets;
+
 	class AdminAssetsInventoryHeaderForApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 		// LOCATION
 		private $admin_threef;
@@ -1562,12 +1564,12 @@
 							'direct_delivery_inv_id' => $body_id[$key]
 							]);
 
-					AssetsInventoryReserved::where(['id' => $tag_id[$t]])
+					AssetsInventoryReserved::where(['id' => $tag_id])
 					->update([
 							'reserved' => 1,
 							'for_po'   => NULL
 							]);
-					$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id[$t]])->groupBy('reference_number')->get();
+					$arfNumber = AssetsInventoryReserved::where(['id' => $tag_id])->groupBy('reference_number')->get();
 					foreach($arfNumber as $val){
 						HeaderRequest::where('reference_number',$val->reference_number)
 						->update([
@@ -1584,12 +1586,18 @@
 				'location'               => 8
 			]);
 
-			AssetsInventoryBody::where(['header_id' => $id])
-			->update([
-					'statuses_id'  => 20,
-					'location'     => 8
-					]);
-
+			foreach($body_id as $key => $inv_id){
+				$itemMasterId    = AssetsInventoryBody::where('id',$inv_id)->first()->item_id;
+				$itemMaster = Assets::where('id', $itemMasterId)->first();
+				AssetsInventoryBody::where(['id' => $inv_id])
+				->update([
+						'serial_no'         => 'N/A',
+						'statuses_id'       => 20,
+						'location'          => 8,
+						'value'             => $itemMaster->item_cost,
+						'warranty_coverage' => 12
+				]);
+			}
 			$message = ['status'=>'success', 'message' => 'Success!','redirect_url'=>CRUDBooster::mainpath()];
 			echo json_encode($message);
 		}

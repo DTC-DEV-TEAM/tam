@@ -409,17 +409,12 @@
 	    | 
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
-			$fields = Request::all();
+			$fields         = Request::all();
+			$item_id 	 	= $fields['item_id'];
+			$inventory_id  	= $fields['inventory_id'];
+			$HeaderID 	 	= MoveOrder::where('id', $id)->first();
+			$arf_header  	= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
 
-			$item_id 					= $fields['item_id'];
-			$inventory_id 				= $fields['inventory_id'];
-
-			$HeaderID 					= MoveOrder::where('id', $id)->first();
-
-			$arf_header 				= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
-
-		
 			if(in_array($arf_header->request_type_id, [5, 9])){
 				$for_closing 				= StatusMatrix::where('current_step', 9)
 												->where('request_type', $arf_header->request_type_id)
@@ -445,14 +440,26 @@
 						->update([
 							'status_id'=> 	$for_closing
 						]);	
-						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
-						->update([
-							'statuses_id'=> 			3,
-							'deployed_to'=> 			$employee_name->bill_to,
-							'deployed_by'=> 			CRUDBooster::myId(),
-							'deployed_at'=> 			date('Y-m-d H:i:s'),
-							'location'=> 				4
-						]);
+						if(!$arf_header->is_direct_deliver){
+							DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
+							->update([
+								'statuses_id' => 3,
+								'deployed_to' => $employee_name->bill_to,
+								'deployed_by' => CRUDBooster::myId(),
+								'deployed_at' => date('Y-m-d H:i:s'),
+								'location'    => 4
+							]);
+						}else{
+							DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
+							->update([
+								'statuses_id' => 3,
+								'deployed_to' => $employee_name->bill_to,
+								'deployed_by' => CRUDBooster::myId(),
+								'deployed_at' => date('Y-m-d H:i:s'),
+								'location'    => 4,
+								'received'    => 1,
+							]);
+						}
 						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->update(['quantity'=>0]);
 					}elseif(in_array($arf_header->request_type_id, [9])){
 						$quantity = MoveOrder::where(['id' => $item_id[$x]])->first()->quantity;
@@ -490,31 +497,6 @@
 					'closing_plug' => 1		
 				]);		
 			}
-  		
-			/*$arf_header = 		HeaderRequest::where(['id' => $id])->first();
-
-			if($arf_header->request_type_id == 5){
-				
-				$postdata['status_id']		 	= 	StatusMatrix::where('current_step', 7)
-																->where('request_type', $arf_header->request_type_id)
-																//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
-																->value('status_id');
-
-			}else{
-
-				$postdata['status_id']		 	= 	StatusMatrix::where('current_step', 8)
-																->where('request_type', $arf_header->request_type_id)
-																//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
-																->value('status_id');
-
-			}
-
-
-														
-			$postdata['received_by']		 		=  	CRUDBooster::myId();
-			$postdata['received_at']		 		=  	date('Y-m-d H:i:s');
-
-			*/
 
 	    }
 
@@ -526,14 +508,9 @@
 	    | 
 	    */
 	    public function hook_after_edit($id) {
-	        //Your code here 
-			
 			$fields = Request::all();
-
 			$mo_request = MoveOrder::where(['id' => $id])->first();
-
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_receiving_success",['reference_number'=>$mo_request->mo_reference_number]), 'info');
-
 	    }
 
 	    /* 
