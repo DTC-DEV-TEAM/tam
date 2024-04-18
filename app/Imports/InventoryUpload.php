@@ -28,9 +28,11 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
      */
     public function collection(Collection $rows){   
         $cooking_and_equipment = DB::table('class')->find(1);
-        $DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
+        //$DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
+        $DatabaseCounterCE = $cooking_and_equipment->code_counter;
         $refrigeration_equipment = DB::table('class')->find(2);
-		$DatabaseCounterRE = DB::table('assets_inventory_body')->where('sub_category_id',$refrigeration_equipment->id)->count();
+		//$DatabaseCounterRE = DB::table('assets_inventory_body')->where('sub_category_id',$refrigeration_equipment->id)->count();
+        $DatabaseCounterRE = $refrigeration_equipment->code_counter;
         $commercial_ovens = DB::table('class')->find(3);
 		$DatabaseCounterCO = DB::table('assets_inventory_body')->where('sub_category_id',$commercial_ovens->id)->count();
         $refrigeration_and_freezer = DB::table('class')->find(4);
@@ -98,7 +100,9 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
             }
             
             if($sub_cat_code == 1){
-                $asset_code                = $cooking_and_equipment->from_code + $DatabaseCounterCE;
+                //$asset_code                = $cooking_and_equipment->from_code + $DatabaseCounterCE;
+                $asset_code                = $DatabaseCounterCE;
+                DB::table('class')->where('id',1)->increment('code_counter');
                 $DatabaseCounterCE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = "FIXED ASSET";
@@ -113,7 +117,9 @@ class InventoryUpload implements ToCollection, SkipsEmptyRows, WithHeadingRow, W
                 }
 
             }else if($sub_cat_code == 2){
-                $asset_code                = $refrigeration_equipment->from_code + $DatabaseCounterRE;
+                //$asset_code                = $refrigeration_equipment->from_code + $DatabaseCounterRE;
+                $asset_code                = $DatabaseCounterRE;
+                DB::table('class')->where('id',2)->increment('code_counter');
                 $DatabaseCounterRE++; 
                 $request_type_id_inventory = 5;
                 $item_category             = "FIXED ASSET";

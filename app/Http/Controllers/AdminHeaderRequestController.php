@@ -432,10 +432,11 @@
 				if(!in_array($info->status_id,[5,8,13,19])){
 					$start = Carbon::parse($info->created_at);
 					$now = Carbon::now();
+					$day = ($start->diffInDays($now) > 1) ? ' Days' : ' Day';
 					if($start->diffInDays($now) > 15){
-						$column_value = '<span class="label label-danger">'.$start->diffInDays($now).' Days'.'</span>';
+						$column_value = '<span class="label label-danger">'.$start->diffInDays($now). $day .'</span>';
 					}else{
-						$column_value = '<span class="label label-info">'.$start->diffInDays($now).' Days'.'</span>';
+						$column_value = '<span class="label label-info">'.$start->diffInDays($now). $day .'</span>';
 					}
 				}else if(in_array($info->status_id,[5,8])){
 					$column_value = '<span class="label label-success">'."".'</span>';

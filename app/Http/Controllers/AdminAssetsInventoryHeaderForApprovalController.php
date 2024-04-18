@@ -909,9 +909,12 @@
 
 			//put asset code per based on  item category COOKING AND EQUIPMENT
 			$finalCEAssetsArr = [];
-			$DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
+			// $DatabaseCounterCE = DB::table('assets_inventory_body')->where('sub_category_id',$cooking_and_equipment->id)->count();
+			$DatabaseCounterCE = $cooking_and_equipment->code_counter;
 			foreach((array)$cooking_and_equipment_array as $finalfakey => $finalfavalue) {
-				$finalfavalue['asset_code'] = $cooking_and_equipment->from_code + $DatabaseCounterCE;
+				// $finalfavalue['asset_code'] = $cooking_and_equipment->from_code + $DatabaseCounterCE;
+				$finalfavalue['asset_code'] = $DatabaseCounterCE;
+				DB::table('class')->where('id',1)->increment('code_counter');
 				$DatabaseCounterCE++; // or any rule you want.	
 				$finalCEAssetsArr[] = $finalfavalue;
 			}
@@ -938,9 +941,12 @@
 
 			//put asset code per based on  item category REFRIGERATION EQUIPMENT
 			$finalREassetsArr = [];
-			$DatabaseCounterRE = DB::table('assets_inventory_body')->where('sub_category_id',$refrigeration_equipment->id)->count();
+			//$DatabaseCounterRE = DB::table('assets_inventory_body')->where('sub_category_id',$refrigeration_equipment->id)->count();
+			$DatabaseCounterRE = $refrigeration_equipment->code_counter;
 			foreach((array)$refrigeration_equipment_array as $finalrekey => $finalrevalue) {
-					$finalrevalue['asset_code'] = $refrigeration_equipment->from_code + $DatabaseCounterRE;
+					//$finalrevalue['asset_code'] = $refrigeration_equipment->from_code + $DatabaseCounterRE;
+					$finalrevalue['asset_code'] = $DatabaseCounterRE;
+					DB::table('class')->where('id',2)->increment('code_counter');
 					$DatabaseCounterRE++; // or any rule you want.	
 					$finalREassetsArr[] = $finalrevalue;
 			}
@@ -1784,7 +1790,7 @@
 						)
 				->take(10)
 				->get();
-			}else if(in_array($type, [5,6,7])){
+			}else if(in_array($type, [5,6,7,8])){
 				$items = DB::table('assets')
 				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
 				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
