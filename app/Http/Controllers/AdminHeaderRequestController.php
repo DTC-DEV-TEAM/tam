@@ -1672,8 +1672,8 @@
 			$data['items'] = array();
 
 			$item = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE','	FOR DEPLETION'])->whereNull('assets.from_dam')
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE','	FOR DEPLETION'])->whereNull('assets.from_dam')
 			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
 			->select(	'assets.*',

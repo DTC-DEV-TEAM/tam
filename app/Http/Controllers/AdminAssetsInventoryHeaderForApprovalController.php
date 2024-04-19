@@ -1016,8 +1016,7 @@
 			AssetsInventoryHeaderForApproval::where('id', $id)
 			->update([
 				'header_approval_status' => 20, 
-				'po_no'                  => $po_no,
-				'location'               => 8
+				'po_no'                  => $po_no
 			]);
 
 			foreach($body_id as $key => $inv_id){
@@ -1027,7 +1026,6 @@
 				->update([
 						'serial_no'         => 'N/A',
 						'statuses_id'       => 20,
-						'location'          => 8,
 						'value'             => $itemMaster->item_cost,
 						'warranty_coverage' => 12
 				]);
