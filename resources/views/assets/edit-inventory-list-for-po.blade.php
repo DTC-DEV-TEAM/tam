@@ -94,6 +94,7 @@
     <form id="ForApprovalForm" name="ForApprovalForm" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="{{$Header->header_id}}" name="header_id" id="header_id">
+        <input type="hidden" value="{{$Header->location}}" name="location_id" id="location_id">
           
     <div class='panel-body'>    
     <section id="loading">
@@ -150,7 +151,11 @@
                 <table id="asset-items">
                     <thead>
                         <tr style="background-color:#00a65a; border: 0.5px solid #000;">
-                            <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @if($Header->location == 8)
+                                 <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @else
+                                <th style="text-align: center" colspan="10"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @endif
                         </tr>
                         <tr>
                             <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
@@ -158,7 +163,9 @@
                             <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>      
                             <th width="5%" class="text-center">{{ trans('message.table.location_id_text') }}</th>                                         
                             <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
-                            <th width="5%" class="text-center">Direct Deliver(ARF Request)</th>                   
+                            @if($Header->location == 8)
+                                <th width="5%" class="text-center">Direct Deliver(ARF Request)</th>  
+                            @endif                 
                         </tr>
                     </thead>
                     <tbody>
@@ -175,15 +182,16 @@
                             <td class="text-center">{{$res->item_description}}</td>   
                             <td class="qty" style="text-align:center">{{$res->warehouse_location}}</td>  
                             <td class="qty" style="text-align:center">{{$res->quantity}}</td>   
-                            <td>
-                                <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
-                                    <option value=""></option>
-                                           @foreach($reserved_assets as $reserve)
-                                               <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
-                                           @endforeach
-                                </select>
-                            </td>                                                                                                
-                                                                                                                            
+                            @if($Header->location == 8)
+                                <td>
+                                    <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
+                                        <option value=""></option>
+                                            @foreach($reserved_assets as $reserve)
+                                                <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
+                                            @endforeach
+                                    </select>
+                                </td>                                                                                                
+                            @endif                                                                                                     
                             </tr>
                         @endforeach
                     </tbody>
@@ -360,19 +368,35 @@
             qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
         }
     }
-    document.getElementById("asset-items").innerHTML +=
-    "<tr>"+
-        "<td colspan='4' style='text-align:center'>"+
-                "<strong>TOTAL</strong>"+
-            "</td>"+
-            
-            "<td style='text-align:center'>"+
-                "<strong>" +
-                    qty +
-                "</strong>"+
-            "</td>"+
-            "<td></td>"+
-    "</tr>";
+    if($('#location_id').val() == 8){
+        document.getElementById("asset-items").innerHTML +=
+        "<tr>"+
+            "<td colspan='4' style='text-align:center'>"+
+                    "<strong>TOTAL</strong>"+
+                "</td>"+
+                
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        qty +
+                    "</strong>"+
+                "</td>"+
+                "<td></td>"+
+        "</tr>";
+    }else{
+        document.getElementById("asset-items").innerHTML +=
+        "<tr>"+
+            "<td colspan='4' style='text-align:center'>"+
+                    "<strong>TOTAL</strong>"+
+                "</td>"+
+                
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        qty +
+                    "</strong>"+
+                "</td>"+
+        "</tr>";
+    }
+    
 
     </script>
 @endpush

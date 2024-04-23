@@ -648,7 +648,7 @@
 			$data['reserved_assets'] = AssetsInventoryReserved::
 										leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')
 										->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')
-										->whereNotNull('for_po')->whereIn('digits_code', $arrayDigitsCode)->get();
+										->whereIn('digits_code', $arrayDigitsCode)->get();
 			return $this->view("assets.edit-inventory-list-for-po", $data);
 		}
 

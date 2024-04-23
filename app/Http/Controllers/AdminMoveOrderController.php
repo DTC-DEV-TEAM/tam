@@ -709,6 +709,8 @@
 						'to_mo'       => 0
 					]);	
 
+					DB::table('assets_inventory_reserved')->where('body_id', $body_id)->delete();
+
 				}
 
 				
