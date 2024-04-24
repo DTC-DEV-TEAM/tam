@@ -53,6 +53,7 @@
 			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description'];
 			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 			$this->form[] = ['label'=>'Location','name'=>'location_id','type'=>'select3-new','width'=>'col-sm-5','datatable'=>'warehouse_location_model,location'];
+			$this->form[] = ['label'=>'Asset Code Counter','name'=>'code_counter','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				
 				$this->form[] = ['label'=>'Status','name'=>'class_status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
@@ -317,6 +318,7 @@
 	        $fields = Request::all();
 			$from_code = $fields['from_code'];
 			$from_to = $fields['from_to'];
+			$code_counter = $fields['code_counter'];
 			$category_id = $fields['category_id'];
 			$category_description = $fields['category_description'];
 			
@@ -345,6 +347,7 @@
 
 				$postdata['from_code']= $from_code;
 				$postdata['to_code']= $from_to;
+				$postdata['code_counter']= $code_counter;
 				$postdata['category_code']= $from_code . " - " . $from_to;
 				$postdata['category_id'] = $category_id;
 				$postdata['class_description'] = $category_description;

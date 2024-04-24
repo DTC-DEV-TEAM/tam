@@ -104,6 +104,15 @@
                     </div>
                 </div>
           </div>
+
+          <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="control-label">Asset Code Counter</label>
+                    <input type="text" class="form-control finput" name="code_counter" id="code_counter" >
+                </div>
+            </div>
+          </div>
         
         </div>
         
@@ -156,6 +165,15 @@
                     swal({
                         type: 'error',
                         title: 'Invalid FA To code Length!',
+                        icon: 'error',
+                        confirmButtonColor: "#367fa9",
+                    }); 
+                    event.preventDefault(); // cancel default behavior
+                    return false;
+                }else if($("#code_counter").val() === ""){
+                    swal({
+                        type: 'error',
+                        title: 'Asset code counter required!',
                         icon: 'error',
                         confirmButtonColor: "#367fa9",
                     }); 
