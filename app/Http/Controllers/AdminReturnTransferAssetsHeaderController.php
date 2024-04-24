@@ -270,7 +270,7 @@
 			}
 			
 			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
-				$status		 			= $forturnover;
+				$status		 			= self::ForVerification;
 				for($x=0; $x < count($moId); $x++) {
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
 					->update([
@@ -291,6 +291,7 @@
 				$conHeader['requested_by'] = CRUDBooster::myId(); 
 				$conHeader['requested_date'] = date('Y-m-d H:i:s');
 				if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
+					$conHeader['approved_by']   = CRUDBooster::myId();
 					$conHeader['approved_date'] = date('Y-m-d H:i:s');
 				}
 				if($hData == 1){
@@ -423,7 +424,7 @@
 			}
 			
 			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
-				$status		 			= $forturnover;
+				$status		 			= self::ForVerification;
 				for($x=0; $x < count($moId); $x++) {
 					DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
 					->update([
@@ -439,9 +440,11 @@
 			$count_header       = DB::table('return_transfer_assets_header')->count();
 			$reference_no = "1".str_pad($count_header + 1, 7, '0', STR_PAD_LEFT)."AT";
 			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
-				$approved = date('Y-m-d H:i:s');
+				$approved    = date('Y-m-d H:i:s');
+				$approved_by = CRUDBooster::myId();
 			}else{
-			    $approved = NULL;
+			    $approved    = NULL;
+				$approved_by = NULL;
 			}
 			$id = ReturnTransferAssetsHeader::Create(
                 [
@@ -453,6 +456,7 @@
 					'purpose'      => $purpose,
                     'requested_by' => CRUDBooster::myId(),
                     'requested_date' => date('Y-m-d H:i:s'),
+					'approved_by'    => $approved_by,
 					'approved_date'  => $approved,
                     'location_to_pick' => 0,
                     'store_branch' => $location,

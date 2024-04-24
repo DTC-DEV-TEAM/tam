@@ -416,9 +416,7 @@
 				if($countItem == 0){
 					ReturnTransferAssetsHeader::where('id', $id)
 					->update([
-						'status'          => $to_close,
-						'transacted_by'   => CRUDBooster::myId(),
-						'transacted_date' => date('Y-m-d H:i:s')
+						'status'          => $to_close
 					]);	
 				}
 				

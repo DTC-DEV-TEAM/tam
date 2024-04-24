@@ -597,7 +597,7 @@
 
 		}
 
-		//Get Invetory Approval List
+		//Get Invetory FOR PO List
 		public function getDetail($id){
 			$this->cbLoader();
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
@@ -606,40 +606,8 @@
 
 			$data = [];
 			$data['page_title'] = 'View Asset Inventory for PO Details';
-            //header details
-			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
-				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
-				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_header_for_approval.location', '=', 'warehouse_location_model.id')
-				->select(
-					'assets_inventory_header_for_approval.*',
-					'assets_inventory_header_for_approval.id as header_id',
-					'cms_users.*',
-					'warehouse_location_model.location as warehouse_location',
-					'approver.name as approver',
-					'assets_inventory_header_for_approval.created_at as date_created'
-					)
-			    ->where('assets_inventory_header_for_approval.id', $id)
-			    ->first();
-
-	        //Body details
-			$data['Body'] = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
-			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id', '=', 'assets_inventory_header_for_approval.id')
-			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
-				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
-				->select(
-				  'assets_inventory_body.*',
-				  'assets_inventory_body.id as for_approval_body_id',
-				  'statuses.*',
-				  'warehouse_location_model.location as warehouse_location',
-				  'assets_inventory_header_for_approval.location as location',
-				  'assets_inventory_body.location as body_location',
-				  'assets_inventory_body.updated_at as date_updated',
-				  'cms_users_updated_by.name as updated_by'
-				)
-				->where('assets_inventory_body.header_id', $id)
-				->get();
+			$data['Header'] = AssetsInventoryHeaderForApproval::headerDetail($id);
+			$data['Body'] = AssetsInventoryBody::detailBody($id);
 			$arrayDigitsCode = [];
 			foreach($data['Body'] as $codes) {
 				$digits_code['digits_code'] = $codes['digits_code'];
@@ -648,6 +616,7 @@
 			$data['reserved_assets'] = AssetsInventoryReserved::
 										leftjoin('header_request','assets_inventory_reserved.reference_number','=','header_request.reference_number')
 										->select('assets_inventory_reserved.*','header_request.*','assets_inventory_reserved.id as served_id')
+										->whereNotNull('for_po')
 										->whereIn('digits_code', $arrayDigitsCode)->get();
 			return $this->view("assets.edit-inventory-list-for-po", $data);
 		}
@@ -660,45 +629,13 @@
 
 			$data = [];
 			$data['page_title'] = 'View Asset Inventory Details';
-            //header details
-			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
-				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
-				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_header_for_approval.location', '=', 'warehouse_location_model.id')
-				->select(
-					'assets_inventory_header_for_approval.*',
-					'assets_inventory_header_for_approval.id as header_id',
-					'cms_users.*',
-					'warehouse_location_model.location as warehouse_location',
-					'approver.name as approver',
-					'assets_inventory_header_for_approval.created_at as date_created'
-					)
-			    ->where('assets_inventory_header_for_approval.id', $id)
-			    ->first();
+			$data['Header'] = AssetsInventoryHeaderForApproval::headerDetail($id);
+			$data['Body'] = AssetsInventoryBody::detailBody($id);
 
 			$data['header_images'] = AssetsHeaderImages::select(
 				  'assets_header_images.*'
 				)
 				->where('assets_header_images.header_id', $id)
-				->get();
-	        //Body details
-			$data['Body'] = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
-			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id', '=', 'assets_inventory_header_for_approval.id')
-			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
-				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
-				->select(
-				  'assets_inventory_body.*',
-				  'assets_inventory_body.id as for_approval_body_id',
-				  'statuses.*',
-				  'assets.item_cost as item_cost',
-				  'assets_inventory_header_for_approval.location as location',
-				  'warehouse_location_model.location as warehouse_location',
-				  'assets_inventory_body.location as body_location',
-				  'assets_inventory_body.updated_at as date_updated',
-				  'cms_users_updated_by.name as updated_by'
-				)
-				->where('assets_inventory_body.header_id', $id)
 				->get();
 			$arrayDigitsCode = [];
             foreach($data['Body'] as $codes) {
@@ -732,41 +669,13 @@
 
 			$data = [];
 			$data['page_title'] = 'View Asset Inventory Details';
-            //header details
-			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
-				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
-				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
-				->select(
-					'assets_inventory_header_for_approval.*',
-					'assets_inventory_header_for_approval.id as header_id',
-					'cms_users.*',
-					'approver.name as approver',
-					'assets_inventory_header_for_approval.created_at as date_created'
-					)
-			    ->where('assets_inventory_header_for_approval.id', $id)
-			    ->first();
+			$data['Header'] = AssetsInventoryHeaderForApproval::headerDetail($id);
+			$data['Body'] = AssetsInventoryBody::detailBody($id);
 
 			$data['header_images'] = AssetsHeaderImages::select(
 				  'assets_header_images.*'
 				)
 				->where('assets_header_images.header_id', $id)
-				->get();
-	        //Body details
-			$data['Body'] = AssetsInventoryBodyForApproval::leftjoin('statuses', 'assets_inventory_body_for_approval.statuses_id','=','statuses.id')
-			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body_for_approval.header_id', '=', 'assets_inventory_header_for_approval.id')
-			    ->leftjoin('assets', 'assets_inventory_body_for_approval.item_id', '=', 'assets.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_body_for_approval.location', '=', 'warehouse_location_model.id')
-				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body_for_approval.updated_by', '=', 'cms_users_updated_by.id')
-				->select(
-				  'assets_inventory_body_for_approval.*',
-				  'assets_inventory_body_for_approval.id as for_approval_body_id',
-				  'statuses.*',
-				  'assets_inventory_header_for_approval.location as location',
-				  'warehouse_location_model.location as body_location',
-				  'assets_inventory_body_for_approval.updated_at as date_updated',
-				  'cms_users_updated_by.name as updated_by'
-				)
-				->where('assets_inventory_body_for_approval.header_id', $id)
 				->get();
 			$data['warehouse_location'] = WarehouseLocationModel::where('id','!=',4)->get();
 			return $this->view("assets.inventory_list_for_approval", $data);
@@ -780,44 +689,16 @@
 
 			$data = [];
 			$data['page_title'] = 'View Asset Movement History Inventory Details';
-            //header details
-			$data['Header'] = AssetsInventoryHeaderForApproval::leftjoin('assets_header_images', 'assets_inventory_header_for_approval.id', '=', 'assets_header_images.header_id')
-				->leftjoin('cms_users', 'assets_inventory_header_for_approval.created_by', '=', 'cms_users.id')
-				->leftjoin('cms_users as approver', 'assets_inventory_header_for_approval.updated_by', '=', 'approver.id')
-				->select(
-					'assets_inventory_header_for_approval.*',
-					'assets_inventory_header_for_approval.id as header_id',
-					'cms_users.*',
-					'approver.name as approver',
-					'assets_inventory_header_for_approval.created_at as date_created'
-					)
-			    ->where('assets_inventory_header_for_approval.id', $id)
-			    ->first();
+			$data['Header'] = AssetsInventoryHeaderForApproval::headerDetail($id);
+			$data['Body'] = AssetsInventoryBody::detailBody($id);
 
 			$data['header_images'] = AssetsHeaderImages::select(
 				  'assets_header_images.*'
 				)
 				->where('assets_header_images.header_id', $id)
 				->get();
-	        //Body details
-			$data['Body'] = AssetsInventoryBody::leftjoin('statuses', 'assets_inventory_body.statuses_id','=','statuses.id')
-			    ->leftjoin('assets_inventory_header_for_approval', 'assets_inventory_body.header_id', '=', 'assets_inventory_header_for_approval.id')
-			    ->leftjoin('assets', 'assets_inventory_body.item_id', '=', 'assets.id')
-				->leftjoin('cms_users as cms_users_updated_by', 'assets_inventory_body.updated_by', '=', 'cms_users_updated_by.id')
-				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
-				->select(
-				  'assets_inventory_body.*',
-				  'assets_inventory_body.id as aib_id',
-				  'statuses.*',
-				  'assets_inventory_header_for_approval.location as location',
-				  'warehouse_location_model.location as body_location',
-				  'assets_inventory_body.updated_at as date_updated',
-				  'cms_users_updated_by.name as updated_by'
-				)
-				->where('assets_inventory_body.header_id', $id)
-				->get();
-
-				return $this->view("assets.inventory_list", $data);
+	       
+			return $this->view("assets.inventory_list", $data);
 		}
 
 		public function getapprovedProcess(Request $request){
@@ -1157,7 +1038,6 @@
 
 		}
 
-
 		public function getGenerateBarcode($id) {
 			if(!CRUDBooster::isView()) CRUDBooster::redirect(CRUDBooster::adminPath(),trans('crudbooster.denied_access'));
 			//Create your own query 
@@ -1307,6 +1187,74 @@
 							->where('location_id','LIKE', '%'.$id.'%')
 							->get();
 			return($subcategories);
+		}
+
+		public function getExportforpo($id) {
+			ini_set('max_execution_time', 0);
+			ini_set('memory_limit', '4000M');
+	
+			$filename = 'for-po-'.date('Y-m-d');
+			$items = AssetsInventoryBody::detailForPo($id);
+			$data [] = array(
+				"Asset Code",
+                "Digits Code",
+                "Serial No",
+                "Status", 
+                "Deployed To",
+                "RR Date",
+                "Location",
+                "Item Condition",
+                "Item Description",
+                "Value",
+                "Quantity",
+                "Category",
+                "Sub Category",
+                "Warranty Coverage",
+                "Created By",
+                "Created Date"
+			);
+
+			foreach($items as $item){
+				$data[] = array(
+					"Asset Code"         => $item->asset_code,
+					"Digits Code"		 => $item->digits_code,
+					"Serial No" 		 => $item->serial_no,
+					"Status"  			 => $item->status_description,
+					"Deployed To"		 => $item->deployed_to,
+					"RR Date" 			 => $item->rr_date,
+					"Location" 			 => $item->loc_description,
+					"Item Condition" 	 => $item->item_condition,
+					"Item Description"	 => $item->item_description,
+					"Value" 			 => $item->value,
+					"Quantity"			 => $item->quantity,
+					"Category"			 => $item->dam_cat ? $item->dam_cat : $item->tam_cat,
+					"Sub Category"		 => $item->dam_subcat ? $item->dam_subcat : $item->tam_subcat,
+					"Warranty Coverage"  => $item->warranty_coverage,
+					"Created By"		 => $item->name,
+					"Created Date"		 => $item->body_created
+				);
+			}
+			
+			self::ExportToExcel($data,$filename);
+		}
+
+		public function ExportToExcel($data,$filename){
+			ini_set('max_execution_time', 0);
+			ini_set('memory_limit', '4000M');
+			try {
+				$spreadSheet = new Spreadsheet();
+				$spreadSheet->getActiveSheet()->getDefaultColumnDimension()->setWidth(20);
+				$spreadSheet->getActiveSheet()->fromArray($data);
+				$Excel_writer = new Xlsx($spreadSheet);
+				header('Content-Type: application/vnd.ms-excel');
+				header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
+				header('Cache-Control: max-age=0');
+				ob_end_clean();
+				$Excel_writer->save('php://output');
+				exit();
+			} catch (Exception $e) {
+				return;
+			}
 		}
 
 	}

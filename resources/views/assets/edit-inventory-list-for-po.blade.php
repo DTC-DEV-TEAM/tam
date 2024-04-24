@@ -88,6 +88,11 @@
 	<p class="noprint"><a title='Main Module' href='{{CRUDBooster::mainpath()}}'><i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}</a></p>       
 @endif
   <div class='panel panel-default'>
+    <span>
+        <a href="{{CRUDBooster::adminpath("assets_inventory_body_for_approval/exportforpo/".$Header->header_id)}}" id="btn-export" class="btn btn-success btn-sm btn-export" style="float:right; margin: 5px 5px 0 0;"><i class="fa fa-download"></i>
+            <span>Export</span>
+        </a>
+    </span>
     <div class='panel-heading'>  
         Assets Inventory For PO
     </div>
@@ -124,17 +129,6 @@
                         <input class="form-control finput" type="text"  placeholder="PO NO" name="po_no" id="po_no">
                     </div>
                 </div>
-                {{-- <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label"> Direct Deliver(ARF Request)</label>
-                        <select selected data-placeholder="Select ARF" class="form-control select2 arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" style="width:100%">
-                            <option value=""></option>
-                                   @foreach($reserved_assets as $reserve)
-                                       <option value="{{$reserve->arf_id}}">{{$reserve->reference_number}}</option> 
-                                   @endforeach
-                        </select>
-                    </div>                                                                                         
-                </div> --}}
             </div>
         </div>
         <hr>

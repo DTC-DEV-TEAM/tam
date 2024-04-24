@@ -435,12 +435,14 @@
 
 			$employee_name = DB::table('cms_users')->where('id', $arf_header->employee_name)->first();
 				for($x=0; $x < count((array)$item_id); $x++) {
+					$moDetails = MoveOrder::where(['id' => $item_id[$x]])->first();
+					$bodyDetails = BodyRequest::where(['id' => $moDetails->body_request_id])->first();
 					if(in_array($arf_header->request_type_id, [1, 5])){
 						MoveOrder::where('id',$item_id[$x])
 						->update([
 							'status_id'=> 	$for_closing
 						]);	
-						if(!$arf_header->is_direct_deliver){
+						if(!$bodyDetails->direct_delivery_inv_id){
 							DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
 							->update([
 								'statuses_id' => 3,
@@ -457,8 +459,10 @@
 								'deployed_by' => CRUDBooster::myId(),
 								'deployed_at' => date('Y-m-d H:i:s'),
 								'location'    => 4,
-								'received'    => 1,
+								'received'    => 1
 							]);
+							$invHeaderId = DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->first()->header_id;
+							DB::table('assets_inventory_header_for_approval')->where('id', $invHeaderId)->update(['header_approval_status'=>22]);
 						}
 						DB::table('assets_inventory_body')->where('id', $inventory_id[$x])->update(['quantity'=>0]);
 					}elseif(in_array($arf_header->request_type_id, [9])){

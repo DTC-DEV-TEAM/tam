@@ -213,12 +213,19 @@
                                         <td class="col-md-4">{{$Header->verifiedby}} / {{$Header->transacted_date}}</td>
                                     </tr>
                                 @endif
+                               
                             </tbody>
                         </table>
                     </div>
                     <div class="col-md-6">
                         <table style="width:100%">
                             <tbody id="footer">
+                                @if($Header->scheduleby != null || $Header->scheduleby != "")
+                                    <tr>
+                                        <th class="control-label col-md-2">Scheduled By:</th>
+                                        <td class="col-md-4">{{$Header->scheduleby}} / {{$Header->schedule_at}}</td>
+                                    </tr>
+                                @endif
                                 @if($Header->receivedby != null || $Header->receivedby != "")
                                     <tr>
                                         <th class="control-label col-md-2">Received By:</th>
