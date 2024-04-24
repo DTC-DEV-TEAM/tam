@@ -1,7 +1,19 @@
 @extends('crudbooster::admin_template')
 @push('head')
 <style type="text/css">   
-    
+    .select2-selection__choice{
+        font-size:14px !important;
+        color:black !important;
+    }
+    .select2-selection__rendered {
+        line-height: 31px !important;
+    }
+    .select2-container .select2-selection--single {
+        height: 35px !important;
+    }
+    .select2-selection__arrow {
+        height: 34px !important;
+    }
     .zoom-overlay-open,
     .zoom-overlay-transitioning {
     cursor: default;
@@ -76,12 +88,18 @@
 	<p class="noprint"><a title='Main Module' href='{{CRUDBooster::mainpath()}}'><i class='fa fa-chevron-circle-left '></i> &nbsp; {{trans("crudbooster.form_back_to_list",['module'=>CRUDBooster::getCurrentModule()->name])}}</a></p>       
 @endif
   <div class='panel panel-default'>
+    <span>
+        <a href="{{CRUDBooster::adminpath("assets_inventory_body_for_approval/exportforpo/".$Header->header_id)}}" id="btn-export" class="btn btn-success btn-sm btn-export" style="float:right; margin: 5px 5px 0 0;"><i class="fa fa-download"></i>
+            <span>Export</span>
+        </a>
+    </span>
     <div class='panel-heading'>  
         Assets Inventory For PO
     </div>
     <form id="ForApprovalForm" name="ForApprovalForm" enctype="multipart/form-data">
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="{{$Header->header_id}}" name="header_id" id="header_id">
+        <input type="hidden" value="{{$Header->location}}" name="location_id" id="location_id">
           
     <div class='panel-body'>    
     <section id="loading">
@@ -113,7 +131,6 @@
                 </div>
             </div>
         </div>
-            
         <hr>
 
         <!-- Body Area -->
@@ -128,18 +145,27 @@
                 <table id="asset-items">
                     <thead>
                         <tr style="background-color:#00a65a; border: 0.5px solid #000;">
-                            <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @if($Header->location == 8)
+                                 <th style="text-align: center" colspan="11"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @else
+                                <th style="text-align: center" colspan="10"><h4 class="box-title" style="color: #fff;"><b>{{ trans('message.form-label.asset_items') }}</b></h4></th>
+                            @endif
                         </tr>
                         <tr>
                             <th width="10%" class="text-center">{{ trans('message.table.asset_tag') }}</th>
                             <th width="10%" class="text-center">{{ trans('message.table.digits_code') }}</th>   
                             <th width="30%" class="text-center">{{ trans('message.table.item_description') }}</th>      
                             <th width="5%" class="text-center">{{ trans('message.table.location_id_text') }}</th>                                         
-                            <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th>                   
+                            <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
+                            @if($Header->location == 8)
+                                <th width="5%" class="text-center">Direct Deliver(ARF Request)</th>  
+                            @endif                 
                         </tr>
                     </thead>
                     <tbody>
+                        <?php   $tableRow = 1; ?>
                         @foreach($Body as $res)
+                        <?php   $tableRow++; ?>
                             <tr>
                             <td style="display:none">
                                 <input class="form-control" type="text"name="body_id[]" value="{{$res->for_approval_body_id}}">
@@ -149,7 +175,17 @@
                             <td class="text-center">{{$res->digits_code}}</td>
                             <td class="text-center">{{$res->item_description}}</td>   
                             <td class="qty" style="text-align:center">{{$res->warehouse_location}}</td>  
-                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>                                                                                                       
+                            <td class="qty" style="text-align:center">{{$res->quantity}}</td>   
+                            @if($Header->location == 8)
+                                <td>
+                                    <select selected data-placeholder="Select ARF" class="form-control arf_tag" name="arf_tag[]" data-id="{{$tableRow}}" id="arf_tag{{$tableRow}}" required style="width:100%">
+                                        <option value=""></option>
+                                            @foreach($reserved_assets as $reserve)
+                                                <option value="{{$reserve->served_id}}">{{$reserve->reference_number}} | {{$reserve->digits_code}}</option> 
+                                            @endforeach
+                                    </select>
+                                </td>                                                                                                
+                            @endif                                                                                                     
                             </tr>
                         @endforeach
                     </tbody>
@@ -207,12 +243,36 @@
             $("#removeImageHeader").toggle(); 
         });
     });
-    $('.select2').select2({placeholder_text_single : "-- Select --"})
+
     $(".date").datetimepicker({
         viewMode: "days",
         format: "YYYY-MM-DD",
         dayViewHeaderFormat: "MMMM YYYY",
     });
+
+    $(document).ready(function () {
+        var $selects = $('.arf_tag');
+        $selects.select2();
+        $('.arf_tag').change(function () {
+            $('option:hidden', $selects).each(function () {
+                var self = this,
+                    toShow = true;
+                $selects.not($(this).parent()).each(function () {
+                    if (self.value == this.value) toShow = false;
+                })
+                if (toShow) {
+                    $(this).removeAttr('disabled');
+                    $(this).parent().select2();
+                }
+            });
+            if (this.value != "") {
+                //$selects.not(this).children('option[value=' + this.value + ']').attr('disabled', 'disabled');
+                $selects.not(this).children('option[value=' + this.value + ']').remove();
+                $selects.select2();
+            }
+   
+        });
+    })
    
     /**Send Request*/
     $('#btnSubmit').on('click', function (event) {
@@ -302,18 +362,35 @@
             qty += isNaN(tds[i].innerHTML) ? 0 : parseFloat(tds[i].innerHTML);
         }
     }
-    document.getElementById("asset-items").innerHTML +=
-    "<tr>"+
-        "<td colspan='4' style='text-align:center'>"+
-                "<strong>TOTAL</strong>"+
-            "</td>"+
-            
-            "<td style='text-align:center'>"+
-                "<strong>" +
-                    qty +
-                "</strong>"+
-            "</td>"+
-    "</tr>";
+    if($('#location_id').val() == 8){
+        document.getElementById("asset-items").innerHTML +=
+        "<tr>"+
+            "<td colspan='4' style='text-align:center'>"+
+                    "<strong>TOTAL</strong>"+
+                "</td>"+
+                
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        qty +
+                    "</strong>"+
+                "</td>"+
+                "<td></td>"+
+        "</tr>";
+    }else{
+        document.getElementById("asset-items").innerHTML +=
+        "<tr>"+
+            "<td colspan='4' style='text-align:center'>"+
+                    "<strong>TOTAL</strong>"+
+                "</td>"+
+                
+                "<td style='text-align:center'>"+
+                    "<strong>" +
+                        qty +
+                    "</strong>"+
+                "</td>"+
+        "</tr>";
+    }
+    
 
     </script>
 @endpush

@@ -432,10 +432,11 @@
 				if(!in_array($info->status_id,[5,8,13,19])){
 					$start = Carbon::parse($info->created_at);
 					$now = Carbon::now();
+					$day = ($start->diffInDays($now) > 1) ? ' Days' : ' Day';
 					if($start->diffInDays($now) > 15){
-						$column_value = '<span class="label label-danger">'.$start->diffInDays($now).' Days'.'</span>';
+						$column_value = '<span class="label label-danger">'.$start->diffInDays($now). $day .'</span>';
 					}else{
-						$column_value = '<span class="label label-info">'.$start->diffInDays($now).' Days'.'</span>';
+						$column_value = '<span class="label label-info">'.$start->diffInDays($now). $day .'</span>';
 					}
 				}else if(in_array($info->status_id,[5,8])){
 					$column_value = '<span class="label label-success">'."".'</span>';
@@ -483,12 +484,10 @@
 			$pending            = DB::table('statuses')->where('id', 1)->value('id');
 			$approved           = DB::table('statuses')->where('id', 4)->value('id');
 
-			if(in_array(CRUDBooster::myPrivilegeId(), [10,11,13,14])){ 
-				//$postdata['status_id']		 			= $pending;
-				$postdata['status_id']		 			= StatusMatrix::where('current_step', 2)
-																		->where('request_type', $request_type_id)
-																		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
-																		->value('status_id');
+			if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
+				$postdata['status_id']              = $this->for_move_order;
+				$postdata['approved_by'] 		    = CRUDBooster::myId();
+				$postdata['approved_at'] 		    = date('Y-m-d H:i:s');	
 			}else{
 				$postdata['status_id']		 			= StatusMatrix::where('current_step', 1)
 																		->where('request_type', $request_type_id)
@@ -983,7 +982,9 @@
 			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
+			// $data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
+			
+
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
@@ -995,7 +996,9 @@
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			$applicationsExplode = explode(",",$data['Header']->application);
 			$data['applicationsExplode'] = array_map('trim', $applicationsExplode);
+			$submaster_details = self::getSubmasters();
 			// dd($data['purposes'],$data['Header']->purpose);
+			$data = array_merge($data, $submaster_details);
 			return $this->view("assets.edit-requisition", $data);
 		}
 
@@ -1034,6 +1037,15 @@
 				return $this->view("assets.add-requisition-fa", $data);
 			}
 				
+		}
+
+		public function getSubmasters() {
+			$data = [];
+			$data['fa_categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
+													   ->orderby('category_description', 'asc')
+													   ->first();
+
+			return $data;
 		}
 
 		// public function getAddRequisitionNonTrade() {
@@ -1671,8 +1683,8 @@
 			$data['items'] = array();
 
 			$item = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
+			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE','	FOR DEPLETION'])->whereNull('assets.from_dam')
+			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE','	FOR DEPLETION'])->whereNull('assets.from_dam')
 			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
 			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
 			->select(	'assets.*',
@@ -2004,7 +2016,7 @@
 			$dataLines          = array();
 			$arf_header         = DB::table('header_request')->where(['id' => $fields['headerID']])->first();
 			$digits_code 		= $fields['digits_code'];
-			$supplies_cost 		= $fields['supplies_cost'];
+			$item_cost 		    = $fields['item_cost'];
 			$item_description 	= $fields['item_description'];
 			$category 		    = $fields['category'];
 			$sub_category 	    = $fields['sub_category'];
@@ -2056,7 +2068,8 @@
 					$dataLines[$key]['app_id'] 			    = implode(", ",$apps_array);
 					$dataLines[$key]['app_id_others'] 	    = $app_id_others[$key];
 					$dataLines[$key]['quantity'] 			= 1;
-					$dataLines[$key]['unit_cost'] 		    = $supplies_cost[$key];
+					$dataLines[$key]['unit_cost'] 		    = $item_cost[$key];
+					$dataLines[$key]['total_unit_cost'] 	= $item_cost[$key];
 					$dataLines[$key]['budget_range'] 		= $budget_range[$key];
 					$dataLines[$key]['created_by'] 		    = CRUDBooster::myId();
 					$dataLines[$key]['created_at'] 		    = date('Y-m-d H:i:s');
@@ -2076,12 +2089,14 @@
 			}
 
 			//DELETE LINES IF SELECTED
-			foreach($fields['deleteRowData'] as $dKey => $dLine){
-				BodyRequest::where('id', $dLine)
-				->update([
-					'deleted_at'=> 		date('Y-m-d H:i:s'),
-					'deleted_by'=> 		CRUDBooster::myId()
-				]);	
+			if(is_array($fields['deleteRowData'])){
+				foreach($fields['deleteRowData'] as $dKey => $dLine){
+					BodyRequest::where('id', $dLine)
+					->update([
+						'deleted_at'=> 		date('Y-m-d H:i:s'),
+						'deleted_by'=> 		CRUDBooster::myId()
+					]);	
+				}
 			}
 			
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_edit_employee",['reference_number'=>$arf_header->reference_number]), 'success');

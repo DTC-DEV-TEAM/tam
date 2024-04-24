@@ -33,6 +33,7 @@ class ReturnTransferAssetsHeader extends Model
         ->leftjoin('departments', 'employees.department_id', '=', 'departments.id')
         ->leftjoin('cms_users as approved', 'return_transfer_assets_header.approved_by','=', 'approved.id')
         ->leftjoin('cms_users as verified', 'return_transfer_assets_header.transacted_by','=', 'verified.id')
+        ->leftjoin('cms_users as schedule', 'return_transfer_assets_header.schedule_by','=', 'schedule.id')
         ->leftjoin('cms_users as received', 'return_transfer_assets_header.received_by','=', 'received.id')
         ->leftjoin('cms_users as closed', 'return_transfer_assets_header.close_by','=', 'closed.id')
         ->leftjoin('locations', 'return_transfer_assets_header.store_branch', '=', 'locations.id')
@@ -48,6 +49,7 @@ class ReturnTransferAssetsHeader extends Model
                 'departments.department_name as department_name',
                 'approved.name as approvedby',
                 'verified.name as verifiedby',
+                'schedule.name as scheduleby',
                 'received.name as receivedby',
                 'closed.name as closedby',
                 'locations.store_name as store_branch',

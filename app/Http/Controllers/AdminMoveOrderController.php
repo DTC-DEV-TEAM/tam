@@ -23,7 +23,7 @@
 	use App\Models\AssetsNonTradeInventoryReserved;
 
 	class AdminMoveOrderController extends \crocodicstudio\crudbooster\controllers\CBController {
-
+		private const ForPrintingAdf = 18;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -48,34 +48,16 @@
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
 
-		
-
 			$this->col[] = ["label"=>"Status","name"=>"status_id","join"=>"statuses,status_description"];
-
 			$this->col[] = ["label"=>"Reference Number","name"=>"mo_reference_number"];
-
 			$this->col[] = ["label"=>"Request Type","name"=>"header_request_id","join"=>"header_request,request_type_id"];
-
 			$this->col[] = ["label"=>"Employee Name","name"=>"request_created_by","join"=>"cms_users,bill_to"];
 			$this->col[] = ["label"=>"Department","name"=>"header_request_id","join"=>"header_request,department"];
-
 			$this->col[] = ["label"=>"MO By","name"=>"header_request_id","join"=>"header_request,mo_by"];
 			$this->col[] = ["label"=>"MO Date","name"=>"header_request_id","join"=>"header_request,mo_at"];
-
 			$this->col[] = ["label"=>"MO Plug","name"=>"mo_plug","visible"=>false];
-
 			$this->col[] = ["label"=>"To Pick","name"=>"to_pick","visible"=>false];
-
 			$this->col[] = ["label"=>"To Print","name"=>"to_print","visible"=>false];
-
-			//$this->col[] = ["label"=>"To Print","name"=>"to_print","visible"=>false];
-
-			
-
-			//$this->col[] = ["label"=>"Requested By","name"=>"created_by","join"=>"cms_users,name"];
-			//$this->col[] = ["label"=>"Requested Date","name"=>"created_at"];
-
-
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
@@ -110,29 +92,13 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-
 				$for_printing     = DB::table('statuses')->where('id', 17)->value('id');
-
 				$for_receiving    = DB::table('statuses')->where('id', 16)->value('id');
-
 				$for_printing_adf = DB::table('statuses')->where('id', 18)->value('id');
 				$cancelled        = DB::table('statuses')->where('id', 8)->value('id');
-
-				//dd("[status_id]");
-
-				//$arf_header 				= HeaderRequest::where(['id' => $HeaderID->header_request_id])->first();
-
-				//dd($id);
-				// or [to_print] == 1
 				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintADF/[id]'),'icon'=>'fa fa-print', "showIf"=>"[status_id] == $for_printing_adf"];
-
 				$this->addaction[] = ['title'=>'Print','url'=>CRUDBooster::mainpath('getRequestPrintPickList/[id]'),'icon'=>'fa fa-print', "showIf"=>"[mo_plug] == 0"];
-
 				$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailOrdering/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[mo_plug] == 1"];
-
-				//$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestOrdering/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[mo_plug] == 0"];
-
-				//$this->addaction[] = ['title'=>'Detail','url'=>CRUDBooster::mainpath('getDetailOrdering/[id]'),'icon'=>'fa fa-eye', "showIf"=>"[mo_plug] == 1"];
 			}
 
 
@@ -548,15 +514,11 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        //Your code here
-			$fields = Request::all();
-		
-			$cont = (new static)->apiContext;
-			$dataLines1 = array();
-			$locationArray = array();
+			$fields                             = Request::all();
+			$dataLines1                         = array();
+			$locationArray                      = array();
 			$Header_id 							= $fields['header_request_id'];
 			$digits_code 						= $fields['add_digits_code'];
-			//$asset_code 						= $fields['add_asset_code'];
 			$item_description 					= $fields['add_item_description'];
 			$serial_no 							= $fields['add_serial_no'];
 			$quantity 							= $fields['add_quantity'];
@@ -572,22 +534,13 @@
 			if(!$digits_code || !$item_description){
 				return CRUDBooster::redirect(CRUDBooster::mainpath(),"No Reserved Item","danger");
 			}
-			//$postdata['quantity_total']		 	= $quantity_total;
-			//$postdata['total']		 			= $total;
+
 			$arf_header 		= HeaderRequest::where(['id' => $Header_id])->first();
-			// if(in_array($arf_header->request_type_id, [1, 5])){
-			//     $inventory_id 						= $fields['inventory_id'];
-			// 	$item_id 							= $fields['item_id'];
-			// }else{
-			// 	$inventory_id 						= NULL;
-			// 	$item_id 							= $fields['inventory_id'];
-			// }
 			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])->count();
 			$count_header 		= MoveOrder::count();
 			$count_header1  	= $count_header + 1;
-			//dd(count((array)$digits_code));
+
 			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
-			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
 												->value('status_id');
@@ -597,154 +550,186 @@
 												->value('status_id');
 			}
 
-            //dd($body_request_id, $body_request_id);
-			for($x=0; $x < count((array)$item_description); $x++) {
-				$inventory_info = 	DB::table('assets_inventory_body')->where('digits_code', $digits_code[$x])->where('statuses_id',6)->first();
-				//$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
-				$ref_inventory   =  		str_pad($setLocationToPick[$x], 2, '0', STR_PAD_LEFT);	
+			foreach((array)$body_request_id as $x => $body_id) {
+				$bodyInfo       = BodyRequest::where(['id' => $body_id])->first();
+				if(!$bodyInfo->direct_delivery_inv_id){
+					$inventory_info = 	DB::table('assets_inventory_body')->where('digits_code', $digits_code[$x])->where('statuses_id',6)->first();
+					//$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
+					$ref_inventory   =  		str_pad($setLocationToPick[$x], 2, '0', STR_PAD_LEFT);	
 					if(count((array)$digits_code) != $body_request){
-						if($body_request_id[$x] == "" || $body_request_id[$x] == null){
+						if($body_id == "" || $body_id == null){
 							$count_header++;
 							$header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
 							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
 						}else{
 							$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
 							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
-
 						}
-						// $count_header++;
-						// $header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
-						// $reference_number	= 	"MO-".$header_ref.$ref_inventory;
-
-						//$reference_number	= 	"MO-".$header_ref;
 					}else{
 						$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
 						$reference_number	= 	"MO-".$header_ref.$ref_inventory;
-						//$reference_number	= 	"MO-".$header_ref;
 					}
-					// $items = 				DB::table('assets')->where('assets.id', $item_id[$x])->first();
-					// $category_id = 			DB::table('category')->where('id',	$items->category_id)->value('category_description');
-					// $sub_category_id = 		DB::table('class')->where('id',	$items->class_id)->value('class_description');
+					
+					$dataLines1[$x]['status_id'] 			= $for_printing;
+					$dataLines1[$x]['mo_reference_number'] 	= $reference_number;
+					$dataLines1[$x]['header_request_id'] 	= $arf_header->id;
+					$dataLines1[$x]['body_request_id'] 		= $body_id;
+					$dataLines1[$x]['item_id'] 		        = NULL;
+					$dataLines1[$x]['inventory_id'] 		= NULL;
+					$dataLines1[$x]['digits_code'] 			= $digits_code[$x];
+					$dataLines1[$x]['asset_code'] 			= NULL;
+					$dataLines1[$x]['item_description'] 	= $item_description[$x];
+					$dataLines1[$x]['category_id'] 			= $category_id[$x];
+					$dataLines1[$x]['sub_category_id'] 		= $sub_category_id[$x];
+					$array_location                         = [1,2];
+					$dataLines1[$x]['quantity'] 			= $quantity[$x];
+					$dataLines1[$x]['unit_cost'] 			= $unit_cost[$x];
+					$dataLines1[$x]['total_unit_cost'] 		= $total_unit_cost[$x];
+					$dataLines1[$x]['location_id'] 			= $setLocationToPick[$x];
+					$dataLines1[$x]['created_by'] 			= CRUDBooster::myId();
+					$dataLines1[$x]['created_at'] 			= date('Y-m-d H:i:s');
+					$dataLines1[$x]['request_created_by']   = $arf_header->created_by;
+					$dataLines1[$x]['request_type_id_mo']   = $arf_header->request_type_id;
+					$dataLines1[$x]['mo_plug']              = 0;
+					$dataLines1[$x]['to_pick']              = 0;
+					$dataLines1[$x]['printed_at']           = NULL;
 
-				$dataLines1[$x]['status_id'] 			= $for_printing;
-				$dataLines1[$x]['mo_reference_number'] 	= $reference_number;
-				$dataLines1[$x]['header_request_id'] 	= $arf_header->id;
-				$dataLines1[$x]['body_request_id'] 		= $body_request_id[$x];
-				//$dataLines1[$x]['item_id'] 				= $item_id[$x];
-				//$dataLines1[$x]['inventory_id'] 		= $inventory_id[$x];
-				$dataLines1[$x]['digits_code'] 			= $digits_code[$x];
-				//$dataLines1[$x]['asset_code'] 			= $asset_code[$x];
-				$dataLines1[$x]['item_description'] 	= $item_description[$x];
-				$dataLines1[$x]['category_id'] 			= $category_id[$x];
-				$dataLines1[$x]['sub_category_id'] 		= $sub_category_id[$x];
+					array_push($locationArray, $inventory_info->location);
+					BodyRequest::where('id',$body_id)
+					->update([
+						'mo_plug'=> 		1,
+						'location_id'=> 	$setLocationToPick[$x],
+						'to_mo'=> 	0
+					]);	
+				}else{
+					$inventory_info = 	DB::table('assets_inventory_body')->where('id', $bodyInfo->direct_delivery_inv_id)->first();
+					//$ref_inventory   =  		str_pad($inventory_info->location, 2, '0', STR_PAD_LEFT);
+					$ref_inventory   =  		str_pad($setLocationToPick[$x], 2, '0', STR_PAD_LEFT);	
+					if(count((array)$digits_code) != $body_request){
+						if($body_id == "" || $body_id == null){
+							$count_header++;
+							$header_ref   =  		str_pad($count_header, 7, '0', STR_PAD_LEFT);			
+							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+						}else{
+							$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
+							$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+						}
+					}else{
+						$header_ref   =  		str_pad($count_header1, 7, '0', STR_PAD_LEFT);			
+						$reference_number	= 	"MO-".$header_ref.$ref_inventory;
+					}
+					
+					$dataLines1[$x]['status_id'] 			= self::ForPrintingAdf;
+					$dataLines1[$x]['mo_reference_number'] 	= $reference_number;
+					$dataLines1[$x]['header_request_id'] 	= $arf_header->id;
+					$dataLines1[$x]['body_request_id'] 		= $body_id;
+					$dataLines1[$x]['item_id'] 		        = $inventory_info->item_id;
+					$dataLines1[$x]['inventory_id'] 		= $inventory_info->id;
+					$dataLines1[$x]['digits_code'] 			= $digits_code[$x];
+					$dataLines1[$x]['asset_code'] 			= $inventory_info->asset_code;
+					$dataLines1[$x]['item_description'] 	= $item_description[$x];
+					$dataLines1[$x]['category_id'] 			= $category_id[$x];
+					$dataLines1[$x]['sub_category_id'] 		= $sub_category_id[$x];
+					$array_location                         = [1,2];
+					$dataLines1[$x]['quantity'] 			= $quantity[$x];
+					$dataLines1[$x]['unit_cost'] 			= $inventory_info->value ? $inventory_info->value : 0;
+					$dataLines1[$x]['total_unit_cost'] 		= $inventory_info->value ? $inventory_info->value : 0;
+					$dataLines1[$x]['location_id'] 			= $setLocationToPick[$x];
+					$dataLines1[$x]['created_by'] 			= CRUDBooster::myId();
+					$dataLines1[$x]['created_at'] 			= date('Y-m-d H:i:s');
+					$dataLines1[$x]['request_created_by']   = $arf_header->created_by;
+					$dataLines1[$x]['request_type_id_mo']   = $arf_header->request_type_id;
+					$dataLines1[$x]['mo_plug']              = 1;
+					$dataLines1[$x]['to_pick']              = 1;
+					$dataLines1[$x]['printed_at']           = date('Y-m-d H:i:s');
 
-				$array_location = [1,2];
-				// if(in_array($arf_header->request_type_id, [1, 5])){
-				// 	$location 						= $inventory_info->location;
-				// }else{
-				// 	$location 						= implode(",",$array_location);
-				// }
-				// if(!empty($setLocationToPick)){
-				// 	$location = $setLocationToPick;
-				// }else{
-				// 	$location = $inventory_info->location;
-				// }
-				//$dataLines1[$x]['serial_no'] 			= $serial_no[$x];
-				$dataLines1[$x]['quantity'] 			= $quantity[$x];
-				$dataLines1[$x]['unit_cost'] 			= $unit_cost[$x];
-				$dataLines1[$x]['total_unit_cost'] 		= $total_unit_cost[$x];
-				//$dataLines1[$x]['to_reco'] 				= $arf_header->to_reco;
-				$dataLines1[$x]['location_id'] 			= $setLocationToPick[$x];
-				$dataLines1[$x]['created_by'] 			= CRUDBooster::myId();
-				$dataLines1[$x]['created_at'] 			= date('Y-m-d H:i:s');
-				$dataLines1[$x]['request_created_by']   = $arf_header->created_by;
-				$dataLines1[$x]['request_type_id_mo']   = $arf_header->request_type_id;
+					BodyRequest::where('id',$body_request_id[$x])
+					->update([
+						'mo_plug'     => 1,
+						'location_id' => $setLocationToPick[$x],
+						'to_mo'       => 0
+					]);	
 
-				array_push($locationArray, $inventory_info->location);
-			
-				BodyRequest::where('id',$body_request_id[$x])
-				->update([
-					'mo_plug'=> 		1,
-					'location_id'=> 	$location,
-					'to_mo'=> 	0
-				]);	
-
-				// DB::table('assets_inventory_body')->where('id', $inventory_id[$x])
-				// ->update([
-				// 	'statuses_id'=> 			2
-				// ]);
-
+					DB::table('assets_inventory_reserved')->where('body_id', $body_id)->delete();
+				}
 			}
 
-			
 			DB::beginTransaction();
 			try {
 				MoveOrder::insert($dataLines1);
 				DB::commit();
-				//CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_pullout_data_success",['mps_reference'=>$pullout_header->reference]), 'success');
 			} catch (\Exception $e) {
 				DB::rollback();
-
 				CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.alert_database_error",['database_error'=>$e]), 'danger');
 			}
 
-			if(in_array($arf_header->request_type_id, [1, 5])){
-				$headLocation 						= implode(",", $locationArray);
-			}else{
-				$headLocation 						= $location;
-			}
-
-			if($arf_header->print_by == null){	
-				HeaderRequest::where('id',$Header_id)
-				->update([
-					'mo_by'          => CRUDBooster::myId(),
-					'mo_at'          => date('Y-m-d H:i:s'),
-					'purchased2_by'	 => CRUDBooster::myId(),
-				    'purchased2_at'  => date('Y-m-d H:i:s'),
-					//'status_id'      => $for_printing,
-					'quantity_total' => $quantity_total,
-					'total'          => $total,
-					'location_id'    => $headLocation,
-					'to_mo'          => 0
-				]);
-
-
-				/*MoveOrder::where('header_request_id',$Header_id)
-				->update([
-					'location_id_list'=> implode(",", $locationArray)
-				]);*/
-				
-			}else{
-
-				$sum_qty = $arf_header->quantity_total + $quantity_total;
-
-				$sum = $arf_header->total + $total;
-
-				HeaderRequest::where('id',$Header_id)
-				->update([
-					'mo_by'          => CRUDBooster::myId(),
-					'mo_at'          => date('Y-m-d H:i:s'),
-					'purchased2_by'	 => CRUDBooster::myId(),
-				    'purchased2_at'  => date('Y-m-d H:i:s'),
-					'quantity_total' => $sum_qty,
-					'total'          => $sum,
-					'to_mo'          => 0
-				]);
-
-
-			}
-
-			$cancelled  = 		DB::table('statuses')->where('id', 8)->value('id');
-			$body_request 		= BodyRequest::where(['header_request_id' => $Header_id])->whereNull('deleted_at')->count();
-			$mo_request 		= MoveOrder::where(['header_request_id' => $Header_id])->where('status_id', '!=', $cancelled)->count();
+			$cancelled    = DB::table('statuses')->where('id', 8)->value('id');
+			$body_request = BodyRequest::where(['header_request_id' => $Header_id])->whereNull('deleted_at')->count();
+			$body_request_direct_delivery = BodyRequest::where(['header_request_id' => $Header_id])->whereNull('deleted_at')->whereNotNull('direct_delivery_inv_id')->count();
+			$mo_request   = MoveOrder::where(['header_request_id' => $Header_id])->where('status_id', '!=', $cancelled)->count();
 
 			if($body_request == $mo_request){
+				if($body_request_direct_delivery != $mo_request){
+					if(in_array($arf_header->request_type_id, [1, 5])){
+						$headLocation 						= implode(",", $locationArray);
+					}else{
+						$headLocation 						= $location;
+					}
+	
+					if($arf_header->print_by == null){	
+						HeaderRequest::where('id',$Header_id)
+						->update([
+							'mo_by'          => CRUDBooster::myId(),
+							'mo_at'          => date('Y-m-d H:i:s'),
+							'purchased2_by'	 => CRUDBooster::myId(),
+							'purchased2_at'  => date('Y-m-d H:i:s'),
+							'quantity_total' => $quantity_total,
+							'total'          => $total,
+							'location_id'    => $headLocation,
+							'to_mo'          => 0
+						]);
+					}else{
+						$sum_qty = $arf_header->quantity_total + $quantity_total;
+						$sum = $arf_header->total + $total;
+						HeaderRequest::where('id',$Header_id)
+						->update([
+							'mo_by'          => CRUDBooster::myId(),
+							'mo_at'          => date('Y-m-d H:i:s'),
+							'purchased2_by'	 => CRUDBooster::myId(),
+							'purchased2_at'  => date('Y-m-d H:i:s'),
+							'quantity_total' => $sum_qty,
+							'total'          => $sum,
+							'to_mo'          => 0
+						]);
+					}
 					HeaderRequest::where('id',$Header_id)
 					->update([
 						'status_id' => $for_printing,
 						'mo_plug'   => 1
 					]);
+				}else{
+					HeaderRequest::where('id',$Header_id)
+					->update([
+						'mo_by'          => CRUDBooster::myId(),
+						'mo_at'          => date('Y-m-d H:i:s'),
+						'purchased2_by'	 => CRUDBooster::myId(),
+						'purchased2_at'  => date('Y-m-d H:i:s'),
+						'quantity_total' => $quantity_total,
+						'total'          => $total,
+						'location_id'    => 8,
+						'to_mo'          => 0,
+						'print_by'       => CRUDBooster::myId(),
+						'print_at'       => date('Y-m-d H:i:s'),
+						'picked_by'      => CRUDBooster::myId(),
+						'picked_at'      => date('Y-m-d H:i:s')
+					]);
 
+					HeaderRequest::where('id',$Header_id)
+					->update([
+						'status_id' => self::ForPrintingAdf,
+						'mo_plug'   => 1
+					]);
+				}
 			}else{
 				HeaderRequest::where('id',$Header_id)
 				->update([
@@ -752,8 +737,7 @@
 					'mo_plug' => 0
 				]);
 			}
-			//$postdata['mo_print']		 	= 1;
-			//unset($postData['id']);
+
 	    }
 
 	    /* 
@@ -764,23 +748,11 @@
 	    | 
 	    */
 	    public function hook_after_add($id) {        
-	        //Your code here
-
 			MoveOrder::wherenull('status_id')->delete();
-
-			//$fields 	= Request::all();
-
-			//$Header_id 		= $fields['header_request_id'];
-
-			//$arf_header = HeaderRequest::where(['id' => $Header_id])->first();
-
 			$mo_request = MoveOrder::where(['created_by' => CRUDBooster::myId()])->orderBy('id','desc')->first();
-
-			
 			$arf_header 		= HeaderRequest::where(['id' => $mo_request->header_request_id])->first();
 			
 			if(in_array($arf_header->request_type_id, [5, 6, 7, 9])){
-			//if($arf_header->request_type_id == 5){
 				$for_printing = 				StatusMatrix::where('current_step', 5)
 												->where('request_type', $arf_header->request_type_id)
 												->value('status_id');
@@ -794,22 +766,13 @@
 								  ->where(['status_id' => $for_printing])
 								  ->get();
 
-
 			$approval_array = array();
 			foreach($mo_info as $matrix){
-
 				array_push($approval_array, $matrix->mo_reference_number);
-
 			}
 			$approval_string = implode(",",$approval_array);
-
-
 			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("crudbooster.mo_success",['reference_number'=>$approval_string]), 'info');
 
-			//return redirect()->action('AdminMoveOrderController@getRequestPrintPickList',['id'=>$mo_request->id])->send();
-			
-			//exit;
-			
 	    }
 
 	    /* 
@@ -1181,7 +1144,6 @@
 			return $this->view("assets.ordering-request", $data);
 		}
 
-
 		public function getRequestPrintPickList($id){
 			$this->cbLoader();
 			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
@@ -1239,7 +1201,6 @@
 			return $this->view("assets.print-picklist", $data);
 
 		}
-
 
 		public function getDetailOrdering($id){
 			$this->cbLoader();
@@ -1422,10 +1383,14 @@
 								->where('header_request.id', $search)->first();
 			if(in_array($data['Header']->request_type_id,[1,5])){
 				$data['Body'] = BodyRequest::leftjoin('assets_inventory_reserved', 'body_request.id', '=', 'assets_inventory_reserved.body_id')
+				->leftjoin('assets_inventory_body', 'body_request.direct_delivery_inv_id', '=', 'assets_inventory_body.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
 				->select(
 				  'body_request.*',
 				  'body_request.id as body_id',
-				  'assets_inventory_reserved.reserved as reserved'
+				  'assets_inventory_reserved.reserved as reserved',
+				  'warehouse_location_model.location as dd_location',
+				  'assets_inventory_body.location as location_id'
 				)
 				->where('body_request.header_request_id', $search)
 				->where('body_request.mo_plug', 0)
@@ -1435,10 +1400,14 @@
 				->get();
 			}else{
 				$data['Body'] = BodyRequest::leftjoin('assets_non_trade_inventory_reserved', 'body_request.id', '=', 'assets_non_trade_inventory_reserved.body_id')
+				->leftjoin('assets_inventory_body', 'body_request.direct_delivery_inv_id', '=', 'assets_inventory_body.id')
+				->leftjoin('warehouse_location_model', 'assets_inventory_body.location', '=', 'warehouse_location_model.id')
 				->select(
 				  'body_request.*',
 				  'body_request.id as body_id',
-				  'assets_non_trade_inventory_reserved.reserved as reserved'
+				  'assets_non_trade_inventory_reserved.reserved as reserved',
+				  'warehouse_location_model.location as dd_location',
+				  'assets_inventory_body.location as location_id'
 				)
 				->where('body_request.header_request_id', $search)
 				->where('body_request.mo_plug', 0)
@@ -1550,19 +1519,37 @@
 				$tableRow++;
 				$total++;
                 if(in_array(CRUDBooster::myPrivilegeId(), [5,17])){
-					$data['ARFBody'] .='
+					if(!$rowresult->direct_delivery_inv_id){
+						$data['ARFBody'] .='
 						<tr style="background-color: #d4edda; color:#155724">
 							<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
 							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
 							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
-					';
-				}else{
-					$data['ARFBody'] .='
-						<tr id="setColor'.$tableRow.'">
+						';
+					}else{
+						$data['ARFBody'] .='
+						<tr style="background-color: #f0ad4e; color:#fff">
 							<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
 							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
 							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
-					';
+						';
+					}
+				}else{
+					if(!$rowresult->direct_delivery_inv_id){
+						$data['ARFBody'] .='
+							<tr id="setColor'.$tableRow.'">
+								<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
+								<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
+								<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
+						';
+					}else{
+						$data['ARFBody'] .='
+						<tr style="background-color: #f0ad4e; color:#fff">
+							<input type="hidden"  class="form-control text-center finput"  name="item_description[]" id="item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="remove_btn'.$tableRow.'"  required  value="'.$tableRow.'">
+							<input type="hidden"  class="form-control"  name="remove_btn[]" id="category"  required  value="'.$data['Header']->request_type_id.'">
+						';
+					}
 				}
 				
 				// if($rowresult->reserved != null || $rowresult->reserved != ""){ 
@@ -1572,58 +1559,112 @@
 				// }
 				if(in_array(CRUDBooster::myPrivilegeId(), [5,17])){
 					if($rowresult->reserved != null || $rowresult->reserved != ""){ 
-						if(CRUDBooster::isSuperadmin()){
-							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
-						}
-						$data['ARFBody'] .='
-						   <td style="text-align:center" height="10">
-								<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
-								<input class="form-control text-center itemDcode finput" style="background-color: #d4edda;color:#155724" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
-							</td>
+						if(!$rowresult->direct_delivery_inv_id){
+							if(CRUDBooster::isSuperadmin()){
+								$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+							}
+							$data['ARFBody'] .='
 							<td style="text-align:center" height="10">
-								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-							   <input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-							  <input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
-							</td>	
-	
-							<td style="text-align:center" class="rep_qty">
-							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
-							</td>  
-							<td style="text-align:center" class="re_qty">
-							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
-							</td>     
-							<td style="text-align:center" class="served_qty">
-							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
-							 </td>                                                           
-							<td style="text-align:center" class="unserved_qty">
-							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
-							</td>
-							<td style="text-align:center" class="unit_cost">
-							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
-							</td>
-							<td style="text-align:center" class="total_cost">
-							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
-							</td>
-							<td style="text-align:center">
-								<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
-							</td>
-							<td>
-								<input type="hidden" class="form-control finput location" style="background-color: #d4edda;color:#155724" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" value="'.$itAssetLocation->id.'">
-								<input type="text" class="form-control finput location" style="background-color: #d4edda;color:#155724"  data-id="'.$tableRow.'" value="'.$itAssetLocation->location.'">
+									<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+									<input class="form-control text-center itemDcode finput" style="background-color: #d4edda;color:#155724" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
+								</td>
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								<input type="text"  class="form-control text-center finput" style="background-color: #d4edda;color:#155724" name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+								</td>	
+		
+								<td style="text-align:center" class="rep_qty">
+								'. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+								</td>  
+								<td style="text-align:center" class="re_qty">
+								'. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+								</td>     
+								<td style="text-align:center" class="served_qty">
+								'. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+								</td>                                                           
+								<td style="text-align:center" class="unserved_qty">
+								'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+								</td>
+								<td style="text-align:center" class="unit_cost">
+								'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+								</td>
+								<td style="text-align:center" class="total_cost">
+								'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+								</td>
+								<td style="text-align:center">
+									<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
+								</td>
+								<td>
+									<input type="hidden" class="form-control finput location" style="background-color: #d4edda;color:#155724" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" value="'.$itAssetLocation->id.'">
+									<input type="text" class="form-control finput location" style="background-color: #d4edda;color:#155724"  data-id="'.$tableRow.'" value="'.$itAssetLocation->location.'">
 
-							</td>
-							</tr>
-						';	
+								</td>
+								</tr>
+							';	
+						}else{
+							if(CRUDBooster::isSuperadmin()){
+								$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+							}
+							$data['ARFBody'] .='
+							   <td style="text-align:center" height="10">
+									<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+									<input class="form-control text-center itemDcode finput" style="background-color: #f0ad4e;color:#fff" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
+								</td>
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								   <input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								  <input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+								</td>	
+		
+								<td style="text-align:center" class="rep_qty">
+								 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+								</td>  
+								<td style="text-align:center" class="re_qty">
+								 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+								</td>     
+								<td style="text-align:center" class="served_qty">
+								 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+								 </td>                                                           
+								<td style="text-align:center" class="unserved_qty">
+								'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+								</td>
+								<td style="text-align:center" class="unit_cost">
+								'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+								</td>
+								<td style="text-align:center" class="total_cost">
+								'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+								</td>
+								<td style="text-align:center">
+									<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-default"></i>
+								</td>
+								<td>
+									<input type="hidden" class="form-control finput location" style="background-color: #f0ad4e;color:#fff" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" value="'.$rowresult->location_id.'">
+									<input type="text" class="form-control finput location" style="background-color: #f0ad4e;color:#fff"  data-id="'.$tableRow.'" value="'.$rowresult->dd_location.'">
+								</td>
+								</tr>
+							';	
+						}
 					}else{
 						$data['ARFBody'] .='<tr>';
 						if(CRUDBooster::isSuperadmin()){
@@ -1668,68 +1709,121 @@
 					}
 				}else{
 					if($rowresult->reserved != null || $rowresult->reserved != ""){ 
-						if(CRUDBooster::isSuperadmin()){
-							$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
-						}
-						$data['ARFBody'] .='
-						   <td style="text-align:center" height="10">
-								<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
-								<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
-							</td>
-							<td style="text-align:center" height="10">
-								<input type="text"  class="form-control text-center finput"  name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-								<input type="text"  class="form-control text-center finput"  name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-							   <input type="text"  class="form-control text-center finput"  name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
-							</td>
-	
-							<td style="text-align:center" height="10">
-							  <input type="text"  class="form-control text-center finput"  name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
-							</td>	
-	
-							<td style="text-align:center" class="rep_qty">
-							 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
-							</td>  
-							<td style="text-align:center" class="re_qty">
-							 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
-							</td>     
-							<td style="text-align:center" class="served_qty">
-							 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
-							 </td>                                                           
-							<td style="text-align:center" class="unserved_qty">
-							'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
-							</td>
-							<td style="text-align:center" class="unit_cost">
-							'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
-							</td>
-							<td style="text-align:center" class="total_cost">
-							'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
-							</td>
-							<td style="text-align:center">
-								<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
-							</td>
-							<td>
-							<select selected data-placeholder="Select Location" class="form-control location" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" required style="width:100%">
-							<option value=""></option>
-						';
-						foreach($data['locations'] as $location){
+						if(!$rowresult->direct_delivery_inv_id){
+							if(CRUDBooster::isSuperadmin()){
+								$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+							}
 							$data['ARFBody'] .='
-							<option value='.$location->id.'>'. $location->location .'</option>;
-							';
-						}
-						$data['ARFBody'] .='
-									</select>
-									<input type="hidden" name="stock[]" id="stock'.$tableRow.'"  required readonly>
-									<div id="display_error'.$tableRow.'" style="text-align:left"></div>
+							   <td style="text-align:center" height="10">
+									<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+									<input class="form-control text-center itemDcode finput" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
 								</td>
-							</tr>
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput"  name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput"  name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								   <input type="text"  class="form-control text-center finput"  name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								  <input type="text"  class="form-control text-center finput"  name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+								</td>	
+		
+								<td style="text-align:center" class="rep_qty">
+								 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+								</td>  
+								<td style="text-align:center" class="re_qty">
+								 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+								</td>     
+								<td style="text-align:center" class="served_qty">
+								 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+								 </td>                                                           
+								<td style="text-align:center" class="unserved_qty">
+								'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+								</td>
+								<td style="text-align:center" class="unit_cost">
+								'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+								</td>
+								<td style="text-align:center" class="total_cost">
+								'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+								</td>
+								<td style="text-align:center">
+									<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-success"></i>
+								</td>
+								<td>
+								<select selected data-placeholder="Select Location" class="form-control location" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" required style="width:100%">
+								<option value=""></option>
 							';
-					
+							foreach($data['locations'] as $location){
+								$data['ARFBody'] .='
+								<option value='.$location->id.'>'. $location->location .'</option>;
+								';
+							}
+							$data['ARFBody'] .='
+										</select>
+										<input type="hidden" name="stock[]" id="stock'.$tableRow.'"  required readonly>
+										<div id="display_error'.$tableRow.'" style="text-align:left"></div>
+									</td>
+								</tr>
+								';
+						}else{
+							if(CRUDBooster::isSuperadmin()){
+								$data['ARFBody'] .='<td style="text-align:center" height="10"><input type="checkbox" name="body_id_to_cancel[]" id="body_id_to_cancel'.$tableRow.'" class="body_id_to_cancel" required data-id="'.$tableRow.'" value="'.$rowresult->body_id.'"/></td>';
+							}
+							$data['ARFBody'] .='
+							   <td style="text-align:center" height="10">
+									<input type="hidden"  class="form-control"  name="body_request_id[]" id="body_request_id'.$tableRow.'"  required  value="'.$rowresult->id.'">                                                                               
+									<input class="form-control text-center itemDcode finput" style="background-color: #f0ad4e;color:#fff" type="text" name="add_digits_code[]" value="'.$rowresult->digits_code.'" id="add_digits_code'.$tableRow.'" required max="99999999" readonly>                                                                              
+								</td>
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="add_item_description[]" id="add_item_description'.$tableRow.'"  required  value="'.$rowresult->item_description.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+									<input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="category_id[]" id="category_id'.$tableRow.'"  required  value="'.$rowresult->category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								   <input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="sub_category_id[]" id="sub_category_id'.$tableRow.'"  required  value="'.$rowresult->sub_category_id.'" readonly>
+								</td>
+		
+								<td style="text-align:center" height="10">
+								  <input type="text"  class="form-control text-center finput" style="background-color: #f0ad4e;color:#fff" name="add_quantity[]" id="add_quantity'.$tableRow.'"  required  value="'.$rowresult->quantity.'" readonly>
+								</td>	
+		
+								<td style="text-align:center" class="rep_qty">
+								 '. ($rowresult->replenish_qty ? $rowresult->replenish_qty : 0) .'
+								</td>  
+								<td style="text-align:center" class="re_qty">
+								 '. ($rowresult->reorder_qty ? $rowresult->reorder_qty : 0) .'
+								</td>     
+								<td style="text-align:center" class="served_qty">
+								 '. ($rowresult->serve_qty ? $rowresult->serve_qty : 0) .'
+								 </td>                                                           
+								<td style="text-align:center" class="unserved_qty">
+								'. ($rowresult->unserved_qty ? $rowresult->unserved_qty : 0).'
+								</td>
+								<td style="text-align:center" class="unit_cost">
+								'. ($rowresult->unit_cost ? $rowresult->unit_cost : 0) .'
+								</td>
+								<td style="text-align:center" class="total_cost">
+								'. ($rowresult->unit_cost * $rowresult->serve_qty) .'
+								</td>
+								<td style="text-align:center">
+									<i data-toggle="tooltip" data-placement="right" title="reserved" class="fa fa-check-circle text-default"></i>
+								</td>
+								<td>
+									<input type="hidden" class="form-control finput" style="background-color: #f0ad4e;color:#fff" name="location[]" data-id="'.$tableRow.'" id="location'.$tableRow.'" value="'.$rowresult->location_id.'">
+									<input type="text" class="form-control finput" style="background-color: #f0ad4e;color:#fff"  data-id="'.$tableRow.'" value="'.$rowresult->dd_location.'">
+								</td>
+								</tr>
+							';	
+						}
 					}else{
 						$data['ARFBody'] .='<tr>';
 						if(CRUDBooster::isSuperadmin()){
@@ -1956,8 +2050,6 @@
 
 				</script>
 			';
-
-
 
 			return $data;
 		}

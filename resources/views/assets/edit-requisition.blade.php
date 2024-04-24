@@ -445,6 +445,7 @@
                     </td>   
                     <td>
                         <input type="text" placeholder="Sub category" class="form-control sub_category text-center" data-id="${tableRow}" id="sub_category${tableRow}"  name="sub_category[]" readonly>
+                        <input type="hidden" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center item_cost sinput" data-id="${tableRow}" id="item_cost${tableRow}"  name="item_cost[]"   maxlength="100" readonly> 
                     </td> 
              
                     <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" readonly></td> 
@@ -474,7 +475,7 @@
             }
             //Search item
             let countrow = 1;
-            
+            var categories = <?php echo json_encode($fa_categories->category_description); ?>;
             $(function(){
                 countrow++;
                 $('#itemDesc'+tableRow).autocomplete({
@@ -536,9 +537,13 @@
                         var e = ui.item;
                         if (e.id) {
                             $("#digits_code"+$(this).attr("data-id")).val(e.digits_code);
-                            $('#category'+$(this).attr("data-id")).val(e.category_description);
+                            if($('#request_type_id').val() == 1){
+                                $('#category'+$(this).attr("data-id")).val(e.category_description);
+                            }else{
+                                $('#category'+$(this).attr("data-id")).val(categories);
+                            }
                             $('#sub_category'+$(this).attr("data-id")).val(e.sub_category_description);
-                            $("#supplies_cost"+$(this).attr("data-id")).val(e.item_cost);
+                            $("#item_cost"+$(this).attr("data-id")).val(e.item_cost);
                             $('#itemDesc'+$(this).attr("data-id")).val(e.value);
                             $('#itemDesc'+$(this).attr("data-id")).attr('readonly','readonly');
                             $('#fixed_description'+$(this).attr("data-id")).val(e.value);

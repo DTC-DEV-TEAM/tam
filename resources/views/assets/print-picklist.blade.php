@@ -22,7 +22,7 @@
 
                         <tr>
                             <td colspan="4">
-                                <h4 align="center" ><strong>Pick List Report (DAM)</strong></h4> 
+                                <h4 align="center" ><strong>Pick List Report (TAM)</strong></h4> 
                             </td>
                         </tr>
 

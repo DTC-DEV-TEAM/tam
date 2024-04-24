@@ -39,6 +39,7 @@
 			$this->col = [];
 			
 			$this->col[] = ["label"=>"FA Code","name"=>"category_code"];
+			$this->col[] = ["label"=>"Asset code counter","name"=>"code_counter"];
 			$this->col[] = ["label"=>"Description","name"=>"class_description"];
 			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"category,category_description"];
 			$this->col[] = ["label"=>"Status","name"=>"class_status"];
@@ -298,7 +299,7 @@
 	    |
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
-	    	if($column_index == 5){
+	    	if($column_index == 6){
 				if($column_value != null){
 					$column_value = '<span class="label label-danger">'.$column_value.'</span>';
 				}
