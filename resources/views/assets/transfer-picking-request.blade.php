@@ -85,14 +85,16 @@
                 <div class="col-md-6">
                     <table style="width:100%">
                         <tbody id="footer">
-                            <tr>
-                                <th class="control-label col-md-3">Location:</th>
-                                <td>
-                                    @if($Header->location_pick != null || $Header->location_pick != "")
-                                     {{$Header->location_pick}}
-                                    @endif
-                                </td>                              
-                            </tr>
+                            @if(in_array($Header->request_type_id,[1,5]))
+                                <tr>
+                                    <th class="control-label col-md-3">Location:</th>
+                                    <td>
+                                        @if($Header->location_pick != null || $Header->location_pick != "")
+                                        {{$Header->location_pick}}
+                                        @endif
+                                    </td>                              
+                                </tr>
+                            @endif
                             <tr>
                                 <th class="control-label col-md-3">Pick up by:</th>
                                 <td>

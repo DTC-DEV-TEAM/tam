@@ -104,8 +104,12 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label require">{{ trans('message.form-label.department') }}</label>
-                        <input type="text" class="form-control finput"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}">
-
+                        {{-- <input type="text" class="form-control finput"  id="department" name="department"  required readonly value="{{$employeeinfos->department_name}}"> --}}
+                        <select required id="department" name="department" class="form-select select2" style="width:100%;">
+                            @foreach($departments as $res)
+                                <option value="{{ $res->id }}">{{ $res->department_name }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
                 
@@ -248,7 +252,7 @@
             null;
         };
         setTimeout("preventBack()", 0);
-
+        $('#department').select2({})
         var tableRow = 1;
 
         $(document).ready(function() {
@@ -673,7 +677,15 @@
             event.preventDefault();
             var countRow = $('#asset-items tfoot tr').length;
                 // var value = $('.vvalue').val();
-                if(! $(".purpose").is(':checked')){
+                if($("#department").val() === '') {
+                    swal({
+                        type: 'error',
+                        title: 'Department required!',
+                        icon: 'error',
+                        confirmButtonColor: "#5cb85c",
+                    }); 
+                    event.preventDefault(); // cancel default behavior
+                }else if(! $(".purpose").is(':checked')){
                     swal({
                         type: 'error',
                         title: 'Please choose Purpose!',
