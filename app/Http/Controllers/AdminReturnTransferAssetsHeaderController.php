@@ -205,7 +205,8 @@
 			}else{
 				$data['stores'] = NULL;
 			}	
-			$data['users'] = Users::where('id_cms_privileges','!=',1)->where('department_id',$data['user']->department_id)->get();
+			$departmentList = array_map('intval',explode(",",$data['user']->department_id));
+			$data['users'] = Users::where('id_cms_privileges','!=',1)->whereIn('department_id',$departmentList)->get();
 			return $this->view("assets.transfer-assets", $data);
 		}
 
