@@ -157,7 +157,7 @@
                     @foreach($return_body as $rowresult)
                     <?php $tableRow1++; ?>
                     <?Php $item_count++; ?>
-                        <tr>
+                        <tr class="row-data">
                             {{-- <td style="text-align:center" height="10">
                                 <input type="checkbox" name="item_to_receive_id[]" id="item_to_receive_id{{$tableRow1}}" class="item_to_receive_id" required data-id="{{$tableRow1}}" value="{{$rowresult->body_id}}"/>
                             </td> --}}
@@ -357,11 +357,12 @@
             //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                 if ($('.good:checked').length == $('.good').length) {
                     $('#btnSubmit').attr("disabled", false);
-                }else if($('#asset-items tbody tr').length - 2 == $('.good:checked').length + $('.defective:checked').length){
+                }else if($('#asset-items tbody tr.row-data').length == $('.good:checked').length + $('.defective:checked').length){
                     $('#btnSubmit').attr("disabled", false);
                 }else{
                     $('#btnSubmit').attr("disabled", true);  
                 }
+
             // }else{
             //     if(count_pick == 0){
             //         $('#btnSubmit').attr("disabled", true);
@@ -404,11 +405,12 @@
             // if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                 if ($('.good:checked').length == $('.good').length) {
                     $('#btnSubmit').attr("disabled", false);
-                }else if($('#asset-items tbody tr').length - 2 == $('.good:checked').length + $('.defective:checked').length){
+                }else if($('#asset-items tbody tr.row-data').length == $('.good:checked').length + $('.defective:checked').length){
                     $('#btnSubmit').attr("disabled", false);
                 }else{
                     $('#btnSubmit').attr("disabled", true);  
                 }
+    
             // }else{
             //     if ($('.good:checked').length == $('.good').length) {
             //         $('#btnSubmit').attr("disabled", false);
@@ -441,7 +443,7 @@
                 //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                     if ($('.defective:checked').length == $('.defective').length) {
                         $('#btnSubmit').attr("disabled", false);
-                    }else if($('#asset-items tbody tr').length - 2 == $('.defective:checked').length + $('.good:checked').length){
+                    }else if($('#asset-items tbody tr.row-data').length == $('.defective:checked').length + $('.good:checked').length){
                         $('#btnSubmit').attr("disabled", false);
                     }else{
                         $('#btnSubmit').attr("disabled", true);  
@@ -458,30 +460,30 @@
                 $('#good'+id).not(this).prop('checked', false); 
                 $('#comments'+id).removeAttr("disabled");
                 $.ajax({
-                url: "{{ route('assets.get.comments') }}",
-                dataType: "json",
-                type: "POST",
-                data: {
-                    "asset_code": asset_code
-                },
-                success: function (data) {
-                    var json = JSON.parse(JSON.stringify(data.items));
-                    if(data.items != null){
-                        $.each(json, function (index, item) { 
-                                var row = '<span class="text-comment" id="text-comment-id'+id+'">' + 
-                                        '<p style="margin-top:5px"><strong>' + item.asset_code+ 
-                                        ':</strong>' + item.comments + 
-                                        '</p>' + 
-                                        '<p style="text-align:right; font-size:10px; font-style: italic; border-bottom:1px solid #d2d6de">' + item.created_at + 
-                                        '</p></span>'
-                                        ;
-                        $(".comment_div").append(row);
-                    }); 
+                    url: "{{ route('assets.get.comments') }}",
+                    dataType: "json",
+                    type: "POST",
+                    data: {
+                        "asset_code": asset_code
+                    },
+                    success: function (data) {
+                        var json = JSON.parse(JSON.stringify(data.items));
+                        if(data.items != null){
+                            $.each(json, function (index, item) { 
+                                    var row = '<span class="text-comment" id="text-comment-id'+id+'">' + 
+                                            '<p style="margin-top:5px"><strong>' + item.asset_code+ 
+                                            ':</strong>' + item.comments + 
+                                            '</p>' + 
+                                            '<p style="text-align:right; font-size:10px; font-style: italic; border-bottom:1px solid #d2d6de">' + item.created_at + 
+                                            '</p></span>'
+                                            ;
+                            $(".comment_div").append(row);
+                        }); 
+                        }
+                        
+                        
                     }
-                    
-                    
-                }
-            });
+                });
                 //$("#good"+id).val("1");
 
                 $("#defective_text"+id).val("1");
@@ -491,11 +493,12 @@
                 //if ($('.item_to_receive_id:checked').length == $('.item_to_receive_id').length) {
                     if ($('.defective:checked').length == $('.defective').length) {
                         $('#btnSubmit').attr("disabled", false);
-                    }else if($('#asset-items tbody tr').length - 2 == $('.defective:checked').length + $('.good:checked').length){
+                    }else if($('#asset-items tbody tr.row-data').length == $('.defective:checked').length + $('.good:checked').length){
                         $('#btnSubmit').attr("disabled", false);
                     }else{
                         $('#btnSubmit').attr("disabled", true);  
                     }
+                    
                 // }else{ 
                 //     if ($('.good:checked').length == $('.good').length) {
                 //         $('#btnSubmit').attr("disabled", false);

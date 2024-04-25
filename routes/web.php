@@ -145,7 +145,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('/admin/db-truncate','TruncateController@dbtruncate');
     
     //TIMFS API
-    Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-timfs-data','AdminAssetsController@getItemMasterTimfsData')->name('get-item-master-timfs-data');
+    Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-timfs-data','AdminAssetsController@assetsFaTimfs')->name('get-item-master-timfs-data');
     Route::post(config('crudbooster.ADMIN_PATH').'/get-item-master-updated-timfs-data','AdminAssetsController@getItemMasterUpdatedTimfsData')->name('get-item-master-updated-timfs-data');
 
     //DAM API

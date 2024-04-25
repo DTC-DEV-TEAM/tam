@@ -90,7 +90,7 @@
                                             @if(in_array($Header->request_type_id,[1,5]))
                                                 <th style="text-align:center" height="10">Asset Code</th>
                                             @endif
-                                            <th style="text-align:center" height="10">Digits Code</th>
+                                            <th style="text-align:center" height="10">Item Code</th>
                                             <th style="text-align:center" height="10">Item Description</th>  
                                             @if(in_array($Header->request_type_id,[1,5]))        
                                                 <th style="text-align:center" height="10">Serial#</th>
