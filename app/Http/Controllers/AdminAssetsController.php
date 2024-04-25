@@ -159,9 +159,9 @@
 						"icon"=>"fa fa-upload",
 						"url"=>CRUDBooster::mainpath('item-master-upload')];
 					//$this->index_button[] = ["label"=>"Add Assets","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-asset'),"color"=>"success"];
+					$this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
+					// $this->index_button[] = ["label"=>"Sync Data Updated","icon"=>"fa fa-refresh","color"=>"primary"];
 				}
-				$this->index_button[] = ["label"=>"Sync Data","icon"=>"fa fa-refresh","color"=>"primary"];
-				$this->index_button[] = ["label"=>"Sync Data Updated","icon"=>"fa fa-refresh","color"=>"primary"];
 			}
 
 
