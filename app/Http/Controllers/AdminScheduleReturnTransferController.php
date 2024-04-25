@@ -136,6 +136,11 @@
 						'location'=> $fields['location_to_pick']
 					]);
 				}
+			}else{
+				ReturnTransferAssets::where('return_header_id', $id)
+				->update([
+					'status'           => self::ForTurnOver
+				]);	
 			}
 	    }
 

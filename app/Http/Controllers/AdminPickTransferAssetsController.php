@@ -80,7 +80,7 @@
 				
 				$forturnover           = DB::table('statuses')->where('id', 24)->value('id');
 
-				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status] == $forturnover"];
+				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == $forturnover"];
 				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
 			}
 
@@ -397,9 +397,7 @@
 				if($countItem == 0){
 					ReturnTransferAssetsHeader::where('id', $id)
 					->update([
-						'status'          => $to_close,
-						'transacted_by'   => CRUDBooster::myId(),
-						'transacted_date' => date('Y-m-d H:i:s')
+						'status'          => $to_close
 					]);	
 				}
 			
