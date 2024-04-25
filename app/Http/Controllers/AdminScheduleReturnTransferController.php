@@ -123,7 +123,7 @@
 			$postdata['location_to_pick']    = $fields['location_to_pick'];
 			$header = ReturnTransferAssetsHeader::where('id',$id)->first();
 
-			if($header->request_type_id == 1){
+			if(in_array($header->request_type_id,[1,5])){
 				ReturnTransferAssets::where('return_header_id', $id)
 				->update([
 					'status'           => self::ForTurnOver,
