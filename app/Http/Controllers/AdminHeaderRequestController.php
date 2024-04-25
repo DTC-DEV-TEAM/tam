@@ -500,7 +500,7 @@
 			$postdata['employee_name'] 				= $employees->id;
 			$postdata['company_name'] 				= $employees->company_name_id;
 			$postdata['position'] 					= $employees->position_id;
-			$postdata['department'] 				= $employees->department_id;
+			$postdata['department'] 				= $department;
 			if(CRUDBooster::myPrivilegeId() == 8){
 				$postdata['store_branch'] 			= $employees->location_id;
 			}else{
@@ -943,11 +943,12 @@
 			$this->cbLoader();
 			$data['page_title'] = 'Create New IT Asset Request';
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
+			$departmentList = array_map('intval',explode(",",$data['user']->department_id));
+			$data['departments'] = DB::table('departments')->whereIn('id',$departmentList)->where('status', 'ACTIVE')->get();
+
 			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
@@ -1011,11 +1012,11 @@
 			$this->cbLoader();
 			$data['page_title'] = 'Create New FA Request';
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
+			$departmentList = array_map('intval',explode(",",$data['user']->department_id));
+			$data['departments'] = DB::table('departments')->whereIn('id',$departmentList)->where('status', 'ACTIVE')->get();
 			$data['categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
 													   ->orderby('category_description', 'asc')
 													   ->first();

@@ -666,7 +666,7 @@
 					$flag = true;
 				}
 				
-				fputcsv($out, array('johndoe@digits.ph', '40000769', 'ASUS X415J LAPTOP', 'COMPUTER SOFTWARE/PROGRAM', 'XSER12', '1', 'WORKING', 'IT WAREHOUSE' , '1'));
+				fputcsv($out, array('johndoe@digits.ph', '40001122', 'OFE LAPTOP WINDOWS ADVANCED', 'COMMUNICATION EQUIPMENT', 'XSER12', '1', 'WORKING', 'IT WAREHOUSE' , '12'));
 				fclose($out);
 				
 				exit;
