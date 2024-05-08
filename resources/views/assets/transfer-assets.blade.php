@@ -176,7 +176,7 @@ var table;
         }else if ($('#purpose').val() == "") {
             swal({
                 type: 'error',
-                title: 'Please choose purpose!',
+                title: 'Please choose reason!',
                 icon: 'error',
                 confirmButtonColor: "#367fa9",
             }); 

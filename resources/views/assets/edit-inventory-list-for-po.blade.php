@@ -158,7 +158,7 @@
                             <th width="5%" class="text-center">{{ trans('message.table.location_id_text') }}</th>                                         
                             <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
                             @if($Header->location == 8)
-                                <th width="5%" class="text-center">Direct Deliver(ARF Request)</th>  
+                                <th width="5%" class="text-center"><span class="text-danger">*</span>Direct Deliver(ARF Request)</th>  
                             @endif                 
                         </tr>
                     </thead>
