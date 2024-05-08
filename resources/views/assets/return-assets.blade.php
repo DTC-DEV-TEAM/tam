@@ -39,7 +39,7 @@
 
 <div class='panel panel-default'>
     <div class='panel-heading'>
-        Asset Form
+        Asset Return Form
     </div>
 
     <form action="{{ CRUDBooster::mainpath('add-save') }}" method="POST" id="AssetReturnRequest" enctype="multipart/form-data">
@@ -47,7 +47,7 @@
         <input type="hidden" value="1" name="request_type_id" id="request_type_id">
         
         <div class="form-group" style="padding:10px">
-            <label class="require control-label">Reason:</label>
+            <label class="require control-label"><span class="text-danger">*</span>Reason:</label>
             <select class="users" data-placeholder="Choose reason"  style="width: 50%;" name="purpose" id="purpose">
                 <option value=""></option>
                 @foreach($purposes as $purpose)
@@ -155,7 +155,7 @@ var table;
         if ($('#purpose').val() == '') {
             swal({
                 type: 'error',
-                title: 'Please choose purpose!',
+                title: 'Please choose reason!',
                 icon: 'error',
                 confirmButtonColor: '#367fa9',
             }); 

@@ -59,8 +59,8 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label class="require control-label">Purpose:</label>
-                    <select class="users" data-placeholder="Choose purpose" name="purpose" id="purpose" style="width: 100%;">
+                    <label class="require control-label"><span class="text-danger">*</span> Reason:</label>
+                    <select class="users" data-placeholder="Choose reason" name="purpose" id="purpose" style="width: 100%;">
                         <option value=""></option>
                         @foreach($purposes as $purpose)
                             <option value="{{$purpose->description}}">{{$purpose->description}}</option>
