@@ -1096,7 +1096,7 @@
 						)
 				->take(10)
 				->get();
-			}else if(in_array($type, [5,6,7,8])){
+			}else if(in_array($type, [5,6,7])){
 				$items = DB::table('assets')
 				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
 				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])

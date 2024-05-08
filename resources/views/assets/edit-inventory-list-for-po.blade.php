@@ -291,58 +291,76 @@
             });  
             event.preventDefault();
             return false;
-        }else{
-            swal({
-                    title: "Are you sure?",
-                    type: "warning",
-                    showCancelButton: true,
-                    confirmButtonColor: "#41B314",
-                    cancelButtonColor: "#F9354C",
-                    confirmButtonText: "Yes, save it!",
-                    width: 450,
-                    height: 200
-                    }, function () {
-                        //$("#cancelledForm").submit();  
-                    $.ajaxSetup({
-                        headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            }
-                    });
-                    var formData = new FormData();
-
-
-                    formData.append('form_data', $('#ForApprovalForm').serialize());
-                    formData.append('approvalMethod', fired_button);
-                    formData.append('remarks', remarks);  
-                    formData.append('id', id);
-                    $.ajax({
-                        url: "{{ route('assets.get.forPoProcess') }}",
-                        dataType: "json",
-                        type: "POST",
-                        data: formData,
-                        processData : false,
-                        contentType : false,
-
-                        success: function (data) {
-                            if (data.status == "success") {
-                                swal({
-                                    type: data.status,
-                                    title: data.message,
-                                });
-                                setTimeout(function(){
-                                    //window.location.replace(document.referrer);
-                                    window.location.replace(data.redirect_url);
-                                }, 1000); 
-                                } else if (data.status == "error") {
-                                swal({
-                                    type: data.status,
-                                    title: data.message,
-                                });
-                            }
-                        }
-                    })
-                });
         }
+
+        if($('#location_id').val() == 8){
+            var arf_tag = $(".arf_tag option").length;
+            var arf_tag_value = $('.arf_tag').find(":selected");
+            for(i=0;i<arf_tag;i++){
+                if(arf_tag_value.eq(i).val() == ""){
+                    swal({  
+                            type: 'error',
+                            title: 'Arf Tagging Required!',
+                            icon: 'error',
+                            confirmButtonColor: "#5cb85c",
+                        });
+                        event.preventDefault();
+                        return false;
+                } 
+            } 
+        }
+        
+        swal({
+            title: "Are you sure?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#41B314",
+            cancelButtonColor: "#F9354C",
+            confirmButtonText: "Yes, save it!",
+            width: 450,
+            height: 200
+            }, function () {
+                //$("#cancelledForm").submit();  
+            $.ajaxSetup({
+                headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+            });
+            var formData = new FormData();
+
+
+            formData.append('form_data', $('#ForApprovalForm').serialize());
+            formData.append('approvalMethod', fired_button);
+            formData.append('remarks', remarks);  
+            formData.append('id', id);
+            $.ajax({
+                url: "{{ route('assets.get.forPoProcess') }}",
+                dataType: "json",
+                type: "POST",
+                data: formData,
+                processData : false,
+                contentType : false,
+
+                success: function (data) {
+                    if (data.status == "success") {
+                        swal({
+                            type: data.status,
+                            title: data.message,
+                        });
+                        setTimeout(function(){
+                            //window.location.replace(document.referrer);
+                            window.location.replace(data.redirect_url);
+                        }, 1000); 
+                        } else if (data.status == "error") {
+                        swal({
+                            type: data.status,
+                            title: data.message,
+                        });
+                    }
+                }
+            })
+        });
+        
             
     });
     function RefreshPage(){
