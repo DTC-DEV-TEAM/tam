@@ -52,7 +52,7 @@
 			$this->form = [];
 			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description'];
 			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			$this->form[] = ['label'=>'Location','name'=>'location_id','type'=>'select3-new','width'=>'col-sm-5','datatable'=>'warehouse_location_model,location'];
+			$this->form[] = ['label'=>'Location','name'=>'location_id','type'=>'select3-new','width'=>'col-sm-5','datatable'=>'warehouse_location_model,location','validation'=>'required'];
 			$this->form[] = ['label'=>'Asset Code Counter','name'=>'code_counter','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
 			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
 				
@@ -191,8 +191,8 @@
 				let add_action = x.includes('add');
 				let edit_action = x.includes('edit');
 				if (edit_action){
-					var a  = 	location_id.split(',').length;
-					var b = 	location_id.split(',');
+					var a = location_id.split(',').length;
+					var b = location_id.split(',');
 					var selectedValues = new Array();
 	
 					for (let i = 0; i < a; i++) {

@@ -191,35 +191,41 @@ Route::group(['middleware' => ['web']], function() {
     //ASSET RETURN NON TRADE
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/return-nontrade-assets', 'AdminReturnTransferAssetsHeaderController@getReturnNonTradeAssets')->name('assets.return.non.trade.assets'); 
 
-     //inventory upload
-     Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
-     Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
-     Route::get('/admin/assets_inventory_body/upload-inventory-template','AdminAssetsInventoryBodyController@uploadInventoryTemplate'); 
-     
-     //inventory upload Not Available
-     Route::get('/admin/assets_inventory_body/upload-inventory-not-available','AdminAssetsInventoryBodyController@uploadInventoryNotAvailable');
-     Route::post('/admin/assets_inventory_body/inventory-upload-not-available','AdminAssetsInventoryBodyController@inventoryUploadNotAvailable')->name('upload-inventory-not-available');
- 
-     //inventory update
-     Route::get('/admin/assets_inventory_body/upload-inventory-update','AdminAssetsInventoryBodyController@uploadInventoryUpdate');
-     Route::post('/admin/assets_inventory_body/inventory-upload-update','AdminAssetsInventoryBodyController@inventoryUploadUpdate')->name('upload-inventory-update');
-     Route::get('/admin/assets_inventory_body/update-digits-code-template','AdminAssetsInventoryBodyController@updateDigitsCodeTemplate');
- 
-     //Deployed Assets
-     Route::get('/admin/deployed_asset/Detail/{id}','AdminDeployedAssetsController@Detail')->name('deployed-asset');
-     Route::get('/admin/deployed_asset/DetailMoOnly/{id}','AdminDeployedAssetsController@DetailMoOnly')->name('deployed-asset');
-     
-     //hr requisition for new employee
-     Route::post(config('crudbooster.ADMIN_PATH').'/hr_requisition/search-user','AdminHrRequisitionController@SearchUser')->name('hr.search.user');
-     Route::get('admin/erf_header_request/getRequestCancel/{id}','AdminHrRequisitionController@getRequestCancel')->name('getRequestCancel');
-     Route::get('/admin/erf_edit_status/getEditErf/{id}','AdminErfEditStatusController@getEditErf')->name('edit-erf');
-     Route::get('/admin/erf_edit_status/getErfCreateAccount/{id}','AdminErfEditStatusController@getErfCreateAccount')->name('create-account-erf');
-     Route::get('/admin/erf_edit_status/getDetailErf/{id}','AdminErfEditStatusController@getDetailErf')->name('details-erf');
-     Route::post('/admin/erf_edit_status/create-account','AdminErfEditStatusController@createAccount')->name('create-account');
-     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/get-getEmail','AdminErfEditStatusController@getEmail')->name('getEmail');
-     Route::post(config('crudbooster.ADMIN_PATH').'/customers/get-checkEmail','AdminErfEditStatusController@checkEmail')->name('checkEmail');
-     Route::get('/admin/erf_edit_status/getErfSetOnboardingDate/{id}','AdminErfEditStatusController@getErfSetOnboardingDate')->name('set-onboarding-erf');
-     Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/setOnboarding','AdminErfEditStatusController@setOnboarding')->name('set-onboarding-date');
+    //inventory upload
+    Route::get('/admin/assets_inventory_body/inventory-upload','AdminAssetsInventoryBodyController@uploadInventory');
+    Route::post('/admin/assets_inventory_body/upload-inventory','AdminAssetsInventoryBodyController@inventoryUpload')->name('upload-inventory');
+    Route::get('/admin/assets_inventory_body/upload-inventory-template','AdminAssetsInventoryBodyController@uploadInventoryTemplate'); 
+    
+    //inventory upload Not Available
+    Route::get('/admin/assets_inventory_body/upload-inventory-not-available','AdminAssetsInventoryBodyController@uploadInventoryNotAvailable');
+    Route::post('/admin/assets_inventory_body/inventory-upload-not-available','AdminAssetsInventoryBodyController@inventoryUploadNotAvailable')->name('upload-inventory-not-available');
+
+    //inventory update
+    Route::get('/admin/assets_inventory_body/upload-inventory-update','AdminAssetsInventoryBodyController@uploadInventoryUpdate');
+    Route::post('/admin/assets_inventory_body/inventory-upload-update','AdminAssetsInventoryBodyController@inventoryUploadUpdate')->name('upload-inventory-update');
+    Route::get('/admin/assets_inventory_body/update-digits-code-template','AdminAssetsInventoryBodyController@updateDigitsCodeTemplate');
+    Route::get('/admin/assets_inventory_body/update-location-template','AdminAssetsInventoryBodyController@updateLocationTemplate');
+
+    //Deployed Assets
+    Route::get('/admin/deployed_asset/Detail/{id}','AdminDeployedAssetsController@Detail')->name('deployed-asset');
+    Route::get('/admin/deployed_asset/DetailMoOnly/{id}','AdminDeployedAssetsController@DetailMoOnly')->name('deployed-asset');
+    
+    //Inventory upload without code counter
+    Route::get('/admin/assets_inventory_body/upload-inventory-update-wo-code-counter','AdminAssetsInventoryBodyController@uploadInventoryWoCodeCounter');
+    Route::post('/admin/assets_inventory_body/upload-inventory-wo-code-counter','AdminAssetsInventoryBodyController@inventoryUploadWoCodeCounter')->name('upload-inventory-wo-code-counter');
+    Route::get('/admin/assets_inventory_body/upload-inventory-wo-code-counter-template','AdminAssetsInventoryBodyController@uploadInventoryTemplateWoCodeCounter'); 
+
+    //hr requisition for new employee
+    Route::post(config('crudbooster.ADMIN_PATH').'/hr_requisition/search-user','AdminHrRequisitionController@SearchUser')->name('hr.search.user');
+    Route::get('admin/erf_header_request/getRequestCancel/{id}','AdminHrRequisitionController@getRequestCancel')->name('getRequestCancel');
+    Route::get('/admin/erf_edit_status/getEditErf/{id}','AdminErfEditStatusController@getEditErf')->name('edit-erf');
+    Route::get('/admin/erf_edit_status/getErfCreateAccount/{id}','AdminErfEditStatusController@getErfCreateAccount')->name('create-account-erf');
+    Route::get('/admin/erf_edit_status/getDetailErf/{id}','AdminErfEditStatusController@getDetailErf')->name('details-erf');
+    Route::post('/admin/erf_edit_status/create-account','AdminErfEditStatusController@createAccount')->name('create-account');
+    Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/get-getEmail','AdminErfEditStatusController@getEmail')->name('getEmail');
+    Route::post(config('crudbooster.ADMIN_PATH').'/customers/get-checkEmail','AdminErfEditStatusController@checkEmail')->name('checkEmail');
+    Route::get('/admin/erf_edit_status/getErfSetOnboardingDate/{id}','AdminErfEditStatusController@getErfSetOnboardingDate')->name('set-onboarding-erf');
+    Route::post(config('crudbooster.ADMIN_PATH').'/erf_edit_status/setOnboarding','AdminErfEditStatusController@setOnboarding')->name('set-onboarding-date');
  
      //hr requisition for new employee
     Route::post(config('crudbooster.ADMIN_PATH').'/hr_requisition/search-user','AdminHrRequisitionController@SearchUser')->name('hr.search.user');
