@@ -184,6 +184,14 @@
                     </div>
                 @endforeach
             </div>
+            <hr>
+
+            <div class="row">                           
+                <label class="control-label col-md-2">{{ trans('message.table.approver_comments') }}:</label>
+                <div class="col-md-4">
+                        <p>{{$Header->approver_return_comments}}</p>
+                </div>
+            </div>
 
             <hr/>
 

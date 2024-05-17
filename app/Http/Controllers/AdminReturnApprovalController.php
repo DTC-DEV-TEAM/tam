@@ -146,10 +146,10 @@
 			    }
 			}else if($approval_action  == 2){
 				$postdata['status'] 			= self::returnForApproval;
-				$postdata['approver_comments'] 	= $approver_comments;
+				$postdata['approver_return_comments'] 	= $approver_comments;
 				ReturnTransferAssets::where([
 					'return_header_id'=>$id,
-					'status'=>self::ForApproval
+					'status'=>self::ForApproval,
 				])
 				->update([
 					    'status' => self::returnForApproval
