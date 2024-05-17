@@ -7,7 +7,7 @@
         <div class="box-tools"></div>
     </div>
 
-    <form method='post' id="form" enctype="multipart/form-data" action="{{ route('upload-inventory-update') }}">
+    <form method='post' id="form" enctype="multipart/form-data" action="{{ route('upload-inventory-wo-code-counter') }}">
         <input type="hidden" name="_token" value="{{ csrf_token() }}">
         <div class="box-body">
 
@@ -17,23 +17,15 @@
                 * File format should be : CSV, XLSX file format<br/>
             </div>
 
-            <label class='col-sm-1 control-label'>Import Template File: </label>
-            <div class='col-sm-3' style="display: flex; justify-content:space-between">
-                <a href='{{ CRUDBooster::mainpath() }}/update-digits-code-template' class="btn btn-primary" role="button">Digits code Template</a>
-                <a href='{{ CRUDBooster::mainpath() }}/update-location-template' class="btn btn-success" role="button">Location Template</a>
+            <label class='col-sm-2 control-label'>Import Template File: </label>
+            <div class='col-sm-4'>
+                <a href='{{ CRUDBooster::mainpath() }}/upload-inventory-wo-code-counter-template' class="btn btn-primary" role="button">Download Template</a>
             </div>
+            <br/>
+            <br/>
 
-            <label class='col-sm-1 control-label'>Upload Type: </label>
-            <div class='col-sm-3'>
-                <select class="form-control select2" style="width: 100%;" required name="upload_type" id="upload_type">
-                    <option value="">Select Upload Type</option>
-                    <option value="update_code">Update code</option>
-                    <option value="update_location">Update deployed location</option>
-                </select>
-            </div>
-
-            <label for='import_file' class='col-sm-1 control-label'>File to Import: </label>
-            <div class='col-sm-3'>
+            <label for='import_file' class='col-sm-2 control-label'>File to Import: </label>
+            <div class='col-sm-4'>
                 <input type='file' name='import_file' class='form-control' required/>
                 <div class='help-block'>File type supported only : CSV, XLSX</div>
             </div>

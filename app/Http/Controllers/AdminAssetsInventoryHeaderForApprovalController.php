@@ -1096,21 +1096,23 @@
 						)
 				->take(10)
 				->get();
-			}else if(in_array($type, [5,6,7])){
-				$items = DB::table('assets')
-				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
-				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
-				->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
-				->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
-				->select(	'assets.*',
-				            'tam_categories.id as cat_id',
-							'assets.id as assetID',
-							'tam_categories.category_description as tam_category_description',
-							'category.category_description as dam_category_description'
-						)
-				->take(10)
-				->get();
-			}else{
+			}
+			// else if(in_array($type, [5,6,7])){
+			// 	$items = DB::table('assets')
+			// 	->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+			// 	->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])
+			// 	->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
+			// 	->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
+			// 	->select(	'assets.*',
+			// 	            'tam_categories.id as cat_id',
+			// 				'assets.id as assetID',
+			// 				'tam_categories.category_description as tam_category_description',
+			// 				'category.category_description as dam_category_description'
+			// 			)
+			// 	->take(10)
+			// 	->get();
+			// }
+			else{
 				$items = DB::table('assets')
 				->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')
 				->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNull('assets.from_dam')

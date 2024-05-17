@@ -4,84 +4,60 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
-	use App\Models\SubCategory;
+	use App\WarehouseLocationModel;
+	use Maatwebsite\Excel\Facades\Excel;
+	use App\Exports\ExportServices;
+	use App\Models\Services;
 
-	class AdminSubCategoriesController extends \crocodicstudio\crudbooster\controllers\CBController {
-
-        public function __construct() {
-			// Register ENUM type
-			//$this->request = $request;
-			DB::getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping("enum", "string");
-		}
+	class AdminAssetsServicesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
 			$this->title_field = "id";
 			$this->limit = "20";
-			$this->orderby = "id,asc";
+			$this->orderby = "id,desc";
 			$this->global_privilege = false;
 			$this->button_table_action = true;
 			$this->button_bulk_action = false;
 			$this->button_action_style = "button_icon";
 			$this->button_add = false;
-			$this->button_edit = true;
-			$this->button_delete = FALSE;
+			$this->button_edit = false;
+			$this->button_delete = false;
 			$this->button_detail = true;
 			$this->button_show = true;
 			$this->button_filter = true;
 			$this->button_import = false;
-			$this->button_export = true;
-			$this->table = "class";
+			$this->button_export = false;
+			$this->table = "assets_services";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
 			$this->col = [];
-			
-			$this->col[] = ["label"=>"FA Code","name"=>"category_code"];
-			$this->col[] = ["label"=>"Asset code counter","name"=>"code_counter"];
-			$this->col[] = ["label"=>"Description","name"=>"class_description"];
-			$this->col[] = ["label"=>"Category","name"=>"category_id","join"=>"category,category_description"];
-			$this->col[] = ["label"=>"Status","name"=>"class_status"];
-			$this->col[] = ["label"=>"Limit Code","name"=>"limit_code"];
+			$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
+			$this->col[] = ["label"=>"Service Description","name"=>"service_description"];
+			$this->col[] = ["label"=>"Vendor","name"=>"vendor"];
+			$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
+			$this->col[] = ["label"=>"Amount","name"=>"amount"];
+			$this->col[] = ["label"=>"Is Export","name"=>"is_export"];
+			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
 			$this->col[] = ["label" => "Created At", "name" => "created_at"];
-			$this->col[] = ["label" => "Updated At", "name" => "updated_at"];
 			# END COLUMNS DO NOT REMOVE THIS LINE
 
 			# START FORM DO NOT REMOVE THIS LINE
 			$this->form = [];
-			$this->form[] = ['label'=>'Category','name'=>'category_id','type'=>'select2','validation'=>'required|integer|min:0','width'=>'col-sm-5','datatable'=>'category,category_description'];
-			$this->form[] = ['label'=>'Sub Category Name','name'=>'class_description','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			$this->form[] = ['label'=>'Location','name'=>'location_id','type'=>'select3-new','width'=>'col-sm-5','datatable'=>'warehouse_location_model,location','validation'=>'required'];
-			$this->form[] = ['label'=>'Asset Code Counter','name'=>'code_counter','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			if(CRUDBooster::getCurrentMethod() == 'getEdit' || CRUDBooster::getCurrentMethod() == 'postEditSave' || CRUDBooster::getCurrentMethod() == 'getDetail') {
-				
-				$this->form[] = ['label'=>'Status','name'=>'class_status','type'=>'select','validation'=>'required','width'=>'col-sm-5','dataenum'=>'ACTIVE;INACTIVE'];
 
-				//$this->form[] = ['label'=>'Useful Life','name'=>'useful_life','type'=>'text','validation'=>'required|min:1|max:255','width'=>'col-sm-5'];
-			}
-
-
-
-			if(CRUDBooster::getCurrentMethod() == 'getDetail'){
-				//$this->form[] = ["label"=>"Created By","name"=>"created_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Created Date','name'=>'created_at', 'type'=>'datetime'];
-				//$this->form[] = ["label"=>"Updated By","name"=>"updated_by",'type'=>'select',"datatable"=>"cms_users,name"];
-				$this->form[] = ['label'=>'Updated Date','name'=>'updated_at', 'type'=>'datetime'];
-			}
-			
-			//$this->form[] = ['label'=>'Created By','name'=>'created_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
-			//$this->form[] = ['label'=>'Updated By','name'=>'updated_by','type'=>'number','validation'=>'required|integer|min:0','width'=>'col-sm-5'];
 			# END FORM DO NOT REMOVE THIS LINE
 
 			# OLD START FORM
 			//$this->form = [];
-			//$this->form[] = ["label"=>"Category Id","name"=>"category_id","type"=>"select2","required"=>TRUE,"validation"=>"required|integer|min:0","datatable"=>"category,id"];
-			//$this->form[] = ["label"=>"Class Code","name"=>"class_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Class Description","name"=>"class_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Class Status","name"=>"class_status","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
-			//$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
-			//$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			$this->form[] = ["label"=>"Asset Code","name"=>"asset_code","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			$this->form[] = ["label"=>"Service Description","name"=>"service_description","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			$this->form[] = ["label"=>"Vendor","name"=>"vendor","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			$this->form[] = ["label"=>"Location","name"=>"location","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			$this->form[] = ["label"=>"Amount","name"=>"amount","type"=>"text","required"=>TRUE,"validation"=>"required|min:1|max:255"];
+			$this->form[] = ["label"=>"Created By","name"=>"created_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
+			$this->form[] = ["label"=>"Updated By","name"=>"updated_by","type"=>"number","required"=>TRUE,"validation"=>"required|integer|min:0"];
 			# OLD END FORM
 
 			/* 
@@ -148,9 +124,14 @@
 	        | 
 	        */
 	        $this->index_button = array();
-			if(CRUDBooster::getCurrentMethod() == 'getIndex'){
-				$this->index_button[] = ["label"=>"Add Category","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-category'),"color"=>"success"];
+			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
+				if(in_array(CRUDBooster::isSuperadmin(),[1,6])){
+					$this->index_button[] = ["label"=>"Add Services","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-services'),"color"=>"success"];
+					$this->index_button[] = ["label"=>"Export all","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export-all'),"color"=>"primary"];
+					$this->index_button[] = ["label"=>"Export new created","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
+				}
 			}
+
 
 
 	        /* 
@@ -184,25 +165,6 @@
 	        |
 	        */
 	        $this->script_js = NULL;
-			$this->script_js = "
-			$(document).ready(function() {
-				$('#location_id').select2();
-				let x = $(location).attr('pathname').split('/');
-				let add_action = x.includes('add');
-				let edit_action = x.includes('edit');
-				if (edit_action){
-					var a = location_id.split(',').length;
-					var b = location_id.split(',');
-					var selectedValues = new Array();
-	
-					for (let i = 0; i < a; i++) {
-						selectedValues[i] = b[i];
-						$('#location_id').val(selectedValues);
-					}
-				}
-
-			});
-			";
 
 
             /*
@@ -252,7 +214,6 @@
 	        $this->style_css = NULL;
 	        
 	        
-	        
 	        /*
 	        | ---------------------------------------------------------------------- 
 	        | Include css File 
@@ -262,7 +223,7 @@
 	        |
 	        */
 	        $this->load_css = array();
-	        
+			$this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
@@ -301,8 +262,10 @@
 	    */    
 	    public function hook_row_index($column_index,&$column_value) {	        
 	    	if($column_index == 6){
-				if($column_value != null){
-					$column_value = '<span class="label label-danger">'.$column_value.'</span>';
+				if($column_value == 1){
+					$column_value = '<span class="label label-success">Yes</span>';
+				}else{
+					$column_value = '<span class="label label-danger">No</span>';
 				}
 			}
 	    }
@@ -315,46 +278,21 @@
 	    |
 	    */
 	    public function hook_before_add(&$postdata) {        
-	        $fields = Request::all();
-			$from_code = $fields['from_code'];
-			$from_to = $fields['from_to'];
-			$code_counter = $fields['code_counter'];
-			$category_id = $fields['category_id'];
-			$category_description = $fields['category_description'];
-			
-			$checkRowDbExist = DB::table('class')->select(DB::raw("(category_code) AS code"))->get()->toArray();
-			$checkRowDbColumnExist = array_column($checkRowDbExist, 'code');
-			//code check validity
-			$fromCode   = SubCategory::select('*')->where('from_code','>=', $from_code)->orWhere('to_code','>=', $from_code)->get()->count();
-			$FromtoCode = SubCategory::select('*')->where('to_code','>=', $from_to)->orWhere('from_code','>=', $from_to)->get()->count();
-			if (in_array($from_code . ' - ' . $from_to, $checkRowDbColumnExist)) {
-				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_exist_data_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
-			}else if($fromCode != 0){
-				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_invalid_code_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
-			}else if($FromtoCode != 0){
-				return CRUDBooster::redirect(CRUDBooster::mainpath("add-category"),trans("crudbooster.alert_invalid_code_danger",['code'=>$from_code . ' - ' . $from_to]),"danger");
+			$fields = Request::all();
+			$coa = DB::table('class')->find($fields['asset_code']);
+			if($coa->code_counter > $coa->to_code){
+				return 	CRUDBooster::redirect(CRUDBooster::mainpath(), 'Asset Code Exceed!', 'danger');
 			}else{
-
-				$locationIds = array();
-				$location = json_encode($postdata['location_id'], true);
-				$locationArray1 = explode(",", $location);
-		
-				foreach ($locationArray1 as $key => $value) {
-					$locationIds[$key] = preg_replace("/[^0-9]/","",$value);
-				}
-		
-				$postdata['location_id'] = implode(",", $locationIds);
-
-				$postdata['from_code']= $from_code;
-				$postdata['to_code']= $from_to;
-				$postdata['code_counter']= $code_counter;
-				$postdata['category_code']= $from_code . " - " . $from_to;
-				$postdata['category_id'] = $category_id;
-				$postdata['class_description'] = $category_description;
-				$postdata['class_status'] = "ACTIVE";
-				$postdata['created_by']=CRUDBooster::myId();
+				$postdata['asset_code'] = $coa->code_counter;
+				$postdata['service_description'] = $fields['services_description'];
+				$postdata['vendor'] = $fields['vendor'];
+				$postdata['location'] = $fields['location'];
+				$postdata['amount'] = intval(str_replace(',', '', $fields['amount']));
+				$postdata['created_by'] = CRUDBooster::myId();
+				$postdata['created_at'] = date('Y-m-d H:i:s');
+				DB::table('class')->where('id',$coa->id)->increment('code_counter');
 			}
-			
+
 	    }
 
 	    /* 
@@ -379,18 +317,7 @@
 	    */
 	    public function hook_before_edit(&$postdata,$id) {        
 	        //Your code here
-			//unset($postdata['category_id']);
-			$locationIds = array();
-			$location = json_encode($postdata['location_id'], true);
-			$locationArray1 = explode(",", $location);
-	
-			foreach ($locationArray1 as $key => $value) {
-				$locationIds[$key] = preg_replace("/[^0-9]/","",$value);
-			}
-	
-			$postdata['location_id'] = implode(",", $locationIds);
 
-			$postdata['updated_by']=CRUDBooster::myId();
 	    }
 
 	    /* 
@@ -429,57 +356,36 @@
 
 	    }
 
-		/*****CUSTOM FUNCTION AREA */ 
-		public function getAddCategory() {
-
+		public function getAddServices() {
 			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
 				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
 			}
 
 			$this->cbLoader();
-			$data['page_title'] = 'Add Sub Category';
-			$data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->whereIn('id', [4,6])->orderby('category_description', 'asc')->get();
-			return $this->view("sub_categories.add-sub-category", $data);
-
+			$data['page_title'] = 'Add Services';
+			$subMaster = self::getSubMasters();
+			$data = array_merge($data, $subMaster);
+			return $this->view("services.add-services", $data);
 		}
 
-		public function getSubCatCodeRangeFrom(Request $request){
-			$fields = Request::all();
-			$code = $fields['code'] ? $fields['code'] : "";
+		public function getSubMasters(){
 			$data = [];
-			$countCode = SubCategory::select('*')->where('from_code','>=', $code)->orWhere('to_code','>=', $code)->get()->count();
-			if($countCode) {
-				$data['item'] = "<span id='notif' class='label label-danger'> Invalid Code</span>";
-				$data['disabled'] = 1;
-			  }else{
-				$data['item'] = "<span id='notif' class='label label-success'> Code Available.</span>";
-				$data['disabled'] = 0;
-			  }
-			  
-			echo json_encode($data);
+			$data['asset_code'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
+			$data['location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			return $data;
 		}
 
-		public function getSubCatCodeRangeTo(Request $request){
-			$fields = Request::all();
-			$code = $fields['code'] ? $fields['code'] : "";
-			$data = [];
-			$countCode = SubCategory::select('*')->where('to_code','>=', $code)->orWhere('from_code','>=', $code)->get()->count();
-			  if($countCode) {
-				$data['item'] = "<span id='notif' class='label label-danger'> Invalid Code</span>";
-				$data['disabled'] = 1;
-			  }else{
-				$data['item'] = "<span id='notif' class='label label-success'> Code Available.</span>";
-				$data['disabled'] = 0;
-			  }
-			echo json_encode($data);
+		public function getExport() {
+			$servicesToExport = Services::getServicesToExport()->get();
+			$filePath = 'services-new-created.xlsx';
+			Services::whereIn('id', $servicesToExport->pluck('s_id'))->update(['is_export' => 1]);
+		    return Excel::download(new ExportServices($servicesToExport), $filePath);
 		}
 
-		public function getSubCatCodeRangeAll(Request $request){
-			$fields = Request::all();
-			$code = $fields['code'];
-			dd($code);
-			$data = SubCategory::select('from_code')->get();
-			echo json_encode($data);
+		public function getExportAll() {
+			$servicesToExport = Services::getServicesToExportAll()->get();
+			$filePath = 'services-all-data.xlsx';
+		    return Excel::download(new ExportServices($servicesToExport), $filePath);
 		}
 
 	}
