@@ -100,7 +100,7 @@
                     <select selected data-placeholder="Choose location" class="form-control" name="location" data-id="" id="location" required style="width:100%">
                         <option value=""></option>
                         @foreach($location as $data)
-                          <option value="{{$data->id}}">{{$data->location}}</option>
+                          <option value="{{$data->id}}">{{$data->name}}</option>
                          @endforeach
                     </select>
                 </div>

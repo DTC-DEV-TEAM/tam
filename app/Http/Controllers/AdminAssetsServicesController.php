@@ -8,6 +8,7 @@
 	use Maatwebsite\Excel\Facades\Excel;
 	use App\Exports\ExportServices;
 	use App\Models\Services;
+	use App\Users;
 
 	class AdminAssetsServicesController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -37,7 +38,7 @@
 			$this->col[] = ["label"=>"Asset Code","name"=>"asset_code"];
 			$this->col[] = ["label"=>"Service Description","name"=>"service_description"];
 			$this->col[] = ["label"=>"Vendor","name"=>"vendor"];
-			$this->col[] = ["label"=>"Location","name"=>"location","join"=>"warehouse_location_model,location"];
+			$this->col[] = ["label"=>"Location","name"=>"location","join"=>"cms_users,name"];
 			$this->col[] = ["label"=>"Amount","name"=>"amount"];
 			$this->col[] = ["label"=>"Is Export","name"=>"is_export"];
 			$this->col[] = ["label" => "Created By", "name" => "created_by", "join" => "cms_users,name"];
@@ -125,7 +126,7 @@
 	        */
 	        $this->index_button = array();
 			if(CRUDBooster::getCurrentMethod() == 'getIndex') {
-				if(in_array(CRUDBooster::isSuperadmin(),[1,6])){
+				if(in_array(CRUDBooster::myPrivilegeId(),[1,6,9])){
 					$this->index_button[] = ["label"=>"Add Services","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-services'),"color"=>"success"];
 					$this->index_button[] = ["label"=>"Export all","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export-all'),"color"=>"primary"];
 					$this->index_button[] = ["label"=>"Export new created","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('export'),"color"=>"primary"];
@@ -371,7 +372,7 @@
 		public function getSubMasters(){
 			$data = [];
 			$data['asset_code'] = DB::table('class')->where('class_status', 'ACTIVE')->whereNull('limit_code')->orderby('class_description', 'asc')->get();
-			$data['location'] = WarehouseLocationModel::where('id','!=',4)->get();
+			$data['location'] = Users::where('id_cms_privileges',8)->get();
 			return $data;
 		}
 
