@@ -286,7 +286,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-marketing-search','AdminHeaderRequestController@itemMarketingSearch')->name('item.marketing.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-supplies-search','AdminHeaderRequestController@itemSuppliesSearch')->name('item.supplies.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-non-trade-search','AdminHeaderRequestController@itemNonTradeSearch')->name('item.non.trade.search');
-
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-smallwares-search','AdminHeaderRequestController@itemSmallwaresSearch')->name('item.smallwares.search');
 
     //Item Sourcing Routes
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/create-arf','AdminItemSourcingHeaderController@createArf')->name('create-arf');

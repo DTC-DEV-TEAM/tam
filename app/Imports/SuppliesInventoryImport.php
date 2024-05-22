@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\AssetsSuppliesInventory;
+use App\Models\AssetsSmallwaresInventory;
 use Illuminate\Support\Facades\Hash;
 //use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -22,7 +22,7 @@ class SuppliesInventoryImport implements ToCollection, WithHeadingRow
      */
     public function collection(Collection $rows)
     {
-        $updateToZero = DB::table('assets_supplies_inventory')->update(['quantity' => 0]);
+        $updateToZero = DB::table('assets_smallwares_inventory')->update(['quantity' => 0]);
         foreach ($rows->toArray() as $key => $row){
             $item 	                    = DB::table('assets')->where(['digits_code' => $row['digits_code']])->first();
             $checkRowDbDigitsCode       = DB::table('assets')->select("digits_code AS codes")->get()->toArray();
@@ -33,7 +33,7 @@ class SuppliesInventoryImport implements ToCollection, WithHeadingRow
                 return CRUDBooster::redirect(CRUDBooster::mainpath(),"Digits Code not exist in Item Master: ".($key+2),"danger");
             }
 
-            $save = AssetsSuppliesInventory::updateOrcreate([
+            $save = AssetsSmallwaresInventory::updateOrcreate([
                 'digits_code'      => $row['digits_code'] 
             ],
             [

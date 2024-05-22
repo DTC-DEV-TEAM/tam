@@ -18,6 +18,7 @@
 	use Illuminate\Support\Facades\Log;
 	use Illuminate\Support\Facades\Redirect;
 	use Carbon\Carbon;
+	use App\Models\AssetsSmallwaresInventory;
 
 	class AdminApprovalController extends \crocodicstudio\crudbooster\controllers\CBController {
 
@@ -252,9 +253,9 @@
 					]);	
 		    	}
 
-				if(in_array($arf_header->request_type_id, [7])){
+				if(in_array($arf_header->request_type_id, [10])){
 					//Get the inventory value per digits code
-					$arraySearch = DB::table('assets_non_trade_inventory')->select('*')->get()->toArray();
+					$arraySearch = DB::table('assets_smallwares_inventory')->select('*')->get()->toArray();
 									
 					$finalBodyValue = [];
 					foreach($arf_body as $bodyfKey => $bodyVal){
@@ -283,7 +284,7 @@
 								'unserved_rep_qty'   =>  $fBodyVal['quantity'],
 								'unserved_ro_qty'    =>  NULL
 							]);	
-							DB::table('assets_non_trade_inventory')
+							DB::table('assets_smallwares_inventory')
 							->where('digits_code', $fBodyVal['digits_code'])
 							->decrement('quantity', $fBodyVal['quantity']);
 						}else{
@@ -298,7 +299,7 @@
 								'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
 								'unserved_ro_qty'    =>  $reorder
 							]);	
-							AssetsNonTradeInventory::where('digits_code', $fBodyVal['digits_code'])
+							AssetsSmallwaresInventory::where('digits_code', $fBodyVal['digits_code'])
 							->update([
 								'quantity'   =>  0,
 							]);	
