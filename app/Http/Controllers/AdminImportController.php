@@ -31,7 +31,7 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
         $headings = array_filter((new HeadingRowImport)->toArray($path)[0][0]);
 
         if (count($headings) !== 5) {
-			CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'), 'Template column not match, please refer to downloaded template.', 'danger');
+			CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'), 'Template column not match, please refer to downloaded template.', 'danger');
 		} else {
             try {
 
@@ -40,7 +40,7 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
                 }else{
                     Excel::import(new FulfillmentRoUpload, $path);
                 }
-                CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'), trans("Upload Successfully!"), 'success');
+                CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'), trans("Upload Successfully!"), 'success');
                 
             } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
                 $failures = $e->failures();
@@ -56,7 +56,7 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
                 $errors = collect($error)->unique()->toArray();
         
             }
-            CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'), $errors[0], 'danger');
+            CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'), $errors[0], 'danger');
 
 		}
         
@@ -65,7 +65,7 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
     function downloadFulfillQtyTemplate() {
         $arrHeader = [
             "arf_number"         => "ARF NUMBER",
-            "digits_code"        => "DIGITS CODE",
+            "item_code"          => "ITEM CODE",
             "dr_qty"             => "DR QTY",
             "dr_number"          => "DR NUMBER",
             "dr_type"            => "DR TYPE",
@@ -73,7 +73,7 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
 
         $arrData = [
             "erf_number"         => "ARF-0000001",
-            "digits_code"        => "40000054",
+            "item_code"          => "40000054",
             "dr_qty"             => "1",
             "dr_number"          => "DR#12345",
             "dr_type"            => "REP/RO", 
@@ -101,13 +101,13 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
     function downloadPOTemplate() {
         $arrHeader = [
             "arf_number"         => "ARF NUMBER",
-            "digits_code"        => "DIGITS CODE",
+            "item_code"          => "ITEM CODE",
             "po_qty"             => "PO QTY",
             "po_no"              => "PO NUMBER",
         ];
         $arrData = [
             "erf_number"         => "ARF-0000001",
-            "digits_code"        => "40000054",
+            "item_code"          => "40000054",
             "po_qty"             => "1",
             "po_no"              => "PO#1234",
         ];
@@ -127,19 +127,19 @@ class AdminImportController extends \crocodicstudio\crudbooster\controllers\CBCo
         $path_excel = $request->file('import_file')->store('temp');
         $path = storage_path('app').'/'.$path_excel;
         Excel::import(new CancellationUpload, $path);	
-        CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'), trans("Upload Successfully!"), 'success');
+        CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'), trans("Upload Successfully!"), 'success');
     }
 
     //CANCELLATION PO TEMPLATE
     function downloadCancellationTemplate() {
         $arrHeader = [
             "arf_number"         => "ARF NUMBER",
-            "digits_code"        => "DIGITS CODE",
+            "item_code"          => "ITEM CODE",
             "remarks"            => "Remarks",
         ];
         $arrData = [
             "erf_number"         => "ARF-0000001",
-            "digits_code"        => "40000054",
+            "item_code"          => "40000054",
             "po_qty"             => "Reset"
         ];
         $spreadsheet = new Spreadsheet();

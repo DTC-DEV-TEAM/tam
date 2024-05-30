@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\AssetsSuppliesInventory;
+use App\Models\AssetsSmallwaresInventory;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -33,10 +33,10 @@ class ExportSuppliesInventory implements FromQuery, WithHeadings, WithMapping
 
     public function query()
     {
-        $data = AssetsSuppliesInventory::query()->select(
-          'assets_supplies_inventory.digits_code',
-          'assets_supplies_inventory.description',
-          'assets_supplies_inventory.quantity'
+        $data = AssetsSmallwaresInventory::query()->select(
+          'assets_smallwares_inventory.digits_code',
+          'assets_smallwares_inventory.description',
+          'assets_smallwares_inventory.quantity'
         );
     
         return $data;

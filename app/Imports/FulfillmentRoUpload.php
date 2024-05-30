@@ -27,28 +27,28 @@ class FulfillmentRoUpload implements ToCollection, WithHeadingRow
         foreach ($rows->toArray() as $key => $row){
             
             $header   = DB::table('header_request')->where(['reference_number' => $row['arf_number']])->first();
-            $checkQty = DB::table('body_request')->where(['header_request_id'=>$header->id,'digits_code'=>$row['digits_code']])->value('unserved_ro_qty');
+            $checkQty = DB::table('body_request')->where(['header_request_id'=>$header->id,'digits_code'=>$row['item_code']])->value('unserved_ro_qty');
             
-            $checkRowDbDigitsCode       = DB::table('assets')->select("digits_code AS codes")->get()->toArray();
+            $checkRowDbDigitsCode       = DB::table('items_smallwares')->select("tasteless_code AS codes")->get()->toArray();
             $checkRowDbColumnDigitsCode = array_column($checkRowDbDigitsCode, 'codes');
           
-            if(!in_array($row['digits_code'], $checkRowDbColumnDigitsCode)){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"Digits Code not exist in Item Master: ".($key+2),"danger");
+            if(!in_array($row['item_code'], $checkRowDbColumnDigitsCode)){
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"Item Code not exist in Item Master: ".($key+2),"danger");
             }
 
             $checkRowDbRefNo       = DB::table('header_request')->select("reference_number AS ref_num")->get()->toArray();
             $checkRowDbColumnRefNo = array_column($checkRowDbRefNo, 'ref_num');
           
             if(!in_array($row['arf_number'], $checkRowDbColumnRefNo)){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"Arf Invalid! please check arf reference no: ".($key+2),"danger");
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"Arf Invalid! please check arf reference no: ".($key+2),"danger");
             }
             
             if($row['dr_qty'] > $checkQty){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"ReOrder Fullfill Qty Exceed! at line: ".($key+2),"danger");
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"ReOrder Fullfill Qty Exceed! at line: ".($key+2),"danger");
             }
 
             if(empty($row['dr_qty'])){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"Dr Qty Required! at line: ".($key+2),"danger");
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"Dr Qty Required! at line: ".($key+2),"danger");
             }
          
             HeaderRequest::where('id',$header->id)
@@ -57,7 +57,7 @@ class FulfillmentRoUpload implements ToCollection, WithHeadingRow
                     'purchased2_by'	 => CRUDBooster::myId(),
                     'purchased2_at'  => date('Y-m-d H:i:s')
 			]);	
-            BodyRequest::where(['header_request_id'=>$header->id,'digits_code'=>$row['digits_code']])
+            BodyRequest::where(['header_request_id'=>$header->id,'digits_code'=>$row['item_code']])
             ->update(
                         [
                         'mo_so_num'       => DB::raw('CONCAT_WS(",",mo_so_num, "'. $row['dr_number'].'")'),
@@ -70,7 +70,7 @@ class FulfillmentRoUpload implements ToCollection, WithHeadingRow
             FulfillmentHistories::Create(
                 [
                     'arf_number'  => $row['arf_number'], 
-                    'digits_code' => $row['digits_code'], 
+                    'digits_code' => $row['item_code'], 
                     'dr_qty'      => $row['dr_qty'],
                     'dr_no'       => $row['dr_number'],
                     'dr_type'     => $row['dr_type'],
