@@ -17,38 +17,45 @@ use DB;
 use CRUDBooster;
 class CancellationUpload implements ToCollection, WithHeadingRow
 {
-    /**
-     * @param array $row
-     *
-     * @return Users|null
-     */
+    private $uploadType;
+
+    public function __construct($type){
+        $this->uploadType = $type;
+    }
+
     public function collection(Collection $rows)
     {
         foreach ($rows->toArray() as $key => $row){
-            
-            $header   = DB::table('header_request')->where(['reference_number' => $row['arf_number']])->first();
-            $unservedQty = DB::table('body_request')->where(['header_request_id'=>$header->id,'digits_code'=>$row['digits_code']])->value('unserved_qty');
+            $arf_number = trim($row['arf_number']);
+            $item_code = trim($row['item_code']);
+            $header   = DB::table('header_request')->where(['reference_number' => $arf_number])->first();
+            $unservedQty = DB::table('body_request')->where(['header_request_id'=>$header->id,'digits_code'=>$item_code])->value('unserved_qty');
  
-            $checkRowDbDigitsCode       = DB::table('assets')->select("digits_code AS codes")->get()->toArray();
+            if($this->uploadType === 'it_fa'){
+                $checkRowDbDigitsCode       = DB::table('assets')->select("digits_code AS codes")->get()->toArray();
+            }else{
+                $checkRowDbDigitsCode       = DB::table('items_smallwares')->select("tasteless_code AS codes")->get()->toArray();
+            }
+          
             $checkRowDbColumnDigitsCode = array_column($checkRowDbDigitsCode, 'codes');
           
-            if(!in_array($row['digits_code'], $checkRowDbColumnDigitsCode)){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"Digits Code not exist in Item Master: ".($key+2),"danger");
+            if(!in_array($item_code, $checkRowDbColumnDigitsCode)){
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"Item Code not exist in Item Master: ".($key+2),"danger");
             }
 
             $checkRowDbRefNo       = DB::table('header_request')->select("reference_number AS ref_num")->get()->toArray();
             $checkRowDbColumnRefNo = array_column($checkRowDbRefNo, 'ref_num');
           
-            if(!in_array($row['arf_number'], $checkRowDbColumnRefNo)){
-                return CRUDBooster::redirect(CRUDBooster::adminpath('for_purchasing'),"Arf Invalid! please check arf reference no: ".($key+2),"danger");
+            if(!in_array($arf_number, $checkRowDbColumnRefNo)){
+                return CRUDBooster::redirect(CRUDBooster::adminpath('smallwares'),"Arf Invalid! please check arf reference no: ".($key+2),"danger");
             }
             
-            BodyRequest::where(['header_request_id'=>$header->id,'digits_code'=>$row['digits_code']])
+            BodyRequest::where(['header_request_id'=>$header->id,'digits_code'=>$item_code])
             ->update(
                         [
                         'unserved_qty'      => DB::raw("unserved_qty - '".(int)$unservedQty."'"),
                         'cancelled_qty'     => (int)$unservedQty,
-                        'reason_to_cancel'  => $row['remarks']          
+                        'reason_to_cancel'  => trim($row['remarks'])          
                         ]
                     );
 

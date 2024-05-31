@@ -277,7 +277,7 @@
 											<option value=\"\"></option>
 											<option value=\"1\">IT ASSETS</option>
 												<option value=\"5\">FA</option>
-												<option value=\"7\">SUPPLIES</option>
+												<option value=\"10\">SMALLWARES</option>
 										</select>
 									</div>
 								</div>  
