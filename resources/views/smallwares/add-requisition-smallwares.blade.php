@@ -230,6 +230,12 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="form-group text-center">
+                    <label>CAN'T FIND WHAT YOU ARE LOOKING FOR?</label>
+                    <a type="button" id="getVersions" data-toggle="modal" data-target="#viewDigitsCode"> VIEW HERE </a> <br>
+                </div>
+            </div>
         </div>
 
         <div class='panel-footer'>
@@ -237,6 +243,43 @@
             <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.save') }}</button>
         </div>
     </form>
+</div>
+
+{{-- Digits Code Modal --}}
+<div id="viewDigitsCode" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-center"><strong>View Item Code</strong></h4>
+            </div>
+            <div class="modal-body">
+               <table id="asset-items" class="view-digits-code" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Description</th>
+                        <th>Category</th>
+                        <th>Sub Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($item_master as $items)
+                        <tr>
+                            <td>{{$items->tasteless_code}}</td>
+                            <td>{{$items->full_item_description}}</td>
+                            <td>{{$items->category_description}}</td>
+                            <td>{{$items->subcategory_description}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+               </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
@@ -252,6 +295,19 @@
         setTimeout("preventBack()", 0);
         $('#department').select2({});
         var tableRow = <?php echo json_encode($tableRow); ?>;
+
+        $(".view-digits-code").DataTable({
+            ordering:false,
+            pageLength:10,
+            scrollCollapse: true,
+            crollX: true,
+            fixedColumns: true,
+            fixedHeader: true,
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"],
+            ],
+        });
 
         $(document).ready(function() {
             var stack = [];
@@ -289,6 +345,8 @@
                                                 id:                         item.id,
                                                 digits_code:                item.digits_code,
                                                 value:                      item.item_description,
+                                                category_description:       item.category_description,
+                                                subcategory_description:    item.subcategory_description,
                                                 item_cost:                  item.item_cost,
                                                 wh_qty:                     item.wh_qty,
                                                 unserved_qty:               item.unserved_qty,
@@ -333,7 +391,7 @@
                                         <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center category_id sinput" data-id="${tableRow}" id="category_id${tableRow}"  name="category_id[]" value="${e.category_description}"  maxlength="100" readonly>
                                     </td>
                                     <td>
-                                        <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]" value="${e.class_description}"  maxlength="100" readonly>
+                                        <input type="text" onkeyup="this.value = this.value.toUpperCase();" class="form-control text-center sub_category_id sinput" data-id="${tableRow}" id="sub_category_id${tableRow}"  name="sub_category_id[]" value="${e.subcategory_description}"  maxlength="100" readonly>
                                     </td>
                     
                                     <td><input class="form-control text-center sinput wh_quantity" type="text" required name="wh_quantity[]" id="wh_quantity${tableRow}" data-id="${tableRow}" value="${e.wh_qty}" readonly></td>

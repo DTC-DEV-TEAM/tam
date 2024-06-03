@@ -682,49 +682,49 @@
 
 		//TIMFS FIXED ASSETS API
 		public function assetsFaTimfs(){
-        $api = 'https://timfs-test.tasteless.com.ph/item_masters_fas/api/get-items/9190564927eea2402d14d47ace841eab';
-        
-        $ch = curl_init($api);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($ch);
-        curl_close($ch);
-    
-        $data = json_decode($response, true);
-
-		$all_items = array_merge($data['created_items'] ?? [], $data['updated_items'] ?? []);
-	
-		$to_be_inserted = [];
-		foreach ($all_items as $item) {
-			if($item['sku_statuses_id'] == 1){
-				$status = 'ACTIVE';
-			}else if($item['sku_statuses_id'] == 2){
-				$status = 'INACTIVE';
-			}else{
-				$status = 'FOR DEPLETION';
-			}
-			$to_be_inserted['digits_code']          = $item['tasteless_code'];
-			$to_be_inserted['item_description']     = $item['item_description'];
-			$to_be_inserted['tam_category_id']      = $item['categories_id'];
-			$to_be_inserted['tam_sub_category_id']  = $item['subcategories_id'];
-			$to_be_inserted['item_cost']            = $item['cost'];
-			$to_be_inserted['status']               = $status;
+			$api = 'https://timfs-test.tasteless.com.ph/item_masters_fas/api/get-items/9190564927eea2402d14d47ace841eab';
 			
-			$tasteless_code = $item['tasteless_code'];
-			
-			$is_existing = DB::table('assets')
-				->where('digits_code', $tasteless_code)
-				->exists();
+			$ch = curl_init($api);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$response = curl_exec($ch);
+			curl_close($ch);
+		
+			$data = json_decode($response, true);
 
-			if ($is_existing) {
-				$to_be_inserted['updated_at'] = date('Y-m-d H:i:s');
-				DB::table('assets')
-					->where('digits_code', $item['tasteless_code'])
-					->update($to_be_inserted);
-			} else {
-				$to_be_inserted['created_at'] = date('Y-m-d H:i:s');
-				DB::table('assets')->insert($to_be_inserted);
+			$all_items = array_merge($data['created_items'] ?? [], $data['updated_items'] ?? []);
+		
+			$to_be_inserted = [];
+			foreach ($all_items as $item) {
+				if($item['sku_statuses_id'] == 1){
+					$status = 'ACTIVE';
+				}else if($item['sku_statuses_id'] == 2){
+					$status = 'INACTIVE';
+				}else{
+					$status = 'FOR DEPLETION';
+				}
+				$to_be_inserted['digits_code']          = $item['tasteless_code'];
+				$to_be_inserted['item_description']     = $item['item_description'];
+				$to_be_inserted['tam_category_id']      = $item['categories_id'];
+				$to_be_inserted['tam_sub_category_id']  = $item['subcategories_id'];
+				$to_be_inserted['item_cost']            = $item['cost'];
+				$to_be_inserted['status']               = $status;
+				
+				$tasteless_code = $item['tasteless_code'];
+				
+				$is_existing = DB::table('assets')
+					->where('digits_code', $tasteless_code)
+					->exists();
+
+				if ($is_existing) {
+					$to_be_inserted['updated_at'] = date('Y-m-d H:i:s');
+					DB::table('assets')
+						->where('digits_code', $item['tasteless_code'])
+						->update($to_be_inserted);
+				} else {
+					$to_be_inserted['created_at'] = date('Y-m-d H:i:s');
+					DB::table('assets')->insert($to_be_inserted);
+				}
 			}
 		}
-    }
 
 	}

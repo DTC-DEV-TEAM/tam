@@ -4,6 +4,7 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use App\Assets;
 	use App\Users;
 	use App\HeaderRequest;
 	use App\BodyRequest;
@@ -136,18 +137,13 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-				$released  = 		DB::table('statuses')->where('id', 12)->value('id');
-
 				$this->addaction[] = ['title'=>'Cancel Request',
 				'url'=>CRUDBooster::mainpath('getRequestCancel/[id]'),
 				'icon'=>'fa fa-times', 
-				"showIf"=>"[status_id] == $pending",
+				"showIf"=>"[status_id] == $this->pending",
 				'confirmation'=>'yes',
 				'confirmation_title'=>'Confirm Voiding',
 				'confirmation_text'=>'Are you sure to VOID this request?'];
-				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
 				$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getEdit/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == ".self::returnForApproval.""];
 			
 			}
@@ -781,6 +777,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Create New IT Asset Request';
+			$data['item_master'] = Assets::getItems()->get();
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
@@ -816,15 +813,8 @@
 
 			$data = [];
 			$data['page_title'] = 'Edit Assets Request';
-			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
-			// $data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
-			
-
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
@@ -837,9 +827,13 @@
 			$applicationsExplode = explode(",",$data['Header']->application);
 			$data['applicationsExplode'] = array_map('trim', $applicationsExplode);
 			$submaster_details = self::getSubmasters();
-			// dd($data['purposes'],$data['Header']->purpose);
+
 			$data = array_merge($data, $submaster_details);
-			return $this->view("assets.edit-requisition", $data);
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				return $this->view("assets.edit-requisition", $data);
+			}else{
+				return $this->view("smallwares.edit-smallwares-requisition", $data);
+			}
 		}
 
 		public function getAddRequisitionFA() {
@@ -850,6 +844,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Create New FA Request';
+			$data['item_master'] = Assets::getItemsFa()->get();
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
@@ -925,6 +920,7 @@
 			$this->cbLoader();
 			$data = [];
 			$data['page_title'] = 'Create Small wares';
+			$data['item_master'] = ItemsSmallwares::getItems()->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
 			$data['categories'] = DB::table('category')->where('id', 2)->where('category_status', 'ACTIVE')->orderby('category_description', 'asc')->get();
@@ -953,6 +949,9 @@
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();	
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
+			$data['fa_categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
+													   ->orderby('category_description', 'asc')
+													   ->first();
 			return $data;
 		}
 
@@ -1404,22 +1403,7 @@
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
 
-			$item = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
-			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
-			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
-			->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
-			->leftjoin('sub_category', 'assets.dam_class_id','=', 'sub_category.id')
-			->select(	'assets.*',
-						'assets.id as assetID',
-						'tam_categories.category_description as tam_category_description',
-						'tam_subcategories.subcategory_description as tam_sub_category_description',
-						'category.category_description as dam_category_description',
-						'sub_category.class_description as dam_sub_category_description'
-					)
-			->take(10)
-			->get();
+			$item = Assets::searchItems($search)->take(10)->get();
 
 			$arraySearch = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as wh_qty'))->where('statuses_id',6)->groupBy('digits_code')->get()->toArray();
 			$items = [];
@@ -1768,12 +1752,14 @@
 				$data['message']   ='Item Found';
 				$i = 0;
 				foreach ($finalItems as $key => $value) {
-					$return_data[$i]['id']                   = $value->assetID;
-					$return_data[$i]['digits_code']          = $value->tasteless_code ;
-					$return_data[$i]['item_description']     = $value->full_item_description;
-					$return_data[$i]['item_cost']            = $value->ttp;
-					$return_data[$i]['wh_qty']               = $value->wh_qty  ? $value->wh_qty : 0;
-					$return_data[$i]['unserved_qty']         = $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
+					$return_data[$i]['id']                       = $value->assetID;
+					$return_data[$i]['digits_code']              = $value->tasteless_code ;
+					$return_data[$i]['item_description']         = $value->full_item_description;
+					$return_data[$i]['category_description']     = $value->category_description;
+					$return_data[$i]['subcategory_description']  = $value->subcategory_description;
+					$return_data[$i]['item_cost']                = $value->ttp;
+					$return_data[$i]['wh_qty']                   = $value->wh_qty  ? $value->wh_qty : 0;
+					$return_data[$i]['unserved_qty']             = $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
 					$i++;
 
 				}
@@ -1912,11 +1898,13 @@
 					'requestor_comments' => $fields['requestor_comments']
 			]);	
 			//UPDATE BODY
-			foreach($fields['body_id'] as $key => $line){
-				BodyRequest::where('id',$line)
-				->update([
-						'budget_range'   => $body_budget_range[$key]
-				]);	
+			if(is_array($body_budget_range)){
+				foreach($fields['body_id'] as $key => $line){
+					BodyRequest::where('id',$line)
+					->update([
+							'budget_range'   => $body_budget_range[$key]
+					]);	
+				}
 			}
 
 			//INSERT NEW LINES
