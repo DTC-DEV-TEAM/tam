@@ -279,7 +279,8 @@
                             <label class="require control-label col-md-2" required>{{ trans('message.form-label.application') }}</label>
                             @foreach($applications as $key => $data)
                                 <div class="col-md-2">
-                                    <label class="checkbox-inline control-label col-md-12"><input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
+                                    <label class="checkbox-inline control-label col-md-12">
+                                        <input type="checkbox"  class="application" id="{{$data->app_name}}" name="application[]" value="{{$data->app_name}}" {{ (in_array($data->app_name,$applicationsExplode)) ? "checked" : ""}}>{{$data->app_name}}</label>
                                     <br>
                                 </div>             
                             @endforeach

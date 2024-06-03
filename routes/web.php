@@ -96,18 +96,18 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/recommendation/item-search','AdminRecommendationController@itemSearch')->name('it.item.search');
     
     //PurchasingRequest
-    Route::get('/admin/for_purchasing/getRequestPurchasing/{id}','AdminForPurchasingController@getRequestPurchasing')->name('purchasing-request');
-    Route::get('/admin/for_purchasing/getRequestPrint/{id}','AdminForPurchasingController@getRequestPrint')->name('print-request');
+    Route::get('/admin/smallwares/getRequestPurchasing/{id}','AdminForPurchasingController@getRequestPurchasing')->name('purchasing-request');
+    Route::get('/admin/smallwares/getRequestPrint/{id}','AdminForPurchasingController@getRequestPrint')->name('print-request');
     Route::post(config('crudbooster.ADMIN_PATH').'/getRequestClose','AdminForPurchasingController@getRequestClose')->name('purchasing-request-close');
-     Route::get('/admin/for_purchasing/getRequestPurchasingForMoSo/{id}','AdminForPurchasingController@getRequestPurchasingForMoSo')->name('purchasing-request-per-line-close');
-    Route::get('/admin/for_purchasing/getRequestClose/{id}','AdminForPurchasingController@getRequestClose')->name('purchasing-request');
+     Route::get('/admin/smallwares/getRequestPurchasingForMoSo/{id}','AdminForPurchasingController@getRequestPurchasingForMoSo')->name('purchasing-request-per-line-close');
+    Route::get('/admin/smallwares/getRequestClose/{id}','AdminForPurchasingController@getRequestClose')->name('purchasing-request');
     
-    //Route::get('/admin/for_purchasing/getRequestPrintPickList/{id}','AdminForPurchasingController@getRequestPrintPickList')->name('print-picklist');
-    Route::get('admin/for_purchasing/ARFUpdate','AdminForPurchasingController@ARFUpdate');
-    Route::get('admin/for_purchasing/PickListUpdate','AdminForPurchasingController@PickListUpdate');
-    Route::post(config('crudbooster.ADMIN_PATH').'/for_purchasing/item-search','AdminForPurchasingController@itemSearch')->name('asset.item.tagging');
-    Route::get('/admin/for_purchasing/getDetailPurchasing/{id}','AdminForPurchasingController@getDetailPurchasing')->name('purchasing-detail');
-    Route::post(config('crudbooster.ADMIN_PATH').'/for_purchasing/item-search-supplies-marketing','AdminForPurchasingController@itemSearchSuppliesMarketing')->name('asset.item.supplies.marketing.tagging');
+    //Route::get('/admin/smallwares/getRequestPrintPickList/{id}','AdminForPurchasingController@getRequestPrintPickList')->name('print-picklist');
+    Route::get('admin/smallwares/ARFUpdate','AdminForPurchasingController@ARFUpdate');
+    Route::get('admin/smallwares/PickListUpdate','AdminForPurchasingController@PickListUpdate');
+    Route::post(config('crudbooster.ADMIN_PATH').'/smallwares/item-search','AdminForPurchasingController@itemSearch')->name('asset.item.tagging');
+    Route::get('/admin/smallwares/getDetailPurchasing/{id}','AdminForPurchasingController@getDetailPurchasing')->name('purchasing-detail');
+    Route::post(config('crudbooster.ADMIN_PATH').'/smallwares/item-search-supplies-marketing','AdminForPurchasingController@itemSearchSuppliesMarketing')->name('asset.item.supplies.marketing.tagging');
     
     //MORequest
     Route::get('/admin/move_order/getRequestOrdering/{id}','AdminMoveOrderController@getRequestOrdering')->name('ordering-request');
@@ -286,7 +286,7 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-marketing-search','AdminHeaderRequestController@itemMarketingSearch')->name('item.marketing.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-supplies-search','AdminHeaderRequestController@itemSuppliesSearch')->name('item.supplies.search');
     Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-non-trade-search','AdminHeaderRequestController@itemNonTradeSearch')->name('item.non.trade.search');
-
+    Route::post(config('crudbooster.ADMIN_PATH').'/header_request/item-smallwares-search','AdminHeaderRequestController@itemSmallwaresSearch')->name('item.smallwares.search');
 
     //Item Sourcing Routes
     Route::post(config('crudbooster.ADMIN_PATH').'/item-sourcing-header/create-arf','AdminItemSourcingHeaderController@createArf')->name('create-arf');
@@ -317,26 +317,26 @@ Route::group(['middleware' => ['web']], function() {
     Route::post(config('crudbooster.ADMIN_PATH').'/get-location-updated-data','AdminLocationsController@getLocationUpdatedDataApi')->name('get-location-updated-data');
 
     //Supplies upload quantity fulfillment
-    Route::get('/admin/for_purchasing/fulfillment-upload','AdminForPurchasingController@UploadFulfillment');
+    Route::get('/admin/smallwares/fulfillment-upload','AdminForPurchasingController@UploadFulfillment');
     Route::post('/admin/admin_import/upload-fulfillment','AdminImportController@fulfillmentUpload')->name('upload-fulfillment');
     Route::get('/admin/admin_import/download-filfill-qty-template','AdminImportController@downloadFulfillQtyTemplate');
-    Route::post('/admin/for_purchasing/export-conso','AdminForPurchasingController@ExportConso')->name('export-conso');
+    Route::post('/admin/smallwares/export-conso','AdminForPurchasingController@ExportConso')->name('export-conso');
     //PO UPLOAD
-    Route::get('/admin/for_purchasing/po-upload','AdminForPurchasingController@UploadPo');
+    Route::get('/admin/smallwares/po-upload','AdminForPurchasingController@UploadPo');
     Route::post('/admin/admin_import/upload-po','AdminImportController@poUpload')->name('upload-po');
     Route::get('/admin/admin_import/download-po-template','AdminImportController@downloadPOTemplate');
     
     //CANCELLATION UPLOAD
-    Route::get('/admin/for_purchasing/cancellation-upload','AdminForPurchasingController@UploadCancellation');
+    Route::get('/admin/smallwares/cancellation-upload','AdminForPurchasingController@UploadCancellation');
     Route::post('/admin/admin_import/upload-cancellation','AdminImportController@cancellationUpload')->name('upload-cancellation');
     Route::get('/admin/admin_import/download-cancellation-template','AdminImportController@downloadCancellationTemplate');
     //Supplies Inventory
-    Route::get('/admin/assets_supplies_inventory/supplies-inventory-upload','AdminAssetsSuppliesInventoryController@UploadSuppliesInventory');
-    Route::post('/admin/assets_supplies_inventory/upload-supplies-inventory','AdminAssetsSuppliesInventoryController@SuppliesInventoryUpload')->name('upload-supplies-inventory');
-    Route::get('/admin/assets_supplies_inventory/upload-supplies-inventory-template','AdminAssetsSuppliesInventoryController@downloadSuppliesInventoryTemplate');
-    Route::post(config('crudbooster.ADMIN_PATH').'/assets_supplies_inventory/description','AdminRequestsController@getDescription')->name('get.supplies.description');
-    Route::post(config('crudbooster.ADMIN_PATH').'/assets_supplies_inventory/add-supplies-inventory','AdminRequestsController@addSuppliesInventory')->name('add.supplies.inventory');
-    Route::post(config('crudbooster.ADMIN_PATH').'/assets_supplies_inventory/restrict-request-asset','AdminRequestsController@restrictSuppliesRequest')->name('restrict-request-asset');
+    Route::get('/admin/assets_smallwares_inventory/supplies-inventory-upload','AdminAssetsSuppliesInventoryController@UploadSuppliesInventory');
+    Route::post('/admin/assets_smallwares_inventory/upload-supplies-inventory','AdminAssetsSuppliesInventoryController@SuppliesInventoryUpload')->name('upload-supplies-inventory');
+    Route::get('/admin/assets_smallwares_inventory/upload-supplies-inventory-template','AdminAssetsSuppliesInventoryController@downloadSuppliesInventoryTemplate');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_smallwares_inventory/description','AdminRequestsController@getDescription')->name('get.supplies.description');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_smallwares_inventory/add-supplies-inventory','AdminRequestsController@addSuppliesInventory')->name('add.supplies.inventory');
+    Route::post(config('crudbooster.ADMIN_PATH').'/assets_smallwares_inventory/restrict-request-asset','AdminRequestsController@restrictSuppliesRequest')->name('restrict-request-asset');
 
     //POSITION
 

@@ -4,6 +4,7 @@
 	use Request;
 	use DB;
 	use CRUDBooster;
+	use App\Assets;
 	use App\Users;
 	use App\HeaderRequest;
 	use App\BodyRequest;
@@ -16,6 +17,7 @@
 	use App\AssetsInventoryBody;
 	use App\Exports\ExportTamReportList;
 	use App\Models\AssetsSuppliesInventory;
+	use App\Models\AssetsSmallwaresInventory;
 	use App\Models\AssetsNonTradeInventory;
 	use App\Models\AssetsNonTradeInventoryReserved;
 	use App\Models\AssetsInventoryReserved;
@@ -28,6 +30,7 @@
 	use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 	use Illuminate\Support\Facades\Response;
 	use Carbon\Carbon;
+	use App\Models\ItemsSmallwares;
 
 	class AdminHeaderRequestController extends \crocodicstudio\crudbooster\controllers\CBController {
 		private $pending;   		
@@ -134,18 +137,13 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-
-				$pending           = DB::table('statuses')->where('id', 1)->value('id');
-				$released  = 		DB::table('statuses')->where('id', 12)->value('id');
-
 				$this->addaction[] = ['title'=>'Cancel Request',
 				'url'=>CRUDBooster::mainpath('getRequestCancel/[id]'),
 				'icon'=>'fa fa-times', 
-				"showIf"=>"[status_id] == $pending",
+				"showIf"=>"[status_id] == $this->pending",
 				'confirmation'=>'yes',
 				'confirmation_title'=>'Confirm Voiding',
 				'confirmation_text'=>'Are you sure to VOID this request?'];
-				//$this->addaction[] = ['title'=>'Receive Asset','url'=>CRUDBooster::mainpath('getRequestReceive/[id]'),'icon'=>'fa fa-check', "showIf"=>"[status_id] == $released"];
 				$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getEdit/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == ".self::returnForApproval.""];
 			
 			}
@@ -196,34 +194,9 @@
 				}
 				$this->index_button[] = ["label"=>"IT Asset Request","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-requisition'),"color"=>"success"];
 				$this->index_button[] = ["label"=>"FA Request","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-requisition-fa'),"color"=>"success"];
-				// $this->index_button[] = ["label"=>"Non Trade","icon"=>"fa fa-files-o","url"=>CRUDBooster::mainpath('add-requisition-non-trade'),"color"=>"success"];
+				$this->index_button[] = ["label"=>"Smallwares Request","icon"=>"fa fa-plus-circle","url"=>CRUDBooster::mainpath('add-requisition-smallwares'),"color"=>"success"];
 			
 			}
-
-
-
-
-	        /* 
-	        | ---------------------------------------------------------------------- 
-	        | Customize Table Row Color
-	        | ----------------------------------------------------------------------     
-	        | @condition = If condition. You may use field alias. E.g : [id] == 1
-	        | @color = Default is none. You can use bootstrap success,info,warning,danger,primary.        
-	        | 
-	        */
-	        $this->table_row_color = array();     	          
-
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | You may use this bellow array to add statistic at dashboard 
-	        | ---------------------------------------------------------------------- 
-	        | @label, @count, @icon, @color 
-	        |
-	        */
-	        $this->index_statistic = array();
-
-
 
 	        /*
 	        | ---------------------------------------------------------------------- 
@@ -235,17 +208,6 @@
 	        */
 	        $this->script_js = NULL;
 			$this->script_js = "
-				// $('.fa.fa-times').click(function(){
-				// 	var strconfirm = confirm('Are you sure you want to cancel this request?');
-				// 	if (strconfirm == true) {
-				// 		return true;
-				// 	}else{
-				// 		return false;
-				// 		window.stop();
-				// 	}
-				// });
-				
-				
 				$('.fa.fa-check').click(function(){
 					var strconfirm = confirm('Are you sure you want to close this request?');
 					if (strconfirm == true) {
@@ -257,89 +219,11 @@
 				});	
 			";
 			
-
-            /*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code before index table 
-	        | ---------------------------------------------------------------------- 
-	        | html code to display it before index table
-	        | $this->pre_index_html = "<p>test</p>";
-	        |
-	        */
-	        $this->pre_index_html = null;
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include HTML Code after index table 
-	        | ---------------------------------------------------------------------- 
-	        | html code to display it after index table
-	        | $this->post_index_html = "<p>test</p>";
-	        |
-	        */
-	        $this->post_index_html = null;
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include Javascript File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your javascript each array 
-	        | $this->load_js[] = asset("myfile.js");
-	        |
-	        */
-	        $this->load_js = array();
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Add css style at body 
-	        | ---------------------------------------------------------------------- 
-	        | css code in the variable 
-	        | $this->style_css = ".style{....}";
-	        |
-	        */
-	        $this->style_css = NULL;
-	        
-	        
-	        
-	        /*
-	        | ---------------------------------------------------------------------- 
-	        | Include css File 
-	        | ---------------------------------------------------------------------- 
-	        | URL of your css each array 
-	        | $this->load_css[] = asset("myfile.css");
-	        |
-	        */
 	        $this->load_css = array();
 	        $this->load_css[] = asset("css/font-family.css");
 	        
 	    }
 
-
-	    /*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for button selected
-	    | ---------------------------------------------------------------------- 
-	    | @id_selected = the id selected
-	    | @button_name = the name of button
-	    |
-	    */
-	    public function actionButtonSelected($id_selected,$button_name) {
-	        //Your code here      
-	    }
-
-
-	    /*
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate query of index result 
-	    | ---------------------------------------------------------------------- 
-	    | @query = current sql query 
-	    |
-	    */
 	    public function hook_query_index(&$query) {
 	        //Your code here
 			if(CRUDBooster::isSuperadmin()){
@@ -489,7 +373,7 @@
 				$postdata['approved_by'] 		    = CRUDBooster::myId();
 				$postdata['approved_at'] 		    = date('Y-m-d H:i:s');	
 			}else{
-				$postdata['status_id']		 			= StatusMatrix::where('current_step', 1)
+				$postdata['status_id']		 		= StatusMatrix::where('current_step', 1)
 																		->where('request_type', $request_type_id)
 																		//->where('id_cms_privileges', CRUDBooster::myPrivilegeId())
 																		->value('status_id');
@@ -611,9 +495,9 @@
 			    //manager replenishment
 				$arf_body = BodyRequest::where(['header_request_id' => $arf_header->id])->whereNull('deleted_at')->get();
 				if(in_array(CRUDBooster::myPrivilegeId(), [11,12,14,15])){ 
-					if(in_array($request_type_id, [7])){
+					if(in_array($request_type_id, [10])){
 						//Get the inventory value per digits code
-						$arraySearch = DB::table('assets_supplies_inventory')->select('*')->get()->toArray();
+						$arraySearch = DB::table('assets_smallwares_inventory')->select('*')->get()->toArray();
 										
 						$finalBodyValue = [];
 						foreach($arf_body as $bodyfKey => $bodyVal){
@@ -642,7 +526,7 @@
 									'unserved_rep_qty'   =>  $fBodyVal['quantity'],
 									'unserved_ro_qty'    =>  NULL
 								]);	
-								DB::table('assets_supplies_inventory')
+								DB::table('assets_smallwares_inventory')
 								->where('digits_code', $fBodyVal['digits_code'])
 								->decrement('quantity', $fBodyVal['quantity']);
 							}else{
@@ -657,7 +541,7 @@
 									'unserved_rep_qty'   =>  $fBodyVal['inv_value']->quantity,
 									'unserved_ro_qty'    =>  $reorder
 								]);	
-								AssetsSuppliesInventory::where('digits_code', $fBodyVal['digits_code'])
+								AssetsSmallwaresInventory::where('digits_code', $fBodyVal['digits_code'])
 								->update([
 									'quantity'   =>  0,
 								]);	
@@ -665,108 +549,108 @@
 						}
 					}else if(in_array($request_type_id, [9])){
 						//GET ASSETS NON TRADE INVENTORY AVAILABLE COUNT
-					$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
-					//GET RESERVED QTY 
-					$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+						$inventoryList = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->groupBy('digits_code')->get();
+						//GET RESERVED QTY 
+						$reservedList = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code',DB::raw('SUM(approved_qty) as reserved_qty'))->whereNotNull('reserved')->groupBy('digits_code')->get()->toArray();
+						
+						$resultInventory = [];
+						foreach($inventoryList as $invKey => $invVal){
+							$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
+							if($i !== false){
+								$invVal->reserved_value = $reservedList[$i];
+								$resultInventory[] = $invVal;
+							}else{
+								$invVal->reserved_value = "";
+								$resultInventory[] = $invVal;
+							}
+						}
+						//get the final available qty
+						$finalInventory = [];
+						foreach($resultInventory as $fKey => $fVal){
+							$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
+							$finalInventory[] = $fVal;
+						}
+
+						$finalItFaBodyValue = [];
+						foreach($arf_body as $bodyItFafKey => $bodyItFaVal){
+							$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
+							if($i !== false){
+								$bodyItFaVal->inv_qty = $finalInventory[$i];
+								$finalItFaBodyValue[] = $bodyItFaVal;
+							}else{
+								$bodyItFaVal->inv_qty = "";
+								$finalItFaBodyValue[] = $bodyItFaVal;
+							}
+						}
 					
-					$resultInventory = [];
-					foreach($inventoryList as $invKey => $invVal){
-						$i = array_search($invVal->digits_code, array_column($reservedList,'digits_code'));
-						if($i !== false){
-							$invVal->reserved_value = $reservedList[$i];
-							$resultInventory[] = $invVal;
-						}else{
-							$invVal->reserved_value = "";
-							$resultInventory[] = $invVal;
+						foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
+							$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+							$reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
+							$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
+				
+							if($available_quantity >= $fBodyItFaVal->quantity){
+								//add to reserved taable
+								AssetsNonTradeInventoryReserved::Create(
+									[
+										'reference_number'    => $arf_header->reference_number, 
+										'body_id'             => $fBodyItFaVal->id,
+										'digits_code'         => $fBodyItFaVal->digits_code, 
+										'approved_qty'        => $fBodyItFaVal->quantity,
+										'reserved'            => $fBodyItFaVal->quantity,
+										'for_po'              => NULL,
+										'created_by'          => CRUDBooster::myId(),
+										'created_at'          => date('Y-m-d H:i:s'),
+										'updated_by'          => CRUDBooster::myId(),
+										'updated_at'          => date('Y-m-d H:i:s')
+									]
+								); 
+								
+								//update details in body table
+								BodyRequest::where('id', $fBodyItFaVal->id)
+								->update([
+									'replenish_qty'      =>  $fBodyItFaVal->quantity,
+									'reorder_qty'        =>  NULL,
+									'serve_qty'          =>  NULL,
+									'unserved_qty'       =>  $fBodyItFaVal->quantity,
+									'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
+									'unserved_ro_qty'    =>  NULL
+								]);	
+
+								HeaderRequest::where('id',$id)
+								->update([
+									'to_mo' => 1
+								]);
+								
+							}else{
+								$reorder = $fBodyItFaVal->quantity - $available_quantity;
+								AssetsNonTradeInventoryReserved::Create(
+									[
+										'reference_number'    => $arf_header->reference_number, 
+										'body_id'             => $fBodyItFaVal->id,
+										'digits_code'         => $fBodyItFaVal->digits_code, 
+										'approved_qty'        => $fBodyItFaVal->quantity,
+										'reserved'            => NULL,
+										'for_po'              => 1,
+										'created_by'          => CRUDBooster::myId(),
+										'created_at'          => date('Y-m-d H:i:s'),
+										'updated_by'          => CRUDBooster::myId(),
+										'updated_at'          => date('Y-m-d H:i:s')
+									]
+								);  
+
+								BodyRequest::where('id', $fBodyItFaVal->id)
+								->update([
+									'replenish_qty'      =>  $available_quantity,
+									'reorder_qty'        =>  $reorder,
+									'serve_qty'          =>  NULL,
+									'unserved_qty'       =>  $fBodyItFaVal->quantity,
+									'unserved_rep_qty'   =>  $available_quantity,
+									'unserved_ro_qty'    =>  $reorder
+								]);	
+
+								
+							}
 						}
-					}
-					//get the final available qty
-					$finalInventory = [];
-					foreach($resultInventory as $fKey => $fVal){
-						$fVal->available_qty = max($fVal->avail_qty - $fVal->reserved_value->reserved_qty,0);
-						$finalInventory[] = $fVal;
-					}
-
-					$finalItFaBodyValue = [];
-					foreach($arf_body as $bodyItFafKey => $bodyItFaVal){
-						$i = array_search($bodyItFaVal['digits_code'], array_column($finalInventory,'digits_code'));
-						if($i !== false){
-							$bodyItFaVal->inv_qty = $finalInventory[$i];
-							$finalItFaBodyValue[] = $bodyItFaVal;
-						}else{
-							$bodyItFaVal->inv_qty = "";
-							$finalItFaBodyValue[] = $bodyItFaVal;
-						}
-					}
-                   
-					foreach($finalItFaBodyValue as $fBodyItFaKey => $fBodyItFaVal){
-						$countAvailQty = DB::table('assets_non_trade_inventory_body')->select('digits_code as digits_code','quantity')->where('digits_code',$fBodyItFaVal->digits_code)->first();
-                        $reservedListCount = DB::table('assets_non_trade_inventory_reserved')->select('digits_code as digits_code','approved_qty')->whereNotNull('reserved')->where('digits_code',$fBodyItFaVal->digits_code)->first();
-						$available_quantity = max($countAvailQty->quantity - $reservedListCount->approved_qty,0);
-			
-						if($available_quantity >= $fBodyItFaVal->quantity){
-							//add to reserved taable
-							AssetsNonTradeInventoryReserved::Create(
-								[
-									'reference_number'    => $arf_header->reference_number, 
-									'body_id'             => $fBodyItFaVal->id,
-									'digits_code'         => $fBodyItFaVal->digits_code, 
-									'approved_qty'        => $fBodyItFaVal->quantity,
-									'reserved'            => $fBodyItFaVal->quantity,
-									'for_po'              => NULL,
-									'created_by'          => CRUDBooster::myId(),
-									'created_at'          => date('Y-m-d H:i:s'),
-									'updated_by'          => CRUDBooster::myId(),
-									'updated_at'          => date('Y-m-d H:i:s')
-								]
-							); 
-							
-							//update details in body table
-							BodyRequest::where('id', $fBodyItFaVal->id)
-							->update([
-								'replenish_qty'      =>  $fBodyItFaVal->quantity,
-								'reorder_qty'        =>  NULL,
-								'serve_qty'          =>  NULL,
-								'unserved_qty'       =>  $fBodyItFaVal->quantity,
-								'unserved_rep_qty'   =>  $fBodyItFaVal->quantity,
-								'unserved_ro_qty'    =>  NULL
-							]);	
-
-							HeaderRequest::where('id',$id)
-							->update([
-								'to_mo' => 1
-							]);
-							 
-						}else{
-							$reorder = $fBodyItFaVal->quantity - $available_quantity;
-							AssetsNonTradeInventoryReserved::Create(
-								[
-									'reference_number'    => $arf_header->reference_number, 
-									'body_id'             => $fBodyItFaVal->id,
-									'digits_code'         => $fBodyItFaVal->digits_code, 
-									'approved_qty'        => $fBodyItFaVal->quantity,
-									'reserved'            => NULL,
-									'for_po'              => 1,
-									'created_by'          => CRUDBooster::myId(),
-									'created_at'          => date('Y-m-d H:i:s'),
-									'updated_by'          => CRUDBooster::myId(),
-									'updated_at'          => date('Y-m-d H:i:s')
-								]
-							);  
-
-							BodyRequest::where('id', $fBodyItFaVal->id)
-							->update([
-								'replenish_qty'      =>  $available_quantity,
-								'reorder_qty'        =>  $reorder,
-								'serve_qty'          =>  NULL,
-								'unserved_qty'       =>  $fBodyItFaVal->quantity,
-								'unserved_rep_qty'   =>  $available_quantity,
-								'unserved_ro_qty'    =>  $reorder
-							]);	
-
-							
-					    }
-					}
 					}else{
 						//GET ASSETS INVENTORY AVAILABLE COUNT
 						$inventoryList = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as avail_qty'))->where('statuses_id',6)->groupBy('digits_code')->get();
@@ -885,55 +769,6 @@
 			
 	    }
 
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for manipulate data input before update data is execute
-	    | ---------------------------------------------------------------------- 
-	    | @postdata = input post data 
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_before_edit(&$postdata,$id) {        
-	        //Your code here
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after edit public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_after_edit($id) {
-	        //Your code here 
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command before delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_before_delete($id) {
-	        //Your code here
-
-	    }
-
-	    /* 
-	    | ---------------------------------------------------------------------- 
-	    | Hook for execute command after delete public static function called
-	    | ----------------------------------------------------------------------     
-	    | @id       = current id 
-	    | 
-	    */
-	    public function hook_after_delete($id) {
-	        //Your code here
-
-	    }
-
 	    //By the way, you can still create your own method in here... :) 
 		public function getAddRequisition() {
 			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
@@ -942,6 +777,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Create New IT Asset Request';
+			$data['item_master'] = Assets::getItems()->get();
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
@@ -977,15 +813,8 @@
 
 			$data = [];
 			$data['page_title'] = 'Edit Assets Request';
-			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
 			$data['employeeinfos'] = Users::user($data['user']->id);
-			// $data['categories'] = DB::table('category')->where('category_status', 'ACTIVE')->where('id', 6)->orderby('category_description', 'asc')->get();
-			
-
 			$data['sub_categories'] = DB::table('sub_category')->where('class_status', 'ACTIVE')->where('category_id', 6)->orderby('class_description', 'asc')->get();
 			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();
 			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
@@ -998,9 +827,13 @@
 			$applicationsExplode = explode(",",$data['Header']->application);
 			$data['applicationsExplode'] = array_map('trim', $applicationsExplode);
 			$submaster_details = self::getSubmasters();
-			// dd($data['purposes'],$data['Header']->purpose);
+
 			$data = array_merge($data, $submaster_details);
-			return $this->view("assets.edit-requisition", $data);
+			if(in_array($data['Header']->request_type_id,[1,5])){
+				return $this->view("assets.edit-requisition", $data);
+			}else{
+				return $this->view("smallwares.edit-smallwares-requisition", $data);
+			}
 		}
 
 		public function getAddRequisitionFA() {
@@ -1011,6 +844,7 @@
 
 			$this->cbLoader();
 			$data['page_title'] = 'Create New FA Request';
+			$data['item_master'] = Assets::getItemsFa()->get();
 			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
 			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
 			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
@@ -1038,15 +872,6 @@
 				return $this->view("assets.add-requisition-fa", $data);
 			}
 				
-		}
-
-		public function getSubmasters() {
-			$data = [];
-			$data['fa_categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
-													   ->orderby('category_description', 'asc')
-													   ->first();
-
-			return $data;
 		}
 
 		// public function getAddRequisitionNonTrade() {
@@ -1088,50 +913,47 @@
 		// 	}			
 		// }
 
-		// public function getAddRequisitionSupplies() {
-
-		// 	if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
-		// 		CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
-		// 	}
-		// 	$this->cbLoader();
-		// 	$data['page_title'] = 'Create New Supplies Request';
-		// 	$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
-		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-		// 	$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
-		// 	$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
-		// 	$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
-		// 	$data['employeeinfos'] = DB::table('cms_users')
-		// 								 ->leftjoin('positions', 'cms_users.position_id', '=', 'positions.id')
-		// 								 ->leftjoin('departments', 'cms_users.department_id', '=', 'departments.id')
-		// 								 ->select( 'cms_users.*', 'positions.position_description as position_description', 'departments.department_name as department_name')
-		// 								 ->where('cms_users.id', $data['user']->id)->first();
-		// 	$data['categories'] = DB::table('category')->where('id', 2)->where('category_status', 'ACTIVE')
-		// 											   ->orderby('category_description', 'asc')
-		// 											   ->get();
-		// 	$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->where('category_id', 2)->orderby('class_description', 'asc')->get();
-		// 	$data['item_description'] = DB::table('assets')->where('category_id', 2)
-		// 	                                           //->where('category_status', 'ACTIVE')
-		// 											   ->orderby('item_description', 'asc')
-		// 											   ->get();  
-		// 	$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();	
-		// 	$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
-
-		// 	//$privilegesMatrix = DB::table('cms_privileges')->where('id', '!=', 8)->get();
-		// 	$privilegesMatrix = DB::table('cms_privileges')->get();
-		// 	$privileges_array = array();
-		// 	foreach($privilegesMatrix as $matrix){
-		// 		array_push($privileges_array, $matrix->id);
-		// 	}
-		// 	$privileges_string = implode(",",$privileges_array);
-		// 	$privilegeslist = array_map('intval',explode(",",$privileges_string));
-
-		// 	if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
-		// 		$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
-		// 		$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
-		// 		return $this->view("assets.add-requisition-supplies", $data);
-		// 	}
+		public function getAddRequisitionSmallwares() {
+			if(!CRUDBooster::isCreate() && $this->global_privilege == false) {
+				CRUDBooster::redirect(CRUDBooster::adminPath(), trans('crudbooster.denied_access'));
+			}
+			$this->cbLoader();
+			$data = [];
+			$data['page_title'] = 'Create Small wares';
+			$data['item_master'] = ItemsSmallwares::getItems()->get();
+			$data['user'] = DB::table('cms_users')->where('id', CRUDBooster::myId())->first();
+			$data['employeeinfos'] = Users::user($data['user']->id);
+			$data['categories'] = DB::table('category')->where('id', 2)->where('category_status', 'ACTIVE')->orderby('category_description', 'asc')->get();
+			$data['sub_categories'] = DB::table('class')->where('class_status', 'ACTIVE')->where('category_id', 2)->orderby('class_description', 'asc')->get(); 
+			$privilegesMatrix = DB::table('cms_privileges')->get();
+			$privileges_array = array();
+			foreach($privilegesMatrix as $matrix){
+				array_push($privileges_array, $matrix->id);
+			}
+			$privileges_string = implode(",",$privileges_array);
+			$privilegeslist = array_map('intval',explode(",",$privileges_string));
+			$subMasters = self::getSubmasters();
+			$data = array_merge($data, $subMasters);
+			if(in_array(CRUDBooster::myPrivilegeId(), $privilegeslist)){ 
+				$data['purposes'] = DB::table('request_type')->where('status', 'ACTIVE')->where('privilege', 'Employee')->get();
+				$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
+				return $this->view("smallwares.add-requisition-smallwares", $data);
+			}
 				
-		// }
+		}
+
+		public function getSubmasters() {
+			$data = [];
+			$data['conditions'] = DB::table('condition_type')->where('status', 'ACTIVE')->get();
+			$data['departments'] = DB::table('departments')->where('status', 'ACTIVE')->get();
+			$data['stores'] = DB::table('stores')->where('status', 'ACTIVE')->get();
+			$data['applications'] = DB::table('applications')->where('status', 'ACTIVE')->orderby('app_name', 'asc')->get();	
+			$data['companies'] = DB::table('companies')->where('status', 'ACTIVE')->get();
+			$data['fa_categories'] = DB::table('category')->whereIn('id', [4])->where('category_status', 'ACTIVE')
+													   ->orderby('category_description', 'asc')
+													   ->first();
+			return $data;
+		}
 
 		public function getDetail($id){
 			$this->cbLoader();
@@ -1581,22 +1403,7 @@
 			$data['message']   ='No Item Found!';
 			$data['items'] = array();
 
-			$item = DB::table('assets')
-			->where('assets.digits_code','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
-			->orWhere('assets.item_description','LIKE','%'.$search.'%')->whereNotIn('assets.status',['EOL-DIGITS','INACTIVE'])->whereNotNull('assets.from_dam')
-			->leftjoin('tam_categories', 'assets.tam_category_id','=', 'tam_categories.id')
-			->leftjoin('tam_subcategories','assets.tam_sub_category_id','tam_subcategories.id')
-			->leftjoin('category', 'assets.dam_category_id','=', 'category.id')
-			->leftjoin('sub_category', 'assets.dam_class_id','=', 'sub_category.id')
-			->select(	'assets.*',
-						'assets.id as assetID',
-						'tam_categories.category_description as tam_category_description',
-						'tam_subcategories.subcategory_description as tam_sub_category_description',
-						'category.category_description as dam_category_description',
-						'sub_category.class_description as dam_sub_category_description'
-					)
-			->take(10)
-			->get();
+			$item = Assets::searchItems($search)->take(10)->get();
 
 			$arraySearch = DB::table('assets_inventory_body')->select('digits_code as digits_code',DB::raw('SUM(quantity) as wh_qty'))->where('statuses_id',6)->groupBy('digits_code')->get()->toArray();
 			$items = [];
@@ -1916,6 +1723,53 @@
 			exit;  
 		}
 
+		public function itemSmallwaresSearch(Request $request) {
+			$request = Request::all();
+			$search 		= $request['search'];
+			$data = array();
+			$data['status_no'] = 0;
+			$data['message']   ='No Item Found!';
+			$data['items'] = array();
+
+			$items = ItemsSmallwares::searchItems($search)->take(10)->get();
+
+			$arraySearchUnservedQty = DB::table('body_request')->select('digits_code as digits_code',DB::raw('SUM(unserved_qty) as unserved_qty'))->where('body_request.created_by',CRUDBooster::myId())->groupBy('digits_code')->get()->toArray();
+			$finalItems = [];
+			foreach($items as $itemsKey => $itemsVal){
+				$i = array_search($itemsVal->digits_code, array_column($arraySearchUnservedQty,'digits_code'));
+				if($i !== false){
+					$itemsVal->unserved_qty = $arraySearchUnservedQty[$i];
+					$finalItems[] = $itemsVal;
+				}else{
+					$itemsVal->unserved_qty = "";
+					$finalItems[] = $itemsVal;
+				}
+			}
+			if($finalItems){
+				$data['status'] = 1;
+				$data['problem']  = 1;
+				$data['status_no'] = 1;
+				$data['message']   ='Item Found';
+				$i = 0;
+				foreach ($finalItems as $key => $value) {
+					$return_data[$i]['id']                       = $value->assetID;
+					$return_data[$i]['digits_code']              = $value->tasteless_code ;
+					$return_data[$i]['item_description']         = $value->full_item_description;
+					$return_data[$i]['category_description']     = $value->category_description;
+					$return_data[$i]['subcategory_description']  = $value->subcategory_description;
+					$return_data[$i]['item_cost']                = $value->ttp;
+					$return_data[$i]['wh_qty']                   = $value->wh_qty  ? $value->wh_qty : 0;
+					$return_data[$i]['unserved_qty']             = $value->unserved_qty->unserved_qty  ? $value->unserved_qty->unserved_qty : 0;
+					$i++;
+
+				}
+				$data['items'] = $return_data;
+			}
+
+			echo json_encode($data);
+			exit;  
+		}
+
 		public function cancelArfRequest(Request $request){
 			$data = Request::all();	
 			$id   = $data['id'];
@@ -2044,11 +1898,13 @@
 					'requestor_comments' => $fields['requestor_comments']
 			]);	
 			//UPDATE BODY
-			foreach($fields['body_id'] as $key => $line){
-				BodyRequest::where('id',$line)
-				->update([
-						'budget_range'   => $body_budget_range[$key]
-				]);	
+			if(is_array($body_budget_range)){
+				foreach($fields['body_id'] as $key => $line){
+					BodyRequest::where('id',$line)
+					->update([
+							'budget_range'   => $body_budget_range[$key]
+					]);	
+				}
 			}
 
 			//INSERT NEW LINES

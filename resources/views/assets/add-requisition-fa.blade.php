@@ -217,28 +217,60 @@
                         <textarea placeholder="{{ trans('message.table.comments') }} ..." rows="3" class="form-control finput" name="requestor_comments"></textarea>
                     </div>
                 </div>
-         
             </div>
-
+            <div class="col-md-12">
+                <div class="form-group text-center">
+                    <label>CAN'T FIND WHAT YOU ARE LOOKING FOR?</label>
+                    <a type="button" id="getVersions" data-toggle="modal" data-target="#viewDigitsCode"> VIEW HERE </a> <br>
+                </div>
+            </div>
         </div>
 
         <div class='panel-footer'>
-
             <a href="{{ CRUDBooster::mainpath() }}" class="btn btn-default">{{ trans('message.form.cancel') }}</a>
-
             <button class="btn btn-success pull-right" type="submit" id="btnSubmit"> <i class="fa fa-save" ></i> {{ trans('message.form.create') }}</button>
-
         </div>
-
     </form>
-
-
 </div>
 
-
+{{-- Digits Code Modal --}}
+<div id="viewDigitsCode" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-center"><strong>View Item Code</strong></h4>
+            </div>
+            <div class="modal-body">
+               <table id="asset-items" class="view-digits-code" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Item Code</th>
+                        <th>Item Description</th>
+                        <th>Category</th>
+                        <th>Sub Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($item_master as $items)
+                        <tr>
+                            <td>{{$items->digits_code}}</td>
+                            <td>{{$items->item_description}}</td>
+                            <td>{{$items->tam_category_description}}</td>
+                            <td>{{$items->tam_sub_category_description}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+               </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection
-
 
 @push('bottom')
     <script type="text/javascript">
@@ -255,14 +287,23 @@
         $('#department').select2({})
         var tableRow = 1;
 
+        $(".view-digits-code").DataTable({
+            ordering:false,
+            pageLength:10,
+            scrollCollapse: true,
+            crollX: true,
+            fixedColumns: true,
+            fixedHeader: true,
+            lengthMenu: [
+                [10, 25, 50, 100, -1],
+                [10, 25, 50, 100, "All"],
+            ],
+        });
+
         $(document).ready(function() {
-
-
             $("#add-Row").click(function() {
-
                 var description = "";
                 var count_fail = 0;
-
                 $('.itemDesc').each(function() {
                     description = $(this).val();
                     if (description == null) {

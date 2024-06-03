@@ -41,7 +41,7 @@
 			$this->button_filter = true;
 			$this->button_import = false;
 			$this->button_export = false;
-			$this->table = "assets_supplies_inventory";
+			$this->table = "assets_smallwares_inventory";
 			# END CONFIGURATION DO NOT REMOVE THIS LINE
 
 			# START COLUMNS DO NOT REMOVE THIS LINE
@@ -366,7 +366,7 @@
 		}
 
 		public function UploadSuppliesInventory() {
-			$data['page_title']= 'Assets Supplies Inventory Upload';
+			$data['page_title']= 'Assets Smallwares Inventory Upload';
 			return view('import.asset-supplies-upload', $data)->render();
 		}
 
@@ -374,22 +374,22 @@
 			$path_excel = $request->file('import_file')->store('temp');
 			$path = storage_path('app').'/'.$path_excel;
 			Excel::import(new SuppliesInventoryImport, $path);	
-			CRUDBooster::redirect(CRUDBooster::adminpath('assets_supplies_inventory'), trans("Upload Successfully!"), 'success');
+			CRUDBooster::redirect(CRUDBooster::adminpath('assets_smallwares_inventory'), trans("Upload Successfully!"), 'success');
 		}
 
 		function downloadSuppliesInventoryTemplate() {
 			$arrHeader = [
-				"digits_code"        => "digits_code",
+				"item_code"        => "item_code",
 				"quantity"           => "quantity"
 			];
 			$arrData = [
-				"digits_code"        => "40000054",
+				"item_code"        => "40000054",
 				"quantity"           => "1"
 			];
 			$spreadsheet = new Spreadsheet();
 			$spreadsheet->getActiveSheet()->fromArray(array_values($arrHeader), null, 'A1');
 			$spreadsheet->getActiveSheet()->fromArray($arrData, null, 'A2');
-			$filename = "supplies-inventory";
+			$filename = "smallwares-inventory";
 			header('Content-Type: application/vnd.ms-excel');
 			header('Content-Disposition: attachment;filename="'.$filename.'.xlsx"');
 			header('Cache-Control: max-age=0');
@@ -398,7 +398,7 @@
 		}	
 
 		public function getSuppliesInventoryExport(){
-			return Excel::download(new ExportSuppliesInventory, 'SuppliesInventory.xlsx');
+			return Excel::download(new ExportSuppliesInventory, 'SmallwaresInventory.xlsx');
 		}
 
 		//SUPPLIES REQUEST RESTRICTION
