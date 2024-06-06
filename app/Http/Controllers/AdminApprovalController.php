@@ -79,8 +79,8 @@
 				
 				$pending           = DB::table('statuses')->where('id', 1)->value('id');
 
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApproval/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] != 7"];
-				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalSupplies/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] == 7"];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApproval/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] != 10"];
+				$this->addaction[] = ['title'=>'Update','url'=>CRUDBooster::mainpath('getRequestApprovalSupplies/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status_id] == $pending && [request_type_id] == 10"];
 				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
 			}
 
@@ -720,10 +720,10 @@
 						)
 				->where('header_request.id', $id)->first();
 
-			$body = BodyRequest::leftjoin('assets_supplies_inventory', 'body_request.digits_code','=', 'assets_supplies_inventory.digits_code')
+			$body = BodyRequest::leftjoin('assets_smallwares_inventory', 'body_request.digits_code','=', 'assets_smallwares_inventory.digits_code')
 				->select(
 				  'body_request.*',
-				  'assets_supplies_inventory.quantity as wh_qty'
+				  'assets_smallwares_inventory.quantity as wh_qty'
 				)
 				->where('body_request.header_request_id', $id)
 				->whereNull('deleted_at')
@@ -761,7 +761,7 @@
 			}
 
 			$data['Body'] = $finalInventory;
-	
+			
 			return $this->view("assets.approval-request", $data);
 		}
 

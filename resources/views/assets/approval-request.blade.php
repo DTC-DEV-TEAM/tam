@@ -144,7 +144,7 @@
                             <td style="text-align:center">{{$rowresult->category_id}}</td>
                             <td style="text-align:center">{{$rowresult->sub_category_id}}</td>
 
-                            @if(in_array($Header->request_type_id, [6,7,9]))  
+                            @if(in_array($Header->request_type_id, [6,7,9,10]))  
                                 <td style="text-align:center" class="wh_qty">{{$rowresult->wh_qty ? $rowresult->wh_qty : 0}}</td>
                             @else
                                 <td style="text-align:center" class="wh_qty">{{$rowresult->available_qty ? $rowresult->available_qty : 0}}</td>

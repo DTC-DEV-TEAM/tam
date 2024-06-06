@@ -202,7 +202,7 @@
                                             <th width="10%" class="text-center">{{ trans('message.table.sub_category_id_text') }}</th> 
                                             <th width="5%" class="text-center">{{ trans('message.table.quantity_text') }}</th> 
                                             
-                                            @if(in_array($Header->request_type_id, [6,7]))       
+                                            @if(in_array($Header->request_type_id, [6,7,10]))       
                                                 <th width="5%" class="text-center">For Replenish Qty</th> 
                                                 <th width="5%" class="text-center">For ReOrder Qty</th> 
                                                 <th width="5%" class="text-center">Fulfilled Qty</th> 
@@ -245,7 +245,7 @@
                                                                     {{-- <input type='hidden' name="quantity" class="form-control text-center quantity_item" id="quantity" readonly value="{{$rowresult->quantity}}">
                                                                     <input type='hidden' name="quantity_body" id="quantity{{$tableRow}}" readonly value="{{$rowresult->quantity}}"> --}}
                                                                 </td>
-                                                                @if(in_array($Header->request_type_id, [6,7]))
+                                                                @if(in_array($Header->request_type_id, [6,7,10]))
                                                                     <td style="text-align:center" class="rep_qty">{{$rowresult->replenish_qty ? $rowresult->replenish_qty : 0}}</td>  
                                                                     <td style="text-align:center" class="ro_qty">{{$rowresult->reorder_qty ? $rowresult->reorder_qty : 0}}</td>                                                           
                                                                     <td style="text-align:center" class="served_qty">{{$rowresult->serve_qty ? $rowresult->serve_qty : 0}}</td>
@@ -280,7 +280,7 @@
                                                                         {{-- <input type='hidden' name="quantity" class="form-control text-center quantity_item" id="quantity" readonly value="{{$rowresult->quantity}}">
                                                                         <input type='hidden' name="quantity_body" id="quantity{{$tableRow}}" readonly value="{{$rowresult->quantity}}"> --}}
                                                                 </td>
-                                                                @if(in_array($Header->request_type_id, [6,7]))
+                                                                @if(in_array($Header->request_type_id, [6,7,10]))
                                                                     <td style="text-align:center" class="rep_qty">{{$rowresult->replenish_qty ? $rowresult->replenish_qty : 0}}</td>  
                                                                     <td style="text-align:center" class="ro_qty">{{$rowresult->reorder_qty ? $rowresult->reorder_qty : 0}}</td>                                                           
                                                                     <td style="text-align:center" class="served_qty">{{$rowresult->serve_qty ? $rowresult->serve_qty : 0}}</td>
