@@ -256,7 +256,7 @@
 	        if(CRUDBooster::isSuperadmin()){
 				$query->whereNull('header_request.deleted_at')
 				      ->where('header_request.status_id', $this->forClosing)
-					  ->where('header_request.request_type_id',7)
+					  ->where('header_request.request_type_id',10)
 					  ->orderBy('header_request.status_id', 'ASC')
 					  ->orderBy('header_request.id', 'DESC');
 
@@ -269,7 +269,7 @@
 					$sub_query->where('header_request.created_by', CRUDBooster::myId())
 					          ->where('header_request.status_id', $this->forClosing)
 	                          ->whereNull('header_request.deleted_at')
-							  ->where('header_request.request_type_id',7); 
+							  ->where('header_request.request_type_id',10); 
 				});
 
 				$query->orderBy('header_request.status_id', 'asc')->orderBy('header_request.id', 'DESC');
