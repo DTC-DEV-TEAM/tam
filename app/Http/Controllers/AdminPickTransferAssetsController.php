@@ -10,7 +10,7 @@
 	use App\CommentsGoodDefect;
 	use App\GoodDefectLists;
 	class AdminPickTransferAssetsController extends \crocodicstudio\crudbooster\controllers\CBController {
-
+		private const forTurnOver = 24;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -77,10 +77,9 @@
 	        */
 	        $this->addaction = array();
 			if(CRUDBooster::isUpdate()) {
-				
-				$forturnover           = DB::table('statuses')->where('id', 24)->value('id');
-
-				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == $forturnover"];
+				$forturnover = self::forTurnOver;
+				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingTransfer/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == $forturnover && [privilege_id] == 8"];
+				$this->addaction[] = ['title'=>'Receive','url'=>CRUDBooster::mainpath('getRequestPickingItTransfer/[id]'),'icon'=>'fa fa-edit', "showIf"=>"[status] == $forturnover && [privilege_id] != 8"];
 				//$this->addaction[] = ['title'=>'Edit','url'=>CRUDBooster::mainpath('getRequestEdit/[id]'),'icon'=>'fa fa-pencil', "showIf"=>"[status_id] == $Rejected"]; //, "showIf"=>"[status_level1] == $inwarranty"
 			}
 
@@ -254,8 +253,10 @@
 			$query->where('return_transfer_assets_header.transfer_to', $locationList)
 			        ->whereIn('return_transfer_assets_header.status', [24,25,13]) 
 					->whereNotNull('return_transfer_assets_header.transfer_to')
-					->orderBy('return_transfer_assets_header.id', 'ASC');
-
+					->orderBy('return_transfer_assets_header.id', 'ASC')
+					->leftJoin('cms_users as user','return_transfer_assets_header.requested_by','user.id')
+					->addSelect('user.id_cms_privileges AS privilege_id');
+		
 	            
 	    }
 
@@ -478,6 +479,20 @@
 			return $this->view("assets.transfer-picking-request", $data);
 		}
 
+		public function getRequestPickingItTransfer($id){
+			if(!CRUDBooster::isUpdate() && $this->global_privilege==FALSE) {    
+				CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
+			}  
+
+			$data = array();
+			$data['page_title'] = 'Asset Transfer Receiving';
+			$data['Header'] = ReturnTransferAssetsHeader::detail($id)->first();
+			$data['return_body'] = ReturnTransferAssets::detailForReturnReceiving($id)->get();		
+			// dd($data['return_body']);
+			$data['good_defect_lists'] = GoodDefectLists::all();
+			return $this->view("assets.transfer-it-picking-request", $data);
+		}
+
 		public function getDetail($id){
             if(!CRUDBooster::isRead() && $this->global_privilege==FALSE) {    
                 CRUDBooster::redirect(CRUDBooster::adminPath(),trans("crudbooster.denied_access"));
@@ -490,6 +505,117 @@
 			$data['return_body'] = ReturnTransferAssets::detail($id)->get();	
 			$data['stores'] = DB::table('locations')->where('id', $data['user']->location_id)->first();
 			return $this->view("assets.view-return-details", $data);
+		}
+
+		public function saveStoreTransfer(Request $request){
+			$fields = Request::all();
+			$id = $fields['header_id'];
+			$selectedItem       = $fields['item_to_receive_id'];
+			$selectedItem_array = array();
+			foreach($selectedItem as $select){
+				array_push($selectedItem_array, $select);
+			}
+			$selectedItem_string = implode(",",$selectedItem_array);
+			$selectedItemlist = array_map('intval',explode(",",$selectedItem_string));
+
+			$getSelectedItemList = DB::table('return_transfer_assets')->whereIn('id',$selectedItemlist)->get();
+
+			//MO ID, Item ID
+			$mo_id       = [];
+			$item_id     = [];
+			$arf_number  = [];
+	
+			foreach($getSelectedItemList as $selectItem){
+				array_push($mo_id, $selectItem->mo_id);
+				array_push($item_id, $selectItem->id);
+				array_push($arf_number, $selectItem->reference_no);
+		
+			}
+
+			// $filter_good_text 		    = array_filter($fields['good_text'], fn($value) => !is_null($value) && $value !== '');
+			// $good_text                  = array_values($filter_good_text);
+			// $filter_defective_text 		= array_filter($fields['defective_text'], fn($value) => !is_null($value) && $value !== '');
+			// $defective_text             = array_values($filter_defective_text);
+			
+			//good and defect value
+			$comments = $fields['comments'];
+			$other_comment = $fields['other_comment'];
+        
+			$arf_header 	= ReturnTransferAssetsHeader::where(['id' => $id])->first();
+			
+			$inventory_id 	= MoveOrder::whereIn('id',$mo_id)->get();
+
+			$finalinventory_id = [];
+			$mo_item_id = [];
+			$digits_code = [];
+            $asset_code = [];
+            $item_description = [];
+            $category = [];
+            $serial_no = [];
+            $unit_cost = [];
+			$request_type_id_mo = [];
+			foreach($inventory_id as $invData){
+				array_push($finalinventory_id, $invData['inventory_id']);
+				array_push($mo_item_id, $invData['item_id']);
+				array_push($digits_code, $invData['digits_code']);
+                array_push($asset_code, $invData['asset_code']);
+                array_push($item_description, $invData['item_description']);
+                array_push($category, $invData['category_id']);
+                array_push($serial_no, $invData['serial_no']);
+                array_push($unit_cost, $invData['unit_cost']);
+				array_push($request_type_id_mo, $invData['request_type_id_mo']);
+			}
+			$employee_name = DB::table('cms_users')->where('id', $arf_header->transfer_to)->first();
+
+			for($x=0; $x < count((array)$item_id); $x++) {
+				$to_close  = DB::table('statuses')->where('id',25)->value('id');
+				
+				ReturnTransferAssets::where('id',$selectedItemlist[$x])
+				->update([
+						'status' => $to_close
+				]);	
+
+				$countItem = ReturnTransferAssets::where('return_header_id',$id)->where('status',24)->count();
+				
+				ReturnTransferAssetsHeader::where('id', $id)
+				->update([
+					'received_by' => CRUDBooster::myId(),
+					'received_at' => date('Y-m-d H:i:s')
+				]);	
+
+				if($countItem == 0){
+					ReturnTransferAssetsHeader::where('id', $id)
+					->update([
+						'status'          => $to_close
+					]);	
+				}
+			
+				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])
+				->update([
+					'statuses_id'        => 3,
+					'deployed_to'        => $employee_name->bill_to,
+					'deployed_to_id'     => NULL,
+					'location'           => 4
+				]);
+				
+				DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])->update(['quantity'=>0]);
+				MoveOrder::create([
+					'status_id'           => 13,
+					'mo_reference_number' => $arf_header->reference_no,
+					'inventory_id'        => $finalinventory_id[$x],
+					'item_id'             => $mo_item_id[$x],
+					'request_created_by'  => $employee_name->id,
+					'request_type_id_mo'  => $request_type_id_mo[$x],
+					'digits_code'         => $digits_code[$x],
+					'asset_code'          => $asset_code[$x],
+					'item_description'    => $item_description[$x],
+					'category_id'         => $category[$x],
+					'serial_no'           => $serial_no[$x],
+					'quantity'            => 1,
+					'unit_cost'           => $unit_cost[$x],
+				]);
+			}
+			CRUDBooster::redirect(CRUDBooster::mainpath(), trans("Received!"), 'success');
 		}
 
 	}

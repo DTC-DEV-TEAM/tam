@@ -156,4 +156,5 @@ class ReturnTransferAssets extends Model
 		->where('return_transfer_assets.status', 24)
 		->whereNull('return_transfer_assets.archived');
 	}
+	
 }
