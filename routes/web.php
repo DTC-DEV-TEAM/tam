@@ -172,7 +172,12 @@ Route::group(['middleware' => ['web']], function() {
     Route::get('admin/return_transfer_assets_header/getRequestCancelReturn/{id}','AdminReturnTransferAssetsHeaderController@getRequestCancelReturn')->name('getRequestCancelReturn');
     Route::get('/admin/return_approval/getRequestApprovalReturn/{id}','AdminReturnApprovalController@getRequestApprovalReturn')->name('approval-request-return');
     Route::get('/admin/return_close/getRequestClosingReturn/{id}','AdminReturnCloseController@getRequestClosingReturn')->name('return-closing-request');
+    //IT
     Route::get('/admin/return_picking/getRequestPickingReturn/{id}','AdminReturnPickingController@getRequestPickingReturn')->name('return-picking-request');
+    //ADMIN
+    Route::get('/admin/return_picking/getRequestPickingAdminReturn/{id}','AdminReturnPickingController@getRequestPickingAdminReturn')->name('return-picking-admin-request');
+    Route::post(config('crudbooster.ADMIN_PATH').'/admin-pick-return-request','AdminReturnPickingController@saveAdminPicking')->name('admin-pick-return-request');
+
     Route::get('/admin/return_transfer_assets_header/getRequestPrintTF/{id}','AdminReturnTransferAssetsHeaderController@getRequestPrintTF')->name('print-request-tf');
     Route::get('/admin/return_approval/getRequestForVerificationReturn/{id}','AdminReturnApprovalController@getRequestForVerificationReturn')->name('verification-request-return');
     Route::post(config('crudbooster.ADMIN_PATH').'/return_transfer_assets_header','AdminReturnApprovalController@submitForVerificationReturn')->name('submit-for-verification-return');
@@ -187,6 +192,8 @@ Route::group(['middleware' => ['web']], function() {
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/transfer-assets', 'AdminReturnTransferAssetsHeaderController@getTransferAssets')->name('assets.transfer.assets'); 
     Route::post(config('crudbooster.ADMIN_PATH').'/transfer_assets/save-transfer-assets','AdminReturnTransferAssetsHeaderController@saveTransferAssets')->name('assets.save.transfer.assets');
     Route::get('/admin/pick_transfer_assets/getRequestPickingTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingTransfer')->name('transfer-picking-request');
+    Route::get('/admin/pick_transfer_assets/getRequestPickingItTransfer/{id}','AdminPickTransferAssetsController@getRequestPickingItTransfer')->name('transfer-it-picking-request');
+    Route::post(config('crudbooster.ADMIN_PATH').'/store-pick-transfer-request','AdminPickTransferAssetsController@saveStoreTransfer')->name('store-pick-transfer-request');
 
     //ASSET RETURN NON TRADE
     Route::get(config('crudbooster.ADMIN_PATH').'/return_transfer_assets/return-nontrade-assets', 'AdminReturnTransferAssetsHeaderController@getReturnNonTradeAssets')->name('assets.return.non.trade.assets'); 

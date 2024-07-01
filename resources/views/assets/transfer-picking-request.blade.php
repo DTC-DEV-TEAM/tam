@@ -41,9 +41,10 @@
         Request Form
     </div>
 
-    <form method='post' id="myform" action='{{CRUDBooster::mainpath('edit-save/'.$Header->requestid)}}'>
+    <form method='post' id="myform" action='{{route('store-pick-transfer-request')}}'>
         <input type="hidden" value="{{csrf_token()}}" name="_token" id="token">
         <input type="hidden" value="0" name="action" id="action">
+        <input type="hidden" value="{{$Header->requestid}}" name="header_id" id="header_id">
         <input type="hidden" value="{{$Header->request_type_id}}" name="request_type_id" id="request_type_id">
 
         <div class='panel-body'>

@@ -22,6 +22,7 @@
 		private const ForVerification    = 29;
 		private const ToSchedule         = 48;
 		private const returnForApproval  = 49;
+		private const storePrivilegeId   = 8;
 	    public function cbInit() {
 
 			# START CONFIGURATION DO NOT REMOVE THIS LINE
@@ -113,6 +114,7 @@
 			$approval_action   = $fields['approval_action'];
 			$approver_comments = $fields['approver_comments'];
 			$header 	       = ReturnTransferAssetsHeader::where('id',$header_id)->first();
+			$requestor         = DB::table('cms_users')->where('id',$header->requested_by)->first();
 			$inventory_id 	   = MoveOrder::whereIn('id',$mo_id)->get();
 			$finalinventory_id = [];
 			foreach($inventory_id as $invData){
@@ -122,13 +124,22 @@
 			if($approval_action  == 1){
 				for($x=0; $x < count((array)$mo_id); $x++) {
 	
-					$postdata['status']		 	    = self::ForVerification;
+				
 					$postdata['approved_by'] 		= CRUDBooster::myId();
 					$postdata['approved_date'] 		= date('Y-m-d H:i:s');
-					ReturnTransferAssets::where(['return_header_id'=>$id, 'archived'=> NULL])
-					->update([
-							'status' => self::ForVerification
-					]);	
+					if(in_array($header->request_type_id, [1,8]) && !in_array($requestor->id_cms_privileges,[8])){
+						$postdata['status']	= self::ForTurnOver;
+						ReturnTransferAssets::where(['return_header_id'=>$id, 'archived'=> NULL])
+						->update([
+								'status' => self::ForTurnOver
+						]);	
+					}else{
+						$postdata['status']	= self::ForVerification;
+						ReturnTransferAssets::where(['return_header_id'=>$id, 'archived'=> NULL])
+						->update([
+								'status' => self::ForVerification
+						]);	
+					}
 					if(in_array($header->request_type_id, [1,5,8])){
 						if(in_array($header->request_type_id, [1,5])){
 							DB::table('assets_inventory_body')->where('id', $finalinventory_id[$x])

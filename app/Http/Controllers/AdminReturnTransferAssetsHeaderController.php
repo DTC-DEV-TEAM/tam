@@ -296,7 +296,7 @@
 					$conHeader['approved_date'] = date('Y-m-d H:i:s');
 				}
 				if($hData == 1){
-					$conHeader['location_to_pick'] = $asset_location_id[$hKey]; 
+					$conHeader['location_to_pick'] = 3;
 				}else{
 					$conHeader['location_to_pick'] = $asset_location_id[$hKey];
 				}
